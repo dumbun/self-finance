@@ -6,7 +6,6 @@ import 'package:self_finance/fonts/bodySmallText.dart';
 import 'package:self_finance/fonts/bodyTwoDefaultText.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/fonts/strognHeadingOneText.dart';
-import 'package:self_finance/widgets/roundCornerButton.dart';
 
 class TermsAndConditons extends StatefulWidget {
   const TermsAndConditons({super.key});
