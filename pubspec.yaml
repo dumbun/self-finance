@@ -1,7 +1,6 @@
 name: self_finance
-description: A new Flutter project.
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
+description: It is a finance data storing app. Which help the user to save there coustomer details and calculate the intrest in real time, It is an offline app so the data will be safe inside the device , this app can run in windows, Andriod and IOS.
+
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
