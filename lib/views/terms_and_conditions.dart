@@ -54,7 +54,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
               }
             : null,
         child: const BodyTwoDefaultText(
-          text: "• Next",
+          text: "Next",
           color: getBackgroundColor,
           bold: true,
         ),
@@ -178,11 +178,13 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     );
   }
 
-  Container _getIcon() {
-    return Container(
-      margin: EdgeInsets.only(top: 32.sp, bottom: 28.sp),
-      child: SvgPicture.asset(
-        "assets/icon/iconWithOutBackground.svg",
+  Center _getIcon() {
+    return Center(
+      child: Container(
+        margin: EdgeInsets.only(top: 32.sp, bottom: 28.sp),
+        child: SvgPicture.asset(
+          "assets/icon/iconWithOutBackground.svg",
+        ),
       ),
     );
   }
