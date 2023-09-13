@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/constants/terms_and_conditions_api.dart';
 import 'package:self_finance/fonts/bodySmallText.dart';
 import 'package:self_finance/fonts/bodyTwoDefaultText.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/fonts/strognHeadingOneText.dart';
+import 'package:self_finance/widgets/app_icon.dart';
+import 'package:self_finance/widgets/round_corner_button.dart';
 
 class TermsAndConditons extends StatefulWidget {
   const TermsAndConditons({super.key});
@@ -28,16 +30,18 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
       body: Container(
         padding: EdgeInsets.all(24.sp),
         width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _getIcon(),
-            _getHeading(),
-            _space(),
-            _getTermsAndConditions(),
-            _getNextButton(),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _getIcon(),
+              _getHeading(),
+              _space(),
+              _getTermsAndConditions(),
+              _getNextButton(),
+            ],
+          ),
         ),
       ),
     );
@@ -47,17 +51,9 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     return Container(
       margin: EdgeInsets.only(top: 20.sp),
       width: double.infinity,
-      child: ElevatedButton(
-        onPressed: ticked
-            ? () {
-                //todo navigate to next page
-              }
-            : null,
-        child: const BodyTwoDefaultText(
-          text: "Next",
-          color: getBackgroundColor,
-          bold: true,
-        ),
+      child: RoundedCornerButton(
+        text: "Next",
+        onPressed: ticked ? () => Routes.navigateToPinCreationView(context) : null,
       ),
     );
   }
@@ -146,18 +142,14 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
   }
 
   SizedBox _space() {
-    return SizedBox(
-      height: 24.sp,
-    );
+    return SizedBox(height: 24.sp);
   }
 
   Center _getIcon() {
     return Center(
       child: Container(
-        margin: EdgeInsets.only(top: 32.sp, bottom: 28.sp),
-        child: SvgPicture.asset(
-          "assets/icon/iconWithOutBackground.svg",
-        ),
+        margin: EdgeInsets.only(top: 24.sp, bottom: 24.sp),
+        child: const AppIcon(),
       ),
     );
   }
