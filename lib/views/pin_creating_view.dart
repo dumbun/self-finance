@@ -1,0 +1,134 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/backend/user_db.dart';
+import 'package:self_finance/constants/constants.dart';
+import 'package:self_finance/fonts/bodyTwoDefaultText.dart';
+import 'package:self_finance/fonts/strognHeadingOneText.dart';
+import 'package:self_finance/models/user_model.dart';
+import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/views/test_db.dart';
+import 'package:self_finance/widgets/app_icon.dart';
+import 'package:self_finance/widgets/pin_input_widget.dart';
+import 'package:self_finance/widgets/round_corner_button.dart';
+
+class PinCreatingView extends StatefulWidget {
+  const PinCreatingView({super.key});
+
+  @override
+  State<PinCreatingView> createState() => _PinCreatingViewState();
+}
+
+class _PinCreatingViewState extends State<PinCreatingView> {
+  final pinController1 = TextEditingController();
+  final pinController2 = TextEditingController();
+  bool errorVisibility = false;
+
+  @override
+  void initState() {
+    errorVisibility = false;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    pinController1.dispose();
+    pinController2.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20.0.sp, vertical: 20.sp),
+        width: double.infinity,
+        alignment: Alignment.center,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const AppIcon(),
+              SizedBox(height: 20.sp),
+              const StrongHeadingOne(
+                text: "Set Login PIN",
+                bold: true,
+              ),
+              SizedBox(height: 20.sp),
+              const BodyTwoDefaultText(text: securePinMassage),
+              SizedBox(height: 20.sp),
+              const BodyTwoDefaultText(
+                text: "Enter your Login Pin",
+                bold: true,
+              ),
+              SizedBox(height: 12.sp),
+              PinInputWidget(
+                pinController: pinController1,
+                obscureText: false,
+              ),
+              SizedBox(height: 20.sp),
+              const BodyTwoDefaultText(
+                text: "Confirm your Login Pin",
+                bold: true,
+              ),
+              SizedBox(height: 12.sp),
+              PinInputWidget(
+                pinController: pinController2,
+                obscureText: false,
+              ),
+              SizedBox(height: 20.sp),
+              Visibility(
+                visible: errorVisibility,
+                child: const BodyTwoDefaultText(
+                  text: "Please enter same pin",
+                  color: getErrorColor,
+                  bold: true,
+                ),
+              ),
+              SizedBox(height: 20.sp),
+              SizedBox(
+                width: double.infinity,
+                child: RoundedCornerButton(
+                  text: "Set Login Pin",
+                  onPressed: () {
+                    if (pinController2.value.text != pinController1.value.text) {
+                      setState(() {
+                        errorVisibility = true;
+                      });
+                    }
+                    if (pinController2.value.text == pinController1.value.text) {
+                      setState(() {
+                        errorVisibility = false;
+                      });
+                      _dbProcess(pinController1);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TestDb(),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  _dbProcess(pinController1) async {
+    User newUser = User(
+      id: 1,
+      userName: "USER",
+      userPin: pinController1.text.toString(),
+      profilePicture: Uint8List.fromList([0, 0]),
+    );
+    final bool a = await UserBackEnd.createNewUser(newUser);
+    //todo need to show when password is saved
+    if (a) print("user db created");
+    if (!a) print("user db not created");
+  }
+}
