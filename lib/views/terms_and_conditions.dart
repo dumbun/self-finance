@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
+import 'package:self_finance/constants/terms_and_conditions_api.dart';
 import 'package:self_finance/fonts/bodySmallText.dart';
 import 'package:self_finance/fonts/bodyTwoDefaultText.dart';
 import 'package:self_finance/theme/colors.dart';
@@ -35,7 +36,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
             _getIcon(),
             _getHeading(),
             _space(),
-            _getDetails(),
+            _getTermsAndConditions(),
             _getNextButton(),
           ],
         ),
@@ -62,7 +63,8 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     );
   }
 
-  Container _getDetails() {
+  Container _getTermsAndConditions() {
+    Map<String, List> terms = termsAndConditionsMap;
     return Container(
       height: 88.sp,
       alignment: Alignment.topLeft,
@@ -74,51 +76,10 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const BodyTwoDefaultText(
-                text: testText,
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(height: 16.sp),
-              const BodyTwoDefaultText(text: "Conditions:", bold: true),
-              SizedBox(height: 16.sp),
-              const BodyTwoDefaultText(
-                text: "1. $testText",
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(height: 16.sp),
-              const BodyTwoDefaultText(
-                text: "2. $testText",
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(height: 16.sp),
-              const BodyTwoDefaultText(
-                text: "3. $testText",
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(height: 16.sp),
-              const BodyTwoDefaultText(
-                text: "4. $testText",
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(height: 16.sp),
-              const BodyTwoDefaultText(
-                text: "5. $testText",
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(height: 16.sp),
-              const BodyTwoDefaultText(
-                text: "6. $testText",
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(height: 16.sp),
-              const BodyTwoDefaultText(
-                text: "7. $testText",
-                textAlign: TextAlign.justify,
-              ),
-              SizedBox(height: 16.sp),
-              const BodyTwoDefaultText(
-                text: "8. $testText",
-                textAlign: TextAlign.justify,
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: _getTerms(),
               ),
               SizedBox(height: 16.sp),
               _getCheckBoxWithDescription(),
@@ -128,6 +89,19 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
         ),
       ),
     );
+  }
+
+  _getTerms() {
+    List<Widget> result = [];
+    for (var element in termsAndConditionsMap.entries) {
+      result.add(BodyTwoDefaultText(text: element.key, bold: true));
+      result.add(SizedBox(height: 16.sp));
+      for (var element in element.value) {
+        result.add(BodyTwoDefaultText(text: element));
+        result.add(SizedBox(height: 16.sp));
+      }
+    }
+    return result;
   }
 
   InkWell _getCheckBoxWithDescription() {
@@ -145,9 +119,10 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
           SizedBox(width: 10.sp),
           SizedBox(
             width: 66.sp,
-            height: 25.sp,
+            height: 30.sp,
             child: const BodySmallText(
-              text: testCheckbox,
+              text:
+                  "By using the Self-Finance App, you acknowledge that you have read, understood, and agreed to these Terms and Conditions. ",
             ),
           )
         ],
