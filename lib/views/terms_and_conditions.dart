@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/terms_and_conditions_api.dart';
 import 'package:self_finance/fonts/bodySmallText.dart';
 import 'package:self_finance/fonts/bodyTwoDefaultText.dart';
@@ -64,7 +63,6 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
   }
 
   Container _getTermsAndConditions() {
-    Map<String, List> terms = termsAndConditionsMap;
     return Container(
       height: 88.sp,
       alignment: Alignment.topLeft,
