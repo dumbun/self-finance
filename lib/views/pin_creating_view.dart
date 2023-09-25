@@ -111,11 +111,11 @@ class _PinCreatingViewState extends State<PinCreatingView> {
               errorVisibility = false;
             });
             _dbProcess(pinController1);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const TestDb(),
-              ),
+            // used pushAndRemove method to not allowing the user to go back after creating the pin so that
+            // we can make the only one pin
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (BuildContext context) => const TestDb()),
+              (route) => false,
             );
           }
         },
@@ -130,7 +130,7 @@ class _PinCreatingViewState extends State<PinCreatingView> {
     );
   }
 
-  _dbProcess(pinController1) async {
+  void _dbProcess(pinController1) async {
     User newUser = User(
       id: 1,
       userName: "USER",
