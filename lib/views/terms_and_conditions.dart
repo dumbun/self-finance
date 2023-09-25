@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/constants/terms_and_conditions_api.dart';
-import 'package:self_finance/fonts/bodySmallText.dart';
-import 'package:self_finance/fonts/bodyTwoDefaultText.dart';
+import 'package:self_finance/fonts/body_small_text.dart';
+import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/fonts/strognHeadingOneText.dart';
+import 'package:self_finance/fonts/strong_heading_one_text.dart';
 import 'package:self_finance/widgets/app_icon.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
