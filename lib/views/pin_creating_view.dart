@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/backend/user_db.dart';
 import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/fonts/bodyTwoDefaultText.dart';
-import 'package:self_finance/fonts/strognHeadingOneText.dart';
+import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/fonts/strong_heading_one_text.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/views/test_db.dart';
@@ -49,14 +49,14 @@ class _PinCreatingViewState extends State<PinCreatingView> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const AppIcon(),
+              _getAppIcon(),
               SizedBox(height: 20.sp),
               const StrongHeadingOne(
                 text: "Set Login PIN",
                 bold: true,
               ),
               SizedBox(height: 20.sp),
-              const BodyTwoDefaultText(text: securePinMassage),
+              const BodyTwoDefaultText(text: securePinMassage, textAlign: TextAlign.center),
               SizedBox(height: 20.sp),
               const BodyTwoDefaultText(
                 text: "Enter your Login Pin",
@@ -87,35 +87,46 @@ class _PinCreatingViewState extends State<PinCreatingView> {
                 ),
               ),
               SizedBox(height: 20.sp),
-              SizedBox(
-                width: double.infinity,
-                child: RoundedCornerButton(
-                  text: "Set Login Pin",
-                  onPressed: () {
-                    if (pinController2.value.text != pinController1.value.text) {
-                      setState(() {
-                        errorVisibility = true;
-                      });
-                    }
-                    if (pinController2.value.text == pinController1.value.text) {
-                      setState(() {
-                        errorVisibility = false;
-                      });
-                      _dbProcess(pinController1);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const TestDb(),
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ),
+              _buildSetLoginPinButton(),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  SizedBox _buildSetLoginPinButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: RoundedCornerButton(
+        text: "Set Login Pin",
+        onPressed: () {
+          if (pinController2.value.text != pinController1.value.text) {
+            setState(() {
+              errorVisibility = true;
+            });
+          }
+          if (pinController2.value.text == pinController1.value.text) {
+            setState(() {
+              errorVisibility = false;
+            });
+            _dbProcess(pinController1);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const TestDb(),
+              ),
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  Container _getAppIcon() {
+    return Container(
+      margin: EdgeInsets.only(bottom: 28.sp),
+      child: const AppIcon(),
     );
   }
 
