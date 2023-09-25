@@ -3,7 +3,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/backend/user_db.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/views/dashboard_view.dart';
+import 'package:self_finance/views/auth_view.dart';
 import 'package:self_finance/views/terms_and_conditions.dart';
 
 void main() {
@@ -70,9 +70,7 @@ class _MyAppState extends State<MyApp> {
               )
             : user == null
                 ? const TermsAndConditons()
-                : Dashboard(
-                    user: user!,
-                  ),
+                : AuthView(user: user!),
       ),
     );
   }

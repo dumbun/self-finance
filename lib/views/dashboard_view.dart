@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:self_finance/models/user_model.dart';
 
-class Dashboard extends StatefulWidget {
-  const Dashboard({super.key, required this.user});
+class DashboardView extends StatefulWidget {
+  const DashboardView({super.key, required this.user});
 
   final User user;
 
   @override
-  State<Dashboard> createState() => _DashboardState();
+  State<DashboardView> createState() => _DashboardViewState();
 }
 
-class _DashboardState extends State<Dashboard> {
+class _DashboardViewState extends State<DashboardView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

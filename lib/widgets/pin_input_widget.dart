@@ -2,18 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-class PinInputWidget extends StatefulWidget {
+class PinInputWidget extends StatelessWidget {
   const PinInputWidget({super.key, required this.pinController, required this.obscureText});
 
   final TextEditingController pinController;
   final bool obscureText;
-  @override
-  State<PinInputWidget> createState() => _PinInputWidgetState();
-}
-
-class _PinInputWidgetState extends State<PinInputWidget> {
-  get pinController => widget.pinController;
-  get obscureText => widget.obscureText;
 
   @override
   Widget build(BuildContext context) {
