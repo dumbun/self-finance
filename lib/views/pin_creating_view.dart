@@ -139,7 +139,8 @@ class _PinCreatingViewState extends State<PinCreatingView> {
     );
     final bool a = await UserBackEnd.createNewUser(newUser);
     //todo need to show when password is saved
-    if (a) print("user db created");
-    if (!a) print("user db not created");
+
+    if (a) debugPrint("user db created");
+    if (!a) debugPrint("user db not created");
   }
 }
