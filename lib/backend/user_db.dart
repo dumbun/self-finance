@@ -34,7 +34,7 @@ class UserBackEnd {
         "USER_PROFILE_PICTURE": user.profilePicture,
       };
       final id = await db.insert('USER', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
-      return true;
+      return id == 1 ? true : false;
     } catch (e) {
       return false;
     }
