@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:self_finance/models/customer_model.dart';
 
 class DetailsView extends StatelessWidget {
-  const DetailsView({super.key});
+  const DetailsView({super.key, required this.customer});
+
+  final Customer customer;
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       //todo details view
-      body: Center(
-        child: Text(
-          "Details View Pending",
-          style: TextStyle(
-            fontSize: 40.0,
-          ),
+      body: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(customer.customerName),
+            Text(customer.address),
+            Text(customer.mobileNumber),
+            Text(customer.takenDate),
+            Text(customer.takenAmount.toString()),
+          ],
         ),
       ),
     );

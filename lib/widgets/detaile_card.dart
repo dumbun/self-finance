@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/routes.dart';
-import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/fonts/body_text.dart';
+import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/widgets/arrow_widge.dart';
+import 'package:self_finance/widgets/default_user_Image.dart';
 
 class DetailCard extends StatelessWidget {
-  const DetailCard({super.key});
+  const DetailCard({super.key, required this.customer});
+
+  final Customer customer;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +24,7 @@ class DetailCard extends StatelessWidget {
         color: getVeryLightGreyColor,
         elevation: 0.0,
         child: InkWell(
-          onTap: () => Routes.navigateToDetailsView(context: context),
+          onTap: () => Routes.navigateToDetailsView(context: context, customer: customer),
           child: Padding(
             padding: EdgeInsets.symmetric(
               vertical: 18.0.sp,
@@ -36,28 +39,26 @@ class DetailCard extends StatelessWidget {
                     children: [
                       //image
                       //todo for present we have to use a default icons
-                      SizedBox(
-                        height: 24.sp,
-                        child: SvgPicture.asset("assets/icon/testImage.svg"),
-                      ),
+                      const DefaultUserImage(),
+                      SizedBox(width: 16.sp),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          BodyTwoDefaultText(
-                            text: "name",
+                          BodyOneDefaultText(
+                            text: customer.customerName,
                             bold: true,
                             color: getPrimaryTextColor,
                           ),
                           SizedBox(height: 8.sp),
-                          BodyTwoDefaultText(text: "date"),
+                          BodyOneDefaultText(text: customer.takenDate),
                           SizedBox(height: 8.sp),
                           Row(
                             children: [
-                              BodyTwoDefaultText(text: "amount : "),
-                              BodyTwoDefaultText(
+                              const BodyOneDefaultText(text: "amount - taken : "),
+                              BodyOneDefaultText(
                                 bold: true,
-                                text: "1234",
+                                text: customer.takenAmount.toString(),
                                 error: true,
                               ),
                             ],
