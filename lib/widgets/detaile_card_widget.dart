@@ -5,10 +5,13 @@ import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/widgets/arrow_widge.dart';
-import 'package:self_finance/widgets/default_user_Image.dart';
+import 'package:self_finance/widgets/default_user_image.dart';
 
-class DetailCard extends StatelessWidget {
-  const DetailCard({super.key, required this.customer});
+class DetailCardWidget extends StatelessWidget {
+  const DetailCardWidget({
+    Key? key,
+    required this.customer,
+  }) : super(key: key);
 
   final Customer customer;
 
@@ -17,7 +20,7 @@ class DetailCard extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(
         horizontal: 12.0.sp,
-        vertical: 6.sp,
+        vertical: 6.0.sp,
       ),
       width: double.infinity,
       child: Card(
@@ -37,10 +40,8 @@ class DetailCard extends StatelessWidget {
                 Expanded(
                   child: Row(
                     children: [
-                      //image
-                      //todo for present we have to use a default icons
                       const DefaultUserImage(),
-                      SizedBox(width: 16.sp),
+                      SizedBox(width: 16.0.sp),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -50,9 +51,9 @@ class DetailCard extends StatelessWidget {
                             bold: true,
                             color: getPrimaryTextColor,
                           ),
-                          SizedBox(height: 8.sp),
+                          SizedBox(height: 8.0.sp),
                           BodyOneDefaultText(text: customer.takenDate),
-                          SizedBox(height: 8.sp),
+                          SizedBox(height: 8.0.sp),
                           Row(
                             children: [
                               const BodyOneDefaultText(text: "amount - taken : "),

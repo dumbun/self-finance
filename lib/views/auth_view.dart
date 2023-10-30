@@ -5,7 +5,6 @@ import 'package:local_auth/local_auth.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
-import 'package:self_finance/widgets/detaile_card.dart';
 
 class AuthView extends StatefulWidget {
   const AuthView({Key? key, required this.user}) : super(key: key);

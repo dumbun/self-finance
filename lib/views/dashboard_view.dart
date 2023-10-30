@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/user_model.dart';
+import 'package:self_finance/widgets/detaile_card_widget.dart';
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key, required this.user});
