@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/views/dashboard_view.dart';
+import 'package:self_finance/views/details_view.dart';
 import 'package:self_finance/views/pin_creating_view.dart';
 
 class Routes {
@@ -22,5 +23,10 @@ class Routes {
           builder: (BuildContext context) => DashboardView(user: user),
         ),
         (route) => false);
+  }
+
+  static navigateToDetailsView({required BuildContext context}) {
+    Navigator.of(context)
+        .pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => DetailsView()), (route) => true);
   }
 }
