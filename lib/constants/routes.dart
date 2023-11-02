@@ -40,7 +40,7 @@ class Routes {
   static navigateToAddNewEntry({required BuildContext context}) {
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (BuildContext context) => const AddNewEntryView(),
+          builder: (BuildContext context) => AddNewEntryView(),
         ),
         (route) => true);
   }

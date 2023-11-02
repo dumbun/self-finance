@@ -11,6 +11,9 @@ class RoundedCornerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
+      style: const ButtonStyle(
+        backgroundColor: MaterialStatePropertyAll(getPrimaryColor),
+      ),
       onPressed: onPressed,
       child: BodyTwoDefaultText(
         text: text,
