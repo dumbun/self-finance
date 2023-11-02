@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
@@ -19,12 +20,12 @@ class PinAuthView extends StatefulWidget {
 }
 
 class _PinAuthViewState extends State<PinAuthView> {
-  bool error = false;
-  TextEditingController pinController = TextEditingController();
+  bool _error = false;
+  final TextEditingController _pinController = TextEditingController();
 
   @override
   void dispose() {
-    pinController.dispose();
+    _pinController.dispose();
     super.dispose();
   }
 
@@ -33,10 +34,10 @@ class _PinAuthViewState extends State<PinAuthView> {
     return Scaffold(
       backgroundColor: getBackgroundColor,
       body: Container(
+        alignment: Alignment.center,
         width: double.infinity,
-        padding: EdgeInsets.only(top: 60.sp),
-        child: SingleChildScrollView(
-          child: SafeArea(
+        child: SafeArea(
+          child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -50,13 +51,13 @@ class _PinAuthViewState extends State<PinAuthView> {
                 ),
                 SizedBox(height: 20.sp),
                 PinInputWidget(
-                  pinController: pinController,
+                  pinController: _pinController,
                   obscureText: true,
                 ),
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 10.sp),
                   child: Visibility(
-                    visible: error,
+                    visible: _error,
                     child: const BodyTwoDefaultText(
                       text: "Enter correct PIN",
                       bold: true,
@@ -74,12 +75,12 @@ class _PinAuthViewState extends State<PinAuthView> {
   }
 
   void _getLogin() {
-    if (widget.user.userPin == pinController.text) {
+    if (widget.user.userPin == _pinController.text) {
       Routes.navigateToDashboard(context: context, user: widget.user);
     } else {
-      pinController.clear();
+      _pinController.clear();
       setState(() {
-        error = true;
+        _error = true;
       });
     }
   }

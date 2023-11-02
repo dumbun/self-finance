@@ -27,6 +27,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: getBackgroundColor,
       body: Container(
         padding: EdgeInsets.all(24.sp),
         width: double.infinity,

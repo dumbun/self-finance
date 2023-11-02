@@ -103,16 +103,19 @@ class _AddNewEntryViewState extends State<AddNewEntryView> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 InputTextField(
+                  keyboardType: TextInputType.streetAddress,
                   controller: _address,
                   hintText: "Place",
                 ),
                 const SizedBox(height: 14),
                 InputTextField(
+                  keyboardType: TextInputType.name,
                   controller: _customerName,
                   hintText: "Name",
                 ),
                 const SizedBox(height: 14),
                 InputTextField(
+                  keyboardType: TextInputType.name,
                   controller: _guardianName,
                   hintText: "Guardian Name",
                 ),
@@ -136,6 +139,7 @@ class _AddNewEntryViewState extends State<AddNewEntryView> {
                 ),
                 const SizedBox(height: 14),
                 InputTextField(
+                  keyboardType: TextInputType.name,
                   controller: _itemName,
                   hintText: "Item Name",
                 ),

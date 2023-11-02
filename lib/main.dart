@@ -51,6 +51,7 @@ class _MyAppState extends State<MyApp> {
     ThemeData darkTheme = ThemeData(
       fontFamily: "hell",
       colorScheme: ColorScheme.fromSeed(
+        background: getPrimaryTextColor,
         seedColor: getPrimaryColor,
         primary: getPrimaryColor,
         brightness: Brightness.dark,
@@ -61,6 +62,7 @@ class _MyAppState extends State<MyApp> {
       fontFamily: "hell",
       colorScheme: ColorScheme.fromSeed(
         seedColor: getPrimaryColor,
+        background: getBackgroundColor,
         primary: getPrimaryColor,
         brightness: Brightness.light,
       ),
