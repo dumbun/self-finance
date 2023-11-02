@@ -43,13 +43,13 @@ class BodyOneDefaultText extends StatelessWidget {
     );
   }
 
-  Color _getColor(BuildContext context) {
+  Color? _getColor(BuildContext context) {
     if (error) {
       return getErrorColor;
     } else if (whiteColor) {
       return getBackgroundColor;
     } else {
-      return color ?? getLigthGreyColor;
+      return color;
     }
   }
 }

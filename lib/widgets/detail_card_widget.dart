@@ -24,7 +24,6 @@ class DetailCardWidget extends StatelessWidget {
       ),
       width: double.infinity,
       child: Card(
-        color: getVeryLightGreyColor,
         elevation: 0.0,
         child: InkWell(
           onTap: () => Routes.navigateToDetailsView(context: context, customer: customer),
@@ -49,7 +48,6 @@ class DetailCardWidget extends StatelessWidget {
                           BodyOneDefaultText(
                             text: customer.customerName,
                             bold: true,
-                            color: getPrimaryTextColor,
                           ),
                           SizedBox(height: 8.0.sp),
                           BodyOneDefaultText(text: customer.takenDate),
