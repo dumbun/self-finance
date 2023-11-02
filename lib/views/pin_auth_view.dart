@@ -36,35 +36,37 @@ class _PinAuthViewState extends State<PinAuthView> {
         width: double.infinity,
         padding: EdgeInsets.only(top: 60.sp),
         child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const AppIcon(),
-              SizedBox(height: 20.sp),
-              const StrongHeadingOne(
-                bold: true,
-                text: "Enter your app PIN",
-                color: getPrimaryTextColor,
-              ),
-              SizedBox(height: 20.sp),
-              PinInputWidget(
-                pinController: pinController,
-                obscureText: true,
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 10.sp),
-                child: Visibility(
-                  visible: error,
-                  child: const BodyTwoDefaultText(
-                    text: "Enter correct PIN",
-                    bold: true,
-                    error: true,
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const AppIcon(),
+                SizedBox(height: 20.sp),
+                const StrongHeadingOne(
+                  bold: true,
+                  text: "Enter your app PIN",
+                  color: getPrimaryTextColor,
+                ),
+                SizedBox(height: 20.sp),
+                PinInputWidget(
+                  pinController: pinController,
+                  obscureText: true,
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 10.sp),
+                  child: Visibility(
+                    visible: error,
+                    child: const BodyTwoDefaultText(
+                      text: "Enter correct PIN",
+                      bold: true,
+                      error: true,
+                    ),
                   ),
                 ),
-              ),
-              RoundedCornerButton(text: "Login", onPressed: () => _getLogin()),
-            ],
+                RoundedCornerButton(text: "Login", onPressed: () => _getLogin()),
+              ],
+            ),
           ),
         ),
       ),

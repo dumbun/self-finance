@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/user_model.dart';
+import 'package:self_finance/views/add_new_entry_view.dart';
 import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/details_view.dart';
 import 'package:self_finance/views/pin_creating_view.dart';
@@ -29,9 +30,18 @@ class Routes {
   static navigateToDetailsView({required BuildContext context, required Customer customer}) {
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-            builder: (BuildContext context) => DetailsView(
-                  customer: customer,
-                )),
+          builder: (BuildContext context) => DetailsView(
+            customer: customer,
+          ),
+        ),
+        (route) => true);
+  }
+
+  static navigateToAddNewEntry({required BuildContext context}) {
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (BuildContext context) => const AddNewEntryView(),
+        ),
         (route) => true);
   }
 }
