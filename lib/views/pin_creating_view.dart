@@ -40,55 +40,58 @@ class _PinCreatingViewState extends State<PinCreatingView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20.0.sp, vertical: 20.sp),
-        width: double.infinity,
-        alignment: Alignment.center,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _getAppIcon(),
-              SizedBox(height: 20.sp),
-              const StrongHeadingOne(
-                text: "Set Login PIN",
-                bold: true,
-              ),
-              SizedBox(height: 20.sp),
-              const BodyTwoDefaultText(text: securePinMassage, textAlign: TextAlign.center),
-              SizedBox(height: 20.sp),
-              const BodyTwoDefaultText(
-                text: "Enter your Login Pin",
-                bold: true,
-              ),
-              SizedBox(height: 12.sp),
-              PinInputWidget(
-                pinController: pinController1,
-                obscureText: false,
-              ),
-              SizedBox(height: 20.sp),
-              const BodyTwoDefaultText(
-                text: "Confirm your Login Pin",
-                bold: true,
-              ),
-              SizedBox(height: 12.sp),
-              PinInputWidget(
-                pinController: pinController2,
-                obscureText: false,
-              ),
-              SizedBox(height: 20.sp),
-              Visibility(
-                visible: errorVisibility,
-                child: const BodyTwoDefaultText(
-                  text: "Please enter same pin",
-                  color: getErrorColor,
+      backgroundColor: getBackgroundColor,
+      body: SafeArea(
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 20.0.sp, vertical: 20.sp),
+          width: double.infinity,
+          alignment: Alignment.center,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _getAppIcon(),
+                SizedBox(height: 20.sp),
+                const StrongHeadingOne(
+                  text: "Set Login PIN",
                   bold: true,
                 ),
-              ),
-              SizedBox(height: 20.sp),
-              _buildSetLoginPinButton(),
-            ],
+                SizedBox(height: 20.sp),
+                const BodyTwoDefaultText(text: securePinMassage, textAlign: TextAlign.center),
+                SizedBox(height: 20.sp),
+                const BodyTwoDefaultText(
+                  text: "Enter your Login Pin",
+                  bold: true,
+                ),
+                SizedBox(height: 12.sp),
+                PinInputWidget(
+                  pinController: pinController1,
+                  obscureText: false,
+                ),
+                SizedBox(height: 20.sp),
+                const BodyTwoDefaultText(
+                  text: "Confirm your Login Pin",
+                  bold: true,
+                ),
+                SizedBox(height: 12.sp),
+                PinInputWidget(
+                  pinController: pinController2,
+                  obscureText: false,
+                ),
+                SizedBox(height: 20.sp),
+                Visibility(
+                  visible: errorVisibility,
+                  child: const BodyTwoDefaultText(
+                    text: "Please enter same pin",
+                    color: getErrorColor,
+                    bold: true,
+                  ),
+                ),
+                SizedBox(height: 20.sp),
+                _buildSetLoginPinButton(),
+              ],
+            ),
           ),
         ),
       ),

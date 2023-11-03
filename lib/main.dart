@@ -63,6 +63,8 @@ class _MyAppState extends State<MyApp> {
       colorScheme: ColorScheme.fromSeed(
         seedColor: getPrimaryColor,
         background: getBackgroundColor,
+        error: getErrorColor,
+        surface: getVeryLightGreyColor,
         primary: getPrimaryColor,
         brightness: Brightness.light,
       ),
