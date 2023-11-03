@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
@@ -54,7 +55,8 @@ class _AddNewEntryViewState extends State<AddNewEntryView> {
         required String itemName,
         required String takenDate}) async {
       try {
-        final bool isCretateNewEntry = await BackEnd.createNewEntry(Customer(
+        final bool isCretateNewEntry = await BackEnd.createNewEntry(
+          Customer(
             mobileNumber: mobileNumber,
             address: address,
             customerName: customerName,
@@ -63,8 +65,11 @@ class _AddNewEntryViewState extends State<AddNewEntryView> {
             takenAmount: takenAmount,
             rateOfInterest: rateOfInterest,
             itemName: itemName,
-            transaction: 1));
-        final bool isCreateNewTransaction = await BackEnd.createNewTransaction(Customer(
+            transaction: 1,
+          ),
+        );
+        final bool isCreateNewTransaction = await BackEnd.createNewTransaction(
+          Transactions(
             mobileNumber: mobileNumber,
             address: address,
             customerName: customerName,
@@ -73,7 +78,9 @@ class _AddNewEntryViewState extends State<AddNewEntryView> {
             takenAmount: takenAmount,
             rateOfInterest: rateOfInterest,
             itemName: itemName,
-            transaction: 1));
+            transactionType: 1,
+          ),
+        );
         setState(() {
           _isloading = false;
         });

@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
-import 'package:self_finance/models/customer_model.dart';
-import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/models/transaction_model.dart';
+
 import 'package:self_finance/widgets/arrow_widge.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 
 class DetailCardWidget extends StatelessWidget {
   const DetailCardWidget({
     Key? key,
-    required this.customer,
+    required this.data,
   }) : super(key: key);
 
-  final Customer customer;
+  final Transactions data;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class DetailCardWidget extends StatelessWidget {
       child: Card(
         elevation: 0.0,
         child: InkWell(
-          onTap: () => Routes.navigateToDetailsView(context: context, customer: customer),
+          onTap: () => Routes.navigateToDetailsView(context: context, data: data),
           child: Padding(
             padding: EdgeInsets.symmetric(
               vertical: 18.0.sp,
@@ -46,18 +46,18 @@ class DetailCardWidget extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           BodyOneDefaultText(
-                            text: customer.customerName,
+                            text: data.customerName,
                             bold: true,
                           ),
                           SizedBox(height: 8.0.sp),
-                          BodyOneDefaultText(text: customer.takenDate),
+                          BodyOneDefaultText(text: data.takenDate),
                           SizedBox(height: 8.0.sp),
                           Row(
                             children: [
                               const BodyOneDefaultText(text: "amount - taken : "),
                               BodyOneDefaultText(
                                 bold: true,
-                                text: customer.takenAmount.toString(),
+                                text: data.takenAmount.toString(),
                                 error: true,
                               ),
                             ],

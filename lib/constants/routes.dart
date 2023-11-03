@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/views/add_new_entry_view.dart';
 import 'package:self_finance/views/dashboard_view.dart';
@@ -27,20 +27,21 @@ class Routes {
         (route) => false);
   }
 
-  static navigateToDetailsView({required BuildContext context, required Customer customer}) {
+  static navigateToDetailsView({required BuildContext context, required Transactions data}) {
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (BuildContext context) => DetailsView(
-            customer: customer,
-          ),
+      MaterialPageRoute(
+        builder: (BuildContext context) => DetailsView(
+          data: data,
         ),
-        (route) => true);
+      ),
+      (route) => true,
+    );
   }
 
   static navigateToAddNewEntry({required BuildContext context}) {
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (BuildContext context) => AddNewEntryView(),
+          builder: (BuildContext context) => const AddNewEntryView(),
         ),
         (route) => true);
   }
