@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/theme/colors.dart';
@@ -92,7 +93,7 @@ class _FloatingActionButton extends StatelessWidget {
         mini: false,
         shape: const CircleBorder(),
         backgroundColor: getPrimaryColor,
-        tooltip: "Add New Entry",
+        tooltip: addNewEntry,
         child: const Icon(
           Icons.add_rounded,
           color: getBackgroundColor,

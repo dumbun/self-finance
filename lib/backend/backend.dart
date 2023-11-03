@@ -1,5 +1,6 @@
 import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/models/transaction_model.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
 class BackEnd {
@@ -23,12 +24,16 @@ class BackEnd {
       ADDRESS TEXT NOT NULL,
       CUSTOMER_NAME TEXT NOT NULL,
       GUARDIAN_NAME TEXT NOT NULL,
+      TAKEN_DATE TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       TAKEN_AMOUNT INT NOT NULL,
       RATE_OF_INTEREST DOUBLE NOT NULL,
-      TAKEN_DATE TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       ITEM_NAME TEXT NOT NULL,
-      TRANSFER INT NOT NULL,
-      PAID_DATE TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      TRANSACTION_TYPE INT NOT NULL,
+      PAID_DATE TEXT,
+      VIA TEXT,
+      PAID_AMOUNT DOUBLE,
+      TOTAL_INTREST DOUBLE,
+      DUE_TIME TEXT
     )""");
   }
 
@@ -65,20 +70,26 @@ class BackEnd {
 
   //create new transaction
 
-  static Future<bool> createNewTransaction(Customer customer) async {
+  static Future<bool> createNewTransaction(Transactions transacrtion) async {
     final db = await BackEnd.db();
     try {
       final data = {
-        "MOBILE_NUMBER": customer.mobileNumber,
-        "ADDRESS": customer.address,
-        "CUSTOMER_NAME": customer.customerName,
-        "GUARDIAN_NAME": customer.guardianName,
-        "TAKEN_DATE": customer.takenDate,
-        "TAKEN_AMOUNT": customer.takenAmount,
-        "RATE_OF_INTEREST": customer.rateOfInterest,
-        "ITEM_NAME": customer.itemName,
-        "TRANSFER": customer.transaction
+        "MOBILE_NUMBER": transacrtion.mobileNumber,
+        "ADDRESS": transacrtion.address,
+        "CUSTOMER_NAME": transacrtion.customerName,
+        "GUARDIAN_NAME": transacrtion.guardianName,
+        "TAKEN_DATE": transacrtion.takenDate,
+        "TAKEN_AMOUNT": transacrtion.takenAmount,
+        "RATE_OF_INTEREST": transacrtion.rateOfInterest,
+        "ITEM_NAME": transacrtion.itemName,
+        "TRANSACTION_TYPE": transacrtion.transactionType,
+        "PAID_DATE": transacrtion.paidDate,
+        "VIA": transacrtion.via,
+        "PAID_AMOUNT": transacrtion.paidAmount,
+        "TOTAL_INTREST": transacrtion.totalIntrest,
+        "DUE_TIME": transacrtion.dueTime
       };
+
       final id = await db.insert('TRANSACTIONS', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
       return true;
     } catch (e) {
@@ -88,13 +99,13 @@ class BackEnd {
 
   // get latest Transaction
 
-  static Future<List<Customer>> fetchLatestTransactions() async {
+  static Future<List<Transactions>> fetchLatestTransactions() async {
     final db = await BackEnd.db();
     List<Map<String, Object?>> result = await db.rawQuery("""
       SELECT * FROM TRANSACTIONS ORDER BY TAKEN_DATE DESC 
     """);
     if (result.isNotEmpty) {
-      return Customer.toList(result);
+      return Transactions.toList(result);
     } else {
       return [];
     }
@@ -118,6 +129,23 @@ class BackEnd {
       where: "MOBILE_NUMBER = ? and TRANSFER = ?",
       whereArgs: [mobileNumber, transfer],
     );
+  }
+  // get the transaction by mobile number
+
+  static Future<List<Transactions>> getTransactionsEntriesByMobileNumber(String mobileNumber) async {
+    final db = await BackEnd.db();
+    final List<Map<String, Object?>> data = await db.query(
+      'TRANSACTIONS',
+      orderBy: 'ID',
+      where: "MOBILE_NUMBER = ?",
+      whereArgs: [mobileNumber],
+    );
+    List<Transactions> result = Transactions.toList(data);
+    if (result.isNotEmpty) {
+      return result;
+    } else {
+      return [];
+    }
   }
 
   // Update the item

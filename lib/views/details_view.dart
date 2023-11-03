@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/models/transaction_model.dart';
 
 class DetailsView extends StatelessWidget {
-  const DetailsView({super.key, required this.customer});
+  const DetailsView({super.key, required this.data});
 
-  final Customer customer;
+  final Transactions data;
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +16,13 @@ class DetailsView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(customer.customerName),
-            Text(customer.address),
-            Text(customer.mobileNumber),
-            Text(customer.takenDate),
-            Text(customer.takenAmount.toString()),
+            Text(data.id.toString()),
+            Text(data.customerName),
+            Text(data.via.toString()),
+            Text(data.address),
+            Text(data.mobileNumber),
+            Text(data.takenDate),
+            Text(data.takenAmount.toString()),
           ],
         ),
       ),
