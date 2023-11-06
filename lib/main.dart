@@ -49,16 +49,21 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     ThemeData darkTheme = ThemeData(
+      brightness: Brightness.dark,
       fontFamily: "hell",
       colorScheme: ColorScheme.fromSeed(
         background: getPrimaryTextColor,
+        error: getErrorColor,
         seedColor: getPrimaryColor,
         primary: getPrimaryColor,
         brightness: Brightness.dark,
       ),
+      textTheme: Typography.whiteCupertino,
       useMaterial3: true,
     );
     ThemeData lightTheme = ThemeData(
+      primaryColor: getPrimaryColor,
+      cardTheme: const CardTheme(color: getVeryLightGreyColor),
       fontFamily: "hell",
       colorScheme: ColorScheme.fromSeed(
         seedColor: getPrimaryColor,
@@ -73,6 +78,7 @@ class _MyAppState extends State<MyApp> {
 
     return ResponsiveSizer(
       builder: (context, orientation, screenType) => MaterialApp(
+        color: getPrimaryColor,
         title: 'Self Finance',
         debugShowCheckedModeBanner: false,
         theme: lightTheme,
