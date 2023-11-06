@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/backend/backend.dart';
@@ -50,22 +52,26 @@ class _HistoryViewState extends State<HistoryView> {
             SizedBox(height: 18.sp),
             _buildSearchBar(),
             SizedBox(height: 18.sp),
-            FutureBuilder<List<Transactions>>(
-              future: _dataFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator.adaptive()); // Placeholder for loading state
-                } else if (snapshot.hasError) {
-                  return _showErrorAlert(snapshot.error);
-                } else {
-                  _shodowData = snapshot.data ?? [];
-                  return _buildCards(snapshot.data ?? []);
-                }
-              },
-            ),
+            _buildData(),
           ],
         ),
       ),
+    );
+  }
+
+  FutureBuilder<List<Transactions>> _buildData() {
+    return FutureBuilder<List<Transactions>>(
+      future: _dataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator.adaptive()); // Placeholder for loading state
+        } else if (snapshot.hasError) {
+          return _showErrorAlert(snapshot.error);
+        } else {
+          _shodowData = snapshot.data ?? [];
+          return _buildCards(snapshot.data ?? []);
+        }
+      },
     );
   }
 
@@ -78,10 +84,11 @@ class _HistoryViewState extends State<HistoryView> {
 
     return Expanded(
       child: ListView.builder(
-        itemBuilder: (context, i) {
-          return DetailCardWidget(data: data[i]);
-        },
+        key: ValueKey(data),
         itemCount: data.length,
+        itemBuilder: (BuildContext context, int index) {
+          return DetailCardWidget(data: data[index]);
+        },
       ),
     );
   }
@@ -90,7 +97,7 @@ class _HistoryViewState extends State<HistoryView> {
     return SearchAnchor(
       builder: (BuildContext context, SearchController controller) {
         return SearchBar(
-          elevation: const MaterialStatePropertyAll(0),
+          elevation: MaterialStatePropertyAll(0.sp),
           hintText: "search using mobile number",
           controller: controller,
           padding: MaterialStatePropertyAll<EdgeInsets>(
