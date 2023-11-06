@@ -13,7 +13,9 @@ class EmiCalculator extends StatelessWidget {
       child: const Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [TitleWidget(text: emiCalculator)],
+        children: [
+          TitleWidget(text: emiCalculator),
+        ],
       ),
     );
   }
