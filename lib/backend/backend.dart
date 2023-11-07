@@ -16,10 +16,9 @@ class BackEnd {
       TAKEN_DATE TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       ITEM_NAME TEXT NOT NULL,
       TRANSFER INT NOT NULL,
-      PHOTO_PROOF TEXT,
-      PHOTO_ITEM TEXT,
-      PHOTO_CUSTOMER TEXT
-
+      PHOTO_PROOF TEXT NOT NULL,
+      PHOTO_ITEM TEXT NOT NULL,
+      PHOTO_CUSTOMER TEXT NOT NULL,
       PAID_DATE TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     )""");
     await database.execute("""CREATE TABLE TRANSACTIONS(
@@ -38,9 +37,9 @@ class BackEnd {
       PAID_AMOUNT DOUBLE,
       TOTAL_INTREST DOUBLE,
       DUE_TIME TEXT,
-      PHOTO_PROOF TEXT,
-      PHOTO_ITEM TEXT,
-      PHOTO_CUSTOMER TEXT
+      PHOTO_PROOF TEXT NOT NULL,
+      PHOTO_ITEM TEXT NOT NULL,
+      PHOTO_CUSTOMER TEXT NOT NULL
     )""");
   }
 
@@ -66,7 +65,10 @@ class BackEnd {
         "TAKEN_AMOUNT": customer.takenAmount,
         "RATE_OF_INTEREST": customer.rateOfInterest,
         "ITEM_NAME": customer.itemName,
-        "TRANSFER": customer.transaction
+        "TRANSFER": customer.transaction,
+        "PHOTO_CUSTOMER": customer.photoCustomer,
+        "PHOTO_ITEM": customer.photoItem,
+        "PHOTO_PROOF": customer.photoProof,
       };
       final id = await db.insert('CUSTOMERS', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
       return true;
@@ -94,7 +96,10 @@ class BackEnd {
         "VIA": transacrtion.via,
         "PAID_AMOUNT": transacrtion.paidAmount,
         "TOTAL_INTREST": transacrtion.totalIntrest,
-        "DUE_TIME": transacrtion.dueTime
+        "DUE_TIME": transacrtion.dueTime,
+        "PHOTO_CUSTOMER": transacrtion.photoCustomer,
+        "PHOTO_ITEM": transacrtion.photoItem,
+        "PHOTO_PROOF": transacrtion.photoProof,
       };
 
       final id = await db.insert('TRANSACTIONS', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);

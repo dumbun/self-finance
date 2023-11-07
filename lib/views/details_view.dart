@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/util.dart';
 
 class DetailsView extends StatelessWidget {
   const DetailsView({super.key, required this.data});
@@ -16,6 +17,9 @@ class DetailsView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Utility.imageFromBase64String(data.photoCustomer),
+            Utility.imageFromBase64String(data.photoItem),
+            Utility.imageFromBase64String(data.photoProof),
             Text(data.id.toString()),
             Text(data.customerName),
             Text(data.via.toString()),

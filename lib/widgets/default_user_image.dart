@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/widgets/circle_images.dart';
+import 'package:self_finance/widgets/image_widget.dart';
 
 class DefaultUserImage extends StatelessWidget {
   const DefaultUserImage({
@@ -16,10 +16,14 @@ class DefaultUserImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CircleImage(
+    return ImageWidget(
+      shape: BoxShape.circle,
       height: height ?? 30.sp,
       width: width ?? 30.sp,
-      child: const Svg("assets/icon/defaultImage.svg"),
+      child: const Svg(
+        "assets/icon/defaultImage.svg",
+        source: SvgSource.asset,
+      ),
     );
   }
 }

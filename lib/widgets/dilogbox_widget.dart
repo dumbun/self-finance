@@ -5,7 +5,7 @@ class AlertDilogs {
   static alertDialogWithOneAction(BuildContext context, String title, String content) {
     return showDialog<String>(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
+      builder: (BuildContext context) => AlertDialog.adaptive(
         title: Text(title),
         content: Text(content, style: const TextStyle(fontSize: 22)),
         actions: <Widget>[

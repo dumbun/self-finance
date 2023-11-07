@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
-class CircleImage extends StatelessWidget {
-  const CircleImage({
+class ImageWidget extends StatelessWidget {
+  const ImageWidget({
     super.key,
     required this.height,
     required this.width,
     required this.child,
+    required this.shape,
   });
 
   final double height;
   final double width;
   final ImageProvider<Object> child;
+  final BoxShape shape;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +20,7 @@ class CircleImage extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
+        shape: shape,
         image: DecorationImage(
           fit: BoxFit.fill,
           image: child,

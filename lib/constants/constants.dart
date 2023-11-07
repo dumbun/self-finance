@@ -5,3 +5,6 @@ const String securePinMassage = "Login pin is to Secure your Application from Th
 const String addNewEntry = "Add New Entry";
 const String history = "History";
 const String emiCalculator = "EMI Calculator";
+const String defaultProfileImagePath = "assets/icon/defaultImage.svg";
+const String defaultProofImagePath = "assets/icon/id_proof_icon.svg";
+const String defaultItemImagePath = "assets/icon/item_icon.svg";

@@ -11,15 +11,15 @@ class Customer {
   final double rateOfInterest;
   final String itemName;
   final int transaction;
-  final String? photoProof;
-  final String? photoItem;
-  final String? photoCustomer;
+  final String photoProof;
+  final String photoItem;
+  final String photoCustomer;
 
   const Customer({
     this.id,
-    this.photoProof,
-    this.photoItem,
-    this.photoCustomer,
+    required this.photoProof,
+    required this.photoItem,
+    required this.photoCustomer,
     required this.mobileNumber,
     required this.address,
     required this.customerName,
@@ -78,7 +78,7 @@ class Customer {
         itemName: e["ITEM_NAME"],
         transaction: e["TRANSFER"],
         photoProof: e["PHOTO_PROOF"],
-        photoCustomer: e["photoCustomer"],
+        photoCustomer: e["PHOTO_CUSTOMER"],
         photoItem: e["PHOTO_ITEM"],
       ));
     });
@@ -115,6 +115,9 @@ class Customer {
       rateOfInterest: map['rateOfInterest']?.toDouble() ?? 0.0,
       itemName: map['itemName'] ?? '',
       transaction: map['transaction']?.toInt() ?? 0,
+      photoProof: map['photoCustomer'] ?? '',
+      photoItem: map['photoCustomer'] ?? '',
+      photoCustomer: map['photoItem'] ?? '',
     );
   }
 
