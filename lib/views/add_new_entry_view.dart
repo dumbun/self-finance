@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
@@ -100,114 +101,117 @@ class _AddNewEntryViewState extends State<AddNewEntryView> {
       }
     }
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("Add new Entry")),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                InputTextField(
-                  keyboardType: TextInputType.streetAddress,
-                  controller: _address,
-                  hintText: "Place",
-                ),
-                const SizedBox(height: 14),
-                InputTextField(
-                  keyboardType: TextInputType.name,
-                  controller: _customerName,
-                  hintText: "Name",
-                ),
-                const SizedBox(height: 14),
-                InputTextField(
-                  keyboardType: TextInputType.name,
-                  controller: _guardianName,
-                  hintText: "Guardian Name",
-                ),
-                const SizedBox(height: 14),
-                InputTextField(
-                  controller: _mobileNumber,
-                  keyboardType: TextInputType.phone,
-                  hintText: "Phone Number",
-                ),
-                const SizedBox(height: 14),
-                InputTextField(
-                  controller: _takenAmount,
-                  keyboardType: TextInputType.number,
-                  hintText: "Amount",
-                ),
-                const SizedBox(height: 14),
-                InputTextField(
-                  controller: _rateOfInterest,
-                  keyboardType: TextInputType.number,
-                  hintText: "Rate of Intrest",
-                ),
-                const SizedBox(height: 14),
-                InputTextField(
-                  keyboardType: TextInputType.name,
-                  controller: _itemName,
-                  hintText: "Item Name",
-                ),
-                const SizedBox(height: 14),
-                TextFormField(
-                  controller: _takenDate,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+    return GestureDetector(
+      onVerticalDragDown: (details) => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+        appBar: AppBar(title: const Text("Add new Entry")),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  InputTextField(
+                    keyboardType: TextInputType.streetAddress,
+                    controller: _address,
+                    hintText: "Place",
+                  ),
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    keyboardType: TextInputType.name,
+                    controller: _customerName,
+                    hintText: "Name",
+                  ),
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    keyboardType: TextInputType.name,
+                    controller: _guardianName,
+                    hintText: "Guardian Name",
+                  ),
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    controller: _mobileNumber,
+                    keyboardType: TextInputType.phone,
+                    hintText: "Phone Number",
+                  ),
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    controller: _takenAmount,
+                    keyboardType: TextInputType.number,
+                    hintText: "Amount",
+                  ),
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    controller: _rateOfInterest,
+                    keyboardType: TextInputType.number,
+                    hintText: "Rate of Intrest",
+                  ),
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    keyboardType: TextInputType.name,
+                    controller: _itemName,
+                    hintText: "Item Name",
+                  ),
+                  SizedBox(height: 20.sp),
+                  TextFormField(
+                    controller: _takenDate,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
 
-                    icon: Icon(Icons.calendar_today), //icon of text field
-                    labelText: "Enter Date", //label text of field
-                  ),
-                  readOnly: true,
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(1950),
-                        //DateTime.now() - not to allow to choose before today.
-                        lastDate: DateTime.now());
-                    if (pickedDate != null) {
-                      //pickedDate output format => 2021-03-10 00:00:00.000
-                      String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
-                      //formatted date output using intl package =>  2021-03-16
-                      setState(() {
-                        _takenDate.text = formattedDate; //set output date to InputTextField value.
-                      });
-                    } else {}
-                  },
-                ),
-                const SizedBox(height: 24),
-                if (_isloading == true) const CircularProgressIndicator(),
-                if (_isloading != true &&
-                    _address.text.isNotEmpty &&
-                    _customerName.text.isNotEmpty &&
-                    _guardianName.text.isNotEmpty &&
-                    _itemName.text.isNotEmpty &&
-                    _mobileNumber.text.isNotEmpty &&
-                    _rateOfInterest.text.isNotEmpty &&
-                    _takenAmount.text.isNotEmpty &&
-                    _takenDate.text.isNotEmpty)
-                  RoundedCornerButton(
-                    onPressed: () {
-                      setState(() {
-                        _isloading = true;
-                      });
-                      addNewEntry(
-                        mobileNumber: _mobileNumber.text,
-                        address: _address.text,
-                        customerName: _customerName.text,
-                        guardianName: _guardianName.text,
-                        takenAmount: int.parse(_takenAmount.text),
-                        rateOfInterest: double.parse(_rateOfInterest.text),
-                        itemName: _itemName.text,
-                        takenDate: _takenDate.text,
-                      );
-                      Navigator.of(context).pop();
+                      icon: Icon(Icons.calendar_today), //icon of text field
+                      labelText: "Enter Date", //label text of field
+                    ),
+                    readOnly: true,
+                    onTap: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(1950),
+                          //DateTime.now() - not to allow to choose before today.
+                          lastDate: DateTime.now());
+                      if (pickedDate != null) {
+                        //pickedDate output format => 2021-03-10 00:00:00.000
+                        String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
+                        //formatted date output using intl package =>  2021-03-16
+                        setState(() {
+                          _takenDate.text = formattedDate; //set output date to InputTextField value.
+                        });
+                      } else {}
                     },
-                    text: "Add New Entry",
                   ),
-              ],
+                  const SizedBox(height: 24),
+                  if (_isloading == true) const CircularProgressIndicator(),
+                  if (_isloading != true &&
+                      _address.text.isNotEmpty &&
+                      _customerName.text.isNotEmpty &&
+                      _guardianName.text.isNotEmpty &&
+                      _itemName.text.isNotEmpty &&
+                      _mobileNumber.text.isNotEmpty &&
+                      _rateOfInterest.text.isNotEmpty &&
+                      _takenAmount.text.isNotEmpty &&
+                      _takenDate.text.isNotEmpty)
+                    RoundedCornerButton(
+                      onPressed: () {
+                        setState(() {
+                          _isloading = true;
+                        });
+                        addNewEntry(
+                          mobileNumber: _mobileNumber.text,
+                          address: _address.text,
+                          customerName: _customerName.text,
+                          guardianName: _guardianName.text,
+                          takenAmount: int.parse(_takenAmount.text),
+                          rateOfInterest: double.parse(_rateOfInterest.text),
+                          itemName: _itemName.text,
+                          takenDate: _takenDate.text,
+                        );
+                        Navigator.of(context).pop();
+                      },
+                      text: "Add New Entry",
+                    ),
+                ],
+              ),
             ),
           ),
         ),

@@ -36,19 +36,19 @@ class BodyTwoDefaultText extends StatelessWidget {
       softWrap: true,
       style: TextStyle(
         fontWeight: bold ? FontWeight.bold : FontWeight.w400,
-        fontSize: 15.sp,
+        fontSize: 16.sp,
         color: _getColor(context),
       ),
     );
   }
 
-  Color _getColor(BuildContext context) {
+  Color? _getColor(BuildContext context) {
     if (error) {
       return getErrorColor;
     } else if (whiteColor) {
       return getBackgroundColor;
     } else {
-      return color ?? getLigthGreyColor;
+      return color;
     }
   }
 }

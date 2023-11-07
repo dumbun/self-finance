@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/routes.dart';
-import 'package:self_finance/fonts/body_text.dart';
+import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/transaction_model.dart';
 
 import 'package:self_finance/widgets/arrow_widge.dart';
@@ -45,17 +45,17 @@ class DetailCardWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          BodyOneDefaultText(
+                          BodyTwoDefaultText(
                             text: data.customerName,
                             bold: true,
                           ),
                           SizedBox(height: 8.0.sp),
-                          BodyOneDefaultText(text: data.takenDate),
+                          BodyTwoDefaultText(text: data.takenDate),
                           SizedBox(height: 8.0.sp),
                           Row(
                             children: [
-                              const BodyOneDefaultText(text: "amount - taken : "),
-                              BodyOneDefaultText(
+                              const BodyTwoDefaultText(text: "amount - taken : "),
+                              BodyTwoDefaultText(
                                 bold: true,
                                 text: data.takenAmount.toString(),
                                 error: true,

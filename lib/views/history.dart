@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/backend/backend.dart';
@@ -94,32 +95,16 @@ class _HistoryViewState extends State<HistoryView> {
   Widget _buildSearchBar() {
     return SearchAnchor(
       builder: (BuildContext context, SearchController controller) {
-        return SearchBar(
-          elevation: MaterialStatePropertyAll(0.sp),
-          hintText: "search using mobile number",
+        return CupertinoSearchTextField(
+          style: const TextStyle(color: getPrimaryColor),
+          onSubmitted: (value) => _doSearch(controller.text),
+          placeholder: "Please enter mobile number",
+          keyboardType: TextInputType.phone,
           controller: controller,
-          padding: MaterialStatePropertyAll<EdgeInsets>(
-            EdgeInsets.symmetric(horizontal: 16.0.sp, vertical: 2.sp),
-          ),
-          onTap: () {
-            _doSearch(controller.text);
-          },
           onChanged: (_) {
+            print("object");
             _doSearch(controller.text);
           },
-          leading: const Icon(Icons.search),
-          trailing: [
-            IconButton(
-              onPressed: () {
-                _doSearch(controller.text);
-              },
-              icon: const Icon(
-                Icons.arrow_circle_right_outlined,
-                color: getPrimaryColor,
-              ),
-              selectedIcon: const Icon(Icons.arrow_circle_right),
-            ),
-          ],
         );
       },
       isFullScreen: false,

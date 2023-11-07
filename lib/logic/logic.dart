@@ -4,15 +4,21 @@ class LoanCalculator {
   final int takenAmount;
   final dynamic rateOfInterest;
   final String takenDate;
-  final DateTime todayDate;
+  DateTime? tenureDate;
 
-  LoanCalculator({required this.takenAmount, required this.rateOfInterest, required this.takenDate})
-      : todayDate = DateTime.now();
+  LoanCalculator({
+    required this.takenAmount,
+    required this.rateOfInterest,
+    required this.takenDate,
+    this.tenureDate,
+  });
 
   int getDays() {
+    tenureDate ??= DateTime.now();
+
     final DateFormat format = DateFormat("dd-MM-yyyy");
     final DateTime convertedDate = format.parseStrict(takenDate);
-    final differenceBetweenDays = todayDate.difference(convertedDate).inDays;
+    final differenceBetweenDays = tenureDate!.difference(convertedDate).inDays;
     return differenceBetweenDays;
   }
 
@@ -36,9 +42,10 @@ class LoanCalculator {
 
   double getTotal() {
     int getdays() {
+      tenureDate ??= DateTime.now();
       final DateFormat format = DateFormat("dd-MM-yyyy");
       final DateTime convertedDate = format.parseStrict(takenDate);
-      final differenceBetweenDays = todayDate.difference(convertedDate).inDays;
+      final differenceBetweenDays = tenureDate!.difference(convertedDate).inDays;
       return differenceBetweenDays;
     }
 

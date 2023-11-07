@@ -36,7 +36,7 @@ class BodyOneDefaultText extends StatelessWidget {
       softWrap: true,
       style: TextStyle(
         fontWeight: bold ? FontWeight.bold : FontWeight.w400,
-        fontSize: 16.sp,
+        fontSize: 18.sp,
         fontFamily: "hell",
         color: _getColor(context),
       ),
