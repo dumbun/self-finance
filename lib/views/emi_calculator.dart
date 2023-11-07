@@ -4,6 +4,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/logic/logic.dart';
+import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/widgets/date_picker_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
@@ -168,26 +169,32 @@ class _EmiCalculatorState extends State<EmiCalculator> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            SizedBox(height: 10.sp),
             BodyOneDefaultText(
               text: 'Principal Amount : $_principalAmount',
               bold: true,
             ),
+            SizedBox(height: 10.sp),
             BodyOneDefaultText(
-              text: 'no Due dates : $_monthsAndDays',
+              text: 'No.due Dates : $_monthsAndDays',
               bold: true,
             ),
+            SizedBox(height: 10.sp),
             BodyOneDefaultText(
               text: 'Intrest per Month : ${reduceDecimals(_emiPerMonth)}',
               bold: true,
             ),
+            SizedBox(height: 10.sp),
             BodyOneDefaultText(
               text: 'Total Intrest Amount : ${reduceDecimals(_totalInterest)}',
               bold: true,
             ),
+            SizedBox(height: 10.sp),
             BodyOneDefaultText(
-              text: 'Total amount : ${reduceDecimals(_totalAmount)}',
+              text: 'Total Amount : ${reduceDecimals(_totalAmount)}',
               bold: true,
-            )
+            ),
+            SizedBox(height: 10.sp),
           ],
         ),
       );
