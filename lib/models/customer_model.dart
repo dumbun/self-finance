@@ -11,9 +11,15 @@ class Customer {
   final double rateOfInterest;
   final String itemName;
   final int transaction;
+  final String? photoProof;
+  final String? photoItem;
+  final String? photoCustomer;
 
   const Customer({
     this.id,
+    this.photoProof,
+    this.photoItem,
+    this.photoCustomer,
     required this.mobileNumber,
     required this.address,
     required this.customerName,
@@ -36,6 +42,9 @@ class Customer {
     double? rateOfInterest,
     String? itemName,
     int? transaction,
+    String? photoProof,
+    String? photoItem,
+    String? photoCustomer,
   }) {
     return Customer(
       id: id ?? this.id,
@@ -48,6 +57,9 @@ class Customer {
       rateOfInterest: rateOfInterest ?? this.rateOfInterest,
       itemName: itemName ?? this.itemName,
       transaction: transaction ?? this.transaction,
+      photoProof: photoProof ?? this.photoProof,
+      photoItem: photoItem ?? this.photoItem,
+      photoCustomer: photoCustomer ?? this.photoCustomer,
     );
   }
 
@@ -65,13 +77,16 @@ class Customer {
         rateOfInterest: e["RATE_OF_INTEREST"],
         itemName: e["ITEM_NAME"],
         transaction: e["TRANSFER"],
+        photoProof: e["PHOTO_PROOF"],
+        photoCustomer: e["photoCustomer"],
+        photoItem: e["PHOTO_ITEM"],
       ));
     });
     return custData;
   }
 
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'id': id,
       'mobileNumber': mobileNumber,
       'address': address,
@@ -82,6 +97,9 @@ class Customer {
       'rateOfInterest': rateOfInterest,
       'itemName': itemName,
       'transaction': transaction,
+      'photoCustomer': photoCustomer,
+      'photoItem': photoItem,
+      'photoProof': photoProof,
     };
   }
 

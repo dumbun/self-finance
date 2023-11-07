@@ -18,6 +18,9 @@ class Transactions {
   final int? paidAmount;
   final int? totalIntrest;
   final String? dueTime;
+  final String? photoProof;
+  final String? photoItem;
+  final String? photoCustomer;
 
   Transactions({
     this.id,
@@ -35,6 +38,9 @@ class Transactions {
     this.paidAmount,
     this.totalIntrest,
     this.dueTime,
+    this.photoProof,
+    this.photoItem,
+    this.photoCustomer,
   });
 
   static List<Transactions> toList(data) {
@@ -58,6 +64,9 @@ class Transactions {
             paidAmount: e["PAID_AMOUNT"],
             totalIntrest: e["TOTAL_INTREST"],
             dueTime: e["DUE_TIME"],
+            photoProof: e["PHOTO_PROOF"],
+            photoCustomer: e["photoCustomer"],
+            photoItem: e["PHOTO_ITEM"],
           ),
         );
       },
@@ -81,6 +90,9 @@ class Transactions {
     ValueGetter<int?>? paidAmount,
     ValueGetter<int?>? totalIntrest,
     ValueGetter<String?>? dueTime,
+    String? photoProof,
+    String? photoItem,
+    String? photoCustomer,
   }) {
     return Transactions(
       id: id != null ? id() : this.id,
@@ -98,6 +110,9 @@ class Transactions {
       paidAmount: paidAmount != null ? paidAmount() : this.paidAmount,
       totalIntrest: totalIntrest != null ? totalIntrest() : this.totalIntrest,
       dueTime: dueTime != null ? dueTime() : this.dueTime,
+      photoProof: photoProof ?? this.photoProof,
+      photoItem: photoItem ?? this.photoItem,
+      photoCustomer: photoCustomer ?? this.photoCustomer,
     );
   }
 
@@ -118,6 +133,9 @@ class Transactions {
       'paidAmount': paidAmount,
       'totalIntrest': totalIntrest,
       'dueTime': dueTime,
+      'photoCustomer': photoCustomer,
+      'photoItem': photoItem,
+      'photoProof': photoProof,
     };
   }
 

@@ -28,20 +28,22 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: getBackgroundColor,
-      body: Container(
-        padding: EdgeInsets.all(24.sp),
-        width: double.infinity,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _getIcon(),
-              _getHeading(),
-              _space(),
-              _getTermsAndConditions(),
-              _getNextButton(),
-            ],
+      body: SafeArea(
+        child: Container(
+          padding: EdgeInsets.all(24.sp),
+          width: double.infinity,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _getIcon(),
+                _getHeading(),
+                _space(),
+                _getTermsAndConditions(),
+                _getNextButton(),
+              ],
+            ),
           ),
         ),
       ),
@@ -49,8 +51,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
   }
 
   _getNextButton() {
-    return Container(
-      margin: EdgeInsets.only(top: 20.sp),
+    return SizedBox(
       width: double.infinity,
       child: RoundedCornerButton(
         text: "Next",
@@ -61,7 +62,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
 
   Container _getTermsAndConditions() {
     return Container(
-      height: 88.sp,
+      height: 84.sp,
       alignment: Alignment.topLeft,
       child: SizedBox(
         height: 90.sp,
@@ -89,10 +90,17 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
   _getTerms() {
     List<Widget> result = [];
     for (var element in termsAndConditionsMap.entries) {
-      result.add(BodyTwoDefaultText(text: element.key, bold: true));
+      result.add(BodyTwoDefaultText(
+        text: element.key,
+        bold: true,
+        color: getPrimaryTextColor,
+      ));
       result.add(SizedBox(height: 16.sp));
       for (var element in element.value) {
-        result.add(BodyTwoDefaultText(text: element));
+        result.add(BodyTwoDefaultText(
+          text: element,
+          color: getPrimaryTextColor,
+        ));
         result.add(SizedBox(height: 16.sp));
       }
     }
