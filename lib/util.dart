@@ -5,3 +5,7 @@ double reduceDecimals(double value) {
 int textToInt(String value) {
   return int.parse(value);
 }
+
+DateTime presentDate() {
+  return DateTime.now();
+}

@@ -7,8 +7,14 @@ class InputDatePicker extends StatefulWidget {
     required this.controller,
     required this.labelText,
     this.onChanged,
+    required this.firstDate,
+    required this.lastDate,
+    required this.initialDate,
   });
   final TextEditingController controller;
+  final DateTime firstDate;
+  final DateTime lastDate;
+  final DateTime initialDate;
   final String labelText;
   final Function? onChanged;
   @override
@@ -19,6 +25,7 @@ class _InputDatePickerState extends State<InputDatePicker> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      onSaved: widget.onChanged as void Function(String?)?,
       onChanged: widget.onChanged as void Function(String)?,
       keyboardType: TextInputType.datetime,
       controller: widget.controller,
@@ -31,10 +38,13 @@ class _InputDatePickerState extends State<InputDatePicker> {
       onTap: () async {
         DateTime? pickedDate = await showDatePicker(
           context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(1000),
+          initialDate: widget.initialDate,
+          currentDate: DateTime.now(),
+          keyboardType: TextInputType.datetime,
+          initialDatePickerMode: DatePickerMode.year,
+          firstDate: widget.firstDate,
           //DateTime.now() - not to allow to choose before today.
-          lastDate: DateTime(5000),
+          lastDate: widget.lastDate,
         );
         if (pickedDate != null) {
           //pickedDate output format => 2021-03-10 00:00:00.000
