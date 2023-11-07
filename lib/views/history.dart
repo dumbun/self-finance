@@ -102,7 +102,6 @@ class _HistoryViewState extends State<HistoryView> {
           keyboardType: TextInputType.phone,
           controller: controller,
           onChanged: (_) {
-            print("object");
             _doSearch(controller.text);
           },
         );

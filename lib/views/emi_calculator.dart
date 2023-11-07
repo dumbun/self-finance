@@ -177,7 +177,7 @@ class _EmiCalculatorState extends State<EmiCalculator> {
               bold: true,
             ),
             BodyOneDefaultText(
-              text: 'EMI per Month : $_emiPerMonth',
+              text: 'Intrest per Month : ${reduceDecimals(_emiPerMonth)}',
               bold: true,
             ),
             BodyOneDefaultText(
