@@ -1,55 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/backend/user_db.dart';
 import 'package:self_finance/models/user_model.dart';
+import 'package:self_finance/providers/backend_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/views/auth_view.dart';
 import 'package:self_finance/views/terms_and_conditions.dart';
 
 void main() {
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  bool _isLoadind = true;
-  User? user;
-  fetchData() async {
-    setState(() {
-      _isLoadind = true;
-    });
-    final result = await UserBackEnd.fetchUserData();
-    if (result != null) {
-      setState(() {
-        user = result;
-      });
-    }
-    if (result == null) {
-      setState(() {
-        user = null;
-      });
-    }
-    setState(() {
-      _isLoadind = false;
-    });
-  }
-
-  @override
-  void initState() {
-    fetchData();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +43,6 @@ class _MyAppState extends State<MyApp> {
       ),
       useMaterial3: true,
     );
-
     return ResponsiveSizer(
       builder: (context, orientation, screenType) => MaterialApp(
         color: getPrimaryColor,
@@ -88,13 +50,25 @@ class _MyAppState extends State<MyApp> {
         debugShowCheckedModeBanner: false,
         theme: lightTheme,
         darkTheme: darkTheme,
-        home: _isLoadind
-            ? const Center(
-                child: CircularProgressIndicator.adaptive(),
-              )
-            : user == null
-                ? const TermsAndConditons()
-                : AuthView(user: user!),
+        home: Consumer(
+          builder: (context, ref, child) {
+            AsyncValue<User?> userData = ref.watch(userDataProvider);
+            return userData.when(
+              data: (user) {
+                if (user != null) {
+                  // Use the user data here
+                  return AuthView(user: user);
+                } else {
+                  return const TermsAndConditons();
+                }
+              },
+              loading: () =>
+                  const Center(child: CircularProgressIndicator.adaptive()), // Show a loader while fetching data
+              error: (error, stackTrace) =>
+                  const Center(child: Text('Error fetching user data')), // Show an error message if fetching fails
+            );
+          },
+        ),
       ),
     );
   }
