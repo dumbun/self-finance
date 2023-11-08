@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/routes.dart';
@@ -82,7 +83,7 @@ class DetailCardWidget extends StatelessWidget {
         : SizedBox(
             height: 30.sp,
             width: 30.sp,
-            child: Utility.imageFromBase64String(data.photoItem),
+            child: Utility.imageFromBase64String(data.photoCustomer),
           );
   }
 }

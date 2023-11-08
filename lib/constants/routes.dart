@@ -28,21 +28,20 @@ class Routes {
   }
 
   static navigateToDetailsView({required BuildContext context, required Transactions data}) {
-    Navigator.of(context).pushAndRemoveUntil(
+    Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) => DetailsView(
           data: data,
         ),
       ),
-      (route) => true,
     );
   }
 
   static navigateToAddNewEntry({required BuildContext context}) {
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (BuildContext context) => const AddNewEntryView(),
-        ),
-        (route) => true);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) => const AddNewEntryView(),
+      ),
+    );
   }
 }

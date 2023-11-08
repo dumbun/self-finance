@@ -1,9 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
-class BackEnd {
+class BackEnd extends ChangeNotifier {
   static Future<void> createTable(sql.Database database) async {
     await database.execute("""CREATE TABLE CUSTOMERS(
       ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,

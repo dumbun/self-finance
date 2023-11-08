@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/backend/user_db.dart';
 import 'package:self_finance/models/user_model.dart';
@@ -7,7 +8,11 @@ import 'package:self_finance/views/auth_view.dart';
 import 'package:self_finance/views/terms_and_conditions.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
