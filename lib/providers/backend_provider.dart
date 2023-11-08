@@ -7,7 +7,6 @@ final FutureProvider<User?> userDataProvider = FutureProvider<User?>((ref) async
     User? result = await UserBackEnd.fetchUserData();
     return result;
   } catch (e) {
-    print(e);
     return null;
   }
 });
