@@ -3,7 +3,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/transaction_model.dart';
-
+import 'package:self_finance/util.dart';
 import 'package:self_finance/widgets/arrow_widge.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 
@@ -36,10 +36,10 @@ class DetailCardWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                _buildProfilePic(),
                 Expanded(
                   child: Row(
                     children: [
-                      const DefaultUserImage(),
                       SizedBox(width: 16.0.sp),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,5 +74,15 @@ class DetailCardWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildProfilePic() {
+    return data.photoCustomer == ''
+        ? const DefaultUserImage()
+        : SizedBox(
+            height: 30.sp,
+            width: 30.sp,
+            child: Utility.imageFromBase64String(data.photoItem),
+          );
   }
 }

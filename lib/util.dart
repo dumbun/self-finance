@@ -7,15 +7,16 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 class Utility {
   static Widget imageFromBase64String(String base64String, {double? height, double? width}) {
-    if (base64String.isNotEmpty && base64String != "") {
+    final decodedImage = Image.memory(
+      base64Decode(base64String),
+      fit: BoxFit.fill, // Adjust this based on your image's aspect ratio requirement
+      height: height ?? 40.sp,
+      width: height ?? 40.sp,
+    );
+    if (base64String.isNotEmpty) {
       return ClipRRect(
-        borderRadius: BorderRadius.circular(20.sp),
-        child: Image.memory(
-          base64Decode(base64String),
-          fit: BoxFit.fill,
-          height: height ?? 40.sp,
-          width: height ?? 40.sp,
-        ),
+        borderRadius: BorderRadius.circular(120.sp),
+        child: decodedImage,
       );
     } else {
       return const SizedBox.shrink();
