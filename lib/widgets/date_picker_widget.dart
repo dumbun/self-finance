@@ -25,6 +25,12 @@ class _InputDatePickerState extends State<InputDatePicker> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a valid value';
+        }
+        return null;
+      },
       onSaved: widget.onChanged as void Function(String?)?,
       onChanged: widget.onChanged as void Function(String)?,
       keyboardType: TextInputType.datetime,

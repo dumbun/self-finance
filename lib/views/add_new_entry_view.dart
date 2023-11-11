@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/providers/backend_provider.dart';
 import 'package:self_finance/util.dart';
+import 'package:self_finance/widgets/date_picker_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
-class AddNewEntryView extends StatefulWidget {
+class AddNewEntryView extends ConsumerStatefulWidget {
   const AddNewEntryView({super.key});
 
   @override
-  State<AddNewEntryView> createState() => _AddNewEntryViewState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _AddNewEntryViewState();
 }
 
-class _AddNewEntryViewState extends State<AddNewEntryView> {
+class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final _address = TextEditingController();
   late final _customerName = TextEditingController();
   late final _guardianName = TextEditingController();
@@ -59,6 +61,15 @@ class _AddNewEntryViewState extends State<AddNewEntryView> {
     super.dispose();
   }
 
+  bool validateAndSave() {
+    final FormState? form = _formKey.currentState;
+    if (form!.validate()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     void addNewEntry({
@@ -75,44 +86,84 @@ class _AddNewEntryViewState extends State<AddNewEntryView> {
       required String proofPhoto,
     }) async {
       try {
-        final bool isCretateNewEntry = await BackEnd.createNewEntry(
-          Customer(
-            mobileNumber: mobileNumber,
-            address: address,
-            customerName: customerName,
-            guardianName: guardianName,
-            takenDate: takenDate,
-            takenAmount: takenAmount,
-            rateOfInterest: rateOfInterest,
-            itemName: itemName,
-            photoCustomer: profilePhoto,
-            photoItem: itemPhoto,
-            photoProof: proofPhoto,
-            transaction: 1,
-          ),
+        final Customer customer = Customer(
+          mobileNumber: mobileNumber,
+          address: address,
+          customerName: customerName,
+          guardianName: guardianName,
+          takenDate: takenDate,
+          takenAmount: takenAmount,
+          rateOfInterest: rateOfInterest,
+          itemName: itemName,
+          photoCustomer: profilePhoto,
+          photoItem: itemPhoto,
+          photoProof: proofPhoto,
+          transaction: 1,
         );
-        final bool isCreateNewTransaction = await BackEnd.createNewTransaction(
-          Transactions(
-            mobileNumber: mobileNumber,
-            address: address,
-            customerName: customerName,
-            guardianName: guardianName,
-            takenDate: takenDate,
-            takenAmount: takenAmount,
-            rateOfInterest: rateOfInterest,
-            itemName: itemName,
-            photoCustomer: profilePhoto,
-            transactionType: 1,
-            photoProof: proofPhoto,
-            photoItem: itemPhoto,
-          ),
+
+        Transactions transaction = Transactions(
+          mobileNumber: mobileNumber,
+          address: address,
+          customerName: customerName,
+          guardianName: guardianName,
+          takenDate: takenDate,
+          takenAmount: takenAmount,
+          rateOfInterest: rateOfInterest,
+          itemName: itemName,
+          photoCustomer: profilePhoto,
+          transactionType: 1,
+          photoProof: proofPhoto,
+          photoItem: itemPhoto,
         );
+
+        bool createNewCustomerEntry = await ref.watch(createNewEntryProvider(customer)).when(
+          data: (data) {
+            if (data) {
+              return data;
+            } else {
+              return false;
+            }
+          },
+          error: (error, stackTrace) {
+            return false;
+          },
+          loading: () {
+            return true;
+          },
+        );
+
+        createNewCustomerEntry = await ref.watch(createNewTransactionProvider(transaction)).when(
+          data: (data) {
+            if (data) {
+              return data;
+            } else {
+              AlertDilogs.alertDialogWithOneAction(
+                context,
+                "Error",
+                'Data is not saved please try again after some time',
+              );
+              return false;
+            }
+          },
+          error: (error, stackTrace) {
+            AlertDilogs.alertDialogWithOneAction(
+              context,
+              "Error",
+              error.toString(),
+            );
+            return false;
+          },
+          loading: () {
+            return true;
+          },
+        );
+
         setState(() {
           _isloading = false;
         });
 
         alerts() {
-          if (isCreateNewTransaction && isCretateNewEntry) {
+          if (createNewCustomerEntry) {
             AlertDilogs.alertDialogWithOneAction(context, "Success", "Data saved ✅ ");
           } else {
             AlertDilogs.alertDialogWithOneAction(context, "Fail", "Data not saved please try again 😥 ");
@@ -131,116 +182,120 @@ class _AddNewEntryViewState extends State<AddNewEntryView> {
       child: Scaffold(
         appBar: AppBar(title: const Text("Add new Entry")),
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  InputTextField(
-                    keyboardType: TextInputType.streetAddress,
-                    controller: _address,
-                    hintText: "Place",
-                  ),
-                  SizedBox(height: 20.sp),
-                  InputTextField(
-                    keyboardType: TextInputType.name,
-                    controller: _customerName,
-                    hintText: "Name",
-                  ),
-                  SizedBox(height: 20.sp),
-                  InputTextField(
-                    keyboardType: TextInputType.name,
-                    controller: _guardianName,
-                    hintText: "Guardian Name",
-                  ),
-                  SizedBox(height: 20.sp),
-                  InputTextField(
-                    controller: _mobileNumber,
-                    keyboardType: TextInputType.phone,
-                    hintText: "Phone Number",
-                  ),
-                  SizedBox(height: 20.sp),
-                  InputTextField(
-                    controller: _takenAmount,
-                    keyboardType: TextInputType.number,
-                    hintText: "Amount",
-                  ),
-                  SizedBox(height: 20.sp),
-                  InputTextField(
-                    controller: _rateOfInterest,
-                    keyboardType: TextInputType.number,
-                    hintText: "Rate of Intrest",
-                  ),
-                  SizedBox(height: 20.sp),
-                  InputTextField(
-                    keyboardType: TextInputType.name,
-                    controller: _itemName,
-                    hintText: "Item Name",
-                  ),
-                  SizedBox(height: 20.sp),
-                  TextFormField(
-                    controller: _takenDate,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InputTextField(
+                      keyboardType: TextInputType.streetAddress,
+                      controller: _address,
+                      hintText: "Place",
+                    ),
+                    SizedBox(height: 20.sp),
+                    InputTextField(
+                      keyboardType: TextInputType.name,
+                      controller: _customerName,
+                      hintText: "Name",
+                    ),
+                    SizedBox(height: 20.sp),
+                    InputTextField(
+                      keyboardType: TextInputType.name,
+                      controller: _guardianName,
+                      hintText: "Guardian Name",
+                    ),
+                    SizedBox(height: 20.sp),
+                    InputTextField(
+                      controller: _mobileNumber,
+                      keyboardType: TextInputType.phone,
+                      hintText: "Phone Number",
+                    ),
+                    SizedBox(height: 20.sp),
+                    InputTextField(
+                      controller: _takenAmount,
+                      keyboardType: TextInputType.number,
+                      hintText: "Amount",
+                    ),
+                    SizedBox(height: 20.sp),
+                    InputTextField(
+                      controller: _rateOfInterest,
+                      keyboardType: TextInputType.number,
+                      hintText: "Rate of Intrest",
+                    ),
+                    SizedBox(height: 20.sp),
+                    InputTextField(
+                      keyboardType: TextInputType.name,
+                      controller: _itemName,
+                      hintText: "Item Name",
+                    ),
+                    SizedBox(height: 20.sp),
+                    InputDatePicker(
+                      controller: _takenDate,
+                      labelText: "Enter Date",
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1950),
+                      //DateTime.now() - not to allow to choose before today.
+                      lastDate: DateTime(9999),
+                    ),
+                    SizedBox(height: 24.sp),
+                    _buildImagePickers(),
+                    SizedBox(height: 24.sp),
+                    Visibility(
+                      visible: _isloading,
+                      replacement: RoundedCornerButton(
+                        onPressed: () {
+                          if (validateAndSave()) {
+                            setState(() {
+                              _isloading = true;
+                            });
 
-                      icon: Icon(Icons.calendar_today), //icon of text field
-                      labelText: "Enter Date", //label text of field
+                            double doubleCheck(String text, {String errorString = "error"}) {
+                              try {
+                                return double.parse(text);
+                              } catch (e) {
+                                setState(() {
+                                  _isloading = false;
+                                });
+                                return AlertDilogs.alertDialogWithOneAction(context, errorString, e.toString());
+                              }
+                            }
+
+                            int intCheck(String text, {String errorString = "error"}) {
+                              try {
+                                return int.parse(text);
+                              } catch (e) {
+                                setState(() {
+                                  _isloading = false;
+                                });
+                                return AlertDilogs.alertDialogWithOneAction(context, errorString, e.toString());
+                              }
+                            }
+
+                            addNewEntry(
+                              mobileNumber: _mobileNumber.text,
+                              address: _address.text,
+                              customerName: _customerName.text,
+                              guardianName: _guardianName.text,
+                              takenAmount: intCheck(_takenAmount.text, errorString: "Taken Amount Error"),
+                              rateOfInterest: doubleCheck(_rateOfInterest.text, errorString: "rate Of Interest Error"),
+                              itemName: _itemName.text,
+                              takenDate: _takenDate.text,
+                              profilePhoto: _pickedProfileImageString,
+                              itemPhoto: _pickedItemImageString,
+                              proofPhoto: _pickedProofImageString,
+                            );
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        text: "Add New Entry",
+                      ),
+                      child: const CircularProgressIndicator(),
                     ),
-                    readOnly: true,
-                    onTap: () async {
-                      DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(1950),
-                          //DateTime.now() - not to allow to choose before today.
-                          lastDate: DateTime(9999));
-                      if (pickedDate != null) {
-                        //pickedDate output format => 2021-03-10 00:00:00.000
-                        String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
-                        //formatted date output using intl package =>  2021-03-16
-                        setState(() {
-                          _takenDate.text = formattedDate; //set output date to InputTextField value.
-                        });
-                      } else {}
-                    },
-                  ),
-                  SizedBox(height: 24.sp),
-                  _buildImagePickers(),
-                  SizedBox(height: 24.sp),
-                  if (_isloading == true) const CircularProgressIndicator(),
-                  if (_isloading != true &&
-                      _address.text.isNotEmpty &&
-                      _customerName.text.isNotEmpty &&
-                      _guardianName.text.isNotEmpty &&
-                      _itemName.text.isNotEmpty &&
-                      _mobileNumber.text.isNotEmpty &&
-                      _rateOfInterest.text.isNotEmpty &&
-                      _takenAmount.text.isNotEmpty &&
-                      _takenDate.text.isNotEmpty)
-                    RoundedCornerButton(
-                      onPressed: () {
-                        setState(() {
-                          _isloading = true;
-                        });
-                        addNewEntry(
-                          mobileNumber: _mobileNumber.text,
-                          address: _address.text,
-                          customerName: _customerName.text,
-                          guardianName: _guardianName.text,
-                          takenAmount: int.parse(_takenAmount.text),
-                          rateOfInterest: double.parse(_rateOfInterest.text),
-                          itemName: _itemName.text,
-                          takenDate: _takenDate.text,
-                          profilePhoto: _pickedProfileImageString,
-                          itemPhoto: _pickedItemImageString,
-                          proofPhoto: _pickedProofImageString,
-                        );
-                        Navigator.of(context).pop();
-                      },
-                      text: "Add New Entry",
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

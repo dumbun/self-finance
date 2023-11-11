@@ -2,9 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
-class BackEnd extends ChangeNotifier {
+class BackEnd {
   static Future<void> createTable(sql.Database database) async {
     await database.execute("""CREATE TABLE CUSTOMERS(
       ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -54,6 +55,8 @@ class BackEnd extends ChangeNotifier {
     });
   }
 
+  // create new customer entry
+
   static Future<bool> createNewEntry(Customer customer) async {
     final db = await BackEnd.db();
     try {
@@ -72,6 +75,7 @@ class BackEnd extends ChangeNotifier {
         "PHOTO_PROOF": customer.photoProof,
       };
       final id = await db.insert('CUSTOMERS', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
+      if (id == 0) return false;
       return true;
     } catch (e) {
       return false;
@@ -104,6 +108,7 @@ class BackEnd extends ChangeNotifier {
       };
 
       final id = await db.insert('TRANSACTIONS', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
+      if (id == 0) return false;
       return true;
     } catch (e) {
       return false;

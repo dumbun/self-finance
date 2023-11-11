@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
 
 class DetailsView extends StatelessWidget {
@@ -10,6 +11,9 @@ class DetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: getPrimaryTextColor,
+      ),
       //todo details view
       body: SizedBox(
         width: double.infinity,
