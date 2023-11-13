@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_model.dart';
-import 'package:self_finance/views/add_new_entry_view.dart';
 import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/details_view.dart';
 import 'package:self_finance/views/pin_creating_view.dart';
@@ -36,10 +35,6 @@ class Routes {
   }
 
   static navigateToAddNewEntry({required BuildContext context}) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (BuildContext context) => const AddNewEntryView(),
-      ),
-    );
+    Navigator.pushNamed(context, '/addNewEntry');
   }
 }
