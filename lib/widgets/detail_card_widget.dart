@@ -27,7 +27,9 @@ class DetailCardWidget extends StatelessWidget {
       child: Card(
         elevation: 0.0,
         child: InkWell(
-          onTap: () => Routes.navigateToDetailsView(context: context, data: data),
+          onTap: () {
+            Routes.navigateToDetailsView(context: context, data: data);
+          },
           child: Padding(
             padding: EdgeInsets.symmetric(
               vertical: 18.0.sp,

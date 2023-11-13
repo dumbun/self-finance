@@ -45,7 +45,8 @@ class _HistoryViewState extends State<HistoryView> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 12.sp),
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 16.sp),
       child: RefreshIndicator.adaptive(
         onRefresh: () => _dataFuture = _dataFuture = BackEnd.fetchLatestTransactions(),
         child: Column(
@@ -143,23 +144,6 @@ class _HistoryViewState extends State<HistoryView> {
       },
     );
   }
-
-  // void _doSearch(String mobileNumber) async {
-  //   try {
-  //     if (mobileNumber.isEmpty) {
-  //       setState(() {
-  //         _dataFuture = BackEnd.fetchLatestTransactions();
-  //       });
-  //     } else {
-  //       List<Transactions> queryData = await BackEnd.getTransactionsEntriesByMobileNumber(mobileNumber);
-  //       setState(() {
-  //         _dataFuture = Future.value(queryData);
-  //       });
-  //     }
-  //   } catch (error) {
-  //     _showErrorAlert(error);
-  //   }
-  // }
 
   void _doSearch(String mobileNumber) async {
     try {

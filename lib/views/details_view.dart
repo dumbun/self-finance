@@ -14,7 +14,6 @@ class DetailsView extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: getPrimaryTextColor,
       ),
-      //todo details view
       body: SizedBox(
         width: double.infinity,
         child: Column(

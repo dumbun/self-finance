@@ -47,7 +47,7 @@ DateTime presentDate() {
 Future<String> pickImageFromCamera() async {
   final ImagePicker picker = ImagePicker();
   String result = "";
-  final imgFile = await picker.pickImage(source: ImageSource.camera);
+  final imgFile = await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
 
   if (imgFile != null) {
     Uint8List imgBytes = Uint8List.fromList(await imgFile.readAsBytes());

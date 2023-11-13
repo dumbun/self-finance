@@ -98,7 +98,7 @@ class _EmiCalculatorState extends State<EmiCalculator> {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(20.sp),
+      padding: EdgeInsets.all(16.sp),
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -146,7 +146,6 @@ class _EmiCalculatorState extends State<EmiCalculator> {
                 firstIndicatorValue: _firstIndicatorValue,
                 secoundIndicatorValue: _secoundIndicatorValue,
               ),
-
             _buildDetails(),
           ],
         ),
