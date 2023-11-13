@@ -60,34 +60,24 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     );
   }
 
-  Container _getTermsAndConditions() {
-    return Container(
-      height: 84.sp,
-      alignment: Alignment.topLeft,
-      child: SizedBox(
-        height: 90.sp,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: _getTerms(),
-              ),
-              SizedBox(height: 16.sp),
-              _getCheckBoxWithDescription(),
-              SizedBox(height: 16.sp),
-            ],
-          ),
+  Column _getTermsAndConditions() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: _getTerms(),
         ),
-      ),
+        SizedBox(height: 16.sp),
+        _getCheckBoxWithDescription(),
+        SizedBox(height: 16.sp),
+      ],
     );
   }
 
-  _getTerms() {
+  List<Widget> _getTerms() {
     List<Widget> result = [];
     for (var element in termsAndConditionsMap.entries) {
       result.add(BodyTwoDefaultText(
@@ -133,7 +123,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     );
   }
 
-  dynamic _getClicked() {
+  void _getClicked() {
     setState(() {
       ticked = !ticked;
     });

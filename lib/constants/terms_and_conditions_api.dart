@@ -31,7 +31,7 @@ const changesToTerms = [
 ];
 
 const contactInformation = [
-  "8.1 If you have any questions or concerns about these Terms, please contact us at vamsikrishna2644@gmail.com.",
+  "8.1 If you have any questions or concerns about these Terms, please contact us at sf.help.vamshi@gmail.com.",
   "8.2 If you do not agree with any part of these Terms, please discontinue the use of the App."
 ];
 
