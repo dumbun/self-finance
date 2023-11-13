@@ -27,7 +27,12 @@ class _HistoryViewState extends State<HistoryView> {
   }
 
   Widget _showErrorAlert(error) {
-    return AlertDilogs.alertDialogWithOneAction(context, "error", 'Error fetching data: $error');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AlertDilogs.alertDialogWithOneAction(context, "error", 'Error fetching data: $error');
+    });
+
+    // Return a placeholder widget, or an empty container
+    return const SizedBox.shrink();
   }
 
   @override
@@ -65,10 +70,19 @@ class _HistoryViewState extends State<HistoryView> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator.adaptive()); // Placeholder for loading state
         } else if (snapshot.hasError) {
+          // return Text(snapshot.error.toString());
+          print(snapshot.error);
           return _showErrorAlert(snapshot.error);
         } else {
-          _shodowData = snapshot.data ?? [];
-          return _buildCards(snapshot.data ?? []);
+          // Check if data is null or empty
+          final List<Transactions>? data = snapshot.data;
+          if (data == null || data.isEmpty) {
+            return const Center(
+              child: Text("No transactions found."),
+            );
+          }
+          _shodowData = data;
+          return _buildCards(data);
         }
       },
     );
@@ -130,18 +144,34 @@ class _HistoryViewState extends State<HistoryView> {
     );
   }
 
+  // void _doSearch(String mobileNumber) async {
+  //   try {
+  //     if (mobileNumber.isEmpty) {
+  //       setState(() {
+  //         _dataFuture = BackEnd.fetchLatestTransactions();
+  //       });
+  //     } else {
+  //       List<Transactions> queryData = await BackEnd.getTransactionsEntriesByMobileNumber(mobileNumber);
+  //       setState(() {
+  //         _dataFuture = Future.value(queryData);
+  //       });
+  //     }
+  //   } catch (error) {
+  //     _showErrorAlert(error);
+  //   }
+  // }
+
   void _doSearch(String mobileNumber) async {
     try {
-      if (mobileNumber.isEmpty) {
-        setState(() {
-          _dataFuture = BackEnd.fetchLatestTransactions();
-        });
-      } else {
-        List<Transactions> queryData = await BackEnd.getTransactionsEntriesByMobileNumber(mobileNumber);
-        setState(() {
-          _dataFuture = Future.value(queryData);
-        });
+      List<Transactions> queryData = [];
+
+      if (mobileNumber.isNotEmpty) {
+        queryData = await BackEnd.getTransactionsEntriesByMobileNumber(mobileNumber);
       }
+
+      setState(() {
+        _dataFuture = Future.value(queryData);
+      });
     } catch (error) {
       _showErrorAlert(error);
     }

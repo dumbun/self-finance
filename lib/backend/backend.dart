@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
 class BackEnd {
@@ -120,7 +118,7 @@ class BackEnd {
   static Future<List<Transactions>> fetchLatestTransactions() async {
     final db = await BackEnd.db();
     List<Map<String, Object?>> result = await db.rawQuery("""
-      SELECT * FROM TRANSACTIONS ORDER BY TAKEN_DATE DESC 
+      SELECT * FROM TRANSACTIONS ORDER BY TAKEN_DATE DESC LIMIT 20 OFFSET 0
     """);
     if (result.isNotEmpty) {
       return Transactions.toList(result);

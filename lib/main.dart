@@ -8,6 +8,7 @@ import 'package:self_finance/views/auth_view.dart';
 import 'package:self_finance/views/terms_and_conditions.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const ProviderScope(child: MyApp()));
 }
 
