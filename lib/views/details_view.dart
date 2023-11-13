@@ -21,8 +21,8 @@ class DetailsView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Utility.imageFromBase64String(data.photoCustomer),
-            Utility.imageFromBase64String(data.photoItem),
             Utility.imageFromBase64String(data.photoProof),
+            Utility.imageFromBase64String(data.photoItem),
             Text(data.id.toString()),
             Text(data.customerName),
             Text(data.via.toString()),

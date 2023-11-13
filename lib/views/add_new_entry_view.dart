@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/providers/backend_provider.dart';
-import 'package:self_finance/util.dart';
+import 'package:self_finance/providers/providers.dart';
+import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:self_finance/widgets/date_picker_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
-import 'package:self_finance/widgets/image_picker_widget.dart';
+
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
@@ -31,12 +31,6 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> with SingleTi
   late final _itemName = TextEditingController();
   late final _takenDate = TextEditingController();
   late bool _isloading;
-  Widget? _pickedProfileImage;
-  String _pickedProfileImageString = "";
-  Widget? _pickedItemImage;
-  String _pickedItemImageString = "";
-  Widget? _pickedProofImage;
-  String _pickedProofImageString = "";
 
   //animatior
 
@@ -58,11 +52,7 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> with SingleTi
 
   @override
   void dispose() {
-    _pickedItemImageString;
-    _pickedProofImageString;
     _address.dispose();
-    _pickedProfileImage;
-    _pickedProfileImageString;
     _customerName.dispose();
     _guardianName.dispose();
     _mobileNumber.dispose();
@@ -93,11 +83,12 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> with SingleTi
       required double rateOfInterest,
       required String itemName,
       required String takenDate,
-      required String profilePhoto,
-      required String itemPhoto,
-      required String proofPhoto,
     }) async {
       try {
+        final String photoCustomer = ref.watch(pickedCustomerProfileImageStringProvider);
+        final String photoProof = ref.watch(pickedCustomerProofImageStringProvider);
+        final String photoItem = ref.watch(pickedCustomerItemImageStringProvider);
+
         final Customer customer = Customer(
           mobileNumber: mobileNumber,
           address: address,
@@ -107,9 +98,9 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> with SingleTi
           takenAmount: takenAmount,
           rateOfInterest: rateOfInterest,
           itemName: itemName,
-          photoCustomer: profilePhoto,
-          photoItem: itemPhoto,
-          photoProof: proofPhoto,
+          photoCustomer: photoCustomer,
+          photoProof: photoProof,
+          photoItem: photoItem,
           transaction: 1,
         );
 
@@ -122,10 +113,10 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> with SingleTi
           takenAmount: takenAmount,
           rateOfInterest: rateOfInterest,
           itemName: itemName,
-          photoCustomer: profilePhoto,
           transactionType: 1,
-          photoProof: proofPhoto,
-          photoItem: itemPhoto,
+          photoCustomer: photoCustomer,
+          photoProof: photoProof,
+          photoItem: photoItem,
         );
 
         bool createNewCustomerEntry = await ref.read(createNewEntryProvider(customer)).when(
@@ -295,9 +286,6 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> with SingleTi
                               rateOfInterest: doubleCheck(_rateOfInterest.text, errorString: "rate Of Interest Error"),
                               itemName: _itemName.text,
                               takenDate: _takenDate.text,
-                              profilePhoto: _pickedProfileImageString,
-                              itemPhoto: _pickedItemImageString,
-                              proofPhoto: _pickedProofImageString,
                             );
                             Navigator.of(context).pop();
                           }
@@ -325,81 +313,25 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> with SingleTi
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildImageButtons(
-              _doProfilePickingProcess,
-              defaultProfileImagePath,
-              _pickedProfileImage,
-              "Customer Photo",
+            ImagePickerWidget(
+              text: "Customer Photo",
+              defaultImage: defaultProfileImagePath,
+              imageProvider: pickedCustomerProfileImageStringProvider,
             ),
-            _buildImageButtons(
-              _doProofPickingProcess,
-              defaultProofImagePath,
-              _pickedProofImage,
-              "Customer Proof",
+            ImagePickerWidget(
+              text: "Customer Proof",
+              defaultImage: defaultProofImagePath,
+              imageProvider: pickedCustomerProofImageStringProvider,
             ),
           ],
         ),
         SizedBox(height: 10.sp),
-        _buildImageButtons(
-          _doItemPickingProcess,
-          defaultItemImagePath,
-          _pickedItemImage,
-          "Item photo",
+        ImagePickerWidget(
+          text: "Customer Item",
+          defaultImage: defaultItemImagePath,
+          imageProvider: pickedCustomerItemImageStringProvider,
         ),
       ],
     );
-  }
-
-  Card _buildImageButtons(onTap, defaultImage, pickedImage, text) {
-    return Card(
-      elevation: 0.sp,
-      child: Container(
-        margin: EdgeInsets.all(15.sp),
-        child: Column(
-          children: [
-            ImagePickerWidget(
-              onTap: onTap,
-              defaultImage: defaultImage,
-              pickedImage: pickedImage,
-            ),
-            SizedBox(height: 10.sp),
-            BodyOneDefaultText(text: text)
-          ],
-        ),
-      ),
-    );
-  }
-
-  _doProfilePickingProcess() {
-    pickImageFromCamera().then((value) {
-      if (value != "" && value.isNotEmpty) {
-        _pickedProfileImageString = value;
-        setState(() {
-          _pickedProfileImage = Utility.imageFromBase64String(value);
-        });
-      }
-    });
-  }
-
-  _doItemPickingProcess() {
-    pickImageFromCamera().then((value) {
-      if (value != "" && value.isNotEmpty) {
-        _pickedItemImageString = value;
-        setState(() {
-          _pickedItemImage = Utility.imageFromBase64String(value);
-        });
-      }
-    });
-  }
-
-  _doProofPickingProcess() {
-    pickImageFromCamera().then((value) {
-      if (value != "" && value.isNotEmpty) {
-        _pickedProofImageString = value;
-        setState(() {
-          _pickedProofImage = Utility.imageFromBase64String(value);
-        });
-      }
-    });
   }
 }
