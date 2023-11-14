@@ -17,7 +17,7 @@ class HistoryView extends StatefulWidget {
 }
 
 class _HistoryViewState extends State<HistoryView> {
-  late Future<List<Transactions>> _dataFuture;
+  Future<List<Transactions>> _dataFuture = BackEnd.fetchLatestTransactions();
   List<Transactions> _shodowData = [];
 
   @override
@@ -33,13 +33,6 @@ class _HistoryViewState extends State<HistoryView> {
 
     // Return a placeholder widget, or an empty container
     return const SizedBox.shrink();
-  }
-
-  @override
-  void dispose() {
-    _dataFuture;
-    _shodowData;
-    super.dispose();
   }
 
   @override
@@ -72,7 +65,6 @@ class _HistoryViewState extends State<HistoryView> {
           return const Center(child: CircularProgressIndicator.adaptive()); // Placeholder for loading state
         } else if (snapshot.hasError) {
           // return Text(snapshot.error.toString());
-          print(snapshot.error);
           return _showErrorAlert(snapshot.error);
         } else {
           // Check if data is null or empty

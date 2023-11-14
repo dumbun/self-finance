@@ -225,7 +225,7 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> with SingleTi
                     InputTextField(
                       controller: _rateOfInterest,
                       keyboardType: TextInputType.number,
-                      hintText: "Rate of Intrest",
+                      hintText: "Rate of Intrest %",
                     ),
                     SizedBox(height: 20.sp),
                     InputTextField(
@@ -236,7 +236,7 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> with SingleTi
                     SizedBox(height: 20.sp),
                     InputDatePicker(
                       controller: _takenDate,
-                      labelText: "Enter Date",
+                      labelText: "Enter Date ( dd-MM-yyyy )",
                       initialDate: DateTime.now(),
                       firstDate: DateTime(1950),
                       //DateTime.now() - not to allow to choose before today.

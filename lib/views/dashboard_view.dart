@@ -42,10 +42,10 @@ class _DashboardViewState extends State<DashboardView> {
                 _selectedIndex = index;
               });
             },
-            children: const <Widget>[
-              HomeScreen(),
+            children: <Widget>[
+              const HomeScreen(),
               EmiCalculator(),
-              HistoryView(),
+              const HistoryView(),
             ],
           ),
         ),

@@ -22,7 +22,8 @@ class _EmiCalculatorState extends State<EmiCalculator> {
   final TextEditingController _rateOfIntrestInput = TextEditingController();
   final TextEditingController _takenDataInput = TextEditingController();
   final TextEditingController _tenureDataInput = TextEditingController();
-  final DateTime _firstDate = presentDate();
+  final DateTime _firstDate = DateTime(1000);
+  final DateTime _initalDate = DateTime.now();
   final DateTime _lastDate = DateTime(9999);
   double _firstIndicatorValue = 0;
   double _secoundIndicatorValue = 0;
@@ -110,7 +111,7 @@ class _EmiCalculatorState extends State<EmiCalculator> {
             InputDatePicker(
               firstDate: _firstDate,
               lastDate: _lastDate,
-              initialDate: _firstDate,
+              initialDate: _initalDate,
               onChanged: ((value) => _doCalculations()),
               labelText: "Taken Date ( dd-MM-yyyy )",
               controller: _takenDataInput,
@@ -120,9 +121,9 @@ class _EmiCalculatorState extends State<EmiCalculator> {
             InputDatePicker(
               firstDate: _firstDate,
               lastDate: _lastDate,
-              initialDate: _firstDate,
+              initialDate: _initalDate,
               onChanged: ((value) => _doCalculations()),
-              labelText: "Loan Tenure ( dd-MM-yyyy )",
+              labelText: "Loan Tenure Date ( dd-MM-yyyy )",
               controller: _tenureDataInput,
             ),
             SizedBox(height: 20.sp),
