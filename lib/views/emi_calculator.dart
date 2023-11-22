@@ -122,7 +122,10 @@ class _EmiCalculatorState extends State<EmiCalculator> {
               firstDate: _firstDate,
               lastDate: _lastDate,
               initialDate: _initalDate,
-              onChanged: ((value) => _doCalculations()),
+              onChanged: ((value) {
+                _tenureDataInput.text = value;
+                _doCalculations();
+              }),
               labelText: "Loan Tenure Date ( dd-MM-yyyy )",
               controller: _tenureDataInput,
             ),
