@@ -8,3 +8,7 @@ const String emiCalculator = "EMI Calculator";
 const String defaultProfileImagePath = "assets/icon/defaultImage.svg";
 const String defaultProofImagePath = "assets/icon/id_proof_icon.svg";
 const String defaultItemImagePath = "assets/icon/item_icon.svg";
+const String searchMobile = "Search using mobile number";
+const String mobileNumber = "Mobile Number";
+const String customerName = "Customer Name";
+const String customerPlace = "Customer Place";

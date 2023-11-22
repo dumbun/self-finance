@@ -5,7 +5,7 @@ import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/views/emi_calculator.dart';
-import 'package:self_finance/views/history.dart';
+import 'package:self_finance/views/history/history_view.dart';
 import 'package:self_finance/views/home_screen.dart';
 
 class DashboardView extends StatefulWidget {
@@ -42,10 +42,10 @@ class _DashboardViewState extends State<DashboardView> {
                 _selectedIndex = index;
               });
             },
-            children: <Widget>[
-              const HomeScreen(),
+            children: const <Widget>[
+              HomeScreen(),
               EmiCalculator(),
-              const HistoryView(),
+              HistoryView(),
             ],
           ),
         ),
