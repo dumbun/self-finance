@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/backend/backend.dart';
@@ -17,8 +16,9 @@ class HistoryView extends StatefulWidget {
 }
 
 class _HistoryViewState extends State<HistoryView> {
-  late Future<List<Transactions>> _dataFuture;
+  Future<List<Transactions>> _dataFuture = BackEnd.fetchLatestTransactions();
   List<Transactions> _shodowData = [];
+  List<String> filters = ["Mobile Number", "Name"];
 
   @override
   void initState() {
@@ -33,13 +33,6 @@ class _HistoryViewState extends State<HistoryView> {
 
     // Return a placeholder widget, or an empty container
     return const SizedBox.shrink();
-  }
-
-  @override
-  void dispose() {
-    _dataFuture;
-    _shodowData;
-    super.dispose();
   }
 
   @override
@@ -72,7 +65,6 @@ class _HistoryViewState extends State<HistoryView> {
           return const Center(child: CircularProgressIndicator.adaptive()); // Placeholder for loading state
         } else if (snapshot.hasError) {
           // return Text(snapshot.error.toString());
-          print(snapshot.error);
           return _showErrorAlert(snapshot.error);
         } else {
           // Check if data is null or empty
@@ -107,14 +99,36 @@ class _HistoryViewState extends State<HistoryView> {
     );
   }
 
+  String dropdownValue = "Mobile Number";
+
+  void _doChangeSearchFilters() {}
+
   Widget _buildSearchBar() {
     return SearchAnchor(
       builder: (BuildContext context, SearchController controller) {
-        return CupertinoSearchTextField(
-          style: const TextStyle(color: getPrimaryColor),
+        return SearchBar(
+          elevation: MaterialStatePropertyAll(0.sp),
+          trailing: [
+            DropdownButton(
+
+              icon: const Icon(Icons.filter_alt_outlined),
+              enableFeedback: true,
+              items: filters.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              value: dropdownValue,
+              onChanged: (String? value) {
+                setState(() {
+                  dropdownValue = value!;
+                });
+              },
+            ),
+          ],
+          leading: const Icon(Icons.search),
           onSubmitted: (value) => _doSearch(controller.text),
-          placeholder: "Please enter mobile number",
-          keyboardType: TextInputType.phone,
           controller: controller,
           onChanged: (_) {
             _doSearch(controller.text);

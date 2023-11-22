@@ -36,6 +36,10 @@ double reduceDecimals(double value) {
   return double.parse(value.toStringAsFixed(1));
 }
 
+double textToDouble(String value) {
+  return double.parse(value);
+}
+
 int textToInt(String value) {
   return int.parse(value);
 }
