@@ -4,19 +4,38 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/providers/providers.dart';
 import 'package:self_finance/views/history/history_providers.dart';
 import 'package:self_finance/widgets/detail_card_widget.dart';
-import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 
-class HistoryView extends ConsumerWidget {
+class HistoryView extends ConsumerStatefulWidget {
   const HistoryView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HistoryView> createState() => _HistoryViewState();
+}
+
+class _HistoryViewState extends ConsumerState<HistoryView> {
+  void fetchData() async {
+    List<Transactions> l = [];
+    //converts the async values into a sync values
+    l = await BackEnd.fetchLatestTransactions();
+    ref.read(listOfTransactionsProvider.notifier).state = l;
+  }
+
+  @override
+  void initState() {
+    // fetches and changes the state of the provider when the screen first loades
+    fetchData();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final String hintText = ref.watch(hintTextProvider);
     final String filterText = ref.watch(selectedFilterProvider);
-    Future<List<Transactions>> dataFuture = BackEnd.fetchLatestTransactions();
+    final List<Transactions> data = ref.watch(listOfTransactionsProvider);
 
     return SafeArea(
       child: Container(
@@ -28,62 +47,45 @@ class HistoryView extends ConsumerWidget {
           children: [
             _buildTitle(ref),
             SizedBox(height: 10.sp),
-            _buildSearchBar(ref, hintText, filterText),
+            _buildSearchBar(ref, hintText, filterText, data),
             SizedBox(height: 10.sp),
-            _buildData(dataFuture),
+            _buildData(data),
+
+            // _buildData(dataFuture),
           ],
         ),
       ),
     );
   }
 
-  FutureBuilder<List<Transactions>> _buildData(dataFuture) {
-    return FutureBuilder<List<Transactions>>(
-      future: dataFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator.adaptive()); // Placeholder for loading state
-        } else if (snapshot.hasError) {
-          // return Text(snapshot.error.toString());
-          return AlertDilogs.alertDialogWithOneAction(context, error, 'Error fetching data: ${snapshot.error}');
-        } else {
-          // Check if data is null or empty
-          final List<Transactions>? data = snapshot.data;
-          if (data == null || data.isEmpty) {
+  Expanded _buildData(List<Transactions> data) {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: data.length,
+        itemBuilder: (BuildContext context, int index) {
+          if (data.isEmpty) {
             return const Center(
               child: Text(noTransactionsFound),
             );
           }
-
-          if (data.isEmpty || data == []) {
+          if (data == []) {
             return const Center(
               child: Text(noTransactionsFound),
             );
           }
-
-          return Expanded(
-            child: ListView.builder(
-              key: ValueKey(data),
-              itemCount: data.length,
-              itemBuilder: (BuildContext context, int index) {
-                return DetailCardWidget(data: data[index]);
-              },
-            ),
-          );
-        }
-      },
+          return DetailCardWidget(data: data[index]);
+        },
+      ),
     );
   }
 
-  SearchBar _buildSearchBar(WidgetRef ref, String hintText, filterText) {
+  SearchBar _buildSearchBar(WidgetRef ref, String hintText, filterText, data) {
     return SearchBar(
       elevation: const MaterialStatePropertyAll(0),
       padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.only(left: 16.sp)),
       hintText: hintText,
       leading: const Icon(Icons.search),
       trailing: [
-        //! use drop down menu
-        //todo change the filters
         PopupMenuButton<String>(
           onSelected: (String filter) {
             switch (filter) {
@@ -119,11 +121,73 @@ class HistoryView extends ConsumerWidget {
         ),
       ],
       onChanged: (String value) {
-        //todo  search the user given input to the search bar
-        // using filter text we can search the data user requried
-        print(filterText);
+        if (value == "") {
+          _doReset();
+        }
+        if (filterText == mobileNumber) {
+          // data manupulate when user searches with mobile number filter
+          _doMobileSearch(value);
+          if (value == "") {
+            _doReset();
+          }
+        } else if (filterText == customerName) {
+          // data manupulate when user searches with Customer name filter
+          _doNameSearch(value);
+          if (value == "") {
+            _doReset();
+          }
+        } else if (filterText == customerPlace) {
+          // data manupulate when user searches with Customer place filter
+          _doPlaceSearch(value);
+          if (value == "") {
+            _doReset();
+          }
+        }
       },
     );
+  }
+
+  _doReset() async {
+    ref.read(listOfTransactionsProvider.notifier).state = await BackEnd.fetchLatestTransactions();
+  }
+
+  _doMobileSearch(String mobileNumber) async {
+    List<Transactions> showdowData = await BackEnd.fetchLatestTransactions();
+    var result = showdowData.where((element) {
+      if (element.mobileNumber.contains(mobileNumber)) {
+        return element.mobileNumber.contains(mobileNumber);
+      } else {
+        // _doReset();
+        return false;
+      }
+    }).toList();
+    ref.read(listOfTransactionsProvider.notifier).state = result;
+  }
+
+  _doNameSearch(String name) async {
+    List<Transactions> showdowData = await BackEnd.fetchLatestTransactions();
+    var result = showdowData.where((element) {
+      if (element.customerName.contains(name)) {
+        return element.customerName.contains(name);
+      } else {
+        // _doReset();
+        return false;
+      }
+    }).toList();
+    ref.read(listOfTransactionsProvider.notifier).state = result;
+  }
+
+  _doPlaceSearch(String place) async {
+    List<Transactions> showdowData = await BackEnd.fetchLatestTransactions();
+    var result = showdowData.where((element) {
+      if (element.address.contains(place)) {
+        return element.address.contains(place);
+      } else {
+        // _doReset();
+        return false;
+      }
+    }).toList();
+    ref.read(listOfTransactionsProvider.notifier).state = result;
   }
 
   TitleWidget _buildTitle(WidgetRef ref) {

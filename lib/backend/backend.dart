@@ -163,6 +163,23 @@ class BackEnd {
       return [];
     }
   }
+  // get the transaction by Customer Name
+
+  static Future<List<Transactions>> getTransactionsEntriesByCustomerName(String name) async {
+    final db = await BackEnd.db();
+    final List<Map<String, Object?>> data = await db.query(
+      'TRANSACTIONS',
+      orderBy: 'ID',
+      where: "CUSTOMER_NAME = ?",
+      whereArgs: [name],
+    );
+    List<Transactions> result = Transactions.toList(data);
+    if (result.isNotEmpty) {
+      return result;
+    } else {
+      return [];
+    }
+  }
 
   // Update the item
 
