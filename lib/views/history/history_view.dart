@@ -5,6 +5,7 @@ import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/providers/providers.dart';
+import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/views/history/history_providers.dart';
 import 'package:self_finance/widgets/detail_card_widget.dart';
 import 'package:self_finance/widgets/title_widget.dart';
@@ -26,9 +27,9 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
 
   @override
   void initState() {
+    super.initState();
     // fetches and changes the state of the provider when the screen first loades
     fetchData();
-    super.initState();
   }
 
   @override
@@ -47,11 +48,9 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
           children: [
             _buildTitle(ref),
             SizedBox(height: 10.sp),
-            _buildSearchBar(ref, hintText, filterText, data),
+            _buildSearchBar(ref, hintText, filterText),
             SizedBox(height: 10.sp),
             _buildData(data),
-
-            // _buildData(dataFuture),
           ],
         ),
       ),
@@ -68,38 +67,38 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
               child: Text(noTransactionsFound),
             );
           }
-          if (data == []) {
-            return const Center(
-              child: Text(noTransactionsFound),
-            );
-          }
           return DetailCardWidget(data: data[index]);
         },
       ),
     );
   }
 
-  SearchBar _buildSearchBar(WidgetRef ref, String hintText, filterText, data) {
+  SearchBar _buildSearchBar(WidgetRef ref, String hintText, filterText) {
     return SearchBar(
       elevation: const MaterialStatePropertyAll(0),
       padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.only(left: 16.sp)),
       hintText: hintText,
-      leading: const Icon(Icons.search),
+      leading: const Icon(Icons.search, color: getPrimaryColor),
       trailing: [
         PopupMenuButton<String>(
+          enableFeedback: true,
+          icon: const Icon(Icons.filter_alt_outlined),
+          iconColor: getPrimaryColor,
+          tooltip: filterText,
           onSelected: (String filter) {
+            final update = ref.read(hintTextProvider.notifier);
             switch (filter) {
               case mobileNumber:
-                ref.read(hintTextProvider.notifier).update((state) => searchMobile);
+                update.update((state) => searchMobile);
                 break;
               case customerName:
-                ref.read(hintTextProvider.notifier).update((state) => searchName);
+                update.update((state) => searchName);
                 break;
               case customerPlace:
-                ref.read(hintTextProvider.notifier).update((state) => searchPlace);
+                update.update((state) => searchPlace);
                 break;
               default:
-                ref.read(hintTextProvider.notifier).update((state) => searchMobile);
+                update.update((state) => searchMobile);
             }
             ref.read(selectedFilterProvider.notifier).update((state) => state = filter);
           },
@@ -151,7 +150,7 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
     ref.read(listOfTransactionsProvider.notifier).state = await BackEnd.fetchLatestTransactions();
   }
 
-  _doMobileSearch(String mobileNumber) async {
+  void _doMobileSearch(String mobileNumber) async {
     List<Transactions> showdowData = await BackEnd.fetchLatestTransactions();
     var result = showdowData.where((element) {
       if (element.mobileNumber.contains(mobileNumber)) {
@@ -164,20 +163,19 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
     ref.read(listOfTransactionsProvider.notifier).state = result;
   }
 
-  _doNameSearch(String name) async {
+  void _doNameSearch(String name) async {
     List<Transactions> showdowData = await BackEnd.fetchLatestTransactions();
     var result = showdowData.where((element) {
       if (element.customerName.contains(name)) {
         return element.customerName.contains(name);
       } else {
-        // _doReset();
         return false;
       }
     }).toList();
     ref.read(listOfTransactionsProvider.notifier).state = result;
   }
 
-  _doPlaceSearch(String place) async {
+  void _doPlaceSearch(String place) async {
     List<Transactions> showdowData = await BackEnd.fetchLatestTransactions();
     var result = showdowData.where((element) {
       if (element.address.contains(place)) {
