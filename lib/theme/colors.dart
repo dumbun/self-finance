@@ -7,3 +7,4 @@ const Color getBackgroundColor = Colors.white;
 const Color getPrimaryTextColor = Colors.black;
 const Color getVeryLightGreyColor = Color(0xfff8f9fe);
 const Color getGreenColor = Colors.greenAccent;
+const Color getTransparentColor = Color(0x44000000);
