@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'dart:convert';
@@ -8,10 +9,13 @@ class ImageView extends StatelessWidget {
   const ImageView({super.key, required this.imageString, required this.titile});
   final String imageString;
   final String titile;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: false,
+        titleTextStyle: TextStyle(fontSize: 40.sp),
         backgroundColor: getTransparentColor,
         title: BodyOneDefaultText(
           text: titile,
