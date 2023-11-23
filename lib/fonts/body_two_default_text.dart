@@ -36,7 +36,7 @@ class BodyTwoDefaultText extends StatelessWidget {
       softWrap: true,
       style: TextStyle(
         fontWeight: bold ? FontWeight.bold : FontWeight.w400,
-        fontSize: 16.sp,
+        fontSize: 15.sp,
         color: _getColor(context),
       ),
     );

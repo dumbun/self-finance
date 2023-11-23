@@ -1,9 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/widgets/arrow_widge.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
@@ -53,15 +53,18 @@ class DetailCardWidget extends StatelessWidget {
                             bold: true,
                           ),
                           SizedBox(height: 8.0.sp),
-                          BodyTwoDefaultText(text: data.takenDate),
+                          BodyTwoDefaultText(
+                            text: data.takenDate,
+                            color: getPrimaryColor,
+                          ),
                           SizedBox(height: 8.0.sp),
                           Row(
                             children: [
                               const BodyTwoDefaultText(text: "amount - taken : "),
                               BodyTwoDefaultText(
                                 bold: true,
+                                color: data.transactionType == 0 ? getGreenColor : getErrorColor,
                                 text: data.takenAmount.toString(),
-                                error: true,
                               ),
                             ],
                           ),

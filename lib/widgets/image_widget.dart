@@ -11,7 +11,7 @@ class ImageWidget extends StatelessWidget {
 
   final double height;
   final double width;
-  final ImageProvider<Object> child;
+  final Widget child;
   final BoxShape shape;
 
   @override
@@ -21,11 +21,12 @@ class ImageWidget extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         shape: shape,
-        image: DecorationImage(
-          fit: BoxFit.fill,
-          image: child,
-        ),
+        // image: DecorationImage(
+        //   fit: BoxFit.fill,
+        //   // image: child,
+        // ),
       ),
+      child: child,
     );
   }
 }

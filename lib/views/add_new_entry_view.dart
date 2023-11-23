@@ -19,7 +19,7 @@ class AddNewEntryView extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _AddNewEntryViewState();
 }
 
-class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> with SingleTickerProviderStateMixin {
+class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final _address = TextEditingController();
   late final _customerName = TextEditingController();
@@ -31,20 +31,8 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> with SingleTi
   late final _takenDate = TextEditingController();
   late bool _isloading;
 
-  //animatior
-
-  late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
-
   @override
   void initState() {
-    _fadeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300), // Adjust the duration as needed
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_fadeController);
-
     _isloading = false;
     super.initState();
   }
@@ -291,7 +279,7 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> with SingleTi
                         },
                         text: "Add New Entry",
                       ),
-                      child: FadeTransition(opacity: _fadeAnimation, child: const CircularProgressIndicator()),
+                      child: const CircularProgressIndicator(),
                     ),
                   ],
                 ),
