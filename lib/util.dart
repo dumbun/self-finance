@@ -8,6 +8,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 class Utility {
   static Widget imageFromBase64String(String base64String, {double? height, double? width}) {
     final decodedImage = Image.memory(
+      gaplessPlayback: true,
       base64Decode(base64String),
       fit: BoxFit.fill, // Adjust this based on your image's aspect ratio requirement
       height: height ?? 40.sp,
