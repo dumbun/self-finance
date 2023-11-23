@@ -4,6 +4,7 @@ import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/details_view.dart';
 import 'package:self_finance/views/pin_creating_view.dart';
+import 'package:self_finance/views/image_view.dart';
 
 class Routes {
   final BuildContext context;
@@ -30,6 +31,14 @@ class Routes {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) => DetailsView(data: data),
+      ),
+    );
+  }
+
+  static navigateToImageView({required BuildContext context, required String imageData, required String titile}) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) => ImageView(imageString: imageData, titile: titile),
       ),
     );
   }

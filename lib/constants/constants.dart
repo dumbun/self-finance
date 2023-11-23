@@ -16,3 +16,4 @@ const String noTransactionsFound = "No transactions found. 🫠";
 const String customerName = "Customer Name";
 const String customerPlace = "Customer Place";
 const String error = "Error";
+const String customerPhoto = "Customer Photo";
