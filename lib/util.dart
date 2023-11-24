@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:core';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class Utility {
@@ -31,10 +32,14 @@ class Utility {
   static String base64String(Uint8List data) {
     return base64Encode(data);
   }
+
+  static numberFormate(number) {
+    return NumberFormat('#,##0').format(number);
+  }
 }
 
 double reduceDecimals(double value) {
-  return double.parse(value.toStringAsFixed(1));
+  return double.parse(value.toStringAsFixed(2));
 }
 
 double textToDouble(String value) {

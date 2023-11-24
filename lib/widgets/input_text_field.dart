@@ -6,14 +6,14 @@ import 'package:self_finance/theme/colors.dart';
 class InputTextField extends StatelessWidget {
   const InputTextField({
     super.key,
-    required this.controller,
+    this.controller,
     this.hintText,
     this.fillColor,
     this.onChanged,
     this.keyboardType,
   });
 
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final String? hintText;
   final Color? fillColor;
   final Function? onChanged;
