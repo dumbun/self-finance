@@ -4,7 +4,7 @@ import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/views/emi_calculator.dart';
+import 'package:self_finance/views/EMi%20Calculator/emi_calculator_view.dart';
 import 'package:self_finance/views/history/history_view.dart';
 import 'package:self_finance/views/home_screen.dart';
 
@@ -42,10 +42,10 @@ class _DashboardViewState extends State<DashboardView> {
                 _selectedIndex = index;
               });
             },
-            children: const <Widget>[
-              HomeScreen(),
-              EmiCalculator(),
-              HistoryView(),
+            children: <Widget>[
+              const HomeScreen(),
+              EMICalculatorView(),
+              const HistoryView(),
             ],
           ),
         ),

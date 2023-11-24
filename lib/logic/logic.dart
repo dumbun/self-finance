@@ -2,7 +2,7 @@ import 'package:intl/intl.dart';
 
 class LoanCalculator {
   final int takenAmount;
-  final dynamic rateOfInterest;
+  final double rateOfInterest;
   final String takenDate;
   DateTime? tenureDate;
 
