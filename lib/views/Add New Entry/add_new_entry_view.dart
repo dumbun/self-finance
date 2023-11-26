@@ -1,16 +1,18 @@
+// ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/providers/backend_provider.dart';
 import 'package:self_finance/providers/providers.dart';
+import 'package:self_finance/views/Add%20New%20Entry/providers.dart';
 import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:self_finance/widgets/date_picker_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
+import 'package:self_finance/widgets/snack_bar_widget.dart';
 
 class AddNewEntryView extends ConsumerStatefulWidget {
   const AddNewEntryView({super.key});
@@ -70,6 +72,7 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
       required double rateOfInterest,
       required String itemName,
       required String takenDate,
+      required BuildContext context,
     }) async {
       try {
         final String photoCustomer = ref.watch(pickedCustomerProfileImageStringProvider);
@@ -152,17 +155,13 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
           _isloading = false;
         });
 
-        alerts() {
-          if (createNewCustomerEntry) {
-            AlertDilogs.alertDialogWithOneAction(context, "Success", "Data saved ✅ ");
-          } else {
-            AlertDilogs.alertDialogWithOneAction(context, "Fail", "Data not saved please try again 😥 ");
-          }
+        if (createNewCustomerEntry) {
+          Navigator.of(context).pop();
+          snackBarWidget(context: context, message: savedSuccessfullyText);
+        } else {
+          AlertDilogs.alertDialogWithOneAction(context, "Fail", "Data not saved please try again 😥 ");
         }
-
-        alerts();
       } catch (e) {
-        // ignore: use_build_context_synchronously
         AlertDilogs.alertDialogWithOneAction(context, "error", e.toString());
       }
     }
@@ -236,6 +235,7 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
                     Visibility(
                       visible: _isloading,
                       replacement: RoundedCornerButton(
+                        icon: Icons.person_add_rounded,
                         onPressed: () {
                           if (validateAndSave()) {
                             setState(() {
@@ -273,11 +273,11 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
                               rateOfInterest: doubleCheck(_rateOfInterest.text, errorString: "rate Of Interest Error"),
                               itemName: _itemName.text,
                               takenDate: _takenDate.text,
+                              context: context,
                             );
-                            Navigator.of(context).pop();
                           }
                         },
-                        text: "Add New Entry",
+                        text: "save",
                       ),
                       child: const CircularProgressIndicator(),
                     ),

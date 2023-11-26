@@ -4,6 +4,7 @@ const String testCheckbox = "My billing address is the same as my shipping addre
 const String securePinMassage = "Login pin is to Secure your Application from Third Person Using it";
 const String addNewEntry = "Add New Entry";
 const String history = "History";
+const String savedSuccessfullyText = "Saved successfully ✅";
 const String emiCalculatorTitle = "EMI Calculator";
 const String defaultProfileImagePath = "assets/icon/defaultImage.svg";
 const String defaultProofImagePath = "assets/icon/id_proof_icon.svg";

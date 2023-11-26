@@ -181,7 +181,6 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
       if (element.address.contains(place)) {
         return element.address.contains(place);
       } else {
-        // _doReset();
         return false;
       }
     }).toList();

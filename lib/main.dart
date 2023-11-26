@@ -4,7 +4,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/backend_provider.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/views/add_new_entry_view.dart';
+import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
 import 'package:self_finance/views/auth_view.dart';
 import 'package:self_finance/views/terms_and_conditions.dart';
 
@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
       ),
       textTheme: Typography.whiteCupertino,
       useMaterial3: true,
+      primaryColor: getPrimaryColor,
     );
     ThemeData lightTheme = ThemeData(
       primaryColor: getPrimaryColor,
@@ -55,6 +56,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: lightTheme,
         darkTheme: darkTheme,
+        themeAnimationCurve: Curves.easeInOut,
         home: Consumer(
           builder: (context, ref, child) {
             AsyncValue<User?> userData = ref.watch(userDataProvider);
