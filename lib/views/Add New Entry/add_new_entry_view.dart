@@ -199,7 +199,7 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
                     InputTextField(
                       controller: _mobileNumber,
                       keyboardType: TextInputType.phone,
-                      hintText: "Phone Number",
+                      hintText: "Phone Number ( please add with country code )",
                     ),
                     SizedBox(height: 20.sp),
                     InputTextField(

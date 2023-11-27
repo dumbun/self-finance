@@ -36,6 +36,9 @@ class Utility {
   static String numberFormate(int number) {
     return NumberFormat('#,##0').format(number);
   }
+
+  static bool isValidPhoneNumber(String? value) =>
+      RegExp(r'(^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$)').hasMatch(value ?? '');
 }
 
 double reduceDecimals(double value) {

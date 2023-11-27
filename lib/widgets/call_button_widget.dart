@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/util.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CallButtonWidget extends StatefulWidget {
@@ -36,7 +38,8 @@ class _CallButtonWidgetState extends State<CallButtonWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.phoneNumber != "") {
+    final String phoneNumber = widget.phoneNumber;
+    if (Utility.isValidPhoneNumber(phoneNumber)) {
       return _hasCallSupport
           ? ElevatedButton(
               style: ButtonStyle(
@@ -49,7 +52,10 @@ class _CallButtonWidgetState extends State<CallButtonWidget> {
               onPressed: () async {
                 await _makePhoneCall(widget.phoneNumber);
               },
-              child: const Icon(Icons.phone),
+              child: const Icon(
+                Icons.call,
+                color: getPrimaryColor,
+              ),
             )
           : _buildDisabledPhone();
     } else {
@@ -62,7 +68,10 @@ class _CallButtonWidgetState extends State<CallButtonWidget> {
       shape: const CircleBorder(),
       child: Padding(
         padding: EdgeInsets.all(16.sp),
-        child: const Icon(Icons.phone_disabled_rounded),
+        child: const Icon(
+          Icons.phone_disabled_rounded,
+          color: getErrorColor,
+        ),
       ),
     );
   }
