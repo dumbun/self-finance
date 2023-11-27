@@ -12,3 +12,16 @@ final createNewTransactionProvider = FutureProvider.autoDispose.family<bool, Tra
   final bool result = await BackEnd.createNewTransaction(transactions);
   return result;
 });
+
+final pickedCustomerProfileImageStringProvider = StateProvider<String>((ref) {
+  // Initial value is an empty string
+  return "";
+});
+final pickedCustomerProofImageStringProvider = StateProvider<String>((ref) {
+  // Initial value is an empty string
+  return "";
+});
+final pickedCustomerItemImageStringProvider = StateProvider<String>((ref) {
+  // Initial value is an empty string
+  return "";
+});

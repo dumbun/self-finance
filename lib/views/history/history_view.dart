@@ -4,7 +4,6 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/providers/providers.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/views/history/history_providers.dart';
 import 'package:self_finance/widgets/detail_card_widget.dart';
