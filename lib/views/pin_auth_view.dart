@@ -33,6 +33,7 @@ class _PinAuthViewState extends State<PinAuthView> {
     return Scaffold(
       backgroundColor: getBackgroundColor,
       body: Container(
+        padding: EdgeInsets.all(20.sp),
         alignment: Alignment.center,
         width: double.infinity,
         child: SafeArea(
@@ -53,10 +54,10 @@ class _PinAuthViewState extends State<PinAuthView> {
                   pinController: _pinController,
                   obscureText: true,
                 ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 10.sp),
-                  child: Visibility(
-                    visible: _error,
+                Visibility(
+                  visible: _error,
+                  child: Container(
+                    margin: EdgeInsets.only(top: 20.sp),
                     child: const BodyTwoDefaultText(
                       text: "Enter correct PIN",
                       bold: true,
@@ -64,6 +65,7 @@ class _PinAuthViewState extends State<PinAuthView> {
                     ),
                   ),
                 ),
+                SizedBox(height: 20.sp),
                 RoundedCornerButton(text: "Login", onPressed: () => _getLogin()),
               ],
             ),
