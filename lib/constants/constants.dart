@@ -4,6 +4,10 @@ const String testCheckbox = "My billing address is the same as my shipping addre
 const String securePinMassage = "Login pin is to Secure your Application from Third Person Using it";
 const String addNewEntry = "Add New Entry";
 const String history = "History";
+const String next = "next";
+const String termAcknowledge =
+    "By using the Self-Finance App, you acknowledge that you have read, understood, and agreed to these Terms and Conditions. ";
+const String tAndMString = "Term & Conditions";
 const String savedSuccessfullyText = "Saved successfully ✅";
 const String emiCalculatorTitle = "EMI Calculator";
 const String defaultProfileImagePath = "assets/icon/defaultImage.svg";

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/constants/terms_and_conditions_api.dart';
 import 'package:self_finance/fonts/body_small_text.dart';
@@ -54,7 +55,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     return SizedBox(
       width: double.infinity,
       child: RoundedCornerButton(
-        text: "Next",
+        text: next,
         onPressed: ticked ? () => Routes.navigateToPinCreationView(context) : null,
       ),
     );
@@ -114,8 +115,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
             width: 66.sp,
             height: 30.sp,
             child: const BodySmallText(
-              text:
-                  "By using the Self-Finance App, you acknowledge that you have read, understood, and agreed to these Terms and Conditions. ",
+              text: termAcknowledge,
             ),
           )
         ],
@@ -133,7 +133,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     return Container(
       alignment: Alignment.topLeft,
       child: const StrongHeadingOne(
-        text: "Term & Conditions",
+        text: tAndMString,
         bold: true,
         textAlign: TextAlign.justify,
       ),
