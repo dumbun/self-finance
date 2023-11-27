@@ -11,13 +11,13 @@ class RoundedCornerButton extends StatelessWidget {
   });
 
   final String text;
-  final void Function()? onPressed;
+  final void Function() onPressed;
   final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
     return AnimatedButton(
-      pressEvent: onPressed!,
+      pressEvent: onPressed,
       text: text,
       color: getPrimaryColor,
       icon: icon,

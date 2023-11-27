@@ -4,6 +4,7 @@ import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/util.dart';
+import 'package:self_finance/widgets/call_button_widget.dart';
 
 class DetailsView extends StatelessWidget {
   const DetailsView({super.key, required this.data});
@@ -33,6 +34,7 @@ class DetailsView extends StatelessWidget {
             BodyOneDefaultText(text: data.mobileNumber),
             BodyOneDefaultText(text: data.takenDate),
             BodyOneDefaultText(text: data.takenAmount.toString()),
+            CallButtonWidget(phoneNumber: data.mobileNumber),
           ],
         ),
       ),

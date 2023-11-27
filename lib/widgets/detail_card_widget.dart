@@ -60,11 +60,15 @@ class DetailCardWidget extends StatelessWidget {
                           SizedBox(height: 8.0.sp),
                           Row(
                             children: [
-                              const BodyTwoDefaultText(text: "amount - taken : "),
+                              BodyTwoDefaultText(
+                                text: data.transactionType == 1 ? "amount - taken : " : "Paid amount : ",
+                              ),
                               BodyTwoDefaultText(
                                 bold: true,
-                                color: data.transactionType == 0 ? getGreenColor : getErrorColor,
-                                text: data.takenAmount.toString(),
+                                color: data.transactionType == 1 ? getErrorColor : getGreenColor,
+                                text: data.transactionType == 1
+                                    ? Utility.numberFormate(data.takenAmount)
+                                    : Utility.numberFormate(data.paidAmount!),
                               ),
                             ],
                           ),

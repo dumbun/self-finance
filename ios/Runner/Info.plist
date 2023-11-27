@@ -52,6 +52,11 @@
 	<key>NSCameraUsageDescription</key>
 	<string>using image to save in your database</string>
 	<key>NSMicrophoneUsageDescription</key>
-<string>using image to save in your database</string>
+	<string>using image to save in your database</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>sms</string>
+  		<string>tel</string>
+	</array>
 </dict>
 </plist>

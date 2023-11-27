@@ -1,8 +1,8 @@
-import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:core';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:typed_data';
 import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -33,7 +33,7 @@ class Utility {
     return base64Encode(data);
   }
 
-  static numberFormate(number) {
+  static String numberFormate(int number) {
     return NumberFormat('#,##0').format(number);
   }
 }

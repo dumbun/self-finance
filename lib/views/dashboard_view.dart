@@ -33,7 +33,6 @@ class _DashboardViewState extends State<DashboardView> {
       onVerticalDragDown: (details) => FocusManager.instance.primaryFocus?.unfocus(),
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        resizeToAvoidBottomInset: true,
         body: SafeArea(
           child: PageView(
             controller: _pageController,

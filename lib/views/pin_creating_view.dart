@@ -54,13 +54,19 @@ class _PinCreatingViewState extends State<PinCreatingView> {
                 _getAppIcon(),
                 SizedBox(height: 20.sp),
                 const StrongHeadingOne(
+                  color: getPrimaryTextColor,
                   text: "Set Login PIN",
                   bold: true,
                 ),
                 SizedBox(height: 20.sp),
-                const BodyTwoDefaultText(text: securePinMassage, textAlign: TextAlign.center),
+                const BodyTwoDefaultText(
+                  text: securePinMassage,
+                  textAlign: TextAlign.center,
+                  color: getPrimaryTextColor,
+                ),
                 SizedBox(height: 20.sp),
                 const BodyTwoDefaultText(
+                  color: getPrimaryTextColor,
                   text: "Enter your Login Pin",
                   bold: true,
                 ),
@@ -73,6 +79,7 @@ class _PinCreatingViewState extends State<PinCreatingView> {
                 const BodyTwoDefaultText(
                   text: "Confirm your Login Pin",
                   bold: true,
+                  color: getPrimaryTextColor,
                 ),
                 SizedBox(height: 12.sp),
                 PinInputWidget(

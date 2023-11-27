@@ -18,10 +18,8 @@ class HistoryView extends ConsumerStatefulWidget {
 
 class _HistoryViewState extends ConsumerState<HistoryView> {
   void fetchData() async {
-    List<Transactions> l = [];
     //converts the async values into a sync values
-    l = await BackEnd.fetchLatestTransactions();
-    ref.read(listOfTransactionsProvider.notifier).state = l;
+    ref.read(listOfTransactionsProvider.notifier).state = await BackEnd.fetchLatestTransactions();
   }
 
   @override
@@ -38,19 +36,24 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
     final List<Transactions> data = ref.watch(listOfTransactionsProvider);
 
     return SafeArea(
-      child: Container(
-        padding: EdgeInsets.all(16.sp),
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTitle(ref),
-            SizedBox(height: 10.sp),
-            _buildSearchBar(ref, hintText, filterText),
-            SizedBox(height: 10.sp),
-            _buildData(data),
-          ],
+      child: RefreshIndicator(
+        onRefresh: () async {
+          ref.read(listOfTransactionsProvider.notifier).state = await BackEnd.fetchLatestTransactions();
+        },
+        child: Container(
+          padding: EdgeInsets.all(16.sp),
+          width: double.infinity,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTitle(ref),
+              SizedBox(height: 10.sp),
+              _buildSearchBar(ref, hintText, filterText),
+              SizedBox(height: 10.sp),
+              _buildData(data),
+            ],
+          ),
         ),
       ),
     );
@@ -153,7 +156,7 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
     List<Transactions> showdowData = await BackEnd.fetchLatestTransactions();
     var result = showdowData.where((element) {
       if (element.mobileNumber.contains(mobileNumber)) {
-        return element.mobileNumber.contains(mobileNumber);
+        return true;
       } else {
         // _doReset();
         return false;
@@ -165,8 +168,8 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
   void _doNameSearch(String name) async {
     List<Transactions> showdowData = await BackEnd.fetchLatestTransactions();
     var result = showdowData.where((element) {
-      if (element.customerName.contains(name)) {
-        return element.customerName.contains(name);
+      if (element.customerName.toLowerCase().contains(name.toLowerCase())) {
+        return true;
       } else {
         return false;
       }
@@ -177,8 +180,8 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
   void _doPlaceSearch(String place) async {
     List<Transactions> showdowData = await BackEnd.fetchLatestTransactions();
     var result = showdowData.where((element) {
-      if (element.address.contains(place)) {
-        return element.address.contains(place);
+      if (element.address.toLowerCase().contains(place.toLowerCase())) {
+        return true;
       } else {
         return false;
       }

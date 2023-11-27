@@ -42,7 +42,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
                 _getHeading(),
                 _space(),
                 _getTermsAndConditions(),
-                _getNextButton(),
+                _getNextButton(ticked),
               ],
             ),
           ),
@@ -51,13 +51,16 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     );
   }
 
-  _getNextButton() {
+  _getNextButton(bool t) {
     return SizedBox(
       width: double.infinity,
       child: RoundedCornerButton(
-        text: next,
-        onPressed: ticked ? () => Routes.navigateToPinCreationView(context) : null,
-      ),
+          text: next,
+          onPressed: () {
+            if (t == true) {
+              Routes.navigateToPinCreationView(context);
+            }
+          }),
     );
   }
 
