@@ -13,18 +13,18 @@ class BodyOneDefaultText extends StatelessWidget {
   final Color? color;
   final String? font;
 
-  const BodyOneDefaultText(
-      {Key? key,
-      required this.text,
-      this.textAlign,
-      this.bold = false,
-      this.error = false,
-      this.whiteColor = false,
-      this.maxLines,
-      this.overflow,
-      this.color,
-      this.font})
-      : super(key: key);
+  const BodyOneDefaultText({
+    super.key,
+    required this.text,
+    this.textAlign,
+    this.bold = false,
+    this.error = false,
+    this.whiteColor = false,
+    this.maxLines,
+    this.overflow,
+    this.color,
+    this.font,
+  });
 
   @override
   Widget build(BuildContext context) {

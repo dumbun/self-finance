@@ -14,7 +14,7 @@ class BodySmallText extends StatelessWidget {
   final String? font;
 
   const BodySmallText(
-      {Key? key,
+      {super.key,
       required this.text,
       this.textAlign,
       this.bold = false,
@@ -23,8 +23,7 @@ class BodySmallText extends StatelessWidget {
       this.maxLines,
       this.overflow,
       this.color,
-      this.font})
-      : super(key: key);
+      this.font});
 
   @override
   Widget build(BuildContext context) {

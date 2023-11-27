@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'dart:convert';
@@ -15,11 +14,8 @@ class ImageView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        titleTextStyle: TextStyle(fontSize: 40.sp),
         backgroundColor: getTransparentColor,
-        title: BodyOneDefaultText(
-          text: titile,
-        ),
+        title: BodyOneDefaultText(text: titile),
       ),
       body: SizedBox(
         child: PhotoView(

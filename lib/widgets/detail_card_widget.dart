@@ -10,9 +10,9 @@ import 'package:self_finance/widgets/default_user_image.dart';
 
 class DetailCardWidget extends StatelessWidget {
   const DetailCardWidget({
-    Key? key,
+    super.key,
     required this.data,
-  }) : super(key: key);
+  });
 
   final Transactions data;
 

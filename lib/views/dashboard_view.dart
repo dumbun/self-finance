@@ -9,7 +9,7 @@ import 'package:self_finance/views/history/history_view.dart';
 import 'package:self_finance/views/home_screen.dart';
 
 class DashboardView extends StatefulWidget {
-  const DashboardView({Key? key, required this.user}) : super(key: key);
+  const DashboardView({super.key, required this.user});
 
   final User user;
 
@@ -82,7 +82,7 @@ class _DashboardViewState extends State<DashboardView> {
 }
 
 class _FloatingActionButton extends StatelessWidget {
-  const _FloatingActionButton({Key? key, required this.selectedIndex}) : super(key: key);
+  const _FloatingActionButton({required this.selectedIndex});
 
   final int selectedIndex;
 

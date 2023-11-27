@@ -15,7 +15,7 @@ class StrongHeadingOne extends StatelessWidget {
   final String? font;
 
   const StrongHeadingOne(
-      {Key? key,
+      {super.key,
       required this.text,
       this.textAlign,
       this.bold = false,
@@ -24,8 +24,7 @@ class StrongHeadingOne extends StatelessWidget {
       this.maxLines,
       this.overflow,
       this.color,
-      this.font})
-      : super(key: key);
+      this.font});
   @override
   Widget build(BuildContext context) {
     return Text(

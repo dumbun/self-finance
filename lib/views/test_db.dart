@@ -33,7 +33,7 @@ class _TestDbState extends State<TestDb> {
             onPressed: () {
               fetchData();
             },
-            child: Text("Test")),
+            child: const Text("Test")),
       ),
     );
   }

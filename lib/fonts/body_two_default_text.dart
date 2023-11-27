@@ -14,7 +14,7 @@ class BodyTwoDefaultText extends StatelessWidget {
   final String? font;
 
   const BodyTwoDefaultText(
-      {Key? key,
+      {super.key,
       required this.text,
       this.textAlign,
       this.bold = false,
@@ -23,8 +23,7 @@ class BodyTwoDefaultText extends StatelessWidget {
       this.maxLines,
       this.overflow,
       this.color,
-      this.font})
-      : super(key: key);
+      this.font});
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +34,7 @@ class BodyTwoDefaultText extends StatelessWidget {
       overflow: overflow,
       softWrap: true,
       style: TextStyle(
+        fontFamily: "hell",
         fontWeight: bold ? FontWeight.bold : FontWeight.w400,
         fontSize: 15.sp,
         color: _getColor(context),

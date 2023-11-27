@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
+import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
 
 class DetailsView extends StatelessWidget {
@@ -14,7 +14,8 @@ class DetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: getPrimaryTextColor,
+        // backgroundColor: getTransparentColor,
+        title: BodyOneDefaultText(text: data.customerName),
       ),
       body: SizedBox(
         width: double.infinity,
@@ -25,13 +26,13 @@ class DetailsView extends StatelessWidget {
             _builtImageWidget(context, data.photoCustomer, customerPhoto),
             _builtImageWidget(context, data.photoProof, "Proof"),
             _builtImageWidget(context, data.photoItem, "Item"),
-            Text(data.id.toString()),
-            Text(data.customerName),
-            Text(data.via.toString()),
-            Text(data.address),
-            Text(data.mobileNumber),
-            Text(data.takenDate),
-            Text(data.takenAmount.toString()),
+            BodyOneDefaultText(text: data.id.toString()),
+            BodyOneDefaultText(text: data.customerName),
+            BodyOneDefaultText(text: data.via.toString()),
+            BodyOneDefaultText(text: data.address),
+            BodyOneDefaultText(text: data.mobileNumber),
+            BodyOneDefaultText(text: data.takenDate),
+            BodyOneDefaultText(text: data.takenAmount.toString()),
           ],
         ),
       ),

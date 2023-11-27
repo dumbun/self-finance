@@ -8,11 +8,11 @@ import 'package:self_finance/widgets/image_widget.dart';
 
 class ImagePickerWidget extends ConsumerStatefulWidget {
   const ImagePickerWidget({
-    Key? key,
+    super.key,
     required this.text,
     required this.defaultImage,
     required this.imageProvider,
-  }) : super(key: key);
+  });
 
   final String text;
   final String defaultImage;

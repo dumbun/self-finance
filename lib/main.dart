@@ -28,7 +28,6 @@ class MyApp extends StatelessWidget {
         primary: getPrimaryColor,
         brightness: Brightness.dark,
       ),
-      textTheme: Typography.whiteCupertino,
       useMaterial3: true,
       primaryColor: getPrimaryColor,
     );
@@ -63,7 +62,7 @@ class MyApp extends StatelessWidget {
             return userData.when(
               data: (user) {
                 if (user != null) {
-                  // Use the user data here
+                  // if(user) then build AuthView for autontication
                   return AuthView(user: user);
                 } else {
                   return const TermsAndConditons();

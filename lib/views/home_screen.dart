@@ -1,7 +1,5 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/widgets/dilogbox_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -40,12 +38,6 @@ class HomeScreen extends StatelessWidget {
             btnOkOnPress: () {},
           ).show();
         }),
-        ElevatedButton(
-            onPressed: () {
-              AlertDilogs.alertDialogWithOneAction(context, "Success", savedSuccessfullyText);
-            },
-            child: Text("test")),
-        Text("Home screens"),
       ],
     );
   }
