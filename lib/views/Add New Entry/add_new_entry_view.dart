@@ -206,7 +206,7 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
                         if (Utility.isValidPhoneNumber(value)) {
                           return null;
                         } else {
-                          return "Please Enter correct mobile number don't include ( _ , . or any other Extra Characters )";
+                          return "Please Enter correct Mobile Number";
                         }
                       },
                       controller: _mobileNumber,
