@@ -155,6 +155,10 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
         });
 
         if (createNewCustomerEntry) {
+          /// reseting the providers so that for next entery the provider will show as an empty String
+          ref.read(pickedCustomerItemImageStringProvider.notifier).state = "";
+          ref.read(pickedCustomerProfileImageStringProvider.notifier).state = "";
+          ref.read(pickedCustomerProofImageStringProvider.notifier).state = "";
           Navigator.of(context).pop();
           snackBarWidget(context: context, message: savedSuccessfullyText);
         } else {

@@ -118,7 +118,7 @@ class BackEnd {
   static Future<List<Transactions>> fetchLatestTransactions() async {
     final db = await BackEnd.db();
     List<Map<String, Object?>> result = await db.rawQuery("""
-      SELECT * FROM TRANSACTIONS ORDER BY ID DESC
+      SELECT * FROM TRANSACTIONS ORDER BY TAKEN_DATE 
     """);
     if (result.isNotEmpty) {
       return Transactions.toList(result);
