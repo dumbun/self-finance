@@ -5,6 +5,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/util.dart';
 import 'package:self_finance/views/Add%20New%20Entry/providers.dart';
 import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:self_finance/widgets/date_picker_widget.dart';
@@ -201,6 +202,13 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
                     ),
                     SizedBox(height: 20.sp),
                     InputTextField(
+                      validator: (value) {
+                        if (Utility.isValidPhoneNumber(value)) {
+                          return null;
+                        } else {
+                          return "Please Enter correct mobile number don't include ( _ , . or any other Extra Characters )";
+                        }
+                      },
                       controller: _mobileNumber,
                       keyboardType: TextInputType.phone,
                       hintText: "Phone Number ( please add with country code )",

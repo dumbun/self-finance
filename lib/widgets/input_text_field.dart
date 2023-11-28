@@ -11,12 +11,14 @@ class InputTextField extends StatelessWidget {
     this.fillColor,
     this.onChanged,
     this.keyboardType,
+    this.validator,
   });
 
   final TextEditingController? controller;
   final String? hintText;
   final Color? fillColor;
   final Function? onChanged;
+  final String? Function(String?)? validator;
 
   final TextInputType? keyboardType;
 
@@ -24,12 +26,13 @@ class InputTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       onChanged: onChanged as void Function(String)?,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter a valid value';
-        }
-        return null;
-      },
+      validator: validator ??
+          (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a valid value';
+            }
+            return null;
+          },
       keyboardType: keyboardType ?? TextInputType.text,
       textInputAction: TextInputAction.done,
       controller: controller,
