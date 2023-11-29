@@ -9,7 +9,11 @@ class TitleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: TextStyle(fontFamily: "hell", fontWeight: FontWeight.bold, fontSize: 30.sp),
+      style: TextStyle(
+        fontFamily: "hell",
+        fontWeight: FontWeight.bold,
+        fontSize: 22.sp,
+      ),
     );
   }
 }

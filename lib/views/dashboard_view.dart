@@ -33,12 +33,14 @@ class _DashboardViewState extends State<DashboardView> {
       onVerticalDragDown: (details) => FocusManager.instance.primaryFocus?.unfocus(),
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
+        extendBodyBehindAppBar: true,
         body: SafeArea(
           child: PageView(
             controller: _pageController,
             onPageChanged: (index) {
               setState(() {
                 _selectedIndex = index;
+                // pageTitle = pageTitels[index];
               });
             },
             children: <Widget>[
@@ -48,7 +50,24 @@ class _DashboardViewState extends State<DashboardView> {
             ],
           ),
         ),
-        floatingActionButton: _FloatingActionButton(selectedIndex: _selectedIndex),
+        floatingActionButton: _selectedIndex == 0
+            ? FloatingActionButton(
+                clipBehavior: Clip.antiAlias,
+                foregroundColor: getPrimaryColor,
+                elevation: 2.sp,
+                onPressed: () => Routes.navigateToAddNewEntry(context: context),
+                enableFeedback: true,
+                mini: false,
+                shape: const CircleBorder(),
+                backgroundColor: getPrimaryColor,
+                tooltip: addNewEntry,
+                child: const Icon(
+                  Icons.add_rounded,
+                  color: getBackgroundColor,
+                  size: 25,
+                ),
+              )
+            : null,
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
@@ -77,35 +96,5 @@ class _DashboardViewState extends State<DashboardView> {
         ),
       ),
     );
-  }
-}
-
-class _FloatingActionButton extends StatelessWidget {
-  const _FloatingActionButton({required this.selectedIndex});
-
-  final int selectedIndex;
-
-  @override
-  Widget build(BuildContext context) {
-    if (selectedIndex == 0) {
-      return FloatingActionButton(
-        clipBehavior: Clip.antiAlias,
-        foregroundColor: getPrimaryColor,
-        elevation: 2.sp,
-        onPressed: () => Routes.navigateToAddNewEntry(context: context),
-        enableFeedback: true,
-        mini: false,
-        shape: const CircleBorder(),
-        backgroundColor: getPrimaryColor,
-        tooltip: addNewEntry,
-        child: const Icon(
-          Icons.add_rounded,
-          color: getBackgroundColor,
-          size: 25,
-        ),
-      );
-    } else {
-      return const SizedBox.shrink();
-    }
   }
 }

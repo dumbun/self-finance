@@ -73,7 +73,9 @@ class EMICalculatorView extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const TitleWidget(text: emiCalculatorTitle),
+              const Center(
+                child: TitleWidget(text: emiCalculatorTitle),
+              ),
               SizedBox(height: 20.sp),
               // Taken Date
               _datePicker(
