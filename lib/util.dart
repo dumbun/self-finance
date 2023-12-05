@@ -75,3 +75,22 @@ Future<String> pickImageFromCamera() async {
 
   return result;
 }
+
+Future<String> pickImageFromGallery() async {
+  final ImagePicker picker = ImagePicker();
+  String result = "";
+
+  final XFile? imgFile = await picker.pickImage(
+    source: ImageSource.gallery,
+    imageQuality: 25,
+  );
+
+  if (imgFile != null) {
+    Uint8List imgBytes = Uint8List.fromList(
+      await imgFile.readAsBytes(),
+    );
+    result = Utility.base64String(imgBytes);
+  }
+
+  return result;
+}

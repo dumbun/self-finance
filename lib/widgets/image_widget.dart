@@ -21,12 +21,8 @@ class ImageWidget extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         shape: shape,
-        // image: DecorationImage(
-        //   fit: BoxFit.fill,
-        //   // image: child,
-        // ),
       ),
-      child: child,
+      child: CircleAvatar(child: child),
     );
   }
 }

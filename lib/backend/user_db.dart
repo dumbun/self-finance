@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:sqflite/sqflite.dart' as sql;
@@ -9,7 +8,7 @@ class UserBackEnd {
       ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       USER_NAME TEXT NOT NULL,
       USER_PIN TEXT NOT NULL,
-      USER_PROFILE_PICTURE TEXT
+      USER_PROFILE_PICTURE TEXT NOT NULL
     )""");
   }
 
@@ -29,12 +28,13 @@ class UserBackEnd {
     final db = await UserBackEnd.db();
     try {
       final data = {
+        "ID": user.id,
         "USER_NAME": user.userName,
         "USER_PIN": user.userPin,
         "USER_PROFILE_PICTURE": user.profilePicture,
       };
       final id = await db.insert('USER', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
-      return id == 1 ? true : false;
+      return id != 0 ? true : false;
     } catch (e) {
       return false;
     }
@@ -49,23 +49,30 @@ class UserBackEnd {
 
   // fetch the user data
 
-  static Future<User?> fetchUserData() async {
+  static Future<List> fetchUserData() async {
     final db = await UserBackEnd.db();
-    try {
-      List<Map<String, Object?>> result = await db.rawQuery("""
+
+    List<Map> result = await db.rawQuery("""
       SELECT * FROM USER WHERE ID = 1
     """);
-      return User(
-        id: result[0]["ID"] as int,
-        userName: result[0]["USER_NAME"].toString(),
-        userPin: result[0]["USER_PIN"].toString(),
-        profilePicture: Uint8List.fromList(
-          [0, 0],
-        ),
-      );
-    } catch (e) {
-      return null;
+    if (result.isNotEmpty) {
+      return User.toList(result);
+    } else {
+      return [];
     }
+  }
+
+  static Future<User> fetchIDOneUser() async {
+    final db = await UserBackEnd.db();
+    List<Map<String, Object?>> result = await db.rawQuery("""
+      SELECT * FROM USER WHERE ID = 1
+    """);
+    return User(
+      id: result[0]["ID"] as int,
+      userName: result[0]["USER_NAME"].toString(),
+      userPin: result[0]["USER_PIN"].toString(),
+      profilePicture: result[0]["USER_PROFILE_PICTURE"].toString(),
+    );
   }
 
   // fetch user pin
@@ -83,6 +90,14 @@ class UserBackEnd {
   static Future<int> updateUserName(int id, String name) async {
     final db = await UserBackEnd.db();
     final data = {'USER_NAME': name};
+    final result = await db.update('USER', data, where: "id = ?", whereArgs: [id]);
+    return result;
+  }
+  // Update the USER_PROFILE_PIC
+
+  static Future<int> updateProfilePic(int id, String imageString) async {
+    final db = await UserBackEnd.db();
+    final data = {'USER_PROFILE_PICTURE': imageString};
     final result = await db.update('USER', data, where: "id = ?", whereArgs: [id]);
     return result;
   }

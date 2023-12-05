@@ -93,7 +93,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
       for (var element in element.value) {
         result.add(BodyTwoDefaultText(
           text: element,
-          color: getPrimaryTextColor,
+          color: getLigthGreyColor,
         ));
         result.add(SizedBox(height: 16.sp));
       }
@@ -119,6 +119,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
             height: 30.sp,
             child: const BodySmallText(
               text: termAcknowledge,
+              color: getPrimaryTextColor,
             ),
           )
         ],

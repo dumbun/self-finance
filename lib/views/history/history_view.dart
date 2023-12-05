@@ -6,8 +6,8 @@ import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/views/history/history_providers.dart';
-import 'package:self_finance/widgets/center_title_text_widget.dart';
 import 'package:self_finance/widgets/detail_card_widget.dart';
+import 'package:self_finance/widgets/title_widget.dart';
 
 class HistoryView extends ConsumerStatefulWidget {
   const HistoryView({super.key});
@@ -47,7 +47,9 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CenterTitleTextWidget(title: history, showUserProfile: false),
+              const Center(
+                child: TitleWidget(text: history),
+              ),
               SizedBox(height: 20.sp),
               _buildSearchBar(ref, hintText, filterText),
               SizedBox(height: 10.sp),

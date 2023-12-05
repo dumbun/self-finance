@@ -1,10 +1,8 @@
-import 'dart:typed_data';
-
 class User {
   final int? id;
   final String userName;
   final String userPin;
-  final Uint8List profilePicture;
+  final String profilePicture;
 
   User({this.id, required this.userName, required this.userPin, required this.profilePicture});
 
@@ -27,15 +25,17 @@ class User {
   }
 
   static List<User> toList(data) {
-    List<User> custData = [];
-    data.forEach((Map<String, dynamic> e) {
-      custData.add(User(
-        id: e["ID"],
-        userName: e["userName"],
-        userPin: e["userPin"],
-        profilePicture: e["profilePicture"],
-      ));
-    });
-    return custData;
+    List<User> userData = [];
+    if (data != []) {
+      data.forEach((Map<String, dynamic> e) {
+        userData.add(User(
+          id: e["ID"],
+          userName: e["USER_NAME"],
+          userPin: e["USER_PIN"],
+          profilePicture: e["USER_PROFILE_PICTURE"],
+        ));
+      });
+    }
+    return userData;
   }
 }

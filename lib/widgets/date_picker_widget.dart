@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:self_finance/theme/colors.dart';
 
 class InputDatePicker extends StatefulWidget {
   const InputDatePicker({
@@ -39,6 +40,9 @@ class _InputDatePickerState extends State<InputDatePicker> {
         border: const OutlineInputBorder(),
         // icon: const Icon(Icons.calendar_today), //icon of text field
         labelText: widget.labelText, //label text of field
+        labelStyle: const TextStyle(
+          color: getLigthGreyColor,
+        ),
       ),
       readOnly: true,
       onTap: () async {

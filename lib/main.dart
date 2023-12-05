@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/backend_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
@@ -15,10 +14,9 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    ThemeData darkTheme = ThemeData(
+    final ThemeData darkTheme = ThemeData(
       brightness: Brightness.dark,
       fontFamily: "hell",
       colorScheme: ColorScheme.fromSeed(
@@ -28,10 +26,12 @@ class MyApp extends StatelessWidget {
         primary: getPrimaryColor,
         brightness: Brightness.dark,
       ),
+      primarySwatch: Colors.blue,
       useMaterial3: true,
       primaryColor: getPrimaryColor,
     );
-    ThemeData lightTheme = ThemeData(
+    final ThemeData lightTheme = ThemeData(
+      primarySwatch: Colors.blue,
       primaryColor: getPrimaryColor,
       cardTheme: const CardTheme(color: getVeryLightGreyColor),
       fontFamily: "hell",
@@ -58,12 +58,12 @@ class MyApp extends StatelessWidget {
         themeAnimationCurve: Curves.easeInOut,
         home: Consumer(
           builder: (context, ref, child) {
-            AsyncValue<User?> userData = ref.watch(userDataProvider);
+            AsyncValue<List> userData = ref.watch(userDataProvider);
             return userData.when(
               data: (user) {
-                if (user != null) {
+                if (user.isNotEmpty) {
                   // if(user) then build AuthView for autontication
-                  return AuthView(user: user);
+                  return AuthView(user: user[0]);
                 } else {
                   return const TermsAndConditons();
                 }

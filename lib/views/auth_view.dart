@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:self_finance/backend/user_db.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/views/dashboard_view.dart';
@@ -19,11 +20,16 @@ class AuthView extends StatefulWidget {
 class _AuthViewState extends State<AuthView> {
   final LocalAuthentication auth = LocalAuthentication();
   bool _isAuthenticated = false;
-
+  User? _user;
   @override
   void initState() {
     super.initState();
     _authenticateWithBiometrics();
+    _fetchData();
+  }
+
+  _fetchData() async {
+    _user = await UserBackEnd.fetchIDOneUser();
   }
 
   Future<void> _authenticateWithBiometrics() async {
@@ -72,6 +78,10 @@ class _AuthViewState extends State<AuthView> {
 
   @override
   Widget build(BuildContext context) {
-    return _isAuthenticated ? DashboardView(user: widget.user) : PinAuthView(user: widget.user);
+    return _isAuthenticated
+        ? DashboardView(
+            user: _user!,
+          )
+        : PinAuthView(user: widget.user);
   }
 }

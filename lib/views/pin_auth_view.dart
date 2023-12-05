@@ -5,6 +5,7 @@ import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/fonts/strong_heading_one_text.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/util.dart';
 import 'package:self_finance/widgets/app_icon.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
@@ -42,7 +43,9 @@ class _PinAuthViewState extends State<PinAuthView> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const AppIcon(),
+                widget.user.profilePicture != ""
+                    ? Utility.imageFromBase64String(widget.user.profilePicture)
+                    : const AppIcon(),
                 SizedBox(height: 20.sp),
                 const StrongHeadingOne(
                   bold: true,

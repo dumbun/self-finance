@@ -10,7 +10,6 @@ import 'package:self_finance/views/home_screen.dart';
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key, required this.user});
-
   final User user;
 
   @override
@@ -44,7 +43,7 @@ class _DashboardViewState extends State<DashboardView> {
               });
             },
             children: <Widget>[
-              const HomeScreen(),
+              HomeScreen(user: widget.user),
               EMICalculatorView(),
               const HistoryView(),
             ],

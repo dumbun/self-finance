@@ -45,7 +45,8 @@ class DetailsView extends StatelessWidget {
   GestureDetector _builtImageWidget(BuildContext context, imageData, titile) {
     return GestureDetector(
         onTap: () {
-          Routes.navigateToImageView(context: context, imageData: imageData, titile: titile);
+          Routes.navigateToImageView(
+              context: context, imageData: imageData, titile: titile);
         },
         child: Utility.imageFromBase64String(imageData));
   }
