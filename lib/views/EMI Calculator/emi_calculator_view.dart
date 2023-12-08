@@ -5,6 +5,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/logic/logic.dart';
+import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_providers.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
@@ -197,6 +198,7 @@ class EMICalculatorView extends ConsumerWidget {
         border: const OutlineInputBorder(),
         // icon: const Icon(Icons.calendar_today), //icon of text field
         labelText: labelText, //label text of field
+        labelStyle: const TextStyle(color: getLigthGreyColor),
       ),
       textInputAction: TextInputAction.done,
       onTap: () async {
