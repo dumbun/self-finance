@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 
-class CenterTitleTextWidget extends ConsumerWidget {
+class CenterTitleTextWidget extends StatelessWidget {
   const CenterTitleTextWidget({super.key, required this.showUserProfile, required this.user});
   final bool showUserProfile;
   final User user;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Stack(
       children: [
         Align(
@@ -23,7 +22,18 @@ class CenterTitleTextWidget extends ConsumerWidget {
             ? Align(
                 alignment: Alignment.centerRight,
                 child: user.profilePicture != ""
-                    ? Utility.imageFromBase64String(user.profilePicture)
+                    ? GestureDetector(
+                        onTap: () {
+                          //todo make the screen to show the user detaile and update user details
+                        },
+                        child: SizedBox(
+                          height: 30.sp,
+                          width: 30.sp,
+                          child: Utility.imageFromBase64String(
+                            user.profilePicture,
+                          ),
+                        ),
+                      )
                     : DefaultUserImage(
                         height: 26.sp,
                       ),

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/models/user_model.dart';
+import 'package:self_finance/providers/user_backend_provider.dart';
 import 'package:self_finance/widgets/center_title_text_widget.dart';
+import 'package:self_finance/widgets/title_widget.dart';
 
 class HomeScreen extends ConsumerWidget {
-  const HomeScreen({required this.user, super.key});
-  final User user;
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
@@ -14,13 +15,33 @@ class HomeScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          CenterTitleTextWidget(
-            user: user,
-            showUserProfile: true,
-          ),
+        children: [
+          _buildTitle(),
         ],
       ),
+    );
+  }
+
+  Consumer _buildTitle() {
+    return Consumer(
+      builder: (context, ref, child) {
+        return ref.watch(userDataProvider).when(
+              data: (data) {
+                return Column(
+                  children: <Widget>[
+                    CenterTitleTextWidget(
+                      user: data[0],
+                      showUserProfile: true,
+                    ),
+                  ],
+                );
+              },
+              error: (_, __) {
+                return const Center(child: TitleWidget(text: "Welcome"));
+              },
+              loading: () => const CircularProgressIndicator(),
+            );
+      },
     );
   }
 }

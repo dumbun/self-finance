@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
-import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_view.dart';
 import 'package:self_finance/views/history/history_view.dart';
 import 'package:self_finance/views/home_screen.dart';
 
 class DashboardView extends StatefulWidget {
-  const DashboardView({super.key, required this.user});
-  final User user;
+  const DashboardView({super.key});
 
   @override
   State<DashboardView> createState() => _DashboardViewState();
@@ -43,7 +41,7 @@ class _DashboardViewState extends State<DashboardView> {
               });
             },
             children: <Widget>[
-              HomeScreen(user: widget.user),
+              const HomeScreen(),
               EMICalculatorView(),
               const HistoryView(),
             ],
@@ -51,7 +49,6 @@ class _DashboardViewState extends State<DashboardView> {
         ),
         floatingActionButton: _selectedIndex == 0
             ? FloatingActionButton(
-                clipBehavior: Clip.antiAlias,
                 foregroundColor: getPrimaryColor,
                 elevation: 2.sp,
                 onPressed: () => Routes.navigateToAddNewEntry(context: context),

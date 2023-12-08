@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/providers/backend_provider.dart';
+import 'package:self_finance/providers/user_backend_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
 import 'package:self_finance/views/auth_view.dart';
@@ -12,10 +12,10 @@ void main() {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData darkTheme = ThemeData(
       brightness: Brightness.dark,
       fontFamily: "hell",
@@ -56,27 +56,22 @@ class MyApp extends StatelessWidget {
         theme: lightTheme,
         darkTheme: darkTheme,
         themeAnimationCurve: Curves.easeInOut,
-        home: Consumer(
-          builder: (context, ref, child) {
-            AsyncValue<List> userData = ref.watch(userDataProvider);
-            return userData.when(
+        home: ref.watch(userDataProvider).when(
               data: (user) {
                 if (user.isNotEmpty) {
                   // if(user) then build AuthView for autontication
-                  return AuthView(user: user[0]);
+                  return const AuthView();
                 } else {
                   return const TermsAndConditons();
                 }
               },
               loading: () => const Center(
                 child: CircularProgressIndicator.adaptive(),
-              ), // Show a loader while fetching data
+              ),
               error: (error, stackTrace) => const Center(
                 child: Text('Error fetching user data'),
               ), // Show an error message if fetching fails
-            );
-          },
-        ),
+            ),
       ),
     );
   }

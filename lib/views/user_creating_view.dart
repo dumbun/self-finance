@@ -98,7 +98,7 @@ class UserCreationView extends ConsumerWidget {
   }
 
   navigateToDashboard(ctx, User user) {
-    Routes.navigateToDashboard(context: ctx, user: user);
+    Routes.navigateToDashboard(context: ctx);
     snackBarWidget(context: ctx, message: "success : saved successfully ");
   }
 

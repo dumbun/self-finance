@@ -10,6 +10,7 @@ class Utility {
   static Widget imageFromBase64String(String base64String, {double? height, double? width}) {
     final decodedImage = Image.memory(
       gaplessPlayback: true,
+      cacheWidth: 200,
       base64Decode(base64String),
       fit: BoxFit.fill, // Adjust this based on your image's aspect ratio requirement
       height: height ?? 40.sp,

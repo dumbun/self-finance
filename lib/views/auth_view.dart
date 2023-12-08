@@ -2,16 +2,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:self_finance/backend/user_db.dart';
 import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 
 class AuthView extends StatefulWidget {
-  const AuthView({super.key, required this.user});
-  final User user;
+  const AuthView({super.key});
 
   @override
   State<AuthView> createState() => _AuthViewState();
@@ -20,16 +17,11 @@ class AuthView extends StatefulWidget {
 class _AuthViewState extends State<AuthView> {
   final LocalAuthentication auth = LocalAuthentication();
   bool _isAuthenticated = false;
-  User? _user;
+
   @override
   void initState() {
     super.initState();
     _authenticateWithBiometrics();
-    _fetchData();
-  }
-
-  _fetchData() async {
-    _user = await UserBackEnd.fetchIDOneUser();
   }
 
   Future<void> _authenticateWithBiometrics() async {
@@ -78,10 +70,6 @@ class _AuthViewState extends State<AuthView> {
 
   @override
   Widget build(BuildContext context) {
-    return _isAuthenticated
-        ? DashboardView(
-            user: _user!,
-          )
-        : PinAuthView(user: widget.user);
+    return _isAuthenticated ? const DashboardView() : const PinAuthView();
   }
 }

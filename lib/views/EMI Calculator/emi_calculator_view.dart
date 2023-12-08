@@ -103,7 +103,6 @@ class EMICalculatorView extends ConsumerWidget {
                   }),
               SizedBox(height: 20.sp),
               // rate of Intrest
-
               InputTextField(
                 hintText: "Rate of Intrest %",
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
