@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/backend/backend.dart';
-import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/providers/user_backend_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
 import 'package:self_finance/views/auth_view.dart';
 import 'package:self_finance/views/terms_and_conditions.dart';
-
-// part 'main.g.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

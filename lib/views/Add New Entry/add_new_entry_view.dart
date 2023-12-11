@@ -7,7 +7,6 @@ import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/views/Add%20New%20Entry/providers.dart';
-import 'package:self_finance/views/history/history_providers.dart';
 import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:self_finance/widgets/date_picker_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
@@ -126,34 +125,31 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
           },
         );
 
-        ref.read(counterProvider.notifier).addNew(transaction);
-
-        // createNewCustomerEntry =
-        //     await ref.read(createNewTransactionProvider(transaction)).when(
-        //   data: (data) {
-        //     if (data) {
-        //       return data;
-        //     } else {
-        //       AlertDilogs.alertDialogWithOneAction(
-        //         context,
-        //         "Error",
-        //         'Data is not saved please try again after some time',
-        //       );
-        //       return false;
-        //     }
-        //   },
-        //   error: (error, stackTrace) {
-        //     AlertDilogs.alertDialogWithOneAction(
-        //       context,
-        //       "Error",
-        //       error.toString(),
-        //     );
-        //     return false;
-        //   },
-        //   loading: () {
-        //     return true;
-        //   },
-        // );
+        createNewCustomerEntry = await ref.read(createNewTransactionProvider(transaction)).when(
+          data: (data) {
+            if (data) {
+              return data;
+            } else {
+              AlertDilogs.alertDialogWithOneAction(
+                context,
+                "Error",
+                'Data is not saved please try again after some time',
+              );
+              return false;
+            }
+          },
+          error: (error, stackTrace) {
+            AlertDilogs.alertDialogWithOneAction(
+              context,
+              "Error",
+              error.toString(),
+            );
+            return false;
+          },
+          loading: () {
+            return true;
+          },
+        );
 
         setState(() {
           _isloading = false;
