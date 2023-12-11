@@ -6,7 +6,6 @@ import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/providers/user_backend_provider.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/util.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_view.dart';
 import 'package:self_finance/views/history/history_view.dart';
 import 'package:self_finance/views/home_screen.dart';
