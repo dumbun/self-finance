@@ -12,10 +12,15 @@ void main() {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends ConsumerWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  @override
+  Widget build(BuildContext context) {
     final ThemeData darkTheme = ThemeData(
       brightness: Brightness.dark,
       fontFamily: "hell",
@@ -57,10 +62,12 @@ class MyApp extends ConsumerWidget {
         darkTheme: darkTheme,
         themeAnimationCurve: Curves.easeInOut,
         home: ref.watch(userDataProvider).when(
-              data: (user) {
+              data: (List user) {
                 if (user.isNotEmpty) {
                   // if(user) then build AuthView for autontication
-                  return const AuthView();
+                  return AuthView(
+                    user: user[0],
+                  );
                 } else {
                   return const TermsAndConditons();
                 }

@@ -49,17 +49,14 @@ class UserBackEnd {
 
   // fetch the user data
 
-  static Future<List> fetchUserData() async {
+  static Future<List<User>> fetchUserData() async {
     final db = await UserBackEnd.db();
 
-    List<Map> result = await db.rawQuery("""
+    List<Map<String, Object?>> result = await db.rawQuery("""
       SELECT * FROM USER WHERE ID = 1
     """);
-    if (result.isNotEmpty) {
-      return User.toList(result);
-    } else {
-      return [];
-    }
+
+    return User.toList(result);
   }
 
   static Future<User> fetchIDOneUser() async {

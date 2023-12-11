@@ -28,7 +28,7 @@ class InputTextField extends StatelessWidget {
       onChanged: onChanged as void Function(String)?,
       validator: validator ??
           (value) {
-            if (value == null || value.isEmpty) {
+            if (value == null || value.isEmpty || value == "") {
               return 'Please enter a valid value';
             }
             return null;

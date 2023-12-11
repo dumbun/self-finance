@@ -71,7 +71,7 @@ class _PinCreatingViewState extends State<PinCreatingView> {
     return Container(
       alignment: Alignment.center,
       height: 32.sp,
-      child: AppIcon(),
+      child: const AppIcon(),
     );
   }
 }

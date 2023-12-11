@@ -1,27 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/backend/user_db.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
+import 'package:self_finance/providers/user_backend_provider.dart';
 import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/util.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_view.dart';
 import 'package:self_finance/views/history/history_view.dart';
 import 'package:self_finance/views/home_screen.dart';
 
-class DashboardView extends StatefulWidget {
+class DashboardView extends ConsumerStatefulWidget {
   const DashboardView({super.key});
 
   @override
-  State<DashboardView> createState() => _DashboardViewState();
+  ConsumerState<DashboardView> createState() => _DashboardViewState();
 }
 
-class _DashboardViewState extends State<DashboardView> {
+class _DashboardViewState extends ConsumerState<DashboardView> {
   late PageController _pageController;
   int _selectedIndex = 0;
 
+  void userDataUpdate() async {
+    final data = await UserBackEnd.fetchUserData();
+    if (data.isNotEmpty) {
+      ref.read(up.notifier).state = data[0];
+    }
+  }
+
   @override
   void initState() {
-    super.initState();
+    userDataUpdate();
     _pageController = PageController(initialPage: _selectedIndex);
+    super.initState();
   }
 
   @override
@@ -51,7 +63,10 @@ class _DashboardViewState extends State<DashboardView> {
             ? FloatingActionButton(
                 foregroundColor: getPrimaryColor,
                 elevation: 2.sp,
-                onPressed: () => Routes.navigateToAddNewEntry(context: context),
+                onPressed: () {
+                  Routes.navigateToAddNewEntry(context: context);
+                  ImageCacheManager.prin();
+                },
                 enableFeedback: true,
                 mini: false,
                 shape: const CircleBorder(),

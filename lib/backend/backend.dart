@@ -163,6 +163,7 @@ class BackEnd {
       return [];
     }
   }
+
   // get the transaction by Customer Name
 
   static Future<List<Transactions>> getTransactionsEntriesByCustomerName(String name) async {

@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:self_finance/constants/constants.dart';
+import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 
 class AuthView extends StatefulWidget {
-  const AuthView({super.key});
+  const AuthView({super.key, required this.user});
+  final User user;
 
   @override
   State<AuthView> createState() => _AuthViewState();
@@ -70,6 +72,10 @@ class _AuthViewState extends State<AuthView> {
 
   @override
   Widget build(BuildContext context) {
-    return _isAuthenticated ? const DashboardView() : const PinAuthView();
+    return _isAuthenticated
+        ? const DashboardView()
+        : PinAuthView(
+            user: widget.user,
+          );
   }
 }
