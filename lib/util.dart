@@ -8,25 +8,39 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 class ImageCacheManager {
   static final Map<String, Image> _imageCache = {};
-  static prin() {
-    print("object");
-    print(_imageCache.length);
-  }
+  static const int _maxCacheSize = 50; // Maximum number of images to cache
 
   static Image getCachedImage(String base64String, double? height, double? width) {
     if (_imageCache.containsKey(base64String)) {
-      return _imageCache[base64String]!;
+      final cachedImage = _imageCache[base64String]!;
+      _reorderCache(base64String, cachedImage);
+      return cachedImage;
     } else {
       final decodedImage = Image.memory(
-        gaplessPlayback: true,
         base64Decode(base64String),
         fit: BoxFit.fill,
         height: height ?? 40.sp,
-        width: height ?? 40.sp,
+        width: width ?? 40.sp,
       );
+
+      if (_imageCache.length >= _maxCacheSize) {
+        _removeLeastUsedImage();
+      }
+
       _imageCache[base64String] = decodedImage;
       return decodedImage;
     }
+  }
+
+  static void _reorderCache(String key, Image value) {
+    // Move accessed image to the end to simulate LRU behavior
+    _imageCache.remove(key);
+    _imageCache[key] = value;
+  }
+
+  static void _removeLeastUsedImage() {
+    // Remove the least recently used image
+    _imageCache.remove(_imageCache.keys.first);
   }
 }
 
