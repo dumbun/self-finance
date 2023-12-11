@@ -7,6 +7,7 @@ import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/views/Add%20New%20Entry/providers.dart';
+import 'package:self_finance/views/history/history_providers.dart';
 import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:self_finance/widgets/date_picker_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
@@ -18,8 +19,7 @@ class AddNewEntryView extends ConsumerStatefulWidget {
   const AddNewEntryView({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _AddNewEntryViewState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _AddNewEntryViewState();
 }
 
 class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
@@ -76,12 +76,9 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
       required BuildContext context,
     }) async {
       try {
-        final String photoCustomer =
-            ref.watch(pickedCustomerProfileImageStringProvider);
-        final String photoProof =
-            ref.watch(pickedCustomerProofImageStringProvider);
-        final String photoItem =
-            ref.watch(pickedCustomerItemImageStringProvider);
+        final String photoCustomer = ref.watch(pickedCustomerProfileImageStringProvider);
+        final String photoProof = ref.watch(pickedCustomerProofImageStringProvider);
+        final String photoItem = ref.watch(pickedCustomerItemImageStringProvider);
 
         final Customer customer = Customer(
           mobileNumber: mobileNumber,
@@ -113,8 +110,7 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
           photoItem: photoItem,
         );
 
-        bool createNewCustomerEntry =
-            await ref.read(createNewEntryProvider(customer)).when(
+        bool createNewCustomerEntry = await ref.read(createNewEntryProvider(customer)).when(
           data: (data) {
             if (data) {
               return data;
@@ -130,32 +126,34 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
           },
         );
 
-        createNewCustomerEntry =
-            await ref.read(createNewTransactionProvider(transaction)).when(
-          data: (data) {
-            if (data) {
-              return data;
-            } else {
-              AlertDilogs.alertDialogWithOneAction(
-                context,
-                "Error",
-                'Data is not saved please try again after some time',
-              );
-              return false;
-            }
-          },
-          error: (error, stackTrace) {
-            AlertDilogs.alertDialogWithOneAction(
-              context,
-              "Error",
-              error.toString(),
-            );
-            return false;
-          },
-          loading: () {
-            return true;
-          },
-        );
+        ref.read(counterProvider.notifier).addNew(transaction);
+
+        // createNewCustomerEntry =
+        //     await ref.read(createNewTransactionProvider(transaction)).when(
+        //   data: (data) {
+        //     if (data) {
+        //       return data;
+        //     } else {
+        //       AlertDilogs.alertDialogWithOneAction(
+        //         context,
+        //         "Error",
+        //         'Data is not saved please try again after some time',
+        //       );
+        //       return false;
+        //     }
+        //   },
+        //   error: (error, stackTrace) {
+        //     AlertDilogs.alertDialogWithOneAction(
+        //       context,
+        //       "Error",
+        //       error.toString(),
+        //     );
+        //     return false;
+        //   },
+        //   loading: () {
+        //     return true;
+        //   },
+        // );
 
         setState(() {
           _isloading = false;
@@ -163,20 +161,13 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
 
         if (createNewCustomerEntry) {
           /// reseting the providers so that for next entery the provider will show as an empty String
-          ref
-              .read(pickedCustomerItemImageStringProvider.notifier)
-              .update((state) => "");
-          ref
-              .read(pickedCustomerProfileImageStringProvider.notifier)
-              .update((state) => "");
-          ref
-              .read(pickedCustomerProofImageStringProvider.notifier)
-              .update((state) => "");
+          ref.read(pickedCustomerItemImageStringProvider.notifier).update((state) => "");
+          ref.read(pickedCustomerProfileImageStringProvider.notifier).update((state) => "");
+          ref.read(pickedCustomerProofImageStringProvider.notifier).update((state) => "");
           Navigator.of(context).pop();
           snackBarWidget(context: context, message: savedSuccessfullyText);
         } else {
-          AlertDilogs.alertDialogWithOneAction(
-              context, "Fail", "Data not saved please try again 😥 ");
+          AlertDilogs.alertDialogWithOneAction(context, "Fail", "Data not saved please try again 😥 ");
         }
       } catch (e) {
         AlertDilogs.alertDialogWithOneAction(context, "error", e.toString());
@@ -184,8 +175,7 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
     }
 
     return GestureDetector(
-      onVerticalDragDown: (details) =>
-          FocusManager.instance.primaryFocus?.unfocus(),
+      onVerticalDragDown: (details) => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         appBar: AppBar(title: const Text("Add new Entry")),
         body: SafeArea(
@@ -193,8 +183,7 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
             key: _formKey,
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -268,29 +257,25 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
                               _isloading = true;
                             });
 
-                            double doubleCheck(String text,
-                                {String errorString = "error"}) {
+                            double doubleCheck(String text, {String errorString = "error"}) {
                               try {
                                 return double.parse(text);
                               } catch (e) {
                                 setState(() {
                                   _isloading = false;
                                 });
-                                return AlertDilogs.alertDialogWithOneAction(
-                                    context, errorString, e.toString());
+                                return AlertDilogs.alertDialogWithOneAction(context, errorString, e.toString());
                               }
                             }
 
-                            int intCheck(String text,
-                                {String errorString = "error"}) {
+                            int intCheck(String text, {String errorString = "error"}) {
                               try {
                                 return int.parse(text);
                               } catch (e) {
                                 setState(() {
                                   _isloading = false;
                                 });
-                                return AlertDilogs.alertDialogWithOneAction(
-                                    context, errorString, e.toString());
+                                return AlertDilogs.alertDialogWithOneAction(context, errorString, e.toString());
                               }
                             }
 
@@ -299,10 +284,8 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
                               address: _address.text,
                               customerName: _customerName.text,
                               guardianName: _guardianName.text,
-                              takenAmount: intCheck(_takenAmount.text,
-                                  errorString: "Taken Amount Error"),
-                              rateOfInterest: doubleCheck(_rateOfInterest.text,
-                                  errorString: "rate Of Interest Error"),
+                              takenAmount: intCheck(_takenAmount.text, errorString: "Taken Amount Error"),
+                              rateOfInterest: doubleCheck(_rateOfInterest.text, errorString: "rate Of Interest Error"),
                               itemName: _itemName.text,
                               takenDate: _takenDate.text,
                               context: context,

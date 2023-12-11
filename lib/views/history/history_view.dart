@@ -26,7 +26,7 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
   void initState() {
     super.initState();
     // fetches and changes the state of the provider when the screen first loades
-    fetchData();
+    // fetchData();
   }
 
   @override
@@ -34,7 +34,7 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
     final String hintText = ref.watch(hintTextProvider);
     final String filterText = ref.watch(selectedFilterProvider);
     final List<Transactions> data = ref.watch(listOfTransactionsProvider);
-
+    final List<Transactions> l = ref.watch(counterProvider.notifier).build();
     return SafeArea(
       child: RefreshIndicator(
         onRefresh: () async {
@@ -53,7 +53,7 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
               SizedBox(height: 20.sp),
               _buildSearchBar(ref, hintText, filterText),
               SizedBox(height: 10.sp),
-              _buildData(data),
+              _buildData(l.reversed.toList()),
             ],
           ),
         ),
