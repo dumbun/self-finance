@@ -5,7 +5,7 @@ snackBarWidget({required BuildContext context, required String message}) {
   return ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       animation: ProxyAnimation(),
-      backgroundColor: getPrimaryColor,
+      backgroundColor: AppColors.getPrimaryColor,
       content: Row(
         children: [
           Text(

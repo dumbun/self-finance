@@ -82,12 +82,15 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
       elevation: const MaterialStatePropertyAll(0),
       padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.only(left: 16.sp)),
       hintText: hintText,
-      leading: const Icon(Icons.search, color: getPrimaryColor),
+      leading: const Icon(
+        Icons.search,
+        color: AppColors.getPrimaryColor,
+      ),
       trailing: [
         PopupMenuButton<String>(
           enableFeedback: true,
           icon: const Icon(Icons.filter_alt_outlined),
-          iconColor: getPrimaryColor,
+          iconColor: AppColors.getPrimaryColor,
           tooltip: filterText,
           onSelected: (String filter) {
             final update = ref.read(hintTextProvider.notifier);

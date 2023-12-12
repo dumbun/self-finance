@@ -19,7 +19,7 @@ class RoundedCornerButton extends StatelessWidget {
     return AnimatedButton(
       pressEvent: onPressed,
       text: text,
-      color: getPrimaryColor,
+      color: AppColors.getPrimaryColor,
       icon: icon,
     );
   }

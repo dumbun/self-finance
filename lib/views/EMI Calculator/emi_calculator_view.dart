@@ -198,7 +198,7 @@ class EMICalculatorView extends ConsumerWidget {
         border: const OutlineInputBorder(),
         // icon: const Icon(Icons.calendar_today), //icon of text field
         labelText: labelText, //label text of field
-        labelStyle: const TextStyle(color: getLigthGreyColor),
+        labelStyle: const TextStyle(color: AppColors.getLigthGreyColor),
       ),
       textInputAction: TextInputAction.done,
       onTap: () async {

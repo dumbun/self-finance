@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/providers/p.dart';
 import 'package:self_finance/providers/user_backend_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
@@ -21,31 +22,32 @@ class MyApp extends ConsumerStatefulWidget {
 class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
+    ref.watch(backendProvider.notifier).update();
     final ThemeData darkTheme = ThemeData(
       brightness: Brightness.dark,
       fontFamily: "hell",
       colorScheme: ColorScheme.fromSeed(
-        background: getPrimaryTextColor,
-        error: getErrorColor,
-        seedColor: getPrimaryColor,
-        primary: getPrimaryColor,
+        background: AppColors.getPrimaryTextColor,
+        error: AppColors.getErrorColor,
+        seedColor: AppColors.getPrimaryColor,
+        primary: AppColors.getPrimaryColor,
         brightness: Brightness.dark,
       ),
       primarySwatch: Colors.blue,
       useMaterial3: true,
-      primaryColor: getPrimaryColor,
+      primaryColor: AppColors.getPrimaryColor,
     );
     final ThemeData lightTheme = ThemeData(
       primarySwatch: Colors.blue,
-      primaryColor: getPrimaryColor,
-      cardTheme: const CardTheme(color: getVeryLightGreyColor),
+      primaryColor: AppColors.getPrimaryColor,
+      cardTheme: const CardTheme(color: AppColors.getVeryLightGreyColor),
       fontFamily: "hell",
       colorScheme: ColorScheme.fromSeed(
-        seedColor: getPrimaryColor,
-        background: getBackgroundColor,
-        error: getErrorColor,
-        surface: getVeryLightGreyColor,
-        primary: getPrimaryColor,
+        seedColor: AppColors.getPrimaryColor,
+        background: AppColors.getBackgroundColor,
+        error: AppColors.getErrorColor,
+        surface: AppColors.getVeryLightGreyColor,
+        primary: AppColors.getPrimaryColor,
         brightness: Brightness.light,
       ),
       useMaterial3: true,
@@ -55,7 +57,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         routes: {
           '/addNewEntry': (context) => const AddNewEntryView(),
         },
-        color: getPrimaryColor,
+        color: AppColors.getPrimaryColor,
         title: 'Self Finance',
         debugShowCheckedModeBanner: false,
         theme: lightTheme,

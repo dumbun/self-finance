@@ -54,7 +54,7 @@ class _CallButtonWidgetState extends State<CallButtonWidget> {
               },
               child: const Icon(
                 Icons.call,
-                color: getPrimaryColor,
+                color: AppColors.getPrimaryColor,
               ),
             )
           : _buildDisabledPhone();
@@ -70,7 +70,7 @@ class _CallButtonWidgetState extends State<CallButtonWidget> {
         padding: EdgeInsets.all(16.sp),
         child: const Icon(
           Icons.phone_disabled_rounded,
-          color: getErrorColor,
+          color: AppColors.getErrorColor,
         ),
       ),
     );

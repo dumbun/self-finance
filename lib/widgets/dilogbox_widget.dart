@@ -13,7 +13,7 @@ class AlertDilogs {
             onPressed: () => Navigator.pop(context, 'OK'),
             child: const Text(
               'OK',
-              style: TextStyle(color: getGreenColor, fontWeight: FontWeight.bold, fontSize: 22),
+              style: TextStyle(color: AppColors.getGreenColor, fontWeight: FontWeight.bold, fontSize: 22),
             ),
           ),
         ],

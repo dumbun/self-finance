@@ -5,6 +5,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/providers/p.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/views/Add%20New%20Entry/providers.dart';
 import 'package:self_finance/widgets/image_picker_widget.dart';
@@ -75,11 +76,13 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
       required BuildContext context,
     }) async {
       try {
-        final String photoCustomer = ref.watch(pickedCustomerProfileImageStringProvider);
-        final String photoProof = ref.watch(pickedCustomerProofImageStringProvider);
-        final String photoItem = ref.watch(pickedCustomerItemImageStringProvider);
+        final String photoCustomer = ref.read(pickedCustomerProfileImageStringProvider);
+        final String photoProof = ref.read(pickedCustomerProofImageStringProvider);
+        final String photoItem = ref.read(pickedCustomerItemImageStringProvider);
+        final int id = ref.read(backendProvider.notifier).trnx.length + 1;
 
         final Customer customer = Customer(
+          id: id,
           mobileNumber: mobileNumber,
           address: address,
           customerName: customerName,
@@ -95,6 +98,7 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
         );
 
         Transactions transaction = Transactions(
+          id: id,
           mobileNumber: mobileNumber,
           address: address,
           customerName: customerName,
@@ -109,47 +113,52 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
           photoItem: photoItem,
         );
 
-        bool createNewCustomerEntry = await ref.read(createNewEntryProvider(customer)).when(
-          data: (data) {
-            if (data) {
-              return data;
-            } else {
-              return false;
-            }
-          },
-          error: (error, stackTrace) {
-            return false;
-          },
-          loading: () {
-            return true;
-          },
-        );
-
-        createNewCustomerEntry = await ref.read(createNewTransactionProvider(transaction)).when(
-          data: (data) {
-            if (data) {
-              return data;
-            } else {
-              AlertDilogs.alertDialogWithOneAction(
-                context,
-                "Error",
-                'Data is not saved please try again after some time',
-              );
-              return false;
-            }
-          },
-          error: (error, stackTrace) {
-            AlertDilogs.alertDialogWithOneAction(
-              context,
-              "Error",
-              error.toString(),
+        bool createNewCustomerEntry = await ref.read(backendProvider.notifier).createTransaction(
+              transaction,
+              customer,
             );
-            return false;
-          },
-          loading: () {
-            return true;
-          },
-        );
+
+        // bool createNewCustomerEntry = await ref.read(createNewEntryProvider(customer)).when(
+        //   data: (data) {
+        //     if (data) {
+        //       return data;
+        //     } else {
+        //       return false;
+        //     }
+        //   },
+        //   error: (error, stackTrace) {
+        //     return false;
+        //   },
+        //   loading: () {
+        //     return true;
+        //   },
+        // );
+
+        // createNewCustomerEntry = await ref.read(createNewTransactionProvider(transaction)).when(
+        //   data: (data) {
+        //     if (data) {
+        //       return data;
+        //     } else {
+        //       AlertDilogs.alertDialogWithOneAction(
+        //         context,
+        //         "Error",
+        //         'Data is not saved please try again after some time',
+        //       );
+        //       return false;
+        //     }
+        //   },
+        //   error: (error, stackTrace) {
+        //     AlertDilogs.alertDialogWithOneAction(
+        //       context,
+        //       "Error",
+        //       error.toString(),
+        //     );
+        //     return false;
+        //   },
+        //   loading: () {
+        //     return true;
+        //   },
+        // );
 
         setState(() {
           _isloading = false;

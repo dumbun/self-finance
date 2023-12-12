@@ -43,7 +43,7 @@ class InputTextField extends StatelessWidget {
         labelText: hintText,
         border: const OutlineInputBorder(),
         labelStyle: const TextStyle(
-          color: getLigthGreyColor,
+          color: AppColors.getLigthGreyColor,
         ),
       ),
     );

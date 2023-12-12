@@ -28,7 +28,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: getBackgroundColor,
+      backgroundColor: AppColors.getBackgroundColor,
       body: SafeArea(
         child: Container(
           padding: EdgeInsets.all(24.sp),
@@ -87,13 +87,13 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
       result.add(BodyTwoDefaultText(
         text: element.key,
         bold: true,
-        color: getPrimaryTextColor,
+        color: AppColors.getPrimaryTextColor,
       ));
       result.add(SizedBox(height: 16.sp));
       for (var element in element.value) {
         result.add(BodyTwoDefaultText(
           text: element,
-          color: getLigthGreyColor,
+          color: AppColors.getLigthGreyColor,
         ));
         result.add(SizedBox(height: 16.sp));
       }
@@ -111,7 +111,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
           Checkbox(
             value: ticked,
             onChanged: (value) => _getClicked(),
-            activeColor: getPrimaryColor,
+            activeColor: AppColors.getPrimaryColor,
           ),
           SizedBox(width: 10.sp),
           SizedBox(
@@ -119,7 +119,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
             height: 30.sp,
             child: const BodySmallText(
               text: termAcknowledge,
-              color: getPrimaryTextColor,
+              color: AppColors.getPrimaryTextColor,
             ),
           )
         ],

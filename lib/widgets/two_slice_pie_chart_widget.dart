@@ -63,13 +63,13 @@ class _TwoSlicePieChartWidgetState extends State<TwoSlicePieChartWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Indicator(
-                color: getPrimaryColor,
+                color: AppColors.getPrimaryColor,
                 text: widget.firstIndicatorText,
                 isSquare: true,
               ),
               SizedBox(height: 4.sp),
               Indicator(
-                color: getLigthGreyColor,
+                color: AppColors.getLigthGreyColor,
                 text: widget.secoundIndicatorText,
                 isSquare: true,
               ),
@@ -90,27 +90,27 @@ class _TwoSlicePieChartWidgetState extends State<TwoSlicePieChartWidget> {
       switch (i) {
         case 0:
           return PieChartSectionData(
-            color: getPrimaryColor,
+            color: AppColors.getPrimaryColor,
             value: widget.firstIndicatorValue,
             title: '${widget.firstIndicatorValue}%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
               fontWeight: FontWeight.bold,
-              color: getBackgroundColor,
+              color: AppColors.getBackgroundColor,
               // shadows: shadows,
             ),
           );
         case 1:
           return PieChartSectionData(
-            color: getLigthGreyColor,
+            color: AppColors.getLigthGreyColor,
             value: widget.secoundIndicatorValue,
             title: '${widget.secoundIndicatorValue}%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
               fontWeight: FontWeight.bold,
-              color: getPrimaryTextColor,
+              color: AppColors.getPrimaryTextColor,
               // shadows: shadows,
             ),
           );

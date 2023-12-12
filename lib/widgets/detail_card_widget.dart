@@ -55,7 +55,7 @@ class DetailCardWidget extends StatelessWidget {
                           SizedBox(height: 8.0.sp),
                           BodyTwoDefaultText(
                             text: data.takenDate,
-                            color: getPrimaryColor,
+                            color: AppColors.getPrimaryColor,
                           ),
                           SizedBox(height: 8.0.sp),
                           Row(
@@ -65,7 +65,7 @@ class DetailCardWidget extends StatelessWidget {
                               ),
                               BodyTwoDefaultText(
                                 bold: true,
-                                color: data.transactionType == 1 ? getErrorColor : getGreenColor,
+                                color: data.transactionType == 1 ? AppColors.getErrorColor : AppColors.getGreenColor,
                                 text: data.transactionType == 1
                                     ? Utility.numberFormate(data.takenAmount)
                                     : Utility.numberFormate(data.paidAmount!),

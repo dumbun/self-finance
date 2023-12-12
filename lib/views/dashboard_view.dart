@@ -60,7 +60,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
         ),
         floatingActionButton: _selectedIndex == 0
             ? FloatingActionButton(
-                foregroundColor: getPrimaryColor,
+                foregroundColor: AppColors.getPrimaryColor,
                 elevation: 2.sp,
                 onPressed: () {
                   Routes.navigateToAddNewEntry(context: context);
@@ -68,11 +68,11 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                 enableFeedback: true,
                 mini: false,
                 shape: const CircleBorder(),
-                backgroundColor: getPrimaryColor,
+                backgroundColor: AppColors.getPrimaryColor,
                 tooltip: addNewEntry,
                 child: const Icon(
                   Icons.add_rounded,
-                  color: getBackgroundColor,
+                  color: AppColors.getBackgroundColor,
                   size: 25,
                 ),
               )
@@ -92,7 +92,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
               label: 'History',
             ),
           ],
-          selectedItemColor: getPrimaryColor,
+          selectedItemColor: AppColors.getPrimaryColor,
           currentIndex: _selectedIndex,
           enableFeedback: true,
           onTap: (index) {

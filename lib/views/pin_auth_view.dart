@@ -42,7 +42,7 @@ class _PinAuthViewState extends State<PinAuthView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: getBackgroundColor,
+      backgroundColor: AppColors.getBackgroundColor,
       body: Container(
         padding: EdgeInsets.all(20.sp),
         alignment: Alignment.center,
@@ -60,7 +60,7 @@ class _PinAuthViewState extends State<PinAuthView> {
                 const StrongHeadingOne(
                   bold: true,
                   text: "Enter your app PIN",
-                  color: getPrimaryTextColor,
+                  color: AppColors.getPrimaryTextColor,
                 ),
                 SizedBox(height: 20.sp),
                 PinInputWidget(

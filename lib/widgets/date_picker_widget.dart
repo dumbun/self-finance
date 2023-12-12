@@ -41,7 +41,7 @@ class _InputDatePickerState extends State<InputDatePicker> {
         // icon: const Icon(Icons.calendar_today), //icon of text field
         labelText: widget.labelText, //label text of field
         labelStyle: const TextStyle(
-          color: getLigthGreyColor,
+          color: AppColors.getLigthGreyColor,
         ),
       ),
       readOnly: true,

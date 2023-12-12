@@ -45,9 +45,9 @@ class BodyOneDefaultText extends StatelessWidget {
 
   Color? _getColor(BuildContext context) {
     if (error) {
-      return getErrorColor;
+      return AppColors.getErrorColor;
     } else if (whiteColor) {
-      return getBackgroundColor;
+      return AppColors.getBackgroundColor;
     } else {
       return color;
     }

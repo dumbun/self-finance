@@ -14,7 +14,7 @@ class ImageView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        backgroundColor: getTransparentColor,
+        backgroundColor: AppColors.getTransparentColor,
         title: BodyOneDefaultText(text: titile),
       ),
       body: SizedBox(
