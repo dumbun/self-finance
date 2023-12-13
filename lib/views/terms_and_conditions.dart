@@ -28,30 +28,27 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.getBackgroundColor,
       body: SafeArea(
-        child: Container(
+        child: Padding(
           padding: EdgeInsets.all(24.sp),
-          width: double.infinity,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _getIcon(),
-                _getHeading(),
-                _space(),
-                _getTermsAndConditions(),
-                _getNextButton(ticked),
-              ],
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _getIcon(),
+              _getHeading(),
+              SizedBox(height: 16.sp),
+              _getTerms(),
+              _getCheckBoxWithDescription(),
+              _getNextButton(ticked),
+            ],
           ),
         ),
       ),
     );
   }
 
-  _getNextButton(bool t) {
+  SizedBox _getNextButton(bool t) {
     return SizedBox(
       width: double.infinity,
       child: RoundedCornerButton(
@@ -64,30 +61,13 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     );
   }
 
-  Column _getTermsAndConditions() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: _getTerms(),
-        ),
-        SizedBox(height: 16.sp),
-        _getCheckBoxWithDescription(),
-        SizedBox(height: 16.sp),
-      ],
-    );
-  }
-
-  List<Widget> _getTerms() {
+  Expanded _getTerms() {
     List<Widget> result = [];
+
     for (var element in termsAndConditionsMap.entries) {
       result.add(BodyTwoDefaultText(
         text: element.key,
         bold: true,
-        color: AppColors.getPrimaryTextColor,
       ));
       result.add(SizedBox(height: 16.sp));
       for (var element in element.value) {
@@ -98,31 +78,41 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
         result.add(SizedBox(height: 16.sp));
       }
     }
-    return result;
+
+    return Expanded(
+      child: ListView.builder(
+        scrollDirection: Axis.vertical,
+        itemCount: result.length,
+        itemBuilder: (context, index) => result[index],
+      ),
+    );
   }
 
   InkWell _getCheckBoxWithDescription() {
     return InkWell(
       onTap: () => setState(() => ticked = !ticked),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Checkbox(
-            value: ticked,
-            onChanged: (value) => _getClicked(),
-            activeColor: AppColors.getPrimaryColor,
-          ),
-          SizedBox(width: 10.sp),
-          SizedBox(
-            width: 66.sp,
-            height: 30.sp,
-            child: const BodySmallText(
-              text: termAcknowledge,
-              color: AppColors.getPrimaryTextColor,
+      child: Container(
+        margin: EdgeInsets.only(top: 20.sp, bottom: 20.sp),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Checkbox(
+              value: ticked,
+              onChanged: (value) => _getClicked(),
+              activeColor: AppColors.getPrimaryColor,
             ),
-          )
-        ],
+            SizedBox(width: 10.sp),
+            SizedBox(
+              width: 66.sp,
+              height: 30.sp,
+              child: const BodySmallText(
+                color: AppColors.getLigthGreyColor,
+                text: termAcknowledge,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -144,14 +134,14 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     );
   }
 
-  SizedBox _space() {
-    return SizedBox(height: 24.sp);
-  }
+  // SizedBox _space() {
+  //   return
+  // }
 
   Center _getIcon() {
     return Center(
       child: Container(
-        margin: EdgeInsets.only(top: 24.sp, bottom: 24.sp),
+        margin: EdgeInsets.only(top: 20.sp, bottom: 24.sp),
         child: const AppIcon(),
       ),
     );

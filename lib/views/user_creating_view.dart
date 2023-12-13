@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/backend/user_db.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/models/user_model.dart';
+import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
@@ -12,15 +13,15 @@ import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
 
-class UserCreationView extends StatefulWidget {
+class UserCreationView extends ConsumerStatefulWidget {
   const UserCreationView({required this.pin, super.key});
   final String pin;
 
   @override
-  State<UserCreationView> createState() => _UserCreationViewState();
+  ConsumerState<UserCreationView> createState() => _UserCreationViewState();
 }
 
-class _UserCreationViewState extends State<UserCreationView> {
+class _UserCreationViewState extends ConsumerState<UserCreationView> {
   String userProfilePicString = "";
   final double height = 55.sp;
   final double width = 55.sp;
@@ -37,24 +38,6 @@ class _UserCreationViewState extends State<UserCreationView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => createUser(
-          User(id: 1, userName: nameInput.text, userPin: widget.pin, profilePicture: userProfilePicString),
-        ),
-        backgroundColor: AppColors.getPrimaryColor,
-        enableFeedback: true,
-        autofocus: true,
-        isExtended: true,
-        mini: false,
-        shape: const CircleBorder(),
-        tooltip: "Next",
-        splashColor: AppColors.getPrimaryColor,
-        focusElevation: 40.sp,
-        child: const Icon(
-          Icons.arrow_forward_ios_rounded,
-          color: AppColors.getBackgroundColor,
-        ),
-      ),
       extendBodyBehindAppBar: true,
       body: SafeArea(
         child: Form(
@@ -89,6 +72,29 @@ class _UserCreationViewState extends State<UserCreationView> {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => createUser(
+          User(
+            id: 1,
+            userName: nameInput.text,
+            userPin: widget.pin,
+            profilePicture: userProfilePicString,
+          ),
+        ),
+        backgroundColor: AppColors.getPrimaryColor,
+        enableFeedback: true,
+        autofocus: true,
+        isExtended: true,
+        mini: false,
+        shape: const CircleBorder(),
+        tooltip: "Next",
+        splashColor: AppColors.getPrimaryColor,
+        focusElevation: 40.sp,
+        child: const Icon(
+          Icons.arrow_forward_ios_rounded,
+          color: AppColors.getBackgroundColor,
+        ),
+      ),
     );
   }
 
@@ -107,7 +113,7 @@ class _UserCreationViewState extends State<UserCreationView> {
   void createUser(User user) async {
     if (validateAndSave()) {
       try {
-        final result = await UserBackEnd.createNewUser(user);
+        final result = await ref.read(asyncUserProvider.notifier).addUser(user: user);
         result ? navigateToDashboard() : showAlerts();
       } catch (e) {
         showAlerts();

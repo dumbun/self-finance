@@ -36,18 +36,8 @@ class BodySmallText extends StatelessWidget {
       style: TextStyle(
         fontWeight: bold ? FontWeight.bold : FontWeight.w400,
         fontSize: 14.sp,
-        color: _getColor(context),
+        color: !error ? color : AppColors.getErrorColor,
       ),
     );
-  }
-
-  Color _getColor(BuildContext context) {
-    if (error) {
-      return AppColors.getErrorColor;
-    } else if (whiteColor) {
-      return AppColors.getBackgroundColor;
-    } else {
-      return color ?? AppColors.getLigthGreyColor;
-    }
   }
 }

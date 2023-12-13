@@ -5,6 +5,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/views/Add%20New%20Entry/providers.dart';
 import 'package:self_finance/widgets/image_picker_widget.dart';
@@ -94,7 +95,7 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
           transaction: 1,
         );
 
-        Transactions transaction = Transactions(
+        TransactionsHistory transaction = TransactionsHistory(
           mobileNumber: mobileNumber,
           address: address,
           customerName: customerName,
@@ -125,31 +126,7 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
           },
         );
 
-        createNewCustomerEntry = await ref.read(createNewTransactionProvider(transaction)).when(
-          data: (data) {
-            if (data) {
-              return data;
-            } else {
-              AlertDilogs.alertDialogWithOneAction(
-                context,
-                "Error",
-                'Data is not saved please try again after some time',
-              );
-              return false;
-            }
-          },
-          error: (error, stackTrace) {
-            AlertDilogs.alertDialogWithOneAction(
-              context,
-              "Error",
-              error.toString(),
-            );
-            return false;
-          },
-          loading: () {
-            return true;
-          },
-        );
+        createNewCustomerEntry = await ref.watch(asyncTransactionsProvider.notifier).addTrasaction(transaction);
 
         setState(() {
           _isloading = false;
@@ -171,7 +148,7 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
     }
 
     return GestureDetector(
-      onVerticalDragDown: (details) => FocusManager.instance.primaryFocus?.unfocus(),
+      onTap: Utility.unfocus,
       child: Scaffold(
         appBar: AppBar(title: const Text("Add new Entry")),
         body: SafeArea(

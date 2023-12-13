@@ -36,7 +36,7 @@ class Routes {
         (route) => false);
   }
 
-  static navigateToDetailsView({required BuildContext context, required Transactions data}) {
+  static navigateToDetailsView({required BuildContext context, required TransactionsHistory data}) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) => DetailsView(data: data),

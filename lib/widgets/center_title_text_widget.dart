@@ -13,6 +13,7 @@ class CenterTitleTextWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
+      alignment: Alignment.center,
       children: [
         Align(
           alignment: Alignment.center,

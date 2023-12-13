@@ -82,7 +82,7 @@ class BackEnd {
 
   //create new transaction
 
-  static Future<bool> createNewTransaction(Transactions transacrtion) async {
+  static Future<bool> createNewTransaction(TransactionsHistory transacrtion) async {
     final db = await BackEnd.db();
     try {
       final data = {
@@ -115,13 +115,13 @@ class BackEnd {
 
   // get latest Transaction
 
-  static Future<List<Transactions>> fetchLatestTransactions() async {
+  static Future<List<TransactionsHistory>> fetchLatestTransactions() async {
     final db = await BackEnd.db();
     List<Map<String, Object?>> result = await db.rawQuery("""
       SELECT * FROM TRANSACTIONS ORDER BY TAKEN_DATE 
     """);
     if (result.isNotEmpty) {
-      return Transactions.toList(result);
+      return TransactionsHistory.toList(result);
     } else {
       return [];
     }
@@ -129,9 +129,16 @@ class BackEnd {
 
   // get called first  app lunches or reload app
 
-  static Future<List<Map<String, dynamic>>> fetchAllData() async {
+  static Future<List<Customer>> fetchAllData() async {
     final db = await BackEnd.db();
-    return db.query('CUSTOMERS', orderBy: 'ID');
+
+    try {
+      final response = await db.query('CUSTOMERS', orderBy: 'ID');
+      final List<Customer> result = Customer.toList(response);
+      return result;
+    } catch (e) {
+      return [];
+    }
   }
 
   // get the entry by mobile number
@@ -148,7 +155,7 @@ class BackEnd {
   }
   // get the transaction by mobile number
 
-  static Future<List<Transactions>> getTransactionsEntriesByMobileNumber(String mobileNumber) async {
+  static Future<List<TransactionsHistory>> getTransactionsEntriesByMobileNumber(String mobileNumber) async {
     final db = await BackEnd.db();
     final List<Map<String, Object?>> data = await db.query(
       'TRANSACTIONS',
@@ -156,7 +163,7 @@ class BackEnd {
       where: "MOBILE_NUMBER = ?",
       whereArgs: [mobileNumber],
     );
-    List<Transactions> result = Transactions.toList(data);
+    List<TransactionsHistory> result = TransactionsHistory.toList(data);
     if (result.isNotEmpty) {
       return result;
     } else {
@@ -166,7 +173,7 @@ class BackEnd {
 
   // get the transaction by Customer Name
 
-  static Future<List<Transactions>> getTransactionsEntriesByCustomerName(String name) async {
+  static Future<List<TransactionsHistory>> getTransactionsEntriesByCustomerName(String name) async {
     final db = await BackEnd.db();
     final List<Map<String, Object?>> data = await db.query(
       'TRANSACTIONS',
@@ -174,7 +181,7 @@ class BackEnd {
       where: "CUSTOMER_NAME = ?",
       whereArgs: [name],
     );
-    List<Transactions> result = Transactions.toList(data);
+    List<TransactionsHistory> result = TransactionsHistory.toList(data);
     if (result.isNotEmpty) {
       return result;
     } else {
@@ -184,7 +191,7 @@ class BackEnd {
 
   // Update the item
 
-  static Future<int> updateTransactionStatus(int id, int code) async {
+  static Future<int> updateCustomerStatus(int id, int code) async {
     final db = await BackEnd.db();
     final data = {'TRANSFER': code, 'PAID_DATE': DateTime.now().toString()};
     final result = await db.update('CUSTOMERS', data, where: "id = ?", whereArgs: [id]);

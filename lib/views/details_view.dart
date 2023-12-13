@@ -9,7 +9,7 @@ import 'package:self_finance/widgets/call_button_widget.dart';
 class DetailsView extends StatelessWidget {
   const DetailsView({super.key, required this.data});
 
-  final Transactions data;
+  final TransactionsHistory data;
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +45,7 @@ class DetailsView extends StatelessWidget {
   GestureDetector _builtImageWidget(BuildContext context, imageData, titile) {
     return GestureDetector(
         onTap: () {
-          Routes.navigateToImageView(
-              context: context, imageData: imageData, titile: titile);
+          Routes.navigateToImageView(context: context, imageData: imageData, titile: titile);
         },
         child: Utility.imageFromBase64String(imageData));
   }

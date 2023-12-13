@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
+import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/widgets/app_icon.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
@@ -20,6 +21,7 @@ class _PinCreatingViewState extends State<PinCreatingView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.getBackgroundColor,
       body: Padding(
         padding: EdgeInsets.all(18.sp),
         child: Column(
@@ -29,6 +31,7 @@ class _PinCreatingViewState extends State<PinCreatingView> {
             _getAppIcon(),
             SizedBox(height: 20.sp),
             const BodyOneDefaultText(
+              color: AppColors.getPrimaryTextColor,
               bold: true,
               text: "Please create your login pin",
             ),

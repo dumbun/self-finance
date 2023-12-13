@@ -4,7 +4,6 @@ import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/fonts/strong_heading_one_text.dart';
 import 'package:self_finance/models/user_model.dart';
-import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/widgets/app_icon.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
@@ -42,7 +41,7 @@ class _PinAuthViewState extends State<PinAuthView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.getBackgroundColor,
+      // backgroundColor: AppColors.getBackgroundColor,
       body: Container(
         padding: EdgeInsets.all(20.sp),
         alignment: Alignment.center,
@@ -60,7 +59,6 @@ class _PinAuthViewState extends State<PinAuthView> {
                 const StrongHeadingOne(
                   bold: true,
                   text: "Enter your app PIN",
-                  color: AppColors.getPrimaryTextColor,
                 ),
                 SizedBox(height: 20.sp),
                 PinInputWidget(
