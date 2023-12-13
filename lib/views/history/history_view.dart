@@ -7,14 +7,14 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/widgets/detail_card_widget.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:self_finance/providers/transactions_provider.dart';
+import 'package:self_finance/providers/transactions_history_provider.dart';
 
-/// Providers
+//// Providers
 
 final searchHintTextProvider = StateProvider<String>((ref) => searchMobile);
 final searchSelectedFilterProvider = StateProvider<String>((ref) => "Mobile Number");
 
-///
+////
 
 class HistoryView extends ConsumerWidget {
   const HistoryView({super.key});
@@ -23,7 +23,7 @@ class HistoryView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
       child: RefreshIndicator(
-        onRefresh: () => ref.refresh(asyncTransactionsProvider.future),
+        onRefresh: () => ref.refresh(asyncTransactionsHistoryProvider.future),
         child: Container(
           padding: EdgeInsets.all(16.sp),
           width: double.infinity,
@@ -46,7 +46,7 @@ class HistoryView extends ConsumerWidget {
   }
 
   Widget buildData(WidgetRef ref) {
-    return ref.watch(asyncTransactionsProvider).when(
+    return ref.watch(asyncTransactionsHistoryProvider).when(
           data: (data) {
             if (data.isEmpty) {
               return const Center(
@@ -78,18 +78,19 @@ class HistoryView extends ConsumerWidget {
 
     //seach function
     doSearch(value) {
+      final AsyncTransactionsHistory tranxHistory = ref.read(asyncTransactionsHistoryProvider.notifier);
       switch (filterText) {
         case mobileNumber:
-          ref.read(asyncTransactionsProvider.notifier).doMobileSearch(mobileNumber: value);
+          tranxHistory.doMobileSearch(mobileNumber: value);
           break;
         case customerName:
-          ref.read(asyncTransactionsProvider.notifier).doNameSearch(customerName: value);
+          tranxHistory.doNameSearch(customerName: value);
           break;
         case customerPlace:
-          ref.read(asyncTransactionsProvider.notifier).doPlaceSearch(place: value);
+          tranxHistory.doPlaceSearch(place: value);
           break;
         default:
-          ref.read(asyncTransactionsProvider.notifier).doMobileSearch(mobileNumber: value);
+          tranxHistory.doMobileSearch(mobileNumber: value);
       }
     }
 

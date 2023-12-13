@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/customer_model.dart';
-part 'customers_provider.g.dart';
+part 'customers_history_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 class AsyncCustomers extends _$AsyncCustomers {

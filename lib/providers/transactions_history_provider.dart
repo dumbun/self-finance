@@ -1,10 +1,10 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/transaction_model.dart';
-part 'transactions_provider.g.dart';
+part 'transactions_history_provider.g.dart';
 
 @Riverpod(keepAlive: true)
-class AsyncTransactions extends _$AsyncTransactions {
+class AsyncTransactionsHistory extends _$AsyncTransactionsHistory {
   Future<List<TransactionsHistory>> _fetchAllTransactions() async {
     final data = await BackEnd.fetchLatestTransactions();
     return data;
