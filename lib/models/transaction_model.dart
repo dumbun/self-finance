@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
 
-class Transactions {
+class TransactionsHistory {
   final int? id;
   final String mobileNumber;
   final String address;
@@ -22,7 +22,7 @@ class Transactions {
   final String photoItem;
   final String photoCustomer;
 
-  Transactions({
+  TransactionsHistory({
     this.id,
     required this.mobileNumber,
     required this.address,
@@ -43,12 +43,12 @@ class Transactions {
     required this.photoCustomer,
   });
 
-  static List<Transactions> toList(data) {
-    List<Transactions> custData = [];
+  static List<TransactionsHistory> toList(data) {
+    List<TransactionsHistory> custData = [];
     data.forEach(
       (Map<String, dynamic> e) {
         custData.add(
-          Transactions(
+          TransactionsHistory(
             id: e["ID"],
             mobileNumber: e["MOBILE_NUMBER"],
             address: e["ADDRESS"],
@@ -74,7 +74,7 @@ class Transactions {
     return custData;
   }
 
-  Transactions copyWith({
+  TransactionsHistory copyWith({
     ValueGetter<int?>? id,
     String? mobileNumber,
     String? address,
@@ -94,7 +94,7 @@ class Transactions {
     String? photoItem,
     String? photoCustomer,
   }) {
-    return Transactions(
+    return TransactionsHistory(
       id: id != null ? id() : this.id,
       mobileNumber: mobileNumber ?? this.mobileNumber,
       address: address ?? this.address,
@@ -139,8 +139,8 @@ class Transactions {
     };
   }
 
-  factory Transactions.fromMap(Map<String, dynamic> map) {
-    return Transactions(
+  factory TransactionsHistory.fromMap(Map<String, dynamic> map) {
+    return TransactionsHistory(
       id: map['id']?.toInt(),
       mobileNumber: map['mobileNumber'] ?? '',
       address: map['address'] ?? '',
@@ -164,7 +164,7 @@ class Transactions {
 
   String toJson() => json.encode(toMap());
 
-  factory Transactions.fromJson(String source) => Transactions.fromMap(json.decode(source));
+  factory TransactionsHistory.fromJson(String source) => TransactionsHistory.fromMap(json.decode(source));
 
   @override
   String toString() {
@@ -175,7 +175,7 @@ class Transactions {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is Transactions &&
+    return other is TransactionsHistory &&
         other.id == id &&
         other.mobileNumber == mobileNumber &&
         other.address == address &&

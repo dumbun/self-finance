@@ -48,8 +48,9 @@ class ImageCacheManager {
       return cachedImage;
     } else {
       final decodedImage = Image.memory(
+        gaplessPlayback: true,
         base64Decode(base64String),
-        fit: BoxFit.fill,
+        fit: BoxFit.cover,
         height: height ?? 40.sp,
         width: height ?? 40.sp,
       );
@@ -74,6 +75,11 @@ class ImageCacheManager {
 }
 
 class Utility {
+  // to unfocus keyboard when user touches the white space in screen
+  static void unfocus() {
+    FocusManager.instance.primaryFocus?.unfocus();
+  }
+
   static Widget imageFromBase64String(String base64String, {double? height, double? width}) {
     if (base64String.isNotEmpty) {
       final decodedImage = ImageCacheManager.getCachedImage(base64String, height, width);

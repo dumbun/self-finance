@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-
 import 'package:self_finance/theme/colors.dart';
 
 class StrongHeadingOne extends StatelessWidget {
@@ -36,18 +35,8 @@ class StrongHeadingOne extends StatelessWidget {
       style: TextStyle(
         fontWeight: bold ? FontWeight.bold : FontWeight.normal,
         fontSize: 20.sp,
-        color: _getColor(context),
+        color: !error ? color : AppColors.getErrorColor,
       ),
     );
-  }
-
-  Color _getColor(BuildContext context) {
-    if (error) {
-      return AppColors.getErrorColor;
-    } else if (whiteColor) {
-      return AppColors.getBackgroundColor;
-    } else {
-      return color ?? AppColors.getPrimaryTextColor;
-    }
   }
 }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/providers/p.dart';
-import 'package:self_finance/providers/user_backend_provider.dart';
+import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
 import 'package:self_finance/views/auth_view.dart';
@@ -13,16 +12,11 @@ void main() {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends ConsumerStatefulWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
-  @override
-  ConsumerState<MyApp> createState() => _MyAppState();
-}
 
-class _MyAppState extends ConsumerState<MyApp> {
   @override
-  Widget build(BuildContext context) {
-    ref.watch(backendProvider.notifier).update();
+  Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData darkTheme = ThemeData(
       brightness: Brightness.dark,
       fontFamily: "hell",
@@ -63,13 +57,11 @@ class _MyAppState extends ConsumerState<MyApp> {
         theme: lightTheme,
         darkTheme: darkTheme,
         themeAnimationCurve: Curves.easeInOut,
-        home: ref.watch(userDataProvider).when(
+        home: ref.watch(asyncUserProvider).when(
               data: (List user) {
                 if (user.isNotEmpty) {
                   // if(user) then build AuthView for autontication
-                  return AuthView(
-                    user: user[0],
-                  );
+                  return AuthView(user: user[0]);
                 } else {
                   return const TermsAndConditons();
                 }
