@@ -4,6 +4,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/util.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_view.dart';
 import 'package:self_finance/views/history/history_view.dart';
 import 'package:self_finance/views/home_screen.dart';
@@ -20,16 +21,19 @@ class DashboardView extends ConsumerWidget {
     final PageController pageController = PageController();
     return Scaffold(
       body: SafeArea(
-        child: PageView(
-          controller: pageController,
-          onPageChanged: (index) {
-            ref.read(selectedIndexProvider.notifier).update((state) => index);
-          },
-          children: <Widget>[
-            const HomeScreen(),
-            EMICalculatorView(),
-            const HistoryView(),
-          ],
+        child: GestureDetector(
+          onTap: Utility.unfocus,
+          child: PageView(
+            controller: pageController,
+            onPageChanged: (index) {
+              ref.read(selectedIndexProvider.notifier).update((state) => index);
+            },
+            children: <Widget>[
+              const HomeScreen(),
+              EMICalculatorView(),
+              const HistoryView(),
+            ],
+          ),
         ),
       ),
       floatingActionButton: _buildFloatingActionButton(context, ref),
@@ -86,7 +90,7 @@ class DashboardView extends ConsumerWidget {
       onTap: (index) {
         pageController.animateToPage(
           index,
-          duration: const Duration(milliseconds: 400),
+          duration: const Duration(milliseconds: 450),
           curve: Curves.easeInOut,
         );
       },
