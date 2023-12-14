@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/providers/customers_provider.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/widgets/center_title_text_widget.dart';
 
@@ -17,6 +20,17 @@ class HomeScreen extends ConsumerWidget {
         children: [
           _buildHeaderWidget(),
           SizedBox(height: 20.sp),
+          Consumer(
+            builder: (context, ref, child) {
+              return ref.watch(asyncCustomersProvider).when(
+                  data: (data) {
+                    print(jsonEncode(data));
+                    return Text(data.length.toString());
+                  },
+                  error: (_, __) => Text("error"),
+                  loading: () => CircularProgressIndicator());
+            },
+          ),
         ],
       ),
     );
