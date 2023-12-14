@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/providers/user_provider.dart';
+import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/theme/theme_data.dart';
 import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
 import 'package:self_finance/views/auth_view.dart';
@@ -23,6 +24,7 @@ class MyApp extends ConsumerWidget {
         routes: {
           '/addNewEntry': (context) => const AddNewEntryView(),
         },
+        color: AppColors.getPrimaryColor,
         title: 'Self Finance',
         debugShowCheckedModeBanner: false,
         theme: AppThemeData.lightTheme,

@@ -4,56 +4,42 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/util.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_view.dart';
 import 'package:self_finance/views/history/history_view.dart';
 import 'package:self_finance/views/home_screen.dart';
 
-class DashboardView extends ConsumerStatefulWidget {
+//// provider
+final selectedIndexProvider = StateProvider<int>((ref) => 0);
+//// provider
+
+class DashboardView extends ConsumerWidget {
   const DashboardView({super.key});
 
   @override
-  ConsumerState<DashboardView> createState() => _DashboardViewState();
-}
-
-class _DashboardViewState extends ConsumerState<DashboardView> {
-  late PageController _pageController;
-  int _selectedIndex = 0;
-
-  @override
-  void initState() {
-    _pageController = PageController(initialPage: _selectedIndex);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final PageController pageController = PageController();
     return Scaffold(
       body: SafeArea(
-        child: GestureDetector(
-          onTap: Utility.unfocus,
-          child: PageView(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            children: <Widget>[
-              const HomeScreen(),
-              EMICalculatorView(),
-              const HistoryView(),
-            ],
-          ),
+        child: PageView(
+          controller: pageController,
+          onPageChanged: (index) {
+            ref.read(selectedIndexProvider.notifier).update((state) => index);
+          },
+          children: <Widget>[
+            const HomeScreen(),
+            EMICalculatorView(),
+            const HistoryView(),
+          ],
         ),
       ),
-      floatingActionButton: _buildFloatingActionButton(context),
-      bottomNavigationBar: _buildBottomNavigationBar(),
+      floatingActionButton: _buildFloatingActionButton(context, ref),
+      bottomNavigationBar: _buildBottomNavigationBar(ref, pageController),
     );
   }
 
-  Widget _buildFloatingActionButton(BuildContext context) {
-    return _selectedIndex == 0
+  Widget? _buildFloatingActionButton(BuildContext context, WidgetRef ref) {
+    final selectedIndex = ref.watch(selectedIndexProvider);
+    return selectedIndex == 0
         ? FloatingActionButton(
             foregroundColor: AppColors.getPrimaryColor,
             elevation: 2.sp,
@@ -70,31 +56,37 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
               size: 25,
             ),
           )
-        : const SizedBox.shrink();
+        : null;
   }
 
-  Widget _buildBottomNavigationBar() {
+  Widget _buildBottomNavigationBar(WidgetRef ref, PageController pageController) {
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.home_rounded),
+          icon: Icon(Icons.home_outlined),
           label: 'Home',
+          tooltip: "Home Screen",
+          activeIcon: Icon(Icons.home_rounded),
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.calculate_outlined),
           label: 'EMI calculator',
+          activeIcon: Icon(Icons.calculate_rounded),
+          tooltip: "EMI calculator page where you can callculate intrests",
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.history_rounded),
+          icon: Icon(Icons.history_toggle_off),
           label: 'History',
+          activeIcon: Icon(Icons.history_rounded),
+          tooltip: "History Page : Views all your transactions history",
         ),
       ],
       selectedItemColor: AppColors.getPrimaryColor,
-      currentIndex: _selectedIndex,
+      currentIndex: ref.watch(selectedIndexProvider.notifier).state,
       onTap: (index) {
-        _pageController.animateToPage(
+        pageController.animateToPage(
           index,
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 400),
           curve: Curves.easeInOut,
         );
       },

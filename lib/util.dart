@@ -106,22 +106,22 @@ class Utility {
 
   static bool isValidPhoneNumber(String? value) =>
       RegExp(r'(^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$)').hasMatch(value ?? '');
-}
 
-double reduceDecimals(double value) {
-  return double.parse(value.toStringAsFixed(2));
-}
+  static double reduceDecimals(double value) {
+    return double.parse(value.toStringAsFixed(2));
+  }
 
-double textToDouble(String value) {
-  return double.parse(value);
-}
+  static double textToDouble(String value) {
+    return double.parse(value);
+  }
 
-int textToInt(String value) {
-  return int.parse(value);
-}
+  static int textToInt(String value) {
+    return int.parse(value);
+  }
 
-DateTime presentDate() {
-  return DateTime.now();
+  static DateTime presentDate() {
+    return DateTime.now();
+  }
 }
 
 Future<String> pickImageFromCamera() async {

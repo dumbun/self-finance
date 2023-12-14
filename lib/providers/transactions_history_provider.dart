@@ -61,13 +61,13 @@ class AsyncTransactionsHistory extends _$AsyncTransactionsHistory {
     });
   }
 
-  Future<bool> addTrasaction(TransactionsHistory t) async {
+  Future<bool> addTrasaction({required TransactionsHistory transaction}) async {
     bool result = false;
     // Set the state to loading
     state = const AsyncValue.loading();
     // Add the new todo and reload the todo list from the remote repository
     state = await AsyncValue.guard(() async {
-      result = await BackEnd.createNewTransaction(t);
+      result = await BackEnd.createNewTransaction(transaction);
       return _fetchAllTransactions();
     });
     return result;

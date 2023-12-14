@@ -27,8 +27,8 @@ class EMICalculatorView extends ConsumerWidget {
         _rateOfIntrestInput.text != "" &&
         _takenDataInput.text != "" &&
         _tenureDataInput.text != "") {
-      double rateOfInterest = textToDouble(_rateOfIntrestInput.text);
-      int loneAmount = textToInt(_amountGivenInput.text);
+      double rateOfInterest = Utility.textToDouble(_rateOfIntrestInput.text);
+      int loneAmount = Utility.textToInt(_amountGivenInput.text);
       String takenDate = _takenDataInput.text;
       String tenureDate = _tenureDataInput.text;
       final DateFormat format = DateFormat("dd-MM-yyyy");
@@ -51,8 +51,8 @@ class EMICalculatorView extends ConsumerWidget {
       ref.read(principalAmountProvider.notifier).state = principalAmount;
       ref.read(totalAmountProvider.notifier).state = totalAmount;
       ref.read(totalIntrestProvider.notifier).state = totalInterest;
-      ref.read(firstIndicatorPercentageProvider.notifier).state = reduceDecimals(firstIndicatorPercentage);
-      ref.read(secoundIndicatorPercentageProvider.notifier).state = reduceDecimals(secoundIndicatorPercentage);
+      ref.read(firstIndicatorPercentageProvider.notifier).state = Utility.reduceDecimals(firstIndicatorPercentage);
+      ref.read(secoundIndicatorPercentageProvider.notifier).state = Utility.reduceDecimals(secoundIndicatorPercentage);
     }
   }
 
@@ -66,68 +66,60 @@ class EMICalculatorView extends ConsumerWidget {
     final double firstIndicatorValue = ref.watch(firstIndicatorPercentageProvider);
     final double secoundIndicatorValue = ref.watch(secoundIndicatorPercentageProvider);
 
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16.sp),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const Center(
-                child: TitleWidget(text: emiCalculatorTitle),
-              ),
-              SizedBox(height: 20.sp),
-              // Taken Date
-              _datePicker(
-                takenDate,
-                _takenDataInput,
-                context,
-                ref,
-              ),
-              SizedBox(height: 20.sp),
-              // Tenture Date
-              _datePicker(
-                tenureDate,
-                _tenureDataInput,
-                context,
-                ref,
-              ),
-              SizedBox(height: 20.sp),
-              // taken amount
-              InputTextField(
-                  hintText: "Taken Amount",
-                  keyboardType: TextInputType.number,
-                  controller: _amountGivenInput,
-                  onChanged: (value) {
-                    _doCalculations(ref);
-                  }),
-              SizedBox(height: 20.sp),
-              // rate of Intrest
-              InputTextField(
-                hintText: "Rate of Intrest %",
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                controller: _rateOfIntrestInput,
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(16.sp),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            const Center(
+              child: TitleWidget(text: emiCalculatorTitle),
+            ),
+            SizedBox(height: 20.sp),
+            // Taken Date
+            _datePicker(
+              takenDate,
+              _takenDataInput,
+              context,
+              ref,
+            ),
+            SizedBox(height: 20.sp),
+            // Tenture Date
+            _datePicker(
+              tenureDate,
+              _tenureDataInput,
+              context,
+              ref,
+            ),
+            SizedBox(height: 20.sp),
+            // taken amount
+            InputTextField(
+                hintText: "Taken Amount",
+                keyboardType: TextInputType.number,
+                controller: _amountGivenInput,
                 onChanged: (value) {
                   _doCalculations(ref);
-                },
+                }),
+            SizedBox(height: 20.sp),
+            // rate of Intrest
+            InputTextField(
+              hintText: "Rate of Intrest %",
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              controller: _rateOfIntrestInput,
+              onChanged: (value) {
+                _doCalculations(ref);
+              },
+            ),
+            if (firstIndicatorValue != 0 && secoundIndicatorValue != 0)
+              TwoSlicePieChartWidget(
+                firstIndicatorText: "Principal amount",
+                secoundIndicatorText: "Intrest amount",
+                firstIndicatorValue: firstIndicatorValue,
+                secoundIndicatorValue: secoundIndicatorValue,
               ),
-              if (firstIndicatorValue != 0 && secoundIndicatorValue != 0)
-                TwoSlicePieChartWidget(
-                  firstIndicatorText: "Principal amount",
-                  secoundIndicatorText: "Intrest amount",
-                  firstIndicatorValue: firstIndicatorValue,
-                  secoundIndicatorValue: secoundIndicatorValue,
-                ),
-              _buildDetails(
-                totalAmount,
-                totalInterest,
-                emiPerMonth,
-                principalAmount,
-                monthsAndDays,
-              ),
-            ],
-          ),
+            _buildDetails(totalAmount, totalInterest, emiPerMonth, principalAmount, monthsAndDays)
+          ],
         ),
       ),
     );
@@ -161,17 +153,17 @@ class EMICalculatorView extends ConsumerWidget {
             ),
             SizedBox(height: 10.sp),
             BodyOneDefaultText(
-              text: 'Intrest per Month : ${reduceDecimals(emiPerMonth)}',
+              text: 'Intrest per Month : ${Utility.reduceDecimals(emiPerMonth)}',
               bold: true,
             ),
             SizedBox(height: 10.sp),
             BodyOneDefaultText(
-              text: 'Total Intrest Amount : ${reduceDecimals(totalInterest)}',
+              text: 'Total Intrest Amount : ${Utility.reduceDecimals(totalInterest)}',
               bold: true,
             ),
             SizedBox(height: 10.sp),
             BodyOneDefaultText(
-              text: 'Total Amount : ${reduceDecimals(totalAmount)}',
+              text: 'Total Amount : ${Utility.reduceDecimals(totalAmount)}',
               bold: true,
             ),
             SizedBox(height: 10.sp),

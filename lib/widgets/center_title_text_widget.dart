@@ -17,7 +17,7 @@ class CenterTitleTextWidget extends StatelessWidget {
       children: [
         Align(
           alignment: Alignment.center,
-          child: TitleWidget(text: user.userName.toLowerCase()),
+          child: TitleWidget(text: user.userName.toUpperCase()),
         ),
         showUserProfile
             ? Align(

@@ -21,25 +21,23 @@ class HistoryView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SafeArea(
-      child: RefreshIndicator(
-        onRefresh: () => ref.refresh(asyncTransactionsHistoryProvider.future),
-        child: Container(
-          padding: EdgeInsets.all(16.sp),
-          width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Center(
-                child: TitleWidget(text: history),
-              ),
-              SizedBox(height: 20.sp),
-              buildSearchBar(ref),
-              SizedBox(height: 10.sp),
-              Expanded(child: buildData(ref)),
-            ],
-          ),
+    return RefreshIndicator(
+      onRefresh: () => ref.refresh(asyncTransactionsHistoryProvider.future),
+      child: Container(
+        padding: EdgeInsets.all(16.sp),
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Center(
+              child: TitleWidget(text: history),
+            ),
+            SizedBox(height: 20.sp),
+            buildSearchBar(ref),
+            SizedBox(height: 10.sp),
+            Expanded(child: buildData(ref)),
+          ],
         ),
       ),
     );

@@ -5,6 +5,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/providers/customers_provider.dart';
 import 'package:self_finance/providers/transactions_history_provider.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/views/Add%20New%20Entry/providers.dart';
@@ -110,23 +111,17 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
           photoItem: photoItem,
         );
 
-        bool createNewCustomerEntry = await ref.read(createNewEntryProvider(customer)).when(
-          data: (data) {
-            if (data) {
-              return data;
-            } else {
-              return false;
-            }
-          },
-          error: (error, stackTrace) {
-            return false;
-          },
-          loading: () {
-            return true;
-          },
-        );
+        bool createNewCustomerEntry = await ref
+            .read(
+              asyncCustomersProvider.notifier,
+            )
+            .addCustomer(customer: customer);
 
-        createNewCustomerEntry = await ref.watch(asyncTransactionsHistoryProvider.notifier).addTrasaction(transaction);
+        createNewCustomerEntry = await ref
+            .watch(
+              asyncTransactionsHistoryProvider.notifier,
+            )
+            .addTrasaction(transaction: transaction);
 
         setState(() {
           _isloading = false;
