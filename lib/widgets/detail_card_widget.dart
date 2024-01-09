@@ -14,7 +14,7 @@ class DetailCardWidget extends StatelessWidget {
     required this.data,
   });
 
-  final TransactionsHistory data;
+  final Transaction data;
 
   @override
   Widget build(BuildContext context) {
@@ -53,25 +53,25 @@ class DetailCardWidget extends StatelessWidget {
                           //   bold: true,
                           // ),
                           SizedBox(height: 8.0.sp),
-                          BodyTwoDefaultText(
-                            text: data.takenDate,
-                            color: AppColors.getPrimaryColor,
-                          ),
-                          SizedBox(height: 8.0.sp),
-                          Row(
-                            children: [
-                              BodyTwoDefaultText(
-                                text: data.transactionType == 1 ? "amount - taken : " : "Paid amount : ",
-                              ),
-                              BodyTwoDefaultText(
-                                bold: true,
-                                color: data.transactionType == 1 ? AppColors.getErrorColor : AppColors.getGreenColor,
-                                text: data.transactionType == 1
-                                    ? Utility.numberFormate(data.takenAmount)
-                                    : Utility.doubleFormate(data.paidAmount!),
-                              ),
-                            ],
-                          ),
+                          // BodyTwoDefaultText(
+                          //   text: data.takenDate,
+                          //   color: AppColors.getPrimaryColor,
+                          // ),
+                          // SizedBox(height: 8.0.sp),
+                          // Row(
+                          //   children: [
+                          //     BodyTwoDefaultText(
+                          //       text: data.transactionType == 1 ? "amount - taken : " : "Paid amount : ",
+                          //     ),
+                          //     BodyTwoDefaultText(
+                          //       bold: true,
+                          //       color: data.transactionType == 1 ? AppColors.getErrorColor : AppColors.getGreenColor,
+                          //       text: data.transactionType == 1
+                          //           ? Utility.numberFormate(data.takenAmount)
+                          //           : Utility.doubleFormate(data.paidAmount!),
+                          //     ),
+                          // ],
+                          // ),
                         ],
                       ),
                     ],

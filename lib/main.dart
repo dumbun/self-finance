@@ -24,7 +24,7 @@ class MyApp extends ConsumerWidget {
     return ResponsiveSizer(
       builder: (context, orientation, screenType) => MaterialApp(
         routes: {
-          '/addNewEntry': (context) => const AddNewEntryView(),
+          '/addNewEntry': (context) => const AddNewEntery(),
         },
         color: AppColors.getPrimaryColor,
         title: 'Self Finance',
@@ -36,7 +36,7 @@ class MyApp extends ConsumerWidget {
               data: (user) {
                 if (user.isNotEmpty) {
                   // if user is present then build AuthView for autontication
-                  return AuthView(user: user[0]);
+                  return AuthView(user: user.first);
                 } else {
                   // if user is not present then build AuthView for autontication
                   return const TermsAndConditons();

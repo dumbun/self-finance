@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_view.dart';
 import 'package:self_finance/views/history/history_view.dart';
 import 'package:self_finance/views/home_screen.dart';
+import 'package:self_finance/widgets/expandable_fab.dart';
 
 //// provider
 final selectedIndexProvider = StateProvider<int>((ref) => 0);
@@ -23,54 +22,40 @@ class DashboardView extends ConsumerWidget {
       body: SafeArea(
         child: GestureDetector(
           onTap: Utility.unfocus,
-          child: Consumer(
-            builder: (context, ref, child) {
-              return PageView(
-                controller: pageController,
-                onPageChanged: (index) {
-                  ref
-                      .watch(selectedIndexProvider.notifier)
-                      .update((state) => index);
-                },
-                children: <Widget>[
-                  const HomeScreen(),
-                  EMICalculatorView(),
-                  const HistoryView(),
-                ],
-              );
+          child: PageView(
+            controller: pageController,
+            onPageChanged: (index) {
+              ref.read(selectedIndexProvider.notifier).update((state) => index);
             },
+            children: <Widget>[
+              const HomeScreen(),
+              EMICalculatorView(),
+              const HistoryView(),
+            ],
           ),
         ),
       ),
-      floatingActionButton: _buildFloatingActionButton(context, ref),
+      floatingActionButton: ref.watch(selectedIndexProvider) == 0
+          ? ExpandableFab(
+              distance: 32.sp,
+              children: const [
+                ActionButton(
+                  onPressed: null,
+                  icon: Icon(Icons.format_size),
+                ),
+                ActionButton(
+                  onPressed: null,
+                  icon: Icon(Icons.insert_photo),
+                ),
+              ],
+            )
+          : const SizedBox.shrink(),
       bottomNavigationBar: _buildBottomNavigationBar(ref, pageController),
     );
   }
 
-  Widget? _buildFloatingActionButton(BuildContext context, WidgetRef ref) {
-    final selectedIndex = ref.watch(selectedIndexProvider);
-    return selectedIndex == 0
-        ? FloatingActionButton(
-            foregroundColor: AppColors.getPrimaryColor,
-            elevation: 2.sp,
-            onPressed: () {
-              Routes.navigateToAddNewEntry(context: context);
-            },
-            mini: false,
-            shape: const CircleBorder(),
-            backgroundColor: AppColors.getPrimaryColor,
-            tooltip: addNewEntry,
-            child: const Icon(
-              Icons.add_rounded,
-              color: AppColors.getBackgroundColor,
-              size: 25,
-            ),
-          )
-        : null;
-  }
-
-  Widget _buildBottomNavigationBar(
-      WidgetRef ref, PageController pageController) {
+  Widget _buildBottomNavigationBar(WidgetRef ref, PageController pageController) {
+    final int currentIndex = ref.watch(selectedIndexProvider);
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
@@ -93,7 +78,7 @@ class DashboardView extends ConsumerWidget {
         ),
       ],
       selectedItemColor: AppColors.getPrimaryColor,
-      currentIndex: ref.watch(selectedIndexProvider.notifier).state,
+      currentIndex: currentIndex,
       onTap: (index) {
         pageController.animateToPage(
           index,
