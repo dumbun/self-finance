@@ -1,145 +1,152 @@
 import 'dart:convert';
 
-import 'package:flutter/widgets.dart';
+class Transaction {
+  int? id;
+  final int customerId;
+  final int itemId;
+  final DateTime transacrtionDate;
+  final String transacrtionType;
+  final double amount;
+  final double intrestRate;
+  final double intrestAmount;
+  final double remainingAmount;
+  final String proofPhoto;
+  final DateTime createdDate;
 
-class TransactionsHistory {
-  final int? id;
-  final int custId;
-  final String takenDate;
-  final int takenAmount;
-  final double rateOfInterest;
-  final String itemName;
-  final int transactionType;
-  final String? paidDate;
-  final String? via;
-  final double? paidAmount;
-  final double? totalIntrest;
-  final String? dueTime;
-  final String? photoProof;
-  final String? photoItem;
-
-  TransactionsHistory({
+  Transaction({
     this.id,
-    required this.custId,
-    required this.takenDate,
-    required this.takenAmount,
-    required this.rateOfInterest,
-    required this.itemName,
-    required this.transactionType,
-    this.paidDate,
-    this.via,
-    this.paidAmount,
-    this.totalIntrest,
-    this.dueTime,
-    required this.photoProof,
-    required this.photoItem,
+    required this.customerId,
+    required this.itemId,
+    required this.transacrtionDate,
+    required this.transacrtionType,
+    required this.amount,
+    required this.intrestRate,
+    required this.intrestAmount,
+    required this.remainingAmount,
+    required this.proofPhoto,
+    required this.createdDate,
   });
 
-  static List<TransactionsHistory> toList(List<Map<String, Object?>> e) {
-    return List.generate(
-      e.length,
-      (index) => TransactionsHistory(
-        id: e[index]["ID"] as int,
-        custId: e[index][" CUST_ID"] as int,
-        takenDate: e[index]["TAKEN_DATE"] as String,
-        takenAmount: e[index]["TAKEN_AMOUNT"] as int,
-        rateOfInterest: e[index]["RATE_OF_INTEREST"] as double,
-        itemName: e[index]["ITEM_NAME"] as String,
-        transactionType: e[index]["TRANSACTION_TYPE"] as int,
-        paidDate: e[index]["PAID_DATE"] as String,
-        via: e[index]["VIA"] as String,
-        paidAmount: e[index]["PAID_AMOUNT"] as double,
-        totalIntrest: e[index]["TOTAL_INTREST"] as double,
-        dueTime: e[index]["DUE_TIME"] as String,
-        photoProof: e[index]["PHOTO_PROOF"] as String,
-        photoItem: e[index]["PHOTO_ITEM"] as String,
-      ),
-    );
+  static List<Transaction> toList(List<Map<String, dynamic>> data) {
+    if (data.isEmpty) {
+      return []; // If data is empty, return an empty list directly
+    }
+
+    return data.map((e) {
+      return Transaction(
+        id: e["Transaction_ID"],
+        customerId: e["Customer_ID"],
+        itemId: e["Item_ID"],
+        transacrtionDate: e["Transaction_Date"],
+        transacrtionType: e["Transaction_Type"],
+        amount: e["Amount"],
+        intrestRate: e["Interest_Rate"],
+        intrestAmount: e["Interest_Amount"],
+        remainingAmount: e["Remaining_Amount"],
+        proofPhoto: e["Proof_Photo"],
+        createdDate: e["Created_Date"],
+      );
+    }).toList();
   }
 
-  TransactionsHistory copyWith({
-    ValueGetter<int?>? id,
-    int? custId,
-    String? mobileNumber,
-    String? address,
-    String? customerName,
-    String? guardianName,
-    String? takenDate,
-    int? takenAmount,
-    double? rateOfInterest,
-    String? itemName,
-    int? transactionType,
-    ValueGetter<String?>? paidDate,
-    ValueGetter<String?>? via,
-    ValueGetter<double?>? paidAmount,
-    ValueGetter<double?>? totalIntrest,
-    ValueGetter<String?>? dueTime,
-    String? photoProof,
-    String? photoItem,
-    String? photoCustomer,
+  Transaction copyWith({
+    int? id,
+    int? customerId,
+    int? itemId,
+    DateTime? transacrtionDate,
+    String? transacrtionType,
+    double? amount,
+    double? intrestRate,
+    double? intrestAmount,
+    double? remainingAmount,
+    String? proofPhoto,
+    DateTime? createdDate,
   }) {
-    return TransactionsHistory(
-      id: id != null ? id() : this.id,
-      custId: custId ?? this.custId,
-      takenDate: takenDate ?? this.takenDate,
-      takenAmount: takenAmount ?? this.takenAmount,
-      rateOfInterest: rateOfInterest ?? this.rateOfInterest,
-      itemName: itemName ?? this.itemName,
-      transactionType: transactionType ?? this.transactionType,
-      paidDate: paidDate != null ? paidDate() : this.paidDate,
-      via: via != null ? via() : this.via,
-      paidAmount: paidAmount != null ? paidAmount() : this.paidAmount,
-      totalIntrest: totalIntrest != null ? totalIntrest() : this.totalIntrest,
-      dueTime: dueTime != null ? dueTime() : this.dueTime,
-      photoProof: photoProof ?? this.photoProof,
-      photoItem: photoItem ?? this.photoItem,
+    return Transaction(
+      id: id ?? this.id,
+      customerId: customerId ?? this.customerId,
+      itemId: itemId ?? this.itemId,
+      transacrtionDate: transacrtionDate ?? this.transacrtionDate,
+      transacrtionType: transacrtionType ?? this.transacrtionType,
+      amount: amount ?? this.amount,
+      intrestRate: intrestRate ?? this.intrestRate,
+      intrestAmount: intrestAmount ?? this.intrestAmount,
+      remainingAmount: remainingAmount ?? this.remainingAmount,
+      proofPhoto: proofPhoto ?? this.proofPhoto,
+      createdDate: createdDate ?? this.createdDate,
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'id': id,
-      'custId': custId,
-      'takenDate': takenDate,
-      'takenAmount': takenAmount,
-      'rateOfInterest': rateOfInterest,
-      'itemName': itemName,
-      'transactionType': transactionType,
-      'paidDate': paidDate,
-      'via': via,
-      'paidAmount': paidAmount,
-      'totalIntrest': totalIntrest,
-      'dueTime': dueTime,
-      'photoItem': photoItem,
-      'photoProof': photoProof,
+      'customerId': customerId,
+      'itemId': itemId,
+      'transacrtionDate': transacrtionDate.millisecondsSinceEpoch,
+      'transacrtionType': transacrtionType,
+      'amount': amount,
+      'intrestRate': intrestRate,
+      'intrestAmount': intrestAmount,
+      'remainingAmount': remainingAmount,
+      'proofPhoto': proofPhoto,
+      'createdDate': createdDate.millisecondsSinceEpoch,
     };
   }
 
-  factory TransactionsHistory.fromMap(Map<String, dynamic> map) {
-    return TransactionsHistory(
-      id: map['id']?.toInt(),
-      custId: map['custId'],
-      takenDate: map['takenDate'] ?? '',
-      takenAmount: map['takenAmount']?.toInt() ?? 0,
-      rateOfInterest: map['rateOfInterest']?.toDouble() ?? 0.0,
-      itemName: map['itemName'] ?? '',
-      transactionType: map['transactionType']?.toInt() ?? 0,
-      paidDate: map['paidDate'],
-      via: map['via'],
-      paidAmount: map['paidAmount']?.toInt(),
-      totalIntrest: map['totalIntrest']?.toInt(),
-      dueTime: map['dueTime'],
-      photoProof: map['photoProof'] ?? '',
-      photoItem: map['photoItem'] ?? '',
+  factory Transaction.fromMap(Map<String, dynamic> map) {
+    return Transaction(
+      id: map['id'] != null ? map['id'] as int : null,
+      customerId: map['customerId'] as int,
+      itemId: map['itemId'] as int,
+      transacrtionDate: DateTime.fromMillisecondsSinceEpoch(map['transacrtionDate'] as int),
+      transacrtionType: map['transacrtionType'] as String,
+      amount: map['amount'] as double,
+      intrestRate: map['intrestRate'] as double,
+      intrestAmount: map['intrestAmount'] as double,
+      remainingAmount: map['remainingAmount'] as double,
+      proofPhoto: map['proofPhoto'] as String,
+      createdDate: DateTime.fromMillisecondsSinceEpoch(map['createdDate'] as int),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory TransactionsHistory.fromJson(String source) => TransactionsHistory.fromMap(json.decode(source));
+  factory Transaction.fromJson(String source) => Transaction.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'Transactions(id: $id,takenDate: $takenDate, takenAmount: $takenAmount, rateOfInterest: $rateOfInterest, itemName: $itemName, transactionType: $transactionType, paidDate: $paidDate, via: $via, paidAmount: $paidAmount, totalIntrest: $totalIntrest, dueTime: $dueTime)';
+    return 'Transactions(id: $id, customerId: $customerId, itemId: $itemId, transacrtionDate: $transacrtionDate, transacrtionType: $transacrtionType, amount: $amount, intrestRate: $intrestRate, intrestAmount: $intrestAmount, remainingAmount: $remainingAmount, proofPhoto: $proofPhoto, createdDate: $createdDate)';
+  }
+
+  @override
+  bool operator ==(covariant Transaction other) {
+    if (identical(this, other)) return true;
+
+    return other.id == id &&
+        other.customerId == customerId &&
+        other.itemId == itemId &&
+        other.transacrtionDate == transacrtionDate &&
+        other.transacrtionType == transacrtionType &&
+        other.amount == amount &&
+        other.intrestRate == intrestRate &&
+        other.intrestAmount == intrestAmount &&
+        other.remainingAmount == remainingAmount &&
+        other.proofPhoto == proofPhoto &&
+        other.createdDate == createdDate;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        customerId.hashCode ^
+        itemId.hashCode ^
+        transacrtionDate.hashCode ^
+        transacrtionType.hashCode ^
+        amount.hashCode ^
+        intrestRate.hashCode ^
+        intrestAmount.hashCode ^
+        remainingAmount.hashCode ^
+        proofPhoto.hashCode ^
+        createdDate.hashCode;
   }
 }
