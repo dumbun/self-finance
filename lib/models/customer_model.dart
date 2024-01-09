@@ -20,23 +20,20 @@ class Customer {
   });
 
   static List<Customer> toList(List<Map<String, dynamic>> data) {
-    List<Customer> userData = [];
-    if (data != [] && data.isNotEmpty) {
-      for (var e in data) {
-        userData.add(
-          Customer(
-            id: e["Customer_ID"],
-            name: e["Customer_Name"],
-            guardianName: e["Gaurdian_Name"],
-            address: e["Customer_Address"],
-            number: e["Contact_Number"],
-            photo: e["Customer_Photo"],
-            createdDate: e["Created_Date"],
-          ),
-        );
-      }
+    if (data.isEmpty) {
+      return []; // If data is empty, return an empty list directly
     }
-    return userData;
+    return data.map((e) {
+      return Customer(
+        id: e["Customer_ID"],
+        name: e["Customer_Name"],
+        guardianName: e["Guardian_Name"], // Corrected the spelling of 'Guardian_Name'
+        address: e["Customer_Address"],
+        number: e["Contact_Number"],
+        photo: e["Customer_Photo"],
+        createdDate: e["Created_Date"],
+      );
+    }).toList();
   }
 
   Customer copyWith({
