@@ -39,7 +39,7 @@ class DetailCardWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _buildProfilePic(),
+                // _buildProfilePic(),
                 Expanded(
                   child: Row(
                     children: [
@@ -48,10 +48,10 @@ class DetailCardWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          BodyTwoDefaultText(
-                            text: data.customerName,
-                            bold: true,
-                          ),
+                          // BodyTwoDefaultText(
+                          //   text: data.customerName,
+                          //   bold: true,
+                          // ),
                           SizedBox(height: 8.0.sp),
                           BodyTwoDefaultText(
                             text: data.takenDate,
@@ -68,7 +68,7 @@ class DetailCardWidget extends StatelessWidget {
                                 color: data.transactionType == 1 ? AppColors.getErrorColor : AppColors.getGreenColor,
                                 text: data.transactionType == 1
                                     ? Utility.numberFormate(data.takenAmount)
-                                    : Utility.numberFormate(data.paidAmount!),
+                                    : Utility.doubleFormate(data.paidAmount!),
                               ),
                             ],
                           ),
@@ -86,13 +86,13 @@ class DetailCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildProfilePic() {
-    return data.photoCustomer == ''
-        ? const DefaultUserImage()
-        : SizedBox(
-            height: 30.sp,
-            width: 30.sp,
-            child: Utility.imageFromBase64String(data.photoCustomer),
-          );
-  }
+  // Widget _buildProfilePic() {
+  //   return data.photoCustomer == ''
+  //       ? const DefaultUserImage()
+  //       : SizedBox(
+  //           height: 30.sp,
+  //           width: 30.sp,
+  //           child: Utility.imageFromBase64String(data.photoCustomer),
+  //         );
+  // }
 }

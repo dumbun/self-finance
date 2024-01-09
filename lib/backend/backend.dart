@@ -1,29 +1,62 @@
 import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/models/user_history.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
 class BackEnd {
   static Future<void> createTable(sql.Database database) async {
-    await database.execute("""CREATE TABLE CUSTOMERS(
-      ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-      MOBILE_NUMBER TEXT NOT NULL,
-      ADDRESS TEXT NOT NULL,
-      CUSTOMER_NAME TEXT NOT NULL,
-      GUARDIAN_NAME TEXT NOT NULL,
-      TAKEN_AMOUNT INT NOT NULL,
-      RATE_OF_INTEREST DOUBLE NOT NULL,
-      TAKEN_DATE TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      ITEM_NAME TEXT NOT NULL,
-      TRANSFER INT NOT NULL,
-      PHOTO_PROOF TEXT NOT NULL,
-      PHOTO_ITEM TEXT NOT NULL,
-      PHOTO_CUSTOMER TEXT NOT NULL,
-      PAID_DATE TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )""");
-    await database.execute("""CREATE TABLE TRANSACTIONS(
-      ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-      MOBILE_NUMBER TEXT NOT NULL,
+    //// create new customerSTable
+    await database.execute("""
+
+        CREATE TABLE "CUSTOMERS" (
+        CUST_ID INTEGER PRIMARY KEY AUTOINCREMENT, 
+        MOBILE_NUMBER INTEGER NOT NULL, 
+        ADDRESS TEXT NOT NULL, 
+        CUSTOMER_NAME TEXT NOT NULL, 
+        GUARDIAN_NAME TEXT NOT NULL, 
+        PHOTO_CUSTOMER TEXT, 
+        CREATED_DATE CURRENT_TIMESTAMP NOT NULL
+        )
+      
+      """);
+
+    //// make the Unique index
+    await database.execute("""
+
+        CREATE UNIQUE INDEX pk_cust_index ON "CUSTOMERS"("MOBILE_NUMBER")
+
+      """);
+
+    //// creates a new Transactions table
+    await database.execute("""
+
+        CREATE TABLE TRANSACTIONS (       
+        TRAN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        CUST_ID INTEGER NOT NULL,
+        TAKEN_DATE TIMESTAMP NOT NULL ,
+        TAKEN_AMOUNT INTEGER NOT NULL ,
+        RATE_OF_INTEREST DOUBLE NOT NULL ,
+        ITEM_NAME TEXT NOT NULL ,
+        TRANSACTION_TYPE  INTEGER NOT NULL ,
+        PAID_DATE TEXT,
+        VIA  TEXT,
+        PAID_AMOUNT DOUBLE ,
+        TOTAL_INTREST DOUBLE,
+        DUE_TIME  TEXT,
+        PHOTO_PROOF TEXT,
+        PHOTO_ITEM TEXT,
+        CREATED_DATE CURRENT_TIMESTAMP NOT NULL, 
+        FOREIGN KEY (CUST_ID) REFERENCES CUSTOMERS(CUST_ID) 
+
+      )""");
+
+    //// CREATE A TRANSACTION HISTORY TABLE WHERE IT WILL STORE ALL THE TRANSACTIONS
+    await database.execute("""
+
+      CREATE TABLE USER_HISTORY(
+      CUST_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      MOBILE_NUMBER INTEGER NOT NULL,
       ADDRESS TEXT NOT NULL,
       CUSTOMER_NAME TEXT NOT NULL,
       GUARDIAN_NAME TEXT NOT NULL,
@@ -40,7 +73,23 @@ class BackEnd {
       PHOTO_PROOF TEXT NOT NULL,
       PHOTO_ITEM TEXT NOT NULL,
       PHOTO_CUSTOMER TEXT NOT NULL
+
+
     )""");
+
+    //// create the qnique key
+    await database.execute("""
+
+      CREATE UNIQUE INDEX pk_trans_index ON "TRANSACTIONS"("TRAN_ID","CUST_ID")
+
+    """);
+
+    //// turns on foreign key
+    await database.execute("""
+
+      PRAGMA foreign_keys = ON
+
+    """);
   }
 
   // by providing the path the data will store in that path whene it reinstall app data will be safe
@@ -55,41 +104,31 @@ class BackEnd {
 
   // create new customer entry
 
-  static Future<bool> createNewEntry(Customer customer) async {
+  static Future<int> createNewCustomer(Customer customer) async {
     final db = await BackEnd.db();
-    try {
-      final data = {
-        "MOBILE_NUMBER": customer.mobileNumber,
-        "ADDRESS": customer.address,
-        "CUSTOMER_NAME": customer.customerName,
-        "GUARDIAN_NAME": customer.guardianName,
-        "TAKEN_DATE": customer.takenDate,
-        "TAKEN_AMOUNT": customer.takenAmount,
-        "RATE_OF_INTEREST": customer.rateOfInterest,
-        "ITEM_NAME": customer.itemName,
-        "TRANSFER": customer.transaction,
-        "PHOTO_CUSTOMER": customer.photoCustomer,
-        "PHOTO_ITEM": customer.photoItem,
-        "PHOTO_PROOF": customer.photoProof,
-      };
-      final id = await db.insert('CUSTOMERS', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
-      if (id == 0) return false;
-      return true;
-    } catch (e) {
-      return false;
+
+    final data = {
+      "MOBILE_NUMBER": customer.mobileNumber,
+      "ADDRESS": customer.address,
+      "CUSTOMER_NAME": customer.customerName,
+      "GUARDIAN_NAME": customer.guardianName,
+      "PHOTO_CUSTOMER": customer.photoCustomer ?? "",
+      "CREATED_DATE": DateTime.now().toString(),
+    };
+    final id = await db.insert('CUSTOMERS', data);
+    if (id != 0) {
+      return id;
+    } else {
+      return id;
     }
   }
 
-  //create new transaction
-
-  static Future<bool> createNewTransaction(TransactionsHistory transacrtion) async {
+  ///[createNewTransaction] creates a new transaction in the DataBase
+  static Future<int> createNewTransaction(TransactionsHistory transacrtion) async {
     final db = await BackEnd.db();
     try {
       final data = {
-        "MOBILE_NUMBER": transacrtion.mobileNumber,
-        "ADDRESS": transacrtion.address,
-        "CUSTOMER_NAME": transacrtion.customerName,
-        "GUARDIAN_NAME": transacrtion.guardianName,
+        "CUST_ID": transacrtion.custId,
         "TAKEN_DATE": transacrtion.takenDate,
         "TAKEN_AMOUNT": transacrtion.takenAmount,
         "RATE_OF_INTEREST": transacrtion.rateOfInterest,
@@ -100,21 +139,21 @@ class BackEnd {
         "PAID_AMOUNT": transacrtion.paidAmount,
         "TOTAL_INTREST": transacrtion.totalIntrest,
         "DUE_TIME": transacrtion.dueTime,
-        "PHOTO_CUSTOMER": transacrtion.photoCustomer,
-        "PHOTO_ITEM": transacrtion.photoItem,
-        "PHOTO_PROOF": transacrtion.photoProof,
+        "PHOTO_ITEM": transacrtion.photoItem ?? "",
+        "PHOTO_PROOF": transacrtion.photoProof ?? "",
+        "CREATED_DATE": DateTime.now().toString(),
       };
 
       final id = await db.insert('TRANSACTIONS', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
-      if (id == 0) return false;
-      return true;
+      return id;
     } catch (e) {
-      return false;
+      print(e);
+      return 0;
     }
   }
 
-  // get latest Transaction
-
+  /// [fetchLatestTransactions] : get latest
+  /// Transactions of all customers from the TRANSACTIONS Tables without Customers
   static Future<List<TransactionsHistory>> fetchLatestTransactions() async {
     final db = await BackEnd.db();
     List<Map<String, Object?>> result = await db.rawQuery("""
@@ -127,22 +166,44 @@ class BackEnd {
     }
   }
 
-  // get called first  app lunches or reload app
-
-  static Future<List<Customer>> fetchAllData() async {
+  /// [fetchUserHistory] fetch user history
+  static Future<List<UserHistory>> fetchUserHistory() async {
     final db = await BackEnd.db();
-
     try {
-      final response = await db.query('CUSTOMERS', orderBy: 'ID');
-      final List<Customer> result = Customer.toList(response);
-      return result;
+      List<Map<String, Object?>> response = await db.rawQuery("""
+          SELECT * FROM USER_HISTORY
+          """);
+      return UserHistory.toList(response);
     } catch (e) {
+      print(e);
       return [];
     }
   }
 
-  // get the entry by mobile number
+  // get called first  app lunches or reload app
 
+  static Future<List<Customer>> fetchAllCustomersData() async {
+    final db = await BackEnd.db();
+
+    try {
+      final response = await db.query('CUSTOMERS', orderBy: 'CUST_ID');
+      final List<Customer> result = Customer.toList(response);
+      print("resumt $result");
+      return result;
+    } catch (e) {
+      print(e);
+      return [];
+    }
+  }
+
+  /// [fetchAllCustomersWithTransactions] fetchs the all users with there transactions from the Db
+  List<Map<Customer, List<TransactionsHistory>>> fetchAllCustomersWithTransactions() {
+    //todo write a query to fetch the all users with there transactions from the Db and map them
+    //todo and list this them
+    return List.empty();
+  }
+
+  /// [getCustomerEntriesByMobileNumber] get the entry by mobile number
   static Future<List<Map<String, dynamic>>> getCustomerEntriesByMobileNumber(String mobileNumber, int transfer) async {
     final db = await BackEnd.db();
 
@@ -229,7 +290,8 @@ class BackEnd {
   static Future<List<Customer>> fetchThisIDPaidTransactions(String mobileNumber) async {
     final db = await BackEnd.db();
     List<Customer> data = Customer.toList(
-        db.query("CUSTOMERS", where: "MOBILE_NUMBER = ? and TRANSFER = ?", whereArgs: [mobileNumber, 2]));
+      await db.query("CUSTOMERS", where: "MOBILE_NUMBER = ? and TRANSFER = ?", whereArgs: [mobileNumber, 2]),
+    );
     return data;
   }
 

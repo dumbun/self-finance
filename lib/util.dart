@@ -41,7 +41,8 @@ class ImageCacheManager {
     }
   }
 
-  static Image getCachedImage(String base64String, double? height, double? width) {
+  static Image getCachedImage(
+      String base64String, double? height, double? width) {
     if (_imageCache.containsKey(base64String)) {
       final cachedImage = _imageCache[base64String]!;
       _reorderCache(base64String, cachedImage);
@@ -80,9 +81,11 @@ class Utility {
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
-  static Widget imageFromBase64String(String base64String, {double? height, double? width}) {
+  static Widget imageFromBase64String(String base64String,
+      {double? height, double? width}) {
     if (base64String.isNotEmpty) {
-      final decodedImage = ImageCacheManager.getCachedImage(base64String, height, width);
+      final decodedImage =
+          ImageCacheManager.getCachedImage(base64String, height, width);
       return ClipRRect(
         borderRadius: BorderRadius.circular(100.sp),
         child: decodedImage,
@@ -104,8 +107,13 @@ class Utility {
     return NumberFormat('#,##0').format(number);
   }
 
+  static String doubleFormate(double number) {
+    return NumberFormat('#,##0').format(number);
+  }
+
   static bool isValidPhoneNumber(String? value) =>
-      RegExp(r'(^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$)').hasMatch(value ?? '');
+      RegExp(r'(^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$)')
+          .hasMatch(value ?? '');
 
   static double reduceDecimals(double value) {
     return double.parse(value.toStringAsFixed(2));

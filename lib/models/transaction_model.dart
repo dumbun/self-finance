@@ -4,10 +4,7 @@ import 'package:flutter/widgets.dart';
 
 class TransactionsHistory {
   final int? id;
-  final String mobileNumber;
-  final String address;
-  final String customerName;
-  final String guardianName;
+  final int custId;
   final String takenDate;
   final int takenAmount;
   final double rateOfInterest;
@@ -15,19 +12,15 @@ class TransactionsHistory {
   final int transactionType;
   final String? paidDate;
   final String? via;
-  final int? paidAmount;
-  final int? totalIntrest;
+  final double? paidAmount;
+  final double? totalIntrest;
   final String? dueTime;
-  final String photoProof;
-  final String photoItem;
-  final String photoCustomer;
+  final String? photoProof;
+  final String? photoItem;
 
   TransactionsHistory({
     this.id,
-    required this.mobileNumber,
-    required this.address,
-    required this.customerName,
-    required this.guardianName,
+    required this.custId,
     required this.takenDate,
     required this.takenAmount,
     required this.rateOfInterest,
@@ -40,42 +33,33 @@ class TransactionsHistory {
     this.dueTime,
     required this.photoProof,
     required this.photoItem,
-    required this.photoCustomer,
   });
 
-  static List<TransactionsHistory> toList(data) {
-    List<TransactionsHistory> custData = [];
-    data.forEach(
-      (Map<String, dynamic> e) {
-        custData.add(
-          TransactionsHistory(
-            id: e["ID"],
-            mobileNumber: e["MOBILE_NUMBER"],
-            address: e["ADDRESS"],
-            customerName: e["CUSTOMER_NAME"],
-            guardianName: e["GUARDIAN_NAME"],
-            takenDate: e["TAKEN_DATE"],
-            takenAmount: e["TAKEN_AMOUNT"],
-            rateOfInterest: e["RATE_OF_INTEREST"],
-            itemName: e["ITEM_NAME"],
-            transactionType: e["TRANSACTION_TYPE"],
-            paidDate: e["PAID_DATE"],
-            via: e["VIA"],
-            paidAmount: e["PAID_AMOUNT"],
-            totalIntrest: e["TOTAL_INTREST"],
-            dueTime: e["DUE_TIME"],
-            photoProof: e["PHOTO_PROOF"],
-            photoCustomer: e["PHOTO_CUSTOMER"],
-            photoItem: e["PHOTO_ITEM"],
-          ),
-        );
-      },
+  static List<TransactionsHistory> toList(List<Map<String, Object?>> e) {
+    return List.generate(
+      e.length,
+      (index) => TransactionsHistory(
+        id: e[index]["ID"] as int,
+        custId: e[index][" CUST_ID"] as int,
+        takenDate: e[index]["TAKEN_DATE"] as String,
+        takenAmount: e[index]["TAKEN_AMOUNT"] as int,
+        rateOfInterest: e[index]["RATE_OF_INTEREST"] as double,
+        itemName: e[index]["ITEM_NAME"] as String,
+        transactionType: e[index]["TRANSACTION_TYPE"] as int,
+        paidDate: e[index]["PAID_DATE"] as String,
+        via: e[index]["VIA"] as String,
+        paidAmount: e[index]["PAID_AMOUNT"] as double,
+        totalIntrest: e[index]["TOTAL_INTREST"] as double,
+        dueTime: e[index]["DUE_TIME"] as String,
+        photoProof: e[index]["PHOTO_PROOF"] as String,
+        photoItem: e[index]["PHOTO_ITEM"] as String,
+      ),
     );
-    return custData;
   }
 
   TransactionsHistory copyWith({
     ValueGetter<int?>? id,
+    int? custId,
     String? mobileNumber,
     String? address,
     String? customerName,
@@ -87,8 +71,8 @@ class TransactionsHistory {
     int? transactionType,
     ValueGetter<String?>? paidDate,
     ValueGetter<String?>? via,
-    ValueGetter<int?>? paidAmount,
-    ValueGetter<int?>? totalIntrest,
+    ValueGetter<double?>? paidAmount,
+    ValueGetter<double?>? totalIntrest,
     ValueGetter<String?>? dueTime,
     String? photoProof,
     String? photoItem,
@@ -96,10 +80,7 @@ class TransactionsHistory {
   }) {
     return TransactionsHistory(
       id: id != null ? id() : this.id,
-      mobileNumber: mobileNumber ?? this.mobileNumber,
-      address: address ?? this.address,
-      customerName: customerName ?? this.customerName,
-      guardianName: guardianName ?? this.guardianName,
+      custId: custId ?? this.custId,
       takenDate: takenDate ?? this.takenDate,
       takenAmount: takenAmount ?? this.takenAmount,
       rateOfInterest: rateOfInterest ?? this.rateOfInterest,
@@ -112,17 +93,13 @@ class TransactionsHistory {
       dueTime: dueTime != null ? dueTime() : this.dueTime,
       photoProof: photoProof ?? this.photoProof,
       photoItem: photoItem ?? this.photoItem,
-      photoCustomer: photoCustomer ?? this.photoCustomer,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'mobileNumber': mobileNumber,
-      'address': address,
-      'customerName': customerName,
-      'guardianName': guardianName,
+      'custId': custId,
       'takenDate': takenDate,
       'takenAmount': takenAmount,
       'rateOfInterest': rateOfInterest,
@@ -133,7 +110,6 @@ class TransactionsHistory {
       'paidAmount': paidAmount,
       'totalIntrest': totalIntrest,
       'dueTime': dueTime,
-      'photoCustomer': photoCustomer,
       'photoItem': photoItem,
       'photoProof': photoProof,
     };
@@ -142,10 +118,7 @@ class TransactionsHistory {
   factory TransactionsHistory.fromMap(Map<String, dynamic> map) {
     return TransactionsHistory(
       id: map['id']?.toInt(),
-      mobileNumber: map['mobileNumber'] ?? '',
-      address: map['address'] ?? '',
-      customerName: map['customerName'] ?? '',
-      guardianName: map['guardianName'] ?? '',
+      custId: map['custId'],
       takenDate: map['takenDate'] ?? '',
       takenAmount: map['takenAmount']?.toInt() ?? 0,
       rateOfInterest: map['rateOfInterest']?.toDouble() ?? 0.0,
@@ -158,7 +131,6 @@ class TransactionsHistory {
       dueTime: map['dueTime'],
       photoProof: map['photoProof'] ?? '',
       photoItem: map['photoItem'] ?? '',
-      photoCustomer: map['photoCustomer'] ?? '',
     );
   }
 
@@ -168,47 +140,6 @@ class TransactionsHistory {
 
   @override
   String toString() {
-    return 'Transactions(id: $id, mobileNumber: $mobileNumber, address: $address, customerName: $customerName, guardianName: $guardianName, takenDate: $takenDate, takenAmount: $takenAmount, rateOfInterest: $rateOfInterest, itemName: $itemName, transactionType: $transactionType, paidDate: $paidDate, via: $via, paidAmount: $paidAmount, totalIntrest: $totalIntrest, dueTime: $dueTime)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is TransactionsHistory &&
-        other.id == id &&
-        other.mobileNumber == mobileNumber &&
-        other.address == address &&
-        other.customerName == customerName &&
-        other.guardianName == guardianName &&
-        other.takenDate == takenDate &&
-        other.takenAmount == takenAmount &&
-        other.rateOfInterest == rateOfInterest &&
-        other.itemName == itemName &&
-        other.transactionType == transactionType &&
-        other.paidDate == paidDate &&
-        other.via == via &&
-        other.paidAmount == paidAmount &&
-        other.totalIntrest == totalIntrest &&
-        other.dueTime == dueTime;
-  }
-
-  @override
-  int get hashCode {
-    return id.hashCode ^
-        mobileNumber.hashCode ^
-        address.hashCode ^
-        customerName.hashCode ^
-        guardianName.hashCode ^
-        takenDate.hashCode ^
-        takenAmount.hashCode ^
-        rateOfInterest.hashCode ^
-        itemName.hashCode ^
-        transactionType.hashCode ^
-        paidDate.hashCode ^
-        via.hashCode ^
-        paidAmount.hashCode ^
-        totalIntrest.hashCode ^
-        dueTime.hashCode;
+    return 'Transactions(id: $id,takenDate: $takenDate, takenAmount: $takenAmount, rateOfInterest: $rateOfInterest, itemName: $itemName, transactionType: $transactionType, paidDate: $paidDate, via: $via, paidAmount: $paidAmount, totalIntrest: $totalIntrest, dueTime: $dueTime)';
   }
 }

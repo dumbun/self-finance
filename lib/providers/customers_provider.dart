@@ -6,7 +6,8 @@ part 'customers_history_provider.g.dart';
 @Riverpod(keepAlive: true)
 class AsyncCustomers extends _$AsyncCustomers {
   Future<List<Customer>> _fetchAllTransactions() async {
-    final data = await BackEnd.fetchAllData();
+    final data = await BackEnd.fetchAllCustomersData();
+    // print(data);
     return data;
   }
 
@@ -16,15 +17,16 @@ class AsyncCustomers extends _$AsyncCustomers {
     return _fetchAllTransactions();
   }
 
-  Future<bool> addCustomer({required Customer customer}) async {
-    bool result = false;
+  Future<int> addCustomer({required Customer customer}) async {
+    late int result = 0;
     // Set the state to loading
     state = const AsyncValue.loading();
     // Add the new todo and reload the todo list from the remote repository
     state = await AsyncValue.guard(() async {
-      result = await BackEnd.createNewEntry(customer);
+      result = await BackEnd.createNewCustomer(customer);
       return _fetchAllTransactions();
     });
-    return result;
+
+    return (result);
   }
 }

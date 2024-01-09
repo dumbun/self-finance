@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:self_finance/theme/colors.dart';
 
 class InputTextField extends StatelessWidget {
+  /// [InputTextField] input text field helps to add the text field to user to enter the data
+
   const InputTextField({
     super.key,
     this.controller,

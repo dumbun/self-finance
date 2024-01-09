@@ -23,16 +23,22 @@ class DashboardView extends ConsumerWidget {
       body: SafeArea(
         child: GestureDetector(
           onTap: Utility.unfocus,
-          child: PageView(
-            controller: pageController,
-            onPageChanged: (index) {
-              ref.read(selectedIndexProvider.notifier).update((state) => index);
+          child: Consumer(
+            builder: (context, ref, child) {
+              return PageView(
+                controller: pageController,
+                onPageChanged: (index) {
+                  ref
+                      .watch(selectedIndexProvider.notifier)
+                      .update((state) => index);
+                },
+                children: <Widget>[
+                  const HomeScreen(),
+                  EMICalculatorView(),
+                  const HistoryView(),
+                ],
+              );
             },
-            children: <Widget>[
-              const HomeScreen(),
-              EMICalculatorView(),
-              const HistoryView(),
-            ],
           ),
         ),
       ),
@@ -63,7 +69,8 @@ class DashboardView extends ConsumerWidget {
         : null;
   }
 
-  Widget _buildBottomNavigationBar(WidgetRef ref, PageController pageController) {
+  Widget _buildBottomNavigationBar(
+      WidgetRef ref, PageController pageController) {
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(

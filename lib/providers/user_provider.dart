@@ -6,8 +6,7 @@ part 'user_provider.g.dart';
 @Riverpod(keepAlive: true)
 class AsyncUser extends _$AsyncUser {
   Future<List> _fetchAllUsers() async {
-    final data = await UserBackEnd.fetchIDOneUser();
-    return data;
+    return UserBackEnd.fetchIDOneUser();
   }
 
   @override

@@ -79,16 +79,16 @@ class HistoryView extends ConsumerWidget {
       final AsyncTransactionsHistory tranxHistory = ref.read(asyncTransactionsHistoryProvider.notifier);
       switch (filterText) {
         case mobileNumber:
-          tranxHistory.doMobileSearch(mobileNumber: value);
+          // tranxHistory.doMobileSearch(mobileNumber: value);
           break;
         case customerName:
-          tranxHistory.doNameSearch(customerName: value);
+          // tranxHistory.doNameSearch(customerName: value);
           break;
         case customerPlace:
-          tranxHistory.doPlaceSearch(place: value);
+          // tranxHistory.doPlaceSearch(place: value);
           break;
         default:
-          tranxHistory.doMobileSearch(mobileNumber: value);
+        // tranxHistory.doMobileSearch(mobileNumber: value);
       }
     }
 

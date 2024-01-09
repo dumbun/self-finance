@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/backend/user_db.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/colors.dart';
@@ -9,8 +10,9 @@ import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
 import 'package:self_finance/views/auth_view.dart';
 import 'package:self_finance/views/terms_and_conditions.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await UserBackEnd.db();
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -49,7 +51,7 @@ class MyApp extends ConsumerWidget {
                 body: Center(
                   child: BodyOneDefaultText(text: 'Error fetching user data'),
                 ),
-              ), // Show an error message if fetching fails
+              ),
             ),
       ),
     );

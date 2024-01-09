@@ -7,7 +7,7 @@ part of 'transactions_history_provider.dart';
 // **************************************************************************
 
 String _$asyncTransactionsHistoryHash() =>
-    r'8f67ef99c07acdc33a1587c358f2d76a3d4399ed';
+    r'0be493df34403f5ec644ed3182e19542defe574a';
 
 /// See also [AsyncTransactionsHistory].
 @ProviderFor(AsyncTransactionsHistory)

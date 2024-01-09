@@ -16,53 +16,53 @@ class AsyncTransactionsHistory extends _$AsyncTransactionsHistory {
     return _fetchAllTransactions();
   }
 
-  void doPlaceSearch({required String place}) async {
-    //if the user clear the search feild then the data will update to normal
-    if (place == "") {
-      build();
-    }
-    // Set the state to loading
-    state = const AsyncValue.loading();
-    //doing search
-    state = await AsyncValue.guard(() async {
-      var sd = await _fetchAllTransactions();
-      final List<TransactionsHistory> result = sd.where((e) => e.address.contains(place)).toList();
-      return result;
-    });
-  }
+  // void doPlaceSearch({required String place}) async {
+  //   //if the user clear the search feild then the data will update to normal
+  //   if (place == "") {
+  //     build();
+  //   }
+  //   // Set the state to loading
+  //   state = const AsyncValue.loading();
+  //   //doing search
+  //   state = await AsyncValue.guard(() async {
+  //     var sd = await _fetchAllTransactions();
+  //     final List<TransactionsHistory> result = sd.where((e) => e.address.contains(place)).toList();
+  //     return result;
+  //   });
+  // }
 
-  void doMobileSearch({required String mobileNumber}) async {
-    //if the user clear the search feild then the data will update to normal
-    if (mobileNumber == "") {
-      build();
-    }
-    // Set the state to loading
-    state = const AsyncValue.loading();
-    //doing search
-    state = await AsyncValue.guard(() async {
-      var sd = await _fetchAllTransactions();
-      var result = sd.where((e) => e.mobileNumber.contains(mobileNumber)).toList();
-      return result;
-    });
-  }
+  // void doMobileSearch({required String mobileNumber}) async {
+  //   //if the user clear the search feild then the data will update to normal
+  //   if (mobileNumber == "") {
+  //     build();
+  //   }
+  //   // Set the state to loading
+  //   state = const AsyncValue.loading();
+  //   //doing search
+  //   state = await AsyncValue.guard(() async {
+  //     var sd = await _fetchAllTransactions();
+  //     var result = sd.where((e) => e.mobileNumber.contains(mobileNumber)).toList();
+  //     return result;
+  //   });
+  // }
 
-  void doNameSearch({required String customerName}) async {
-    //if the user clear the search feild then the data will update to normal
-    if (customerName == "") {
-      build();
-    }
-    // Set the state to loading
-    state = const AsyncValue.loading();
-    //doing search
-    state = await AsyncValue.guard(() async {
-      var sd = await _fetchAllTransactions();
-      List<TransactionsHistory> result = sd.where((e) => e.customerName.contains(customerName)).toList();
-      return result;
-    });
-  }
+  // void doNameSearch({required String customerName}) async {
+  //   //if the user clear the search feild then the data will update to normal
+  //   if (customerName == "") {
+  //     build();
+  //   }
+  //   // Set the state to loading
+  //   state = const AsyncValue.loading();
+  //   //doing search
+  //   state = await AsyncValue.guard(() async {
+  //     var sd = await _fetchAllTransactions();
+  //     List<TransactionsHistory> result = sd.where((e) => e.customerName.contains(customerName)).toList();
+  //     return result;
+  //   });
+  // }
 
-  Future<bool> addTrasaction({required TransactionsHistory transaction}) async {
-    bool result = false;
+  Future<int> addTrasaction({required TransactionsHistory transaction}) async {
+    int result = 0;
     // Set the state to loading
     state = const AsyncValue.loading();
     // Add the new todo and reload the todo list from the remote repository
