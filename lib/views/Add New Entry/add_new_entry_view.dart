@@ -8,6 +8,8 @@ import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
+/// [AddNewEntery] is a view
+/// which helps the user to save a new customer details with a transcation
 class AddNewEntery extends StatefulWidget {
   const AddNewEntery({super.key});
 
@@ -16,123 +18,124 @@ class AddNewEntery extends StatefulWidget {
 }
 
 class _AddNewEnteryState extends State<AddNewEntery> {
-  final TextEditingController customerName = TextEditingController();
-  final TextEditingController takenDate = TextEditingController();
-  final TextEditingController gaurdianName = TextEditingController();
-  final TextEditingController address = TextEditingController();
-  final TextEditingController mobileNumber = TextEditingController();
-  final TextEditingController takenAmount = TextEditingController();
-  final TextEditingController rateOfIntrest = TextEditingController();
-  final TextEditingController itemDescription = TextEditingController();
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final TextEditingController _customerName = TextEditingController();
+  final TextEditingController _takenDate = TextEditingController();
+  final TextEditingController _gaurdianName = TextEditingController();
+  final TextEditingController _address = TextEditingController();
+  final TextEditingController _mobileNumber = TextEditingController();
+  final TextEditingController _takenAmount = TextEditingController();
+  final TextEditingController _rateOfIntrest = TextEditingController();
+  final TextEditingController _itemDescription = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    customerName.dispose();
-    mobileNumber.dispose();
-    takenDate.dispose();
-    takenAmount.dispose();
-    gaurdianName.dispose();
-    address.dispose();
-    rateOfIntrest.dispose();
-    itemDescription.dispose();
+    _customerName.dispose();
+    _mobileNumber.dispose();
+    _takenDate.dispose();
+    _takenAmount.dispose();
+    _gaurdianName.dispose();
+    _address.dispose();
+    _rateOfIntrest.dispose();
+    _itemDescription.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    bool validateAndSave() {
-      final FormState? form = formKey.currentState;
-      if (form!.validate()) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title:
-            const BodyTwoDefaultText(text: "Add new Entry with new Customer"),
+        title: const BodyTwoDefaultText(text: "Add new Entry with new Customer"),
       ),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 10.sp, horizontal: 16.sp),
           child: Form(
-            key: formKey,
+            key: _formKey,
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Customer name
                   SizedBox(height: 20.sp),
                   InputTextField(
                     keyboardType: TextInputType.name,
                     hintText: " Customer Name ",
-                    controller: customerName,
+                    controller: _customerName,
                   ),
+
+                  // gaurfian Name
                   SizedBox(height: 20.sp),
                   InputTextField(
                     keyboardType: TextInputType.name,
-                    controller: gaurdianName,
+                    controller: _gaurdianName,
                     hintText: " Gaurdian Name ",
                   ),
+
+                  // customer address
                   SizedBox(height: 20.sp),
                   InputTextField(
                     keyboardType: TextInputType.streetAddress,
-                    controller: address,
+                    controller: _address,
                     hintText: " Customer Address ",
                   ),
+
+                  // customer movile number
                   SizedBox(height: 20.sp),
                   InputTextField(
                     keyboardType: TextInputType.phone,
-                    controller: mobileNumber,
+                    controller: _mobileNumber,
                     hintText: " Customer Mobile Number ",
                   ),
+
+                  //taken amount
                   SizedBox(height: 20.sp),
                   InputTextField(
                     keyboardType: TextInputType.number,
                     hintText: " Taken amount ",
-                    controller: takenAmount,
+                    validator: (value) => _amountValidation(value: value),
+                    controller: _takenAmount,
                   ),
+
+                  // rate of intrest
                   SizedBox(height: 20.sp),
                   InputTextField(
-                    validator: (value) {
-                      if (value != null) {
-                        if (value.contains(",") ||
-                            value.contains(" ") ||
-                            value.contains("-")) {
-                          return "please enter the correct value";
-                        } else {
-                          return null;
-                        }
-                      } else {
-                        return null;
-                      }
-                    },
+                    validator: (value) => _amountValidation(value: value),
                     hintText: " Rate of Intrest % ",
-                    controller: rateOfIntrest,
-                    keyboardType: const TextInputType.numberWithOptions(
-                        signed: false, decimal: true),
+                    controller: _rateOfIntrest,
+                    keyboardType: const TextInputType.numberWithOptions(signed: false, decimal: true),
                   ),
+
+                  // taken date picker
                   SizedBox(height: 20.sp),
                   InputDatePicker(
-                    controller: takenDate,
+                    controller: _takenDate,
                     labelText: " Taken Date dd-MM-yyy ",
                     firstDate: DateTime(1000),
                     lastDate: DateTime(5000),
                     initialDate: DateTime.now(),
                   ),
+
+                  // item description
                   SizedBox(height: 20.sp),
                   InputTextField(
-                    controller: itemDescription,
+                    controller: _itemDescription,
                     hintText: " Item Description ",
                   ),
+
+                  // image pickers
                   SizedBox(height: 20.sp),
                   _buildImagePickers(),
+
+                  // save button
                   SizedBox(height: 20.sp),
-                  RoundedCornerButton(text: " Save + ", onPressed: () {}),
+                  RoundedCornerButton(
+                      text: " Save + ",
+                      onPressed: () {
+                        _validateAndSave();
+                      }),
                   SizedBox(height: 20.sp),
                 ],
               ),
@@ -141,6 +144,26 @@ class _AddNewEnteryState extends State<AddNewEntery> {
         ),
       ),
     );
+  }
+
+  String? _amountValidation({required String? value}) {
+    if (value == null || value.isEmpty || value == "") {
+      return 'Please enter a valid value';
+    }
+    if (value.contains(",") || value.contains(" ") || value.contains("-")) {
+      return "please enter the correct value";
+    } else {
+      return null;
+    }
+  }
+
+  bool _validateAndSave() {
+    final FormState? form = _formKey.currentState;
+    if (form!.validate()) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Column _buildImagePickers() {
