@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/backend/user_db.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/providers/user_provider.dart';
@@ -13,6 +14,7 @@ import 'package:self_finance/views/terms_and_conditions.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await UserBackEnd.db();
+  await BackEnd.db();
   runApp(const ProviderScope(child: MyApp()));
 }
 

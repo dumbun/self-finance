@@ -16,10 +16,11 @@ class ImagePickerWidget extends ConsumerStatefulWidget {
 
   final String text;
   final String defaultImage;
-  final StateProvider<String> imageProvider;
+  final AutoDisposeStateProvider<String> imageProvider;
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _ImagePickerWidgetState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _ImagePickerWidgetState();
 }
 
 class _ImagePickerWidgetState extends ConsumerState<ImagePickerWidget> {

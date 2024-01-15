@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/theme/colors.dart';
 
 @immutable
 class ExpandableFab extends StatefulWidget {
@@ -186,10 +187,12 @@ class ActionButton extends StatelessWidget {
     super.key,
     this.onPressed,
     required this.icon,
+    required this.toolTip,
   });
 
   final VoidCallback? onPressed;
   final Widget icon;
+  final String toolTip;
 
   @override
   Widget build(BuildContext context) {
@@ -197,12 +200,13 @@ class ActionButton extends StatelessWidget {
     return Material(
       shape: const CircleBorder(),
       clipBehavior: Clip.antiAlias,
-      color: theme.colorScheme.secondary,
+      color: theme.colorScheme.primary,
       elevation: 4,
       child: IconButton(
+        tooltip: toolTip,
         onPressed: onPressed,
         icon: icon,
-        color: theme.colorScheme.onSecondary,
+        color: AppColors.getPrimaryTextColor,
       ),
     );
   }
