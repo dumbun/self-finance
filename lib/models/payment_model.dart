@@ -3,7 +3,7 @@ import 'dart:convert';
 class Payment {
   int? id;
   final int transactionId;
-  final DateTime paymentDate;
+  final String paymentDate;
   final double amountpaid;
   final String type;
   final DateTime createdDate;
@@ -36,7 +36,7 @@ class Payment {
   Payment copyWith({
     int? id,
     int? transactionId,
-    DateTime? paymentDate,
+    String? paymentDate,
     double? amountpaid,
     String? type,
     DateTime? createdDate,
@@ -55,7 +55,7 @@ class Payment {
     return <String, dynamic>{
       'id': id,
       'transactionId': transactionId,
-      'paymentDate': paymentDate.millisecondsSinceEpoch,
+      'paymentDate': paymentDate,
       'amountpaid': amountpaid,
       'type': type,
       'createdDate': createdDate.millisecondsSinceEpoch,
@@ -66,7 +66,7 @@ class Payment {
     return Payment(
       id: map['id'] != null ? map['id'] as int : null,
       transactionId: map['transactionId'] as int,
-      paymentDate: DateTime.fromMillisecondsSinceEpoch(map['paymentDate'] as int),
+      paymentDate: map['paymentDate'] as String,
       amountpaid: map['amountpaid'] as double,
       type: map['type'] as String,
       createdDate: DateTime.fromMillisecondsSinceEpoch(map['createdDate'] as int),

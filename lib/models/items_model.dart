@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 class Items {
@@ -6,11 +5,12 @@ class Items {
   final int customerid;
   final String name;
   final String description;
-  final DateTime pawnedDate;
-  final DateTime expiryDate;
+  final String pawnedDate;
+  final String expiryDate;
   final double pawnAmount;
   final String status;
-  final DateTime createdDate;
+  final String photo;
+  final String createdDate;
 
   Items({
     this.id,
@@ -21,6 +21,7 @@ class Items {
     required this.expiryDate,
     required this.pawnAmount,
     required this.status,
+    required this.photo,
     required this.createdDate,
   });
 
@@ -38,6 +39,7 @@ class Items {
         expiryDate: e["Expiry_Date"],
         pawnAmount: e["Pawn_Amount"],
         status: e["Item_Status"],
+        photo: e["Item_Photo"],
         createdDate: e["Created_Date"],
       );
     }).toList();
@@ -48,11 +50,12 @@ class Items {
     int? customerid,
     String? name,
     String? description,
-    DateTime? pawnedDate,
-    DateTime? expiryDate,
+    String? pawnedDate,
+    String? expiryDate,
     double? pawnAmount,
     String? status,
-    DateTime? createdDate,
+    String? photo,
+    String? createdDate,
   }) {
     return Items(
       id: id ?? this.id,
@@ -63,6 +66,7 @@ class Items {
       expiryDate: expiryDate ?? this.expiryDate,
       pawnAmount: pawnAmount ?? this.pawnAmount,
       status: status ?? this.status,
+      photo: photo ?? this.photo,
       createdDate: createdDate ?? this.createdDate,
     );
   }
@@ -73,11 +77,12 @@ class Items {
       'customerid': customerid,
       'name': name,
       'description': description,
-      'pawnedDate': pawnedDate.millisecondsSinceEpoch,
-      'expiryDate': expiryDate.millisecondsSinceEpoch,
+      'pawnedDate': pawnedDate,
+      'expiryDate': expiryDate,
       'pawnAmount': pawnAmount,
       'status': status,
-      'createdDate': createdDate.millisecondsSinceEpoch,
+      'photo': photo,
+      'createdDate': createdDate,
     };
   }
 
@@ -87,11 +92,12 @@ class Items {
       customerid: map['customerid'] as int,
       name: map['name'] as String,
       description: map['description'] as String,
-      pawnedDate: DateTime.fromMillisecondsSinceEpoch(map['pawnedDate'] as int),
-      expiryDate: DateTime.fromMillisecondsSinceEpoch(map['expiryDate'] as int),
+      pawnedDate: map['pawnedDate'] as String,
+      expiryDate: map['expiryDate'] as String,
       pawnAmount: map['pawnAmount'] as double,
       status: map['status'] as String,
-      createdDate: DateTime.fromMillisecondsSinceEpoch(map['createdDate'] as int),
+      photo: map['photo'] as String,
+      createdDate: map['createdDate'] as String,
     );
   }
 
@@ -101,7 +107,7 @@ class Items {
 
   @override
   String toString() {
-    return 'Items(id: $id, customerid: $customerid, name: $name, description: $description, pawnedDate: $pawnedDate, expiryDate: $expiryDate, pawnAmount: $pawnAmount, status: $status, createdDate: $createdDate)';
+    return 'Items(id: $id, customerid: $customerid, name: $name, description: $description, pawnedDate: $pawnedDate, expiryDate: $expiryDate, pawnAmount: $pawnAmount, status: $status, photo: $photo, createdDate: $createdDate)';
   }
 
   @override
@@ -116,6 +122,7 @@ class Items {
         other.expiryDate == expiryDate &&
         other.pawnAmount == pawnAmount &&
         other.status == status &&
+        other.photo == photo &&
         other.createdDate == createdDate;
   }
 
@@ -129,6 +136,7 @@ class Items {
         expiryDate.hashCode ^
         pawnAmount.hashCode ^
         status.hashCode ^
+        photo.hashCode ^
         createdDate.hashCode;
   }
 }

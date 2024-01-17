@@ -9,7 +9,7 @@ import 'package:self_finance/widgets/call_button_widget.dart';
 class DetailsView extends StatelessWidget {
   const DetailsView({super.key, required this.data});
 
-  final Transaction data;
+  final Trx data;
 
   @override
   Widget build(BuildContext context) {

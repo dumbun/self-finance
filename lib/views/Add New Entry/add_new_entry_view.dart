@@ -1,23 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/models/items_model.dart';
+import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/providers/customer_provider.dart';
+import 'package:self_finance/providers/items_provider.dart';
+import 'package:self_finance/providers/transactions_provider.dart';
+import 'package:self_finance/util.dart';
 import 'package:self_finance/views/Add%20New%20Entry/providers.dart';
 import 'package:self_finance/widgets/date_picker_widget.dart';
+import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
+import 'package:self_finance/widgets/snack_bar_widget.dart';
 
 /// [AddNewEntery] is a view
 /// which helps the user to save a new customer details with a transcation
-class AddNewEntery extends StatefulWidget {
+class AddNewEntery extends ConsumerStatefulWidget {
   const AddNewEntery({super.key});
 
   @override
-  State<AddNewEntery> createState() => _AddNewEnteryState();
+  ConsumerState<AddNewEntery> createState() => _AddNewEnteryState();
 }
 
-class _AddNewEnteryState extends State<AddNewEntery> {
+class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
   final TextEditingController _customerName = TextEditingController();
   final TextEditingController _takenDate = TextEditingController();
   final TextEditingController _gaurdianName = TextEditingController();
@@ -27,6 +37,7 @@ class _AddNewEnteryState extends State<AddNewEntery> {
   final TextEditingController _rateOfIntrest = TextEditingController();
   final TextEditingController _itemDescription = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _isloading = false;
 
   @override
   void dispose() {
@@ -62,7 +73,7 @@ class _AddNewEnteryState extends State<AddNewEntery> {
                   SizedBox(height: 20.sp),
                   InputTextField(
                     keyboardType: TextInputType.name,
-                    hintText: " Customer Name ",
+                    hintText: " Customer Full Name ",
                     controller: _customerName,
                   ),
 
@@ -71,7 +82,7 @@ class _AddNewEnteryState extends State<AddNewEntery> {
                   InputTextField(
                     keyboardType: TextInputType.name,
                     controller: _gaurdianName,
-                    hintText: " Gaurdian Name ",
+                    hintText: " Gaurdian Full Name ",
                   ),
 
                   // customer address
@@ -82,12 +93,19 @@ class _AddNewEnteryState extends State<AddNewEntery> {
                     hintText: " Customer Address ",
                   ),
 
-                  // customer movile number
+                  // customer mobile number
                   SizedBox(height: 20.sp),
                   InputTextField(
                     keyboardType: TextInputType.phone,
                     controller: _mobileNumber,
                     hintText: " Customer Mobile Number ",
+                    validator: (value) {
+                      if (Utility.isValidPhoneNumber(value)) {
+                        return null;
+                      } else {
+                        return "please enter correct mobile number ";
+                      }
+                    },
                   ),
 
                   //taken amount
@@ -112,9 +130,9 @@ class _AddNewEnteryState extends State<AddNewEntery> {
                   SizedBox(height: 20.sp),
                   InputDatePicker(
                     controller: _takenDate,
-                    labelText: " Taken Date dd-MM-yyy ",
+                    labelText: " Taken Date dd-MM-yyyy ",
                     firstDate: DateTime(1000),
-                    lastDate: DateTime(5000),
+                    lastDate: DateTime.now(),
                     initialDate: DateTime.now(),
                   ),
 
@@ -131,11 +149,14 @@ class _AddNewEnteryState extends State<AddNewEntery> {
 
                   // save button
                   SizedBox(height: 20.sp),
-                  RoundedCornerButton(
+                  Visibility(
+                    visible: _isloading,
+                    replacement: RoundedCornerButton(
                       text: " Save + ",
-                      onPressed: () {
-                        _validateAndSave();
-                      }),
+                      onPressed: _save,
+                    ),
+                    child: const Center(child: CircularProgressIndicator.adaptive()),
+                  ),
                   SizedBox(height: 20.sp),
                 ],
               ),
@@ -144,6 +165,101 @@ class _AddNewEnteryState extends State<AddNewEntery> {
         ),
       ),
     );
+  }
+
+  void _save() async {
+    if (_validateAndSave()) {
+      setState(() {
+        _isloading = true;
+      });
+
+      // creating the new customer
+      final Customer newCustomer = Customer(
+        name: _customerName.text,
+        guardianName: _gaurdianName.text,
+        address: _address.text,
+        number: _mobileNumber.text,
+        photo: ref.read(pickedCustomerProfileImageStringProvider),
+        createdDate: DateTime.now().toString(),
+      );
+      final int customerCreatedResponse =
+          await ref.read(asyncCustomersProvider.notifier).addCustomer(customer: newCustomer);
+
+      // creating new item becacuse every new transaction will have a proof item
+      final Items newItem = Items(
+        customerid: customerCreatedResponse,
+        name: _itemDescription.text,
+        description: _itemDescription.text,
+        pawnedDate: _takenDate.text,
+        expiryDate: DateTime.now().toString(),
+        pawnAmount: _doubleCheck(_takenAmount.text),
+        status: "Active",
+        photo: ref.read(pickedCustomerItemImageStringProvider),
+        createdDate: DateTime.now().toString(),
+      );
+      final int itemCreatedResponse = await ref.read(asyncItemsProvider.notifier).addItem(item: newItem);
+
+      // creating new transaction
+      final Trx newTransaction = Trx(
+        customerId: customerCreatedResponse,
+        itemId: itemCreatedResponse,
+        transacrtionDate: _takenDate.text,
+        transacrtionType: "Debit",
+        amount: _doubleCheck(_takenAmount.text),
+        intrestRate: _doubleCheck(_rateOfIntrest.text),
+        intrestAmount: _doubleCheck(_takenAmount.text) * (_doubleCheck(_rateOfIntrest.text) / 100),
+        remainingAmount: 0,
+        proofPhoto: ref.read(pickedCustomerProofImageStringProvider),
+        createdDate: DateTime.now().toString(),
+      );
+
+      final int transactionCreatedResponse =
+          await ref.read(asyncTransactionsProvider.notifier).addTransaction(transaction: newTransaction);
+
+      if (customerCreatedResponse != 0 && itemCreatedResponse != 0 && transactionCreatedResponse != 0) {
+        setState(() {
+          _isloading = false;
+        });
+        _afterSuccess();
+      } else {
+        setState(() {
+          _isloading = false;
+        });
+        _afterFail();
+      }
+    }
+  }
+
+  void _afterSuccess() {
+    snackBarWidget(context: context, message: "Saved Successfully 👍");
+    Navigator.pop(context);
+  }
+
+  void _afterFail() {
+    Navigator.pop(context);
+    AlertDilogs.alertDialogWithOneAction(context, "error", "Please Try again");
+  }
+
+  double _doubleCheck(String text, {String errorString = "error"}) {
+    try {
+      return double.parse(text);
+    } catch (e) {
+      setState(() {
+        _isloading = false;
+      });
+      return AlertDilogs.alertDialogWithOneAction(context, errorString, e.toString());
+    }
+  }
+
+  int _intCheck(String text, {String errorString = "error"}) {
+    try {
+      return int.parse(text);
+    } catch (e) {
+      setState(() {
+        _isloading = false;
+      });
+      return AlertDilogs.alertDialogWithOneAction(context, errorString, e.toString());
+    }
   }
 
   String? _amountValidation({required String? value}) {

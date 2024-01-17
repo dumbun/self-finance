@@ -1,5 +1,9 @@
 import 'package:path_provider/path_provider.dart';
+import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/models/items_model.dart';
+import 'package:self_finance/models/transaction_model.dart';
 import 'package:sqflite/sqflite.dart' as sql;
+import 'package:sqflite/sqlite_api.dart';
 
 class BackEnd {
   static Future<void> createTable(sql.Database database) async {
@@ -11,48 +15,58 @@ class BackEnd {
           Customer_Name    TEXT,
           Gaurdian_Name    TEXT,
           Customer_Address TEXT,
-          Contact_Number   TEXT,
+          Contact_Number   TEXT UNIQUE NOT NULL,
           Customer_Photo   TEXT,
-          Created_Date     DATETIME
-          ) ;
+          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          );
+      """);
+
+    await database.execute("""
           -- Items Table
           CREATE TABLE Items (
           Item_ID          INTEGER PRIMARY KEY AUTOINCREMENT,
           Customer_ID      INTEGER REFERENCES Customers(Customer_ID),
           Item_Name        TEXT,
           Item_Description TEXT,
-          Pawned_Date      DATE,
-          Expiry_Date      DATE,
+          Pawned_Date      TEXT,
+          Expiry_Date      TEXT,
           Pawn_Amount      REAL,
           Item_Status      TEXT,
-          Created_Date     DATETIME
+          Item_Photo       TEXT,
+          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
           );
+        """);
+
+    await database.execute("""
           -- Transactions Table
           CREATE TABLE Transactions (
           Transaction_ID   INTEGER PRIMARY KEY AUTOINCREMENT,
           Customer_ID      INTEGER REFERENCES Customers(Customer_ID),
           Item_ID          INTEGER REFERENCES Items(Item_ID),
-          Transaction_Date DATE,
+          Transaction_Date TEXT,
           Transaction_Type TEXT,
           Amount           REAL,
           Interest_Rate    REAL,
           Interest_Amount  REAL,
           Remaining_Amount REAL,
           Proof_Photo      TEXT,
-          Created_Date     DATETIME
+          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
           );
+        """);
+    await database.execute("""
           -- Payments Table
           CREATE TABLE Payments (
           Payment_ID       INTEGER PRIMARY KEY AUTOINCREMENT,
           Transaction_ID   INTEGER REFERENCES Transactions(Transaction_ID),
-          Payment_Date     DATE,
+          Payment_Date     TEXT,
           Amount_Paid      REAL,
           Payment_Type     TEXT,
-          Created_Date     DATETIME
+          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
           );
-          CREATE UNIQUE INDEX ui_cust_index ON "CUSTOMERS"("Contact_Number");
-          PRAGMA foreign_keys = ON
-      """);
+        """);
+    await database.execute("""
+             PRAGMA foreign_keys = ON
+        """);
   }
 
   // by providing the path the data will store in that path whene it reinstall app data will be safe
@@ -60,31 +74,108 @@ class BackEnd {
   static Future<sql.Database> db() async {
     final directory = await getApplicationDocumentsDirectory();
     final path = '${directory.path}/itdata.db';
+    print(path);
     return sql.openDatabase(path, version: 1, onCreate: (sql.Database database, int version) async {
       await createTable(database);
     });
   }
 
-  // // create new customer entry
+  //// C U S T O M E R S
+  /// create new customer entry
+  static Future<int> createNewCustomer(Customer customer) async {
+    try {
+      final db = await BackEnd.db();
+      final Map<String, Object> data = {
+        "Customer_Name": customer.name,
+        "Gaurdian_Name": customer.guardianName,
+        "Customer_Address": customer.address,
+        "Contact_Number": customer.number,
+        "Customer_Photo": customer.photo,
+        "Created_Date": customer.createdDate,
+      };
+      final int id = await db.insert('Customers', data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
+      return id;
+    } catch (e) {
+      return 0;
+    }
+  }
 
-  // static Future<int> createNewCustomer(Customer customer) async {
-  //   final db = await BackEnd.db();
+  /// fetch all customer data
+  static Future<List<Customer>> fetchAllCustomerData() async {
+    final Database db = await BackEnd.db();
+    final List<Map<String, Object?>> response = await db.rawQuery("""SELECT * FROM Customers""");
+    return Customer.toList(response);
+  }
 
-  //   final data = {
-  //     "MOBILE_NUMBER": customer.mobileNumber,
-  //     "ADDRESS": customer.address,
-  //     "CUSTOMER_NAME": customer.customerName,
-  //     "GUARDIAN_NAME": customer.guardianName,
-  //     "PHOTO_CUSTOMER": customer.photoCustomer ?? "",
-  //     "CREATED_DATE": DateTime.now().toString(),
-  //   };
-  //   final id = await db.insert('CUSTOMERS', data);
-  //   if (id != 0) {
-  //     return id;
-  //   } else {
-  //     return id;
-  //   }
-  // }
+  //// I T E M S
+  /// create a new item row
+  static Future createNewItem(Items item) async {
+    try {
+      final db = await BackEnd.db();
+      final Map<String, Object> data = {
+        "Customer_ID": item.customerid,
+        "Item_Name": item.name,
+        "Item_Description": item.description,
+        "Pawned_Date": item.pawnedDate,
+        "Expiry_Date": item.expiryDate,
+        "Pawn_Amount": item.pawnAmount,
+        "Item_Status": item.status,
+        "Item_Photo": item.photo,
+        "Created_Date": item.createdDate
+      };
+      final int id = await db.insert("Items", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
+      return id;
+    } catch (e) {
+      print(e.toString());
+      return 0;
+    }
+  }
+
+  /// fetch all items
+  static fetchAllItems() async {
+    final Database db = await BackEnd.db();
+    final List<Map<String, Object?>> response = await db.rawQuery("""SELECT * FROM Items""");
+    return Customer.toList(response);
+  }
+
+  //// T R A N S A C T I O N S
+
+  /// create new Transaction
+
+  static Future<int> createNewTransaction(Trx transasction) async {
+    try {
+      final db = await BackEnd.db();
+      final Map<String, dynamic> data = {
+        "Transaction_ID": transasction.customerId,
+        "Customer_ID": transasction.customerId,
+        "Item_ID": transasction.itemId,
+        "Transaction_Date": transasction.transacrtionDate,
+        "Transaction_Type": transasction.transacrtionType,
+        "Amount": transasction.amount,
+        "Interest_Rate": transasction.intrestRate,
+        "Interest_Amount": transasction.intrestAmount,
+        "Remaining_Amount": transasction.remainingAmount,
+        "Proof_Photo": transasction.proofPhoto,
+        "Created_Date": transasction.createdDate,
+      };
+      final response = await db.insert("Transactions", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
+      return response;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  static Future<List<Trx>> fetchAllTransactions() async {
+    try {
+      final db = await BackEnd.db();
+      final response = await db.rawQuery("""
+          SELECT * FROM Transactions
+      """);
+      return Trx.toList(response);
+    } catch (e) {
+      return [];
+    }
+  }
 
   // ///[createNewTransaction] creates a new transaction in the DataBase
   // static Future<int> createNewTransaction(TransactionsHistory transacrtion) async {

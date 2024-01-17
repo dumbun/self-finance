@@ -1,19 +1,31 @@
 import 'dart:convert';
 
-class Transaction {
+/// [Trx] is a shortform of Transaction class
+/// using this class we can create a [Transaction] which contains the
+/// 1. [customerId] : which is used for the reference the [Customer] in the data base
+/// 2. [itemId] : which is used for the reference the [Item] in the DataBase
+/// 3. [transacrtionDate] : the time when transaction take place
+/// 4. [transacrtionType] : the type of trancation [Debit] or [Credit]
+/// 5. [amount] : Amount involved in the transaction
+/// 6. [intrestRate] : rate of intrest for the transaction
+/// 7. [remainingAmount] : remaning amount after the transaction
+/// 8. [proofPhoto] : proof of the customer who did the transaction
+/// 9. [createdDate] : when the transaction happened
+
+class Trx {
   int? id;
   final int customerId;
   final int itemId;
-  final DateTime transacrtionDate;
+  final String transacrtionDate;
   final String transacrtionType;
   final double amount;
   final double intrestRate;
   final double intrestAmount;
   final double remainingAmount;
   final String proofPhoto;
-  final DateTime createdDate;
+  final String createdDate;
 
-  Transaction({
+  Trx({
     this.id,
     required this.customerId,
     required this.itemId,
@@ -27,13 +39,13 @@ class Transaction {
     required this.createdDate,
   });
 
-  static List<Transaction> toList(List<Map<String, dynamic>> data) {
+  static List<Trx> toList(List<Map<String, dynamic>> data) {
     if (data.isEmpty) {
       return []; // If data is empty, return an empty list directly
     }
 
     return data.map((e) {
-      return Transaction(
+      return Trx(
         id: e["Transaction_ID"],
         customerId: e["Customer_ID"],
         itemId: e["Item_ID"],
@@ -49,20 +61,20 @@ class Transaction {
     }).toList();
   }
 
-  Transaction copyWith({
+  Trx copyWith({
     int? id,
     int? customerId,
     int? itemId,
-    DateTime? transacrtionDate,
+    String? transacrtionDate,
     String? transacrtionType,
     double? amount,
     double? intrestRate,
     double? intrestAmount,
     double? remainingAmount,
     String? proofPhoto,
-    DateTime? createdDate,
+    String? createdDate,
   }) {
-    return Transaction(
+    return Trx(
       id: id ?? this.id,
       customerId: customerId ?? this.customerId,
       itemId: itemId ?? this.itemId,
@@ -82,44 +94,44 @@ class Transaction {
       'id': id,
       'customerId': customerId,
       'itemId': itemId,
-      'transacrtionDate': transacrtionDate.millisecondsSinceEpoch,
+      'transacrtionDate': transacrtionDate,
       'transacrtionType': transacrtionType,
       'amount': amount,
       'intrestRate': intrestRate,
       'intrestAmount': intrestAmount,
       'remainingAmount': remainingAmount,
       'proofPhoto': proofPhoto,
-      'createdDate': createdDate.millisecondsSinceEpoch,
+      'createdDate': createdDate,
     };
   }
 
-  factory Transaction.fromMap(Map<String, dynamic> map) {
-    return Transaction(
+  factory Trx.fromMap(Map<String, dynamic> map) {
+    return Trx(
       id: map['id'] != null ? map['id'] as int : null,
       customerId: map['customerId'] as int,
       itemId: map['itemId'] as int,
-      transacrtionDate: DateTime.fromMillisecondsSinceEpoch(map['transacrtionDate'] as int),
+      transacrtionDate: map['transacrtionDate'] as String,
       transacrtionType: map['transacrtionType'] as String,
       amount: map['amount'] as double,
       intrestRate: map['intrestRate'] as double,
       intrestAmount: map['intrestAmount'] as double,
       remainingAmount: map['remainingAmount'] as double,
       proofPhoto: map['proofPhoto'] as String,
-      createdDate: DateTime.fromMillisecondsSinceEpoch(map['createdDate'] as int),
+      createdDate: map['createdDate'] as String,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Transaction.fromJson(String source) => Transaction.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Trx.fromJson(String source) => Trx.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'Transactions(id: $id, customerId: $customerId, itemId: $itemId, transacrtionDate: $transacrtionDate, transacrtionType: $transacrtionType, amount: $amount, intrestRate: $intrestRate, intrestAmount: $intrestAmount, remainingAmount: $remainingAmount, proofPhoto: $proofPhoto, createdDate: $createdDate)';
+    return 'Transaction(id: $id, customerId: $customerId, itemId: $itemId, transacrtionDate: $transacrtionDate, transacrtionType: $transacrtionType, amount: $amount, intrestRate: $intrestRate, intrestAmount: $intrestAmount, remainingAmount: $remainingAmount, proofPhoto: $proofPhoto, createdDate: $createdDate)';
   }
 
   @override
-  bool operator ==(covariant Transaction other) {
+  bool operator ==(covariant Trx other) {
     if (identical(this, other)) return true;
 
     return other.id == id &&

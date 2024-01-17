@@ -14,7 +14,7 @@ class DetailCardWidget extends StatelessWidget {
     required this.data,
   });
 
-  final Transaction data;
+  final Trx data;
 
   @override
   Widget build(BuildContext context) {

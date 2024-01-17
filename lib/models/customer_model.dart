@@ -7,7 +7,7 @@ class Customer {
   final String address;
   final String number;
   final String photo;
-  final DateTime createdDate;
+  final String createdDate;
 
   Customer({
     this.id,
@@ -43,7 +43,7 @@ class Customer {
     String? address,
     String? number,
     String? photo,
-    DateTime? createdDate,
+    String? createdDate,
   }) {
     return Customer(
       id: id ?? this.id,
@@ -64,7 +64,7 @@ class Customer {
       'address': address,
       'number': number,
       'photo': photo,
-      'createdDate': createdDate.millisecondsSinceEpoch,
+      'createdDate': createdDate,
     };
   }
 
@@ -76,7 +76,7 @@ class Customer {
       address: map['address'] as String,
       number: map['number'] as String,
       photo: map['photo'] as String,
-      createdDate: DateTime.fromMillisecondsSinceEpoch(map['createdDate'] as int),
+      createdDate: map['createdDate'] as String,
     );
   }
 
