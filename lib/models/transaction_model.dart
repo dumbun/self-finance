@@ -1,214 +1,164 @@
 import 'dart:convert';
 
-import 'package:flutter/widgets.dart';
+/// [Trx] is a shortform of Transaction class
+/// using this class we can create a [Transaction] which contains the
+/// 1. [customerId] : which is used for the reference the [Customer] in the data base
+/// 2. [itemId] : which is used for the reference the [Item] in the DataBase
+/// 3. [transacrtionDate] : the time when transaction take place
+/// 4. [transacrtionType] : the type of trancation [Debit] or [Credit]
+/// 5. [amount] : Amount involved in the transaction
+/// 6. [intrestRate] : rate of intrest for the transaction
+/// 7. [remainingAmount] : remaning amount after the transaction
+/// 8. [proofPhoto] : proof of the customer who did the transaction
+/// 9. [createdDate] : when the transaction happened
 
-class TransactionsHistory {
-  final int? id;
-  final String mobileNumber;
-  final String address;
-  final String customerName;
-  final String guardianName;
-  final String takenDate;
-  final int takenAmount;
-  final double rateOfInterest;
-  final String itemName;
-  final int transactionType;
-  final String? paidDate;
-  final String? via;
-  final int? paidAmount;
-  final int? totalIntrest;
-  final String? dueTime;
-  final String photoProof;
-  final String photoItem;
-  final String photoCustomer;
+class Trx {
+  int? id;
+  final int customerId;
+  final int itemId;
+  final String transacrtionDate;
+  final String transacrtionType;
+  final double amount;
+  final double intrestRate;
+  final double intrestAmount;
+  final double remainingAmount;
+  final String proofPhoto;
+  final String createdDate;
 
-  TransactionsHistory({
+  Trx({
     this.id,
-    required this.mobileNumber,
-    required this.address,
-    required this.customerName,
-    required this.guardianName,
-    required this.takenDate,
-    required this.takenAmount,
-    required this.rateOfInterest,
-    required this.itemName,
-    required this.transactionType,
-    this.paidDate,
-    this.via,
-    this.paidAmount,
-    this.totalIntrest,
-    this.dueTime,
-    required this.photoProof,
-    required this.photoItem,
-    required this.photoCustomer,
+    required this.customerId,
+    required this.itemId,
+    required this.transacrtionDate,
+    required this.transacrtionType,
+    required this.amount,
+    required this.intrestRate,
+    required this.intrestAmount,
+    required this.remainingAmount,
+    required this.proofPhoto,
+    required this.createdDate,
   });
 
-  static List<TransactionsHistory> toList(data) {
-    List<TransactionsHistory> custData = [];
-    data.forEach(
-      (Map<String, dynamic> e) {
-        custData.add(
-          TransactionsHistory(
-            id: e["ID"],
-            mobileNumber: e["MOBILE_NUMBER"],
-            address: e["ADDRESS"],
-            customerName: e["CUSTOMER_NAME"],
-            guardianName: e["GUARDIAN_NAME"],
-            takenDate: e["TAKEN_DATE"],
-            takenAmount: e["TAKEN_AMOUNT"],
-            rateOfInterest: e["RATE_OF_INTEREST"],
-            itemName: e["ITEM_NAME"],
-            transactionType: e["TRANSACTION_TYPE"],
-            paidDate: e["PAID_DATE"],
-            via: e["VIA"],
-            paidAmount: e["PAID_AMOUNT"],
-            totalIntrest: e["TOTAL_INTREST"],
-            dueTime: e["DUE_TIME"],
-            photoProof: e["PHOTO_PROOF"],
-            photoCustomer: e["PHOTO_CUSTOMER"],
-            photoItem: e["PHOTO_ITEM"],
-          ),
-        );
-      },
-    );
-    return custData;
+  static List<Trx> toList(List<Map<String, dynamic>> data) {
+    if (data.isEmpty) {
+      return []; // If data is empty, return an empty list directly
+    }
+
+    return data.map((e) {
+      return Trx(
+        id: e["Transaction_ID"],
+        customerId: e["Customer_ID"],
+        itemId: e["Item_ID"],
+        transacrtionDate: e["Transaction_Date"],
+        transacrtionType: e["Transaction_Type"],
+        amount: e["Amount"],
+        intrestRate: e["Interest_Rate"],
+        intrestAmount: e["Interest_Amount"],
+        remainingAmount: e["Remaining_Amount"],
+        proofPhoto: e["Proof_Photo"],
+        createdDate: e["Created_Date"],
+      );
+    }).toList();
   }
 
-  TransactionsHistory copyWith({
-    ValueGetter<int?>? id,
-    String? mobileNumber,
-    String? address,
-    String? customerName,
-    String? guardianName,
-    String? takenDate,
-    int? takenAmount,
-    double? rateOfInterest,
-    String? itemName,
-    int? transactionType,
-    ValueGetter<String?>? paidDate,
-    ValueGetter<String?>? via,
-    ValueGetter<int?>? paidAmount,
-    ValueGetter<int?>? totalIntrest,
-    ValueGetter<String?>? dueTime,
-    String? photoProof,
-    String? photoItem,
-    String? photoCustomer,
+  Trx copyWith({
+    int? id,
+    int? customerId,
+    int? itemId,
+    String? transacrtionDate,
+    String? transacrtionType,
+    double? amount,
+    double? intrestRate,
+    double? intrestAmount,
+    double? remainingAmount,
+    String? proofPhoto,
+    String? createdDate,
   }) {
-    return TransactionsHistory(
-      id: id != null ? id() : this.id,
-      mobileNumber: mobileNumber ?? this.mobileNumber,
-      address: address ?? this.address,
-      customerName: customerName ?? this.customerName,
-      guardianName: guardianName ?? this.guardianName,
-      takenDate: takenDate ?? this.takenDate,
-      takenAmount: takenAmount ?? this.takenAmount,
-      rateOfInterest: rateOfInterest ?? this.rateOfInterest,
-      itemName: itemName ?? this.itemName,
-      transactionType: transactionType ?? this.transactionType,
-      paidDate: paidDate != null ? paidDate() : this.paidDate,
-      via: via != null ? via() : this.via,
-      paidAmount: paidAmount != null ? paidAmount() : this.paidAmount,
-      totalIntrest: totalIntrest != null ? totalIntrest() : this.totalIntrest,
-      dueTime: dueTime != null ? dueTime() : this.dueTime,
-      photoProof: photoProof ?? this.photoProof,
-      photoItem: photoItem ?? this.photoItem,
-      photoCustomer: photoCustomer ?? this.photoCustomer,
+    return Trx(
+      id: id ?? this.id,
+      customerId: customerId ?? this.customerId,
+      itemId: itemId ?? this.itemId,
+      transacrtionDate: transacrtionDate ?? this.transacrtionDate,
+      transacrtionType: transacrtionType ?? this.transacrtionType,
+      amount: amount ?? this.amount,
+      intrestRate: intrestRate ?? this.intrestRate,
+      intrestAmount: intrestAmount ?? this.intrestAmount,
+      remainingAmount: remainingAmount ?? this.remainingAmount,
+      proofPhoto: proofPhoto ?? this.proofPhoto,
+      createdDate: createdDate ?? this.createdDate,
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'id': id,
-      'mobileNumber': mobileNumber,
-      'address': address,
-      'customerName': customerName,
-      'guardianName': guardianName,
-      'takenDate': takenDate,
-      'takenAmount': takenAmount,
-      'rateOfInterest': rateOfInterest,
-      'itemName': itemName,
-      'transactionType': transactionType,
-      'paidDate': paidDate,
-      'via': via,
-      'paidAmount': paidAmount,
-      'totalIntrest': totalIntrest,
-      'dueTime': dueTime,
-      'photoCustomer': photoCustomer,
-      'photoItem': photoItem,
-      'photoProof': photoProof,
+      'customerId': customerId,
+      'itemId': itemId,
+      'transacrtionDate': transacrtionDate,
+      'transacrtionType': transacrtionType,
+      'amount': amount,
+      'intrestRate': intrestRate,
+      'intrestAmount': intrestAmount,
+      'remainingAmount': remainingAmount,
+      'proofPhoto': proofPhoto,
+      'createdDate': createdDate,
     };
   }
 
-  factory TransactionsHistory.fromMap(Map<String, dynamic> map) {
-    return TransactionsHistory(
-      id: map['id']?.toInt(),
-      mobileNumber: map['mobileNumber'] ?? '',
-      address: map['address'] ?? '',
-      customerName: map['customerName'] ?? '',
-      guardianName: map['guardianName'] ?? '',
-      takenDate: map['takenDate'] ?? '',
-      takenAmount: map['takenAmount']?.toInt() ?? 0,
-      rateOfInterest: map['rateOfInterest']?.toDouble() ?? 0.0,
-      itemName: map['itemName'] ?? '',
-      transactionType: map['transactionType']?.toInt() ?? 0,
-      paidDate: map['paidDate'],
-      via: map['via'],
-      paidAmount: map['paidAmount']?.toInt(),
-      totalIntrest: map['totalIntrest']?.toInt(),
-      dueTime: map['dueTime'],
-      photoProof: map['photoProof'] ?? '',
-      photoItem: map['photoItem'] ?? '',
-      photoCustomer: map['photoCustomer'] ?? '',
+  factory Trx.fromMap(Map<String, dynamic> map) {
+    return Trx(
+      id: map['id'] != null ? map['id'] as int : null,
+      customerId: map['customerId'] as int,
+      itemId: map['itemId'] as int,
+      transacrtionDate: map['transacrtionDate'] as String,
+      transacrtionType: map['transacrtionType'] as String,
+      amount: map['amount'] as double,
+      intrestRate: map['intrestRate'] as double,
+      intrestAmount: map['intrestAmount'] as double,
+      remainingAmount: map['remainingAmount'] as double,
+      proofPhoto: map['proofPhoto'] as String,
+      createdDate: map['createdDate'] as String,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory TransactionsHistory.fromJson(String source) => TransactionsHistory.fromMap(json.decode(source));
+  factory Trx.fromJson(String source) => Trx.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'Transactions(id: $id, mobileNumber: $mobileNumber, address: $address, customerName: $customerName, guardianName: $guardianName, takenDate: $takenDate, takenAmount: $takenAmount, rateOfInterest: $rateOfInterest, itemName: $itemName, transactionType: $transactionType, paidDate: $paidDate, via: $via, paidAmount: $paidAmount, totalIntrest: $totalIntrest, dueTime: $dueTime)';
+    return 'Transaction(id: $id, customerId: $customerId, itemId: $itemId, transacrtionDate: $transacrtionDate, transacrtionType: $transacrtionType, amount: $amount, intrestRate: $intrestRate, intrestAmount: $intrestAmount, remainingAmount: $remainingAmount, proofPhoto: $proofPhoto, createdDate: $createdDate)';
   }
 
   @override
-  bool operator ==(Object other) {
+  bool operator ==(covariant Trx other) {
     if (identical(this, other)) return true;
 
-    return other is TransactionsHistory &&
-        other.id == id &&
-        other.mobileNumber == mobileNumber &&
-        other.address == address &&
-        other.customerName == customerName &&
-        other.guardianName == guardianName &&
-        other.takenDate == takenDate &&
-        other.takenAmount == takenAmount &&
-        other.rateOfInterest == rateOfInterest &&
-        other.itemName == itemName &&
-        other.transactionType == transactionType &&
-        other.paidDate == paidDate &&
-        other.via == via &&
-        other.paidAmount == paidAmount &&
-        other.totalIntrest == totalIntrest &&
-        other.dueTime == dueTime;
+    return other.id == id &&
+        other.customerId == customerId &&
+        other.itemId == itemId &&
+        other.transacrtionDate == transacrtionDate &&
+        other.transacrtionType == transacrtionType &&
+        other.amount == amount &&
+        other.intrestRate == intrestRate &&
+        other.intrestAmount == intrestAmount &&
+        other.remainingAmount == remainingAmount &&
+        other.proofPhoto == proofPhoto &&
+        other.createdDate == createdDate;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-        mobileNumber.hashCode ^
-        address.hashCode ^
-        customerName.hashCode ^
-        guardianName.hashCode ^
-        takenDate.hashCode ^
-        takenAmount.hashCode ^
-        rateOfInterest.hashCode ^
-        itemName.hashCode ^
-        transactionType.hashCode ^
-        paidDate.hashCode ^
-        via.hashCode ^
-        paidAmount.hashCode ^
-        totalIntrest.hashCode ^
-        dueTime.hashCode;
+        customerId.hashCode ^
+        itemId.hashCode ^
+        transacrtionDate.hashCode ^
+        transacrtionType.hashCode ^
+        amount.hashCode ^
+        intrestRate.hashCode ^
+        intrestAmount.hashCode ^
+        remainingAmount.hashCode ^
+        proofPhoto.hashCode ^
+        createdDate.hashCode;
   }
 }

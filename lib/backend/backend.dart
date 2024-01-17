@@ -1,46 +1,72 @@
 import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:sqflite/sqflite.dart' as sql;
+import 'package:sqflite/sqlite_api.dart';
 
 class BackEnd {
   static Future<void> createTable(sql.Database database) async {
-    await database.execute("""CREATE TABLE CUSTOMERS(
-      ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-      MOBILE_NUMBER TEXT NOT NULL,
-      ADDRESS TEXT NOT NULL,
-      CUSTOMER_NAME TEXT NOT NULL,
-      GUARDIAN_NAME TEXT NOT NULL,
-      TAKEN_AMOUNT INT NOT NULL,
-      RATE_OF_INTEREST DOUBLE NOT NULL,
-      TAKEN_DATE TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      ITEM_NAME TEXT NOT NULL,
-      TRANSFER INT NOT NULL,
-      PHOTO_PROOF TEXT NOT NULL,
-      PHOTO_ITEM TEXT NOT NULL,
-      PHOTO_CUSTOMER TEXT NOT NULL,
-      PAID_DATE TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )""");
-    await database.execute("""CREATE TABLE TRANSACTIONS(
-      ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-      MOBILE_NUMBER TEXT NOT NULL,
-      ADDRESS TEXT NOT NULL,
-      CUSTOMER_NAME TEXT NOT NULL,
-      GUARDIAN_NAME TEXT NOT NULL,
-      TAKEN_DATE TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      TAKEN_AMOUNT INT NOT NULL,
-      RATE_OF_INTEREST DOUBLE NOT NULL,
-      ITEM_NAME TEXT NOT NULL,
-      TRANSACTION_TYPE INT NOT NULL,
-      PAID_DATE TEXT,
-      VIA TEXT,
-      PAID_AMOUNT DOUBLE,
-      TOTAL_INTREST DOUBLE,
-      DUE_TIME TEXT,
-      PHOTO_PROOF TEXT NOT NULL,
-      PHOTO_ITEM TEXT NOT NULL,
-      PHOTO_CUSTOMER TEXT NOT NULL
-    )""");
+    //// create [new tables]
+    await database.execute("""
+          -- Customers Table
+          CREATE TABLE Customers (
+          Customer_ID      INTEGER PRIMARY KEY AUTOINCREMENT,
+          Customer_Name    TEXT,
+          Gaurdian_Name    TEXT,
+          Customer_Address TEXT,
+          Contact_Number   TEXT UNIQUE NOT NULL,
+          Customer_Photo   TEXT,
+          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          );
+      """);
+
+    await database.execute("""
+          -- Items Table
+          CREATE TABLE Items (
+          Item_ID          INTEGER PRIMARY KEY AUTOINCREMENT,
+          Customer_ID      INTEGER REFERENCES Customers(Customer_ID),
+          Item_Name        TEXT,
+          Item_Description TEXT,
+          Pawned_Date      TEXT,
+          Expiry_Date      TEXT,
+          Pawn_Amount      REAL,
+          Item_Status      TEXT,
+          Item_Photo       TEXT,
+          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          );
+        """);
+
+    await database.execute("""
+          -- Transactions Table
+          CREATE TABLE Transactions (
+          Transaction_ID   INTEGER PRIMARY KEY AUTOINCREMENT,
+          Customer_ID      INTEGER REFERENCES Customers(Customer_ID),
+          Item_ID          INTEGER REFERENCES Items(Item_ID),
+          Transaction_Date TEXT,
+          Transaction_Type TEXT,
+          Amount           REAL,
+          Interest_Rate    REAL,
+          Interest_Amount  REAL,
+          Remaining_Amount REAL,
+          Proof_Photo      TEXT,
+          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          );
+        """);
+    await database.execute("""
+          -- Payments Table
+          CREATE TABLE Payments (
+          Payment_ID       INTEGER PRIMARY KEY AUTOINCREMENT,
+          Transaction_ID   INTEGER REFERENCES Transactions(Transaction_ID),
+          Payment_Date     TEXT,
+          Amount_Paid      REAL,
+          Payment_Type     TEXT,
+          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          );
+        """);
+    await database.execute("""
+             PRAGMA foreign_keys = ON
+        """);
   }
 
   // by providing the path the data will store in that path whene it reinstall app data will be safe
@@ -48,220 +74,310 @@ class BackEnd {
   static Future<sql.Database> db() async {
     final directory = await getApplicationDocumentsDirectory();
     final path = '${directory.path}/itdata.db';
+    print(path);
     return sql.openDatabase(path, version: 1, onCreate: (sql.Database database, int version) async {
       await createTable(database);
     });
   }
 
-  // create new customer entry
-
-  static Future<bool> createNewEntry(Customer customer) async {
-    final db = await BackEnd.db();
+  //// C U S T O M E R S
+  /// create new customer entry
+  static Future<int> createNewCustomer(Customer customer) async {
     try {
-      final data = {
-        "MOBILE_NUMBER": customer.mobileNumber,
-        "ADDRESS": customer.address,
-        "CUSTOMER_NAME": customer.customerName,
-        "GUARDIAN_NAME": customer.guardianName,
-        "TAKEN_DATE": customer.takenDate,
-        "TAKEN_AMOUNT": customer.takenAmount,
-        "RATE_OF_INTEREST": customer.rateOfInterest,
-        "ITEM_NAME": customer.itemName,
-        "TRANSFER": customer.transaction,
-        "PHOTO_CUSTOMER": customer.photoCustomer,
-        "PHOTO_ITEM": customer.photoItem,
-        "PHOTO_PROOF": customer.photoProof,
+      final db = await BackEnd.db();
+      final Map<String, Object> data = {
+        "Customer_Name": customer.name,
+        "Gaurdian_Name": customer.guardianName,
+        "Customer_Address": customer.address,
+        "Contact_Number": customer.number,
+        "Customer_Photo": customer.photo,
+        "Created_Date": customer.createdDate,
       };
-      final id = await db.insert('CUSTOMERS', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
-      if (id == 0) return false;
-      return true;
+      final int id = await db.insert('Customers', data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
+      return id;
     } catch (e) {
-      return false;
+      return 0;
     }
   }
 
-  //create new transaction
+  /// fetch all customer data
+  static Future<List<Customer>> fetchAllCustomerData() async {
+    final Database db = await BackEnd.db();
+    final List<Map<String, Object?>> response = await db.rawQuery("""SELECT * FROM Customers""");
+    return Customer.toList(response);
+  }
 
-  static Future<bool> createNewTransaction(TransactionsHistory transacrtion) async {
-    final db = await BackEnd.db();
+  //// I T E M S
+  /// create a new item row
+  static Future createNewItem(Items item) async {
     try {
-      final data = {
-        "MOBILE_NUMBER": transacrtion.mobileNumber,
-        "ADDRESS": transacrtion.address,
-        "CUSTOMER_NAME": transacrtion.customerName,
-        "GUARDIAN_NAME": transacrtion.guardianName,
-        "TAKEN_DATE": transacrtion.takenDate,
-        "TAKEN_AMOUNT": transacrtion.takenAmount,
-        "RATE_OF_INTEREST": transacrtion.rateOfInterest,
-        "ITEM_NAME": transacrtion.itemName,
-        "TRANSACTION_TYPE": transacrtion.transactionType,
-        "PAID_DATE": transacrtion.paidDate,
-        "VIA": transacrtion.via,
-        "PAID_AMOUNT": transacrtion.paidAmount,
-        "TOTAL_INTREST": transacrtion.totalIntrest,
-        "DUE_TIME": transacrtion.dueTime,
-        "PHOTO_CUSTOMER": transacrtion.photoCustomer,
-        "PHOTO_ITEM": transacrtion.photoItem,
-        "PHOTO_PROOF": transacrtion.photoProof,
+      final db = await BackEnd.db();
+      final Map<String, Object> data = {
+        "Customer_ID": item.customerid,
+        "Item_Name": item.name,
+        "Item_Description": item.description,
+        "Pawned_Date": item.pawnedDate,
+        "Expiry_Date": item.expiryDate,
+        "Pawn_Amount": item.pawnAmount,
+        "Item_Status": item.status,
+        "Item_Photo": item.photo,
+        "Created_Date": item.createdDate
       };
-
-      final id = await db.insert('TRANSACTIONS', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
-      if (id == 0) return false;
-      return true;
+      final int id = await db.insert("Items", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
+      return id;
     } catch (e) {
-      return false;
+      print(e.toString());
+      return 0;
     }
   }
 
-  // get latest Transaction
-
-  static Future<List<TransactionsHistory>> fetchLatestTransactions() async {
-    final db = await BackEnd.db();
-    List<Map<String, Object?>> result = await db.rawQuery("""
-      SELECT * FROM TRANSACTIONS ORDER BY TAKEN_DATE 
-    """);
-    if (result.isNotEmpty) {
-      return TransactionsHistory.toList(result);
-    } else {
-      return [];
-    }
+  /// fetch all items
+  static fetchAllItems() async {
+    final Database db = await BackEnd.db();
+    final List<Map<String, Object?>> response = await db.rawQuery("""SELECT * FROM Items""");
+    return Customer.toList(response);
   }
 
-  // get called first  app lunches or reload app
+  //// T R A N S A C T I O N S
 
-  static Future<List<Customer>> fetchAllData() async {
-    final db = await BackEnd.db();
+  /// create new Transaction
 
+  static Future<int> createNewTransaction(Trx transasction) async {
     try {
-      final response = await db.query('CUSTOMERS', orderBy: 'ID');
-      final List<Customer> result = Customer.toList(response);
-      return result;
+      final db = await BackEnd.db();
+      final Map<String, dynamic> data = {
+        "Transaction_ID": transasction.customerId,
+        "Customer_ID": transasction.customerId,
+        "Item_ID": transasction.itemId,
+        "Transaction_Date": transasction.transacrtionDate,
+        "Transaction_Type": transasction.transacrtionType,
+        "Amount": transasction.amount,
+        "Interest_Rate": transasction.intrestRate,
+        "Interest_Amount": transasction.intrestAmount,
+        "Remaining_Amount": transasction.remainingAmount,
+        "Proof_Photo": transasction.proofPhoto,
+        "Created_Date": transasction.createdDate,
+      };
+      final response = await db.insert("Transactions", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
+      return response;
     } catch (e) {
-      return [];
+      return 0;
     }
   }
 
-  // get the entry by mobile number
-
-  static Future<List<Map<String, dynamic>>> getCustomerEntriesByMobileNumber(String mobileNumber, int transfer) async {
-    final db = await BackEnd.db();
-
-    return db.query(
-      'CUSTOMERS',
-      orderBy: 'ID',
-      where: "MOBILE_NUMBER = ? and TRANSFER = ?",
-      whereArgs: [mobileNumber, transfer],
-    );
-  }
-  // get the transaction by mobile number
-
-  static Future<List<TransactionsHistory>> getTransactionsEntriesByMobileNumber(String mobileNumber) async {
-    final db = await BackEnd.db();
-    final List<Map<String, Object?>> data = await db.query(
-      'TRANSACTIONS',
-      orderBy: 'ID',
-      where: "MOBILE_NUMBER = ?",
-      whereArgs: [mobileNumber],
-    );
-    List<TransactionsHistory> result = TransactionsHistory.toList(data);
-    if (result.isNotEmpty) {
-      return result;
-    } else {
-      return [];
-    }
-  }
-
-  // get the transaction by Customer Name
-
-  static Future<List<TransactionsHistory>> getTransactionsEntriesByCustomerName(String name) async {
-    final db = await BackEnd.db();
-    final List<Map<String, Object?>> data = await db.query(
-      'TRANSACTIONS',
-      orderBy: 'ID',
-      where: "CUSTOMER_NAME = ?",
-      whereArgs: [name],
-    );
-    List<TransactionsHistory> result = TransactionsHistory.toList(data);
-    if (result.isNotEmpty) {
-      return result;
-    } else {
-      return [];
-    }
-  }
-
-  // Update the item
-
-  static Future<int> updateCustomerStatus(int id, int code) async {
-    final db = await BackEnd.db();
-    final data = {'TRANSFER': code, 'PAID_DATE': DateTime.now().toString()};
-    final result = await db.update('CUSTOMERS', data, where: "id = ?", whereArgs: [id]);
-    return result;
-  }
-
-  // Delete entry
-
-  static Future<bool> deleteItem(int id) async {
-    final db = await BackEnd.db();
+  static Future<List<Trx>> fetchAllTransactions() async {
     try {
-      await db.delete('CUSTOMERS', where: "id = ?", whereArgs: [id]);
-      return true;
+      final db = await BackEnd.db();
+      final response = await db.rawQuery("""
+          SELECT * FROM Transactions
+      """);
+      return Trx.toList(response);
     } catch (e) {
-      return false;
+      return [];
     }
   }
 
-  // fetch the all paid transctions
+  // ///[createNewTransaction] creates a new transaction in the DataBase
+  // static Future<int> createNewTransaction(TransactionsHistory transacrtion) async {
+  //   final db = await BackEnd.db();
+  //   try {
+  //     final data = {
+  //       "CUST_ID": transacrtion.custId,
+  //       "TAKEN_DATE": transacrtion.takenDate,
+  //       "TAKEN_AMOUNT": transacrtion.takenAmount,
+  //       "RATE_OF_INTEREST": transacrtion.rateOfInterest,
+  //       "ITEM_NAME": transacrtion.itemName,
+  //       "TRANSACTION_TYPE": transacrtion.transactionType,
+  //       "PAID_DATE": transacrtion.paidDate,
+  //       "VIA": transacrtion.via,
+  //       "PAID_AMOUNT": transacrtion.paidAmount,
+  //       "TOTAL_INTREST": transacrtion.totalIntrest,
+  //       "DUE_TIME": transacrtion.dueTime,
+  //       "PHOTO_ITEM": transacrtion.photoItem ?? "",
+  //       "PHOTO_PROOF": transacrtion.photoProof ?? "",
+  //       "CREATED_DATE": DateTime.now().toString(),
+  //     };
 
-  static Future<List<Map<String, dynamic>>> fetchAllPaidTransactions() async {
-    final db = await BackEnd.db();
-    return db.query("CUSTOMERS", where: "TRANSFER = ?", whereArgs: [2]);
-  }
+  //     final id = await db.insert('TRANSACTIONS', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
+  //     return id;
+  //   } catch (e) {
+  //     print(e);
+  //     return 0;
+  //   }
+  // }
 
-  // fetch the paid transactions of a requried number
-
-  static Future<List<Map<String, dynamic>>> fetchThisNumberPaidTransactions(String mobileNumber) async {
-    final db = await BackEnd.db();
-    return db.query("CUSTOMERS", where: "MOBILE_NUMBER = ? and TRANSFER = ?", whereArgs: [mobileNumber, 2]);
-  }
-
-  // fetch the paid transactions of a requried number
-
-  static Future<List<Customer>> fetchThisIDPaidTransactions(String mobileNumber) async {
-    final db = await BackEnd.db();
-    List<Customer> data = Customer.toList(
-        db.query("CUSTOMERS", where: "MOBILE_NUMBER = ? and TRANSFER = ?", whereArgs: [mobileNumber, 2]));
-    return data;
-  }
-
-  // // fetch the latest transactions
-
-  // static Future<List<Customer>> fetchLatestTransactions() async {
+  // /// [fetchLatestTransactions] : get latest
+  // /// Transactions of all customers from the TRANSACTIONS Tables without Customers
+  // static Future<List<TransactionsHistory>> fetchLatestTransactions() async {
   //   final db = await BackEnd.db();
   //   List<Map<String, Object?>> result = await db.rawQuery("""
-  //     SELECT * FROM CUSTOMERS ORDER BY ID DESC
+  //     SELECT * FROM TRANSACTIONS ORDER BY TAKEN_DATE
   //   """);
   //   if (result.isNotEmpty) {
-  //     return Customer.toList(result);
+  //     return TransactionsHistory.toList(result);
   //   } else {
   //     return [];
   //   }
   // }
 
-  //todo  total amount querys
+  // /// [fetchUserHistory] fetch user history
+  // static Future<List<UserHistory>> fetchUserHistory() async {
+  //   final db = await BackEnd.db();
+  //   try {
+  //     List<Map<String, Object?>> response = await db.rawQuery("""
+  //         SELECT * FROM USER_HISTORY
+  //         """);
+  //     return UserHistory.toList(response);
+  //   } catch (e) {
+  //     print(e);
+  //     return [];
+  //   }
+  // }
 
-  // total ammmountInvested present
-  static Future<int> fetchUserPresentInvestedAmount() async {
-    final db = await BackEnd.db();
-    List<Map<String, Object?>> result = await db.rawQuery("""
-    SELECT SUM(TAKEN_AMOUNT) FROM CUSTOMERS WHERE TRANSFER = 1
-    """);
-    if (result[0]["SUM(TAKEN_AMOUNT)"] != null) {
-      int finalResut = (result[0]["SUM(TAKEN_AMOUNT)"]) as int;
-      return finalResut;
-    } else {
-      return 0;
-    }
-  }
+  // // get called first  app lunches or reload app
+
+  // static Future<List<Customer>> fetchAllCustomersData() async {
+  //   final db = await BackEnd.db();
+
+  //   try {
+  //     final response = await db.query('CUSTOMERS', orderBy: 'CUST_ID');
+  //     final List<Customer> result = Customer.toList(response);
+  //     print("resumt $result");
+  //     return result;
+  //   } catch (e) {
+  //     print(e);
+  //     return [];
+  //   }
+  // }
+
+  // /// [fetchAllCustomersWithTransactions] fetchs the all users with there transactions from the Db
+  // List<Map<Customer, List<TransactionsHistory>>> fetchAllCustomersWithTransactions() {
+  //   //todo write a query to fetch the all users with there transactions from the Db and map them
+  //   //todo and list this them
+  //   return List.empty();
+  // }
+
+  // /// [getCustomerEntriesByMobileNumber] get the entry by mobile number
+  // static Future<List<Map<String, dynamic>>> getCustomerEntriesByMobileNumber(String mobileNumber, int transfer) async {
+  //   final db = await BackEnd.db();
+
+  //   return db.query(
+  //     'CUSTOMERS',
+  //     orderBy: 'ID',
+  //     where: "MOBILE_NUMBER = ? and TRANSFER = ?",
+  //     whereArgs: [mobileNumber, transfer],
+  //   );
+  // }
+  // // get the transaction by mobile number
+
+  // static Future<List<TransactionsHistory>> getTransactionsEntriesByMobileNumber(String mobileNumber) async {
+  //   final db = await BackEnd.db();
+  //   final List<Map<String, Object?>> data = await db.query(
+  //     'TRANSACTIONS',
+  //     orderBy: 'ID',
+  //     where: "MOBILE_NUMBER = ?",
+  //     whereArgs: [mobileNumber],
+  //   );
+  //   List<TransactionsHistory> result = TransactionsHistory.toList(data);
+  //   if (result.isNotEmpty) {
+  //     return result;
+  //   } else {
+  //     return [];
+  //   }
+  // }
+
+  // // get the transaction by Customer Name
+
+  // static Future<List<TransactionsHistory>> getTransactionsEntriesByCustomerName(String name) async {
+  //   final db = await BackEnd.db();
+  //   final List<Map<String, Object?>> data = await db.query(
+  //     'TRANSACTIONS',
+  //     orderBy: 'ID',
+  //     where: "CUSTOMER_NAME = ?",
+  //     whereArgs: [name],
+  //   );
+  //   List<TransactionsHistory> result = TransactionsHistory.toList(data);
+  //   if (result.isNotEmpty) {
+  //     return result;
+  //   } else {
+  //     return [];
+  //   }
+  // }
+
+  // // Update the item
+
+  // static Future<int> updateCustomerStatus(int id, int code) async {
+  //   final db = await BackEnd.db();
+  //   final data = {'TRANSFER': code, 'PAID_DATE': DateTime.now().toString()};
+  //   final result = await db.update('CUSTOMERS', data, where: "id = ?", whereArgs: [id]);
+  //   return result;
+  // }
+
+  // // Delete entry
+
+  // static Future<bool> deleteItem(int id) async {
+  //   final db = await BackEnd.db();
+  //   try {
+  //     await db.delete('CUSTOMERS', where: "id = ?", whereArgs: [id]);
+  //     return true;
+  //   } catch (e) {
+  //     return false;
+  //   }
+  // }
+
+  // // fetch the all paid transctions
+
+  // static Future<List<Map<String, dynamic>>> fetchAllPaidTransactions() async {
+  //   final db = await BackEnd.db();
+  //   return db.query("CUSTOMERS", where: "TRANSFER = ?", whereArgs: [2]);
+  // }
+
+  // // fetch the paid transactions of a requried number
+
+  // static Future<List<Map<String, dynamic>>> fetchThisNumberPaidTransactions(String mobileNumber) async {
+  //   final db = await BackEnd.db();
+  //   return db.query("CUSTOMERS", where: "MOBILE_NUMBER = ? and TRANSFER = ?", whereArgs: [mobileNumber, 2]);
+  // }
+
+  // // fetch the paid transactions of a requried number
+
+  // static Future<List<Customer>> fetchThisIDPaidTransactions(String mobileNumber) async {
+  //   final db = await BackEnd.db();
+  //   List<Customer> data = Customer.toList(
+  //     await db.query("CUSTOMERS", where: "MOBILE_NUMBER = ? and TRANSFER = ?", whereArgs: [mobileNumber, 2]),
+  //   );
+  //   return data;
+  // }
+
+  // // // fetch the latest transactions
+
+  // // static Future<List<Customer>> fetchLatestTransactions() async {
+  // //   final db = await BackEnd.db();
+  // //   List<Map<String, Object?>> result = await db.rawQuery("""
+  // //     SELECT * FROM CUSTOMERS ORDER BY ID DESC
+  // //   """);
+  // //   if (result.isNotEmpty) {
+  // //     return Customer.toList(result);
+  // //   } else {
+  // //     return [];
+  // //   }
+  // // }
+
+  // //todo  total amount querys
+
+  // // total ammmountInvested present
+  // static Future<int> fetchUserPresentInvestedAmount() async {
+  //   final db = await BackEnd.db();
+  //   List<Map<String, Object?>> result = await db.rawQuery("""
+  //   SELECT SUM(TAKEN_AMOUNT) FROM CUSTOMERS WHERE TRANSFER = 1
+  //   """);
+  //   if (result[0]["SUM(TAKEN_AMOUNT)"] != null) {
+  //     int finalResut = (result[0]["SUM(TAKEN_AMOUNT)"]) as int;
+  //     return finalResut;
+  //   } else {
+  //     return 0;
+  //   }
+  // }
 
   // close a data base
 

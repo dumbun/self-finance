@@ -1,271 +1,164 @@
-// ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
+import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/providers/customers_provider.dart';
-import 'package:self_finance/providers/transactions_history_provider.dart';
+import 'package:self_finance/providers/customer_provider.dart';
+import 'package:self_finance/providers/items_provider.dart';
+import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/views/Add%20New%20Entry/providers.dart';
-import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:self_finance/widgets/date_picker_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
+import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
 
-class AddNewEntryView extends ConsumerStatefulWidget {
-  const AddNewEntryView({super.key});
+/// [AddNewEntery] is a view
+/// which helps the user to save a new customer details with a transcation
+class AddNewEntery extends ConsumerStatefulWidget {
+  const AddNewEntery({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _AddNewEntryViewState();
+  ConsumerState<AddNewEntery> createState() => _AddNewEnteryState();
 }
 
-class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
+class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
+  final TextEditingController _customerName = TextEditingController();
+  final TextEditingController _takenDate = TextEditingController();
+  final TextEditingController _gaurdianName = TextEditingController();
+  final TextEditingController _address = TextEditingController();
+  final TextEditingController _mobileNumber = TextEditingController();
+  final TextEditingController _takenAmount = TextEditingController();
+  final TextEditingController _rateOfIntrest = TextEditingController();
+  final TextEditingController _itemDescription = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late final _address = TextEditingController();
-  late final _customerName = TextEditingController();
-  late final _guardianName = TextEditingController();
-  late final _mobileNumber = TextEditingController();
-  late final _takenAmount = TextEditingController();
-  late final _rateOfInterest = TextEditingController();
-  late final _itemName = TextEditingController();
-  late final _takenDate = TextEditingController();
-  late bool _isloading;
-
-  @override
-  void initState() {
-    _isloading = false;
-    super.initState();
-  }
+  bool _isloading = false;
 
   @override
   void dispose() {
-    _address.dispose();
     _customerName.dispose();
-    _guardianName.dispose();
     _mobileNumber.dispose();
-    _takenAmount.dispose();
-    _rateOfInterest.dispose();
-    _itemName.dispose();
     _takenDate.dispose();
+    _takenAmount.dispose();
+    _gaurdianName.dispose();
+    _address.dispose();
+    _rateOfIntrest.dispose();
+    _itemDescription.dispose();
     super.dispose();
-  }
-
-  bool validateAndSave() {
-    final FormState? form = _formKey.currentState;
-    if (form!.validate()) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    void addNewEntry({
-      required String mobileNumber,
-      required String address,
-      required String customerName,
-      required String guardianName,
-      required int takenAmount,
-      required double rateOfInterest,
-      required String itemName,
-      required String takenDate,
-      required BuildContext context,
-    }) async {
-      try {
-        final String photoCustomer = ref.watch(pickedCustomerProfileImageStringProvider);
-        final String photoProof = ref.watch(pickedCustomerProofImageStringProvider);
-        final String photoItem = ref.watch(pickedCustomerItemImageStringProvider);
-
-        final Customer customer = Customer(
-          mobileNumber: mobileNumber,
-          address: address,
-          customerName: customerName,
-          guardianName: guardianName,
-          takenDate: takenDate,
-          takenAmount: takenAmount,
-          rateOfInterest: rateOfInterest,
-          itemName: itemName,
-          photoCustomer: photoCustomer,
-          photoProof: photoProof,
-          photoItem: photoItem,
-          transaction: 1,
-        );
-
-        TransactionsHistory transaction = TransactionsHistory(
-          mobileNumber: mobileNumber,
-          address: address,
-          customerName: customerName,
-          guardianName: guardianName,
-          takenDate: takenDate,
-          takenAmount: takenAmount,
-          rateOfInterest: rateOfInterest,
-          itemName: itemName,
-          transactionType: 1,
-          photoCustomer: photoCustomer,
-          photoProof: photoProof,
-          photoItem: photoItem,
-        );
-
-        bool createNewCustomerEntry = await ref
-            .read(
-              asyncCustomersProvider.notifier,
-            )
-            .addCustomer(customer: customer);
-
-        createNewCustomerEntry = await ref
-            .watch(
-              asyncTransactionsHistoryProvider.notifier,
-            )
-            .addTrasaction(transaction: transaction);
-
-        setState(() {
-          _isloading = false;
-        });
-
-        if (createNewCustomerEntry) {
-          /// reseting the providers so that for next entery the provider will show as an empty String
-          ref.read(pickedCustomerItemImageStringProvider.notifier).update((state) => "");
-          ref.read(pickedCustomerProfileImageStringProvider.notifier).update((state) => "");
-          ref.read(pickedCustomerProofImageStringProvider.notifier).update((state) => "");
-          Navigator.of(context).pop();
-          snackBarWidget(context: context, message: savedSuccessfullyText);
-        } else {
-          AlertDilogs.alertDialogWithOneAction(context, "Fail", "Data not saved please try again 😥 ");
-        }
-      } catch (e) {
-        AlertDilogs.alertDialogWithOneAction(context, "error", e.toString());
-      }
-    }
-
-    return GestureDetector(
-      onTap: Utility.unfocus,
-      child: Scaffold(
-        appBar: AppBar(title: const Text("Add new Entry")),
-        body: SafeArea(
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        title: const BodyTwoDefaultText(text: "Add new Entry with new Customer"),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 10.sp, horizontal: 16.sp),
           child: Form(
             key: _formKey,
             child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    InputTextField(
-                      keyboardType: TextInputType.streetAddress,
-                      controller: _address,
-                      hintText: "Place",
-                    ),
-                    SizedBox(height: 20.sp),
-                    InputTextField(
-                      keyboardType: TextInputType.name,
-                      controller: _customerName,
-                      hintText: "Name",
-                    ),
-                    SizedBox(height: 20.sp),
-                    InputTextField(
-                      keyboardType: TextInputType.name,
-                      controller: _guardianName,
-                      hintText: "Guardian Name",
-                    ),
-                    SizedBox(height: 20.sp),
-                    InputTextField(
-                      validator: (value) {
-                        if (Utility.isValidPhoneNumber(value)) {
-                          return null;
-                        } else {
-                          return "Please Enter correct Mobile Number";
-                        }
-                      },
-                      controller: _mobileNumber,
-                      keyboardType: TextInputType.phone,
-                      hintText: "Phone Number ( please add with country code )",
-                    ),
-                    SizedBox(height: 20.sp),
-                    InputTextField(
-                      controller: _takenAmount,
-                      keyboardType: TextInputType.number,
-                      hintText: "Amount",
-                    ),
-                    SizedBox(height: 20.sp),
-                    InputTextField(
-                      controller: _rateOfInterest,
-                      keyboardType: TextInputType.number,
-                      hintText: "Rate of Intrest %",
-                    ),
-                    SizedBox(height: 20.sp),
-                    InputTextField(
-                      keyboardType: TextInputType.name,
-                      controller: _itemName,
-                      hintText: "Item Name",
-                    ),
-                    SizedBox(height: 20.sp),
-                    InputDatePicker(
-                      controller: _takenDate,
-                      labelText: "Enter Date ( dd-MM-yyyy )",
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(1950),
-                      //DateTime.now() - not to allow to choose before today.
-                      lastDate: DateTime(9999),
-                    ),
-                    SizedBox(height: 24.sp),
-                    _buildImagePickers(),
-                    SizedBox(height: 24.sp),
-                    Visibility(
-                      visible: _isloading,
-                      replacement: RoundedCornerButton(
-                        icon: Icons.person_add_rounded,
-                        onPressed: () {
-                          if (validateAndSave()) {
-                            setState(() {
-                              _isloading = true;
-                            });
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Customer name
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    keyboardType: TextInputType.name,
+                    hintText: " Customer Full Name ",
+                    controller: _customerName,
+                  ),
 
-                            double doubleCheck(String text, {String errorString = "error"}) {
-                              try {
-                                return double.parse(text);
-                              } catch (e) {
-                                setState(() {
-                                  _isloading = false;
-                                });
-                                return AlertDilogs.alertDialogWithOneAction(context, errorString, e.toString());
-                              }
-                            }
+                  // gaurfian Name
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    keyboardType: TextInputType.name,
+                    controller: _gaurdianName,
+                    hintText: " Gaurdian Full Name ",
+                  ),
 
-                            int intCheck(String text, {String errorString = "error"}) {
-                              try {
-                                return int.parse(text);
-                              } catch (e) {
-                                setState(() {
-                                  _isloading = false;
-                                });
-                                return AlertDilogs.alertDialogWithOneAction(context, errorString, e.toString());
-                              }
-                            }
+                  // customer address
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    keyboardType: TextInputType.streetAddress,
+                    controller: _address,
+                    hintText: " Customer Address ",
+                  ),
 
-                            addNewEntry(
-                              mobileNumber: _mobileNumber.text,
-                              address: _address.text,
-                              customerName: _customerName.text,
-                              guardianName: _guardianName.text,
-                              takenAmount: intCheck(_takenAmount.text, errorString: "Taken Amount Error"),
-                              rateOfInterest: doubleCheck(_rateOfInterest.text, errorString: "rate Of Interest Error"),
-                              itemName: _itemName.text,
-                              takenDate: _takenDate.text,
-                              context: context,
-                            );
-                          }
-                        },
-                        text: "save",
-                      ),
-                      child: const CircularProgressIndicator(),
+                  // customer mobile number
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    keyboardType: TextInputType.phone,
+                    controller: _mobileNumber,
+                    hintText: " Customer Mobile Number ",
+                    validator: (value) {
+                      if (Utility.isValidPhoneNumber(value)) {
+                        return null;
+                      } else {
+                        return "please enter correct mobile number ";
+                      }
+                    },
+                  ),
+
+                  //taken amount
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    keyboardType: TextInputType.number,
+                    hintText: " Taken amount ",
+                    validator: (value) => _amountValidation(value: value),
+                    controller: _takenAmount,
+                  ),
+
+                  // rate of intrest
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    validator: (value) => _amountValidation(value: value),
+                    hintText: " Rate of Intrest % ",
+                    controller: _rateOfIntrest,
+                    keyboardType: const TextInputType.numberWithOptions(signed: false, decimal: true),
+                  ),
+
+                  // taken date picker
+                  SizedBox(height: 20.sp),
+                  InputDatePicker(
+                    controller: _takenDate,
+                    labelText: " Taken Date dd-MM-yyyy ",
+                    firstDate: DateTime(1000),
+                    lastDate: DateTime.now(),
+                    initialDate: DateTime.now(),
+                  ),
+
+                  // item description
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    controller: _itemDescription,
+                    hintText: " Item Description ",
+                  ),
+
+                  // image pickers
+                  SizedBox(height: 20.sp),
+                  _buildImagePickers(),
+
+                  // save button
+                  SizedBox(height: 20.sp),
+                  Visibility(
+                    visible: _isloading,
+                    replacement: RoundedCornerButton(
+                      text: " Save + ",
+                      onPressed: _save,
                     ),
-                  ],
-                ),
+                    child: const Center(child: CircularProgressIndicator.adaptive()),
+                  ),
+                  SizedBox(height: 20.sp),
+                ],
               ),
             ),
           ),
@@ -274,7 +167,122 @@ class _AddNewEntryViewState extends ConsumerState<AddNewEntryView> {
     );
   }
 
-  _buildImagePickers() {
+  void _save() async {
+    if (_validateAndSave()) {
+      setState(() {
+        _isloading = true;
+      });
+
+      // creating the new customer
+      final Customer newCustomer = Customer(
+        name: _customerName.text,
+        guardianName: _gaurdianName.text,
+        address: _address.text,
+        number: _mobileNumber.text,
+        photo: ref.read(pickedCustomerProfileImageStringProvider),
+        createdDate: DateTime.now().toString(),
+      );
+      final int customerCreatedResponse =
+          await ref.read(asyncCustomersProvider.notifier).addCustomer(customer: newCustomer);
+
+      // creating new item becacuse every new transaction will have a proof item
+      final Items newItem = Items(
+        customerid: customerCreatedResponse,
+        name: _itemDescription.text,
+        description: _itemDescription.text,
+        pawnedDate: _takenDate.text,
+        expiryDate: DateTime.now().toString(),
+        pawnAmount: _doubleCheck(_takenAmount.text),
+        status: "Active",
+        photo: ref.read(pickedCustomerItemImageStringProvider),
+        createdDate: DateTime.now().toString(),
+      );
+      final int itemCreatedResponse = await ref.read(asyncItemsProvider.notifier).addItem(item: newItem);
+
+      // creating new transaction
+      final Trx newTransaction = Trx(
+        customerId: customerCreatedResponse,
+        itemId: itemCreatedResponse,
+        transacrtionDate: _takenDate.text,
+        transacrtionType: "Debit",
+        amount: _doubleCheck(_takenAmount.text),
+        intrestRate: _doubleCheck(_rateOfIntrest.text),
+        intrestAmount: _doubleCheck(_takenAmount.text) * (_doubleCheck(_rateOfIntrest.text) / 100),
+        remainingAmount: 0,
+        proofPhoto: ref.read(pickedCustomerProofImageStringProvider),
+        createdDate: DateTime.now().toString(),
+      );
+
+      final int transactionCreatedResponse =
+          await ref.read(asyncTransactionsProvider.notifier).addTransaction(transaction: newTransaction);
+
+      if (customerCreatedResponse != 0 && itemCreatedResponse != 0 && transactionCreatedResponse != 0) {
+        setState(() {
+          _isloading = false;
+        });
+        _afterSuccess();
+      } else {
+        setState(() {
+          _isloading = false;
+        });
+        _afterFail();
+      }
+    }
+  }
+
+  void _afterSuccess() {
+    snackBarWidget(context: context, message: "Saved Successfully 👍");
+    Navigator.pop(context);
+  }
+
+  void _afterFail() {
+    Navigator.pop(context);
+    AlertDilogs.alertDialogWithOneAction(context, "error", "Please Try again");
+  }
+
+  double _doubleCheck(String text, {String errorString = "error"}) {
+    try {
+      return double.parse(text);
+    } catch (e) {
+      setState(() {
+        _isloading = false;
+      });
+      return AlertDilogs.alertDialogWithOneAction(context, errorString, e.toString());
+    }
+  }
+
+  int _intCheck(String text, {String errorString = "error"}) {
+    try {
+      return int.parse(text);
+    } catch (e) {
+      setState(() {
+        _isloading = false;
+      });
+      return AlertDilogs.alertDialogWithOneAction(context, errorString, e.toString());
+    }
+  }
+
+  String? _amountValidation({required String? value}) {
+    if (value == null || value.isEmpty || value == "") {
+      return 'Please enter a valid value';
+    }
+    if (value.contains(",") || value.contains(" ") || value.contains("-")) {
+      return "please enter the correct value";
+    } else {
+      return null;
+    }
+  }
+
+  bool _validateAndSave() {
+    final FormState? form = _formKey.currentState;
+    if (form!.validate()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Column _buildImagePickers() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,

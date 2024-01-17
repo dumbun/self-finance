@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AppColors {
+abstract class AppColors {
   static const Color getPrimaryColor = Color(0xff027dfc);
   static const Color getLigthGreyColor = Color(0xFF8F8F98);
   static const Color getErrorColor = Colors.red;

@@ -14,7 +14,7 @@ class DetailCardWidget extends StatelessWidget {
     required this.data,
   });
 
-  final TransactionsHistory data;
+  final Trx data;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,7 @@ class DetailCardWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _buildProfilePic(),
+                // _buildProfilePic(),
                 Expanded(
                   child: Row(
                     children: [
@@ -48,30 +48,30 @@ class DetailCardWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          BodyTwoDefaultText(
-                            text: data.customerName,
-                            bold: true,
-                          ),
+                          // BodyTwoDefaultText(
+                          //   text: data.customerName,
+                          //   bold: true,
+                          // ),
                           SizedBox(height: 8.0.sp),
-                          BodyTwoDefaultText(
-                            text: data.takenDate,
-                            color: AppColors.getPrimaryColor,
-                          ),
-                          SizedBox(height: 8.0.sp),
-                          Row(
-                            children: [
-                              BodyTwoDefaultText(
-                                text: data.transactionType == 1 ? "amount - taken : " : "Paid amount : ",
-                              ),
-                              BodyTwoDefaultText(
-                                bold: true,
-                                color: data.transactionType == 1 ? AppColors.getErrorColor : AppColors.getGreenColor,
-                                text: data.transactionType == 1
-                                    ? Utility.numberFormate(data.takenAmount)
-                                    : Utility.numberFormate(data.paidAmount!),
-                              ),
-                            ],
-                          ),
+                          // BodyTwoDefaultText(
+                          //   text: data.takenDate,
+                          //   color: AppColors.getPrimaryColor,
+                          // ),
+                          // SizedBox(height: 8.0.sp),
+                          // Row(
+                          //   children: [
+                          //     BodyTwoDefaultText(
+                          //       text: data.transactionType == 1 ? "amount - taken : " : "Paid amount : ",
+                          //     ),
+                          //     BodyTwoDefaultText(
+                          //       bold: true,
+                          //       color: data.transactionType == 1 ? AppColors.getErrorColor : AppColors.getGreenColor,
+                          //       text: data.transactionType == 1
+                          //           ? Utility.numberFormate(data.takenAmount)
+                          //           : Utility.doubleFormate(data.paidAmount!),
+                          //     ),
+                          // ],
+                          // ),
                         ],
                       ),
                     ],
@@ -86,13 +86,13 @@ class DetailCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildProfilePic() {
-    return data.photoCustomer == ''
-        ? const DefaultUserImage()
-        : SizedBox(
-            height: 30.sp,
-            width: 30.sp,
-            child: Utility.imageFromBase64String(data.photoCustomer),
-          );
-  }
+  // Widget _buildProfilePic() {
+  //   return data.photoCustomer == ''
+  //       ? const DefaultUserImage()
+  //       : SizedBox(
+  //           height: 30.sp,
+  //           width: 30.sp,
+  //           child: Utility.imageFromBase64String(data.photoCustomer),
+  //         );
+  // }
 }

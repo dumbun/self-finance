@@ -1,24 +1,25 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user_provider.dart';
+part of 'items_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$asyncUserHash() => r'3aedd5b270f2670aab740e3c101fc4a245531a1f';
+String _$asyncItemsHash() => r'5be2097443333f769d088b91c344b9b57735e0ca';
 
-/// See also [AsyncUser].
-@ProviderFor(AsyncUser)
-final asyncUserProvider = AsyncNotifierProvider<AsyncUser, List>.internal(
-  AsyncUser.new,
-  name: r'asyncUserProvider',
+/// See also [AsyncItems].
+@ProviderFor(AsyncItems)
+final asyncItemsProvider =
+    AsyncNotifierProvider<AsyncItems, List<Customer>>.internal(
+  AsyncItems.new,
+  name: r'asyncItemsProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$asyncUserHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$asyncItemsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$AsyncUser = AsyncNotifier<List>;
+typedef _$AsyncItems = AsyncNotifier<List<Customer>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

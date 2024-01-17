@@ -45,7 +45,8 @@ class _AuthViewState extends State<AuthView> {
       }
 
       final authenticated = await auth.authenticate(
-        localizedReason: 'Scan your fingerprint (or face or whatever) to authenticate',
+        localizedReason:
+            'Scan your fingerprint (or face or whatever) to authenticate',
         options: const AuthenticationOptions(
           stickyAuth: true,
           useErrorDialogs: true,

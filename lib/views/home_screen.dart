@@ -15,29 +15,24 @@ class HomeScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeaderWidget(),
-          SizedBox(height: 20.sp),
+          _buildHeaderWidget(ref),
         ],
       ),
     );
   }
 
-  Consumer _buildHeaderWidget() {
-    return Consumer(
-      builder: (context, ref, child) {
-        return ref.watch(asyncUserProvider).when(
-              data: (data) {
-                return CenterTitleTextWidget(
-                  user: data[0],
-                  showUserProfile: true,
-                );
-              },
-              error: (error, stackTrace) => const Text("Welcome"),
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
-              ),
+  Widget _buildHeaderWidget(WidgetRef ref) {
+    return ref.watch(asyncUserProvider).when(
+          data: (data) {
+            return CenterTitleTextWidget(
+              user: data.first,
+              showUserProfile: true,
             );
-      },
-    );
+          },
+          error: (error, stackTrace) => const Text("Welcome"),
+          loading: () => const Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
   }
 }

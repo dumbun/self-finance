@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'customers_provider.dart';
+part of 'customer_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$asyncCustomersHash() => r'5012ad8942af50d7ee0000a394cb1adebbf7c01d';
+String _$asyncCustomersHash() => r'4292dda6cdfaa1ba92b9451c845474fcdf629609';
 
 /// See also [AsyncCustomers].
 @ProviderFor(AsyncCustomers)
