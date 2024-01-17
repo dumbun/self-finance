@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class Customer {
-  int? id;
+  final int? id;
   final String name;
   final String guardianName;
   final String address;
@@ -19,19 +19,19 @@ class Customer {
     required this.createdDate,
   });
 
-  static List<Customer> toList(List<Map<String, dynamic>> data) {
+  static List<Customer> toList(List<Map<String, Object?>> data) {
     if (data.isEmpty) {
       return []; // If data is empty, return an empty list directly
     }
     return data.map((e) {
       return Customer(
-        id: e["Customer_ID"],
-        name: e["Customer_Name"],
-        guardianName: e["Guardian_Name"], // Corrected the spelling of 'Guardian_Name'
-        address: e["Customer_Address"],
-        number: e["Contact_Number"],
-        photo: e["Customer_Photo"],
-        createdDate: e["Created_Date"],
+        id: e["Customer_ID"] as int,
+        name: e["Customer_Name"] as String,
+        guardianName: e["Gaurdian_Name"] as String,
+        address: e["Customer_Address"] as String,
+        number: e["Contact_Number"] as String,
+        photo: e["Customer_Photo"] as String,
+        createdDate: e["Created_Date"] as String,
       );
     }).toList();
   }

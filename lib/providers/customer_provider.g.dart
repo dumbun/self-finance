@@ -6,7 +6,7 @@ part of 'customer_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$asyncCustomersHash() => r'4292dda6cdfaa1ba92b9451c845474fcdf629609';
+String _$asyncCustomersHash() => r'cc6b440f82fc70b4d00c41c977d6c7b7171e0ffd';
 
 /// See also [AsyncCustomers].
 @ProviderFor(AsyncCustomers)

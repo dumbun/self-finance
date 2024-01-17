@@ -173,71 +173,85 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
         _isloading = true;
       });
 
-      // creating the new customer
-      final Customer newCustomer = Customer(
-        name: _customerName.text,
-        guardianName: _gaurdianName.text,
-        address: _address.text,
-        number: _mobileNumber.text,
-        photo: ref.read(pickedCustomerProfileImageStringProvider),
-        createdDate: DateTime.now().toString(),
-      );
-      final int customerCreatedResponse =
-          await ref.read(asyncCustomersProvider.notifier).addCustomer(customer: newCustomer);
-
-      // creating new item becacuse every new transaction will have a proof item
-      final Items newItem = Items(
-        customerid: customerCreatedResponse,
-        name: _itemDescription.text,
-        description: _itemDescription.text,
-        pawnedDate: _takenDate.text,
-        expiryDate: DateTime.now().toString(),
-        pawnAmount: _doubleCheck(_takenAmount.text),
-        status: "Active",
-        photo: ref.read(pickedCustomerItemImageStringProvider),
-        createdDate: DateTime.now().toString(),
-      );
-      final int itemCreatedResponse = await ref.read(asyncItemsProvider.notifier).addItem(item: newItem);
-
-      // creating new transaction
-      final Trx newTransaction = Trx(
-        customerId: customerCreatedResponse,
-        itemId: itemCreatedResponse,
-        transacrtionDate: _takenDate.text,
-        transacrtionType: "Debit",
-        amount: _doubleCheck(_takenAmount.text),
-        intrestRate: _doubleCheck(_rateOfIntrest.text),
-        intrestAmount: _doubleCheck(_takenAmount.text) * (_doubleCheck(_rateOfIntrest.text) / 100),
-        remainingAmount: 0,
-        proofPhoto: ref.read(pickedCustomerProofImageStringProvider),
-        createdDate: DateTime.now().toString(),
-      );
-
-      final int transactionCreatedResponse =
-          await ref.read(asyncTransactionsProvider.notifier).addTransaction(transaction: newTransaction);
-
-      if (customerCreatedResponse != 0 && itemCreatedResponse != 0 && transactionCreatedResponse != 0) {
-        setState(() {
-          _isloading = false;
-        });
-        _afterSuccess();
+      /// already Existing mobile number present check [error]
+      final List<String> customerNumbers = await ref.read(asyncCustomersProvider.notifier).fetchAllCustomersNumbers();
+      if (customerNumbers.contains(_mobileNumber.text)) {
+        _alertDilog(
+          title: "",
+          content:
+              "Contact number is already present in your database please change the number or if you want to add the transacrtion to existing constact please select the add transaction to existing contact in Home Screen",
+        );
       } else {
-        setState(() {
-          _isloading = false;
-        });
-        _afterFail();
+        // creating the new customer
+        final Customer newCustomer = Customer(
+          name: _customerName.text,
+          guardianName: _gaurdianName.text,
+          address: _address.text,
+          number: _mobileNumber.text,
+          photo: ref.read(pickedCustomerProfileImageStringProvider),
+          createdDate: DateTime.now().toString(),
+        );
+        final int customerCreatedResponse =
+            await ref.read(asyncCustomersProvider.notifier).addCustomer(customer: newCustomer);
+
+        // creating new item becacuse every new transaction will have a proof item
+        final Items newItem = Items(
+          customerid: customerCreatedResponse,
+          name: _itemDescription.text,
+          description: _itemDescription.text,
+          pawnedDate: _takenDate.text,
+          expiryDate: DateTime.now().toString(),
+          pawnAmount: _doubleCheck(_takenAmount.text),
+          status: "Active",
+          photo: ref.read(pickedCustomerItemImageStringProvider),
+          createdDate: DateTime.now().toString(),
+        );
+        final int itemCreatedResponse = await ref.read(asyncItemsProvider.notifier).addItem(item: newItem);
+
+        // creating new transaction
+        final Trx newTransaction = Trx(
+          customerId: customerCreatedResponse,
+          itemId: itemCreatedResponse,
+          transacrtionDate: _takenDate.text,
+          transacrtionType: "Debit",
+          amount: _doubleCheck(_takenAmount.text),
+          intrestRate: _doubleCheck(_rateOfIntrest.text),
+          intrestAmount: _doubleCheck(_takenAmount.text) * (_doubleCheck(_rateOfIntrest.text) / 100),
+          remainingAmount: 0,
+          proofPhoto: ref.read(pickedCustomerProofImageStringProvider),
+          createdDate: DateTime.now().toString(),
+        );
+        final int transactionCreatedResponse =
+            await ref.read(asyncTransactionsProvider.notifier).addTransaction(transaction: newTransaction);
+
+        // final response
+        if (customerCreatedResponse != 0 && itemCreatedResponse != 0 && transactionCreatedResponse != 0) {
+          _afterSuccess();
+        } else {
+          _afterFail();
+        }
       }
     }
   }
 
+  void _alertDilog({required String title, required String content}) {
+    AlertDilogs.alertDialogWithOneAction(context, title, content);
+    setState(() {
+      _isloading = false;
+    });
+  }
+
   void _afterSuccess() {
+    setState(() {
+      _isloading = false;
+    });
     snackBarWidget(context: context, message: "Saved Successfully 👍");
     Navigator.pop(context);
   }
 
   void _afterFail() {
+    _alertDilog(title: "error", content: "Please Try again");
     Navigator.pop(context);
-    AlertDilogs.alertDialogWithOneAction(context, "error", "Please Try again");
   }
 
   double _doubleCheck(String text, {String errorString = "error"}) {

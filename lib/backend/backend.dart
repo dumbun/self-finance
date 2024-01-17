@@ -12,12 +12,12 @@ class BackEnd {
           -- Customers Table
           CREATE TABLE Customers (
           Customer_ID      INTEGER PRIMARY KEY AUTOINCREMENT,
-          Customer_Name    TEXT,
-          Gaurdian_Name    TEXT,
-          Customer_Address TEXT,
+          Customer_Name    TEXT NOT NULL,
+          Gaurdian_Name    TEXT NOT NULL,
+          Customer_Address TEXT NOT NULL,
           Contact_Number   TEXT UNIQUE NOT NULL,
-          Customer_Photo   TEXT,
-          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          Customer_Photo   TEXT NOT NULL,
+          Created_Date     TEXT NOT NULL 
           );
       """);
 
@@ -26,14 +26,14 @@ class BackEnd {
           CREATE TABLE Items (
           Item_ID          INTEGER PRIMARY KEY AUTOINCREMENT,
           Customer_ID      INTEGER REFERENCES Customers(Customer_ID),
-          Item_Name        TEXT,
-          Item_Description TEXT,
-          Pawned_Date      TEXT,
-          Expiry_Date      TEXT,
-          Pawn_Amount      REAL,
-          Item_Status      TEXT,
-          Item_Photo       TEXT,
-          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          Item_Name        TEXT NOT NULL,
+          Item_Description TEXT NOT NULL,
+          Pawned_Date      TEXT NOT NULL,
+          Expiry_Date      TEXT NOT NULL,
+          Pawn_Amount      REAL NOT NULL,
+          Item_Status      TEXT NOT NULL,
+          Item_Photo       TEXT NOT NULL,
+          Created_Date     TEXT NOT NULL
           );
         """);
 
@@ -43,14 +43,14 @@ class BackEnd {
           Transaction_ID   INTEGER PRIMARY KEY AUTOINCREMENT,
           Customer_ID      INTEGER REFERENCES Customers(Customer_ID),
           Item_ID          INTEGER REFERENCES Items(Item_ID),
-          Transaction_Date TEXT,
-          Transaction_Type TEXT,
-          Amount           REAL,
-          Interest_Rate    REAL,
-          Interest_Amount  REAL,
-          Remaining_Amount REAL,
-          Proof_Photo      TEXT,
-          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          Transaction_Date TEXT NOT NULL,
+          Transaction_Type TEXT NOT NULL,
+          Amount           REAL NOT NULL,
+          Interest_Rate    REAL NOT NULL,
+          Interest_Amount  REAL NOT NULL,
+          Remaining_Amount REAL NOT NULL,
+          Proof_Photo      TEXT NOT NULL,
+          Created_Date     TEXT NOT NULL 
           );
         """);
     await database.execute("""
@@ -58,10 +58,10 @@ class BackEnd {
           CREATE TABLE Payments (
           Payment_ID       INTEGER PRIMARY KEY AUTOINCREMENT,
           Transaction_ID   INTEGER REFERENCES Transactions(Transaction_ID),
-          Payment_Date     TEXT,
-          Amount_Paid      REAL,
-          Payment_Type     TEXT,
-          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          Payment_Date     TEXT NOT NULL,
+          Amount_Paid      REAL NOT NULL,
+          Payment_Type     TEXT NOT NULL,
+          Created_Date     TEXT NOT NULL
           );
         """);
     await database.execute("""
@@ -105,6 +105,15 @@ class BackEnd {
     final Database db = await BackEnd.db();
     final List<Map<String, Object?>> response = await db.rawQuery("""SELECT * FROM Customers""");
     return Customer.toList(response);
+  }
+
+  /// [fetchAllCustomerNumbers] fetch's the mobile numbers from the all customers
+  static Future<List<String>> fetchAllCustomerNumbers() async {
+    final Database db = await BackEnd.db();
+    final response = await db.rawQuery("""SELECT Contact_Number FROM Customers""");
+    return response.map((e) {
+      return e["Contact_Number"] as String;
+    }).toList();
   }
 
   //// I T E M S
