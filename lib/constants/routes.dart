@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
+import 'package:self_finance/views/Add%20New%20Entry/add_to_existing_contact_view.dart';
 import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/details_view.dart';
 import 'package:self_finance/views/pin_creating_view.dart';
@@ -9,6 +11,14 @@ import 'package:self_finance/views/user_creating_view.dart';
 class Routes {
   final BuildContext context;
   const Routes({required this.context});
+
+  static navigateToAddNewTransactionToExistingContactView(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const AddTransactionToExistingContact(),
+      ),
+    );
+  }
 
   static navigateToUserCreationView(BuildContext context, String pin) {
     Navigator.pushAndRemoveUntil(
@@ -53,6 +63,13 @@ class Routes {
   }
 
   static navigateToAddNewEntry({required BuildContext context}) {
-    Navigator.pushNamed(context, '/addNewEntry');
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        settings: const RouteSettings(
+          name: "add new transacrtion with new contact",
+        ),
+        builder: (context) => const AddNewEntery(),
+      ),
+    );
   }
 }

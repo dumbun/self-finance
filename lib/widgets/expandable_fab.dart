@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/theme/colors.dart';
 
 @immutable
 class ExpandableFab extends StatefulWidget {
@@ -205,8 +203,8 @@ class ActionButton extends StatelessWidget {
       child: IconButton(
         tooltip: toolTip,
         onPressed: onPressed,
-        icon: icon,
-        color: AppColors.getPrimaryTextColor,
+        icon: Padding(padding: EdgeInsets.all(12.sp), child: icon),
+        color: Theme.of(context).backgroundColor,
       ),
     );
   }

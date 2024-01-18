@@ -169,9 +169,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
 
   void _save() async {
     if (_validateAndSave()) {
-      setState(() {
-        _isloading = true;
-      });
+      setState(() => _isloading = true);
 
       /// already Existing mobile number present check [error]
       final List<String> customerNumbers = await ref.read(asyncCustomersProvider.notifier).fetchAllCustomersNumbers();

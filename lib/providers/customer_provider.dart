@@ -3,7 +3,7 @@ import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/customer_model.dart';
 part 'customer_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@Riverpod(keepAlive: false)
 class AsyncCustomers extends _$AsyncCustomers {
   Future<List<Customer>> _fetchAllCustomersData() async {
     return BackEnd.fetchAllCustomerData();
@@ -34,6 +34,18 @@ class AsyncCustomers extends _$AsyncCustomers {
     // Add the new todo and reload the todo list from the remote repository
     state = await AsyncValue.guard(() async {
       data = await BackEnd.fetchAllCustomerNumbers();
+      return _fetchAllCustomersData();
+    });
+    return data;
+  }
+
+  Future<List<Map<String, Object?>>> fetchAllCustomerNumbersWithNames() async {
+    List<Map<String, Object?>> data = [];
+    // Set the state to loading
+    state = const AsyncValue.loading();
+    // Add the new todo and reload the todo list from the remote repository
+    state = await AsyncValue.guard(() async {
+      data = await BackEnd.fetchAllCustomerNumbersWithNames();
       return _fetchAllCustomersData();
     });
     return data;

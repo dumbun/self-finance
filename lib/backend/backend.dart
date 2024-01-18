@@ -116,6 +116,28 @@ class BackEnd {
     }).toList();
   }
 
+  /// [fetchAllCustomerNumbersWithNames] fetch's the mobile numbers with there id and name from the all customers
+  static Future<List<Map<String, String>>> fetchAllCustomerNumbersWithNames() async {
+    final Database db = await BackEnd.db();
+    final List<Map<String, Object?>> response =
+        await db.rawQuery("""SELECT Customer_ID, Customer_Name, Contact_Number FROM Customers""");
+
+    List<Map<String, String>> convertedResponse = [];
+
+    for (Map<String, Object?> map in response) {
+      Map<String, String> convertedMap = {};
+
+      map.forEach((key, value) {
+        // Convert the value to a string or use an empty string if it's null
+        convertedMap[key] = value?.toString() ?? '';
+      });
+
+      convertedResponse.add(convertedMap);
+    }
+
+    return convertedResponse;
+  }
+
   //// I T E M S
   /// create a new item row
   static Future createNewItem(Items item) async {
@@ -135,7 +157,6 @@ class BackEnd {
       final int id = await db.insert("Items", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
       return id;
     } catch (e) {
-      print(e.toString());
       return 0;
     }
   }
@@ -144,7 +165,7 @@ class BackEnd {
   static fetchAllItems() async {
     final Database db = await BackEnd.db();
     final List<Map<String, Object?>> response = await db.rawQuery("""SELECT * FROM Items""");
-    return Customer.toList(response);
+    return Items.toList(response);
   }
 
   //// T R A N S A C T I O N S

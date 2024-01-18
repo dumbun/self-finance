@@ -6,12 +6,12 @@ part of 'transactions_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$asyncTransactionsHash() => r'24b28bcc6e383076fc19c49b6d23bf5f03ab23f3';
+String _$asyncTransactionsHash() => r'4a7b1422f3b391b36fe6ce43a7e93251b3c950f2';
 
 /// See also [AsyncTransactions].
 @ProviderFor(AsyncTransactions)
 final asyncTransactionsProvider =
-    AsyncNotifierProvider<AsyncTransactions, List<Trx>>.internal(
+    AutoDisposeAsyncNotifierProvider<AsyncTransactions, List<Trx>>.internal(
   AsyncTransactions.new,
   name: r'asyncTransactionsProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -21,6 +21,6 @@ final asyncTransactionsProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$AsyncTransactions = AsyncNotifier<List<Trx>>;
+typedef _$AsyncTransactions = AutoDisposeAsyncNotifier<List<Trx>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

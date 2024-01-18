@@ -3,7 +3,7 @@ import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/transaction_model.dart';
 part 'transactions_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@Riverpod(keepAlive: false)
 class AsyncTransactions extends _$AsyncTransactions {
   Future<List<Trx>> _fetchAllTransactionsData() async {
     final data = await BackEnd.fetchAllTransactions();

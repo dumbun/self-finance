@@ -1,19 +1,17 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
-import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 part 'items_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@Riverpod(keepAlive: false)
 class AsyncItems extends _$AsyncItems {
-  Future<List<Customer>> _fetchAllItemsData() async {
-    final data = await BackEnd.fetchAllCustomerData();
-    print(data);
+  Future<List<Items>> _fetchAllItemsData() async {
+    final data = await BackEnd.fetchAllItems();
     return data;
   }
 
   @override
-  FutureOr<List<Customer>> build() {
+  FutureOr<List<Items>> build() {
     // Load initial todo list from the remote repository
     return _fetchAllItemsData();
   }

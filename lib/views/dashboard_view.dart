@@ -20,15 +20,18 @@ class DashboardView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final PageController pageController = PageController();
     return Scaffold(
+      drawer: const Drawer(
+        child: Column(
+          children: [],
+        ),
+      ),
       body: SafeArea(
         child: GestureDetector(
           onTap: Utility.unfocus,
           child: PageView(
             controller: pageController,
             onPageChanged: (index) {
-              ref
-                  .read(selectedPageIndexProvider.notifier)
-                  .update((state) => index);
+              ref.read(selectedPageIndexProvider.notifier).update((state) => index);
             },
             children: <Widget>[
               const HomeScreen(),
@@ -44,13 +47,14 @@ class DashboardView extends ConsumerWidget {
               children: [
                 ActionButton(
                   toolTip: "Add New Transaction to a existing customer",
-                  onPressed: () => {},
+                  onPressed: () => {
+                    Routes.navigateToAddNewTransactionToExistingContactView(context),
+                  },
                   icon: const Icon(Icons.format_align_left),
                 ),
                 ActionButton(
                   toolTip: "Add New Customer",
-                  onPressed: () =>
-                      Routes.navigateToAddNewEntry(context: context),
+                  onPressed: () => Routes.navigateToAddNewEntry(context: context),
                   icon: const Icon(Icons.person_add_alt_1),
                 ),
               ],
