@@ -4,7 +4,8 @@ A new Flutter project.
 
 ## Getting Started
 
-Database Structure 
+# Database Structure 
+
 ![Schema](https://github.com/dumbun/self-finance/assets/113350510/af4f60ae-9b55-434b-81c8-66cf0c17cc6a)
 
 
