@@ -17,7 +17,7 @@ class BackEnd {
           Gaurdian_Name    TEXT NOT NULL,
           Customer_Address TEXT NOT NULL,
           Contact_Number   TEXT UNIQUE NOT NULL,
-          Customer_Photo   TEXT NOT NULL,
+          Customer_Photo   BLOB NOT NULL,
           Created_Date     TEXT NOT NULL 
           );
       """);
@@ -33,7 +33,7 @@ class BackEnd {
           Expiry_Date      TEXT NOT NULL,
           Pawn_Amount      REAL NOT NULL,
           Item_Status      TEXT NOT NULL,
-          Item_Photo       TEXT NOT NULL,
+          Item_Photo       BLOB NOT NULL,
           Created_Date     TEXT NOT NULL
           );
         """);
@@ -50,7 +50,7 @@ class BackEnd {
           Interest_Rate    REAL NOT NULL,
           Interest_Amount  REAL NOT NULL,
           Remaining_Amount REAL NOT NULL,
-          Proof_Photo      TEXT NOT NULL,
+          Proof_Photo      BLOB NOT NULL,
           Created_Date     TEXT NOT NULL 
           );
         """);
@@ -170,6 +170,17 @@ class BackEnd {
     return Items.toList(response);
   }
 
+  // fetch all items of a requried customer
+  static Future<List<Items>> fetchitemOfRequriedCustomer({required int customerID}) async {
+    final Database db = await BackEnd.db();
+    final List<Map<String, Object?>> response = await db.query(
+      "Items",
+      where: 'Customer_ID = ?',
+      whereArgs: [customerID],
+    );
+    return Items.toList(response);
+  }
+
   //// T R A N S A C T I O N S
 
   /// create new Transaction
@@ -207,6 +218,16 @@ class BackEnd {
     } catch (e) {
       return [];
     }
+  }
+
+  static Future<List<Trx>> fetchRequriedCustomerTransactions({required int customerId}) async {
+    final Database db = await BackEnd.db();
+    final response = await db.query(
+      "Transactions",
+      where: 'Customer_ID = ?',
+      whereArgs: [customerId],
+    );
+    return Trx.toList(response);
   }
 
   // ///[createNewTransaction] creates a new transaction in the DataBase

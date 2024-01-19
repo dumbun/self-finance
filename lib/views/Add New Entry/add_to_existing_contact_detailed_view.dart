@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/models/items_model.dart';
+import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/widgets/call_button_widget.dart';
@@ -10,8 +12,15 @@ import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 
 class AddToExistingContactDetailedView extends ConsumerWidget {
-  const AddToExistingContactDetailedView({super.key, required this.customer});
+  const AddToExistingContactDetailedView({
+    super.key,
+    required this.customer,
+    required this.transacrtions,
+    required this.items,
+  });
   final Customer customer;
+  final List<Trx> transacrtions;
+  final List<Items> items;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
