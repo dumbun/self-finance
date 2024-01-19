@@ -18,17 +18,13 @@ class ImageView extends StatelessWidget {
         backgroundColor: AppColors.getTransparentColor,
         title: BodyOneDefaultText(text: titile),
       ),
-      body: SizedBox(
-        child: PhotoView(
-          heroAttributes: PhotoViewHeroAttributes(tag: titile),
-          enablePanAlways: false,
-          gaplessPlayback: true,
-          tightMode: false,
-          wantKeepAlive: true,
-          imageProvider: MemoryImage(
-            base64Decode(imageString),
-          ),
-        ),
+      body: PhotoView(
+        heroAttributes: PhotoViewHeroAttributes(tag: titile),
+        enablePanAlways: false,
+        gaplessPlayback: true,
+        tightMode: false,
+        wantKeepAlive: true,
+        imageProvider: MemoryImage(base64Decode(imageString)),
       ),
     );
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/customer_model.dart';
@@ -11,7 +10,7 @@ import 'package:self_finance/widgets/call_button_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 
-class AddToExistingContactDetailedView extends ConsumerWidget {
+class AddToExistingContactDetailedView extends StatelessWidget {
   const AddToExistingContactDetailedView({
     super.key,
     required this.customer,
@@ -22,7 +21,7 @@ class AddToExistingContactDetailedView extends ConsumerWidget {
   final List<Trx> transacrtions;
   final List<Items> items;
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: BodyTwoDefaultText(text: customer.name),
@@ -36,13 +35,68 @@ class AddToExistingContactDetailedView extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 _buildImage(),
-                SizedBox(height: 20.sp),
+                SizedBox(height: 16.sp),
                 _buildCustomerName(),
-                SizedBox(height: 20.sp),
+                SizedBox(height: 16.sp),
                 _buildNumberDetails(),
+                SizedBox(height: 12.sp),
+                _buildDetails(
+                  const Icon(
+                    Icons.location_on,
+                    color: AppColors.getPrimaryColor,
+                  ),
+                  "Contact Address",
+                  customer.address,
+                ),
+                SizedBox(height: 12.sp),
+                _buildDetails(
+                    const Icon(
+                      Icons.family_restroom,
+                      color: AppColors.getPrimaryColor,
+                    ),
+                    "Gaurdian",
+                    customer.guardianName),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  _buildDetails(Widget icon, String title, String data) {
+    return Card(
+      elevation: 0,
+      child: Padding(
+        padding: EdgeInsets.all(16.sp),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(width: 12.sp),
+            icon,
+            SizedBox(width: 20.sp),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BodyTwoDefaultText(
+                  text: title,
+                  color: AppColors.getLigthGreyColor,
+                ),
+                SizedBox(height: 8.sp),
+                SelectableText(
+                  data,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 18.sp,
+                    fontFamily: "hell",
+                    color: AppColors.getPrimaryColor,
+                  ),
+                )
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -66,7 +120,10 @@ class AddToExistingContactDetailedView extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const BodyTwoDefaultText(text: "Contact Number"),
+                  const BodyTwoDefaultText(
+                    text: "Contact Number",
+                    color: AppColors.getLigthGreyColor,
+                  ),
                   SizedBox(height: 8.sp),
                   SelectableText(
                     customer.number,
@@ -95,12 +152,7 @@ class AddToExistingContactDetailedView extends ConsumerWidget {
   }
 
   /// [ _buildImage()] method to build the image of the customer
-  Container _buildImage() {
-    return Container(
-      alignment: Alignment.center,
-      width: double.infinity,
-      margin: EdgeInsets.only(top: 20.sp),
-      child: CircularImageWidget(imageData: customer.photo, titile: "customer photo"),
-    );
+  Center _buildImage() {
+    return Center(child: CircularImageWidget(imageData: customer.photo, titile: "customer photo"));
   }
 }

@@ -30,7 +30,7 @@ class CenterTitleTextWidget extends StatelessWidget {
                         child: SizedBox(
                           height: 30.sp,
                           width: 30.sp,
-                          child: Utility.imageFromBase64String(user.profilePicture),
+                          child: Hero(tag: "User-image", child: Utility.imageFromBase64String(user.profilePicture)),
                         ),
                       )
                     : DefaultUserImage(

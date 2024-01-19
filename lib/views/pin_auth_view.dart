@@ -53,7 +53,7 @@ class _PinAuthViewState extends State<PinAuthView> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 widget.user.profilePicture != ""
-                    ? Utility.imageFromBase64String(widget.user.profilePicture)
+                    ? Hero(tag: "User-image", child: Utility.imageFromBase64String(widget.user.profilePicture))
                     : const AppIcon(),
                 SizedBox(height: 20.sp),
                 const StrongHeadingOne(
