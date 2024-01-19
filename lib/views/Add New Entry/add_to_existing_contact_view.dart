@@ -2,8 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/backend/backend.dart';
+import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 
@@ -15,7 +18,6 @@ class AddTransactionToExistingContact extends ConsumerWidget {
     final TextEditingController searchController = TextEditingController();
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.getTransparentColor,
         title: const BodyOneDefaultText(text: "Please select the contact"),
       ),
       body: SafeArea(
@@ -56,16 +58,22 @@ class AddTransactionToExistingContact extends ConsumerWidget {
                     ? Expanded(
                         child: ListView.separated(
                           itemCount: data.length,
-                          separatorBuilder: (context, index) => SizedBox(height: 8.sp),
-                          itemBuilder: (context, index) {
-                            return Card(
-                              child: GestureDetector(
-                                onTap: () {
-                                  //Todo using [id] and [name] and [mobile number] fetch the customer total details and show it on the next view
-                                  print(data[index]["Customer_ID"]);
-                                  print(data[index]["Customer_Name"]);
-                                  print(data[index]["Contact_Number"]);
-                                },
+                          separatorBuilder: (BuildContext context, int index) => SizedBox(height: 8.sp),
+                          itemBuilder: (BuildContext context, int index) {
+                            return GestureDetector(
+                              onTap: () async {
+                                await BackEnd.fetchSingleContactDetails(
+                                  id: data[index].id,
+                                ).then(
+                                  (List<Customer> value) =>
+                                      Routes.navigateToAddTransactionToExistingContactDetailedView(
+                                    context,
+                                    customer: value[0],
+                                  ),
+                                );
+                              },
+                              child: Card(
+                                elevation: 0,
                                 child: Padding(
                                   padding: EdgeInsets.all(16.sp),
                                   child: Row(
@@ -73,11 +81,11 @@ class AddTransactionToExistingContact extends ConsumerWidget {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       BodyTwoDefaultText(
-                                        text: data[index]["Customer_Name"] as String,
+                                        text: data[index].name,
                                         bold: true,
                                       ),
                                       BodyTwoDefaultText(
-                                        text: data[index]["Contact_Number"] as String,
+                                        text: data[index].number,
                                         color: AppColors.getLigthGreyColor,
                                       )
                                     ],

@@ -1,14 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final pickedCustomerProfileImageStringProvider = StateProvider.autoDispose<String>((ref) {
+final pickedCustomerProfileImageStringProvider = StateProvider<String>((ref) {
   // Initial value is an empty string
-  return " ";
+  return "";
 });
-final pickedCustomerProofImageStringProvider = StateProvider.autoDispose<String>((ref) {
+final pickedCustomerProofImageStringProvider = StateProvider<String>((ref) {
   // Initial value is an empty string
-  return " ";
+  return "";
 });
-final pickedCustomerItemImageStringProvider = StateProvider.autoDispose<String>((ref) {
+final pickedCustomerItemImageStringProvider = StateProvider<String>((ref) {
   // Initial value is an empty string
-  return " ";
+  return "";
 });

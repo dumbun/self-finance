@@ -7,12 +7,12 @@ part of 'customer_contacts_provider.dart';
 // **************************************************************************
 
 String _$asyncCustomersContactsHash() =>
-    r'f7f22c97b0b9f838e886b67d0027e2b06e383eb2';
+    r'40ce1a1e55ca848f5bdc50b36507ca2c1eeeb2dd';
 
 /// See also [AsyncCustomersContacts].
 @ProviderFor(AsyncCustomersContacts)
 final asyncCustomersContactsProvider = AutoDisposeAsyncNotifierProvider<
-    AsyncCustomersContacts, List<Map<String, String>>>.internal(
+    AsyncCustomersContacts, List<Contact>>.internal(
   AsyncCustomersContacts.new,
   name: r'asyncCustomersContactsProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -22,7 +22,6 @@ final asyncCustomersContactsProvider = AutoDisposeAsyncNotifierProvider<
   allTransitiveDependencies: null,
 );
 
-typedef _$AsyncCustomersContacts
-    = AutoDisposeAsyncNotifier<List<Map<String, String>>>;
+typedef _$AsyncCustomersContacts = AutoDisposeAsyncNotifier<List<Contact>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -5,11 +5,11 @@ class AppThemeData {
   static final ThemeData lightTheme = ThemeData(
     primarySwatch: Colors.blue,
     primaryColor: AppColors.getPrimaryColor,
-    cardTheme: const CardTheme(color: AppColors.getVeryLightGreyColor),
+    cardTheme: const CardTheme(color: AppColors.getBackgroundColor),
     fontFamily: "hell",
     colorScheme: ColorScheme.fromSeed(
       seedColor: AppColors.getPrimaryColor,
-      background: AppColors.getBackgroundColor,
+      background: AppColors.getVeryLightGreyColor,
       error: AppColors.getErrorColor,
       surface: AppColors.getVeryLightGreyColor,
       primary: AppColors.getPrimaryColor,

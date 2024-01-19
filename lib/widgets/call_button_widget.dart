@@ -15,16 +15,6 @@ class CallButtonWidget extends StatefulWidget {
 class _CallButtonWidgetState extends State<CallButtonWidget> {
   bool _hasCallSupport = false;
 
-  Future<void> _makePhoneCall(String phoneNumber) async {
-    final Uri launchUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
-    );
-    if (!await launchUrl(launchUri)) {
-      throw Exception('Could not launch $launchUri');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -38,24 +28,11 @@ class _CallButtonWidgetState extends State<CallButtonWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final String phoneNumber = widget.phoneNumber;
-    if (Utility.isValidPhoneNumber(phoneNumber)) {
+    if (Utility.isValidPhoneNumber(widget.phoneNumber)) {
       return _hasCallSupport
-          ? ElevatedButton(
-              style: ButtonStyle(
-                alignment: Alignment.center,
-                enableFeedback: true,
-                animationDuration: Durations.long1,
-                shape: const MaterialStatePropertyAll<OutlinedBorder?>(CircleBorder()),
-                padding: MaterialStatePropertyAll(EdgeInsets.all(16.sp)),
-              ),
-              onPressed: () async {
-                await _makePhoneCall(widget.phoneNumber);
-              },
-              child: const Icon(
-                Icons.call,
-                color: AppColors.getPrimaryColor,
-              ),
+          ? const Icon(
+              Icons.call,
+              color: AppColors.getPrimaryColor,
             )
           : _buildDisabledPhone();
     } else {

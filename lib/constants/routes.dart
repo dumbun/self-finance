@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
+import 'package:self_finance/views/Add%20New%20Entry/add_to_existing_contact_detailed_view.dart';
 import 'package:self_finance/views/Add%20New%20Entry/add_to_existing_contact_view.dart';
 import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/details_view.dart';
@@ -11,6 +13,14 @@ import 'package:self_finance/views/user_creating_view.dart';
 class Routes {
   final BuildContext context;
   const Routes({required this.context});
+
+  static navigateToAddTransactionToExistingContactDetailedView(BuildContext context, {required Customer customer}) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AddToExistingContactDetailedView(customer: customer),
+      ),
+    );
+  }
 
   static navigateToAddNewTransactionToExistingContactView(BuildContext context) {
     Navigator.of(context).push(

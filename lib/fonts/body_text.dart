@@ -11,7 +11,6 @@ class BodyOneDefaultText extends StatelessWidget {
   final bool error;
   final bool whiteColor;
   final Color? color;
-  final String? font;
 
   const BodyOneDefaultText({
     super.key,
@@ -23,7 +22,6 @@ class BodyOneDefaultText extends StatelessWidget {
     this.maxLines,
     this.overflow,
     this.color,
-    this.font,
   });
 
   @override

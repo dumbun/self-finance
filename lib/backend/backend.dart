@@ -1,4 +1,5 @@
 import 'package:path_provider/path_provider.dart';
+import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
@@ -117,25 +118,26 @@ class BackEnd {
   }
 
   /// [fetchAllCustomerNumbersWithNames] fetch's the mobile numbers with there id and name from the all customers
-  static Future<List<Map<String, String>>> fetchAllCustomerNumbersWithNames() async {
+  static Future<List<Contact>> fetchAllCustomerNumbersWithNames() async {
     final Database db = await BackEnd.db();
     final List<Map<String, Object?>> response =
         await db.rawQuery("""SELECT Customer_ID, Customer_Name, Contact_Number FROM Customers""");
 
-    List<Map<String, String>> convertedResponse = [];
+    return Contact.toList(response);
+  }
 
-    for (Map<String, Object?> map in response) {
-      Map<String, String> convertedMap = {};
-
-      map.forEach((key, value) {
-        // Convert the value to a string or use an empty string if it's null
-        convertedMap[key] = value?.toString() ?? '';
-      });
-
-      convertedResponse.add(convertedMap);
+  static Future<List<Customer>> fetchSingleContactDetails({required int id}) async {
+    try {
+      final db = await BackEnd.db();
+      final response = await db.query(
+        'Customers',
+        where: 'Customer_ID = ?',
+        whereArgs: [id],
+      );
+      return Customer.toList(response);
+    } catch (e) {
+      return [];
     }
-
-    return convertedResponse;
   }
 
   //// I T E M S

@@ -38,16 +38,4 @@ class AsyncCustomers extends _$AsyncCustomers {
     });
     return data;
   }
-
-  Future<List<Map<String, Object?>>> fetchAllCustomerNumbersWithNames() async {
-    List<Map<String, Object?>> data = [];
-    // Set the state to loading
-    state = const AsyncValue.loading();
-    // Add the new todo and reload the todo list from the remote repository
-    state = await AsyncValue.guard(() async {
-      data = await BackEnd.fetchAllCustomerNumbersWithNames();
-      return _fetchAllCustomersData();
-    });
-    return data;
-  }
 }

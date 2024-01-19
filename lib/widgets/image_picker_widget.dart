@@ -16,11 +16,10 @@ class ImagePickerWidget extends ConsumerStatefulWidget {
 
   final String text;
   final String defaultImage;
-  final AutoDisposeStateProvider<String> imageProvider;
+  final StateProvider<String> imageProvider;
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _ImagePickerWidgetState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _ImagePickerWidgetState();
 }
 
 class _ImagePickerWidgetState extends ConsumerState<ImagePickerWidget> {
@@ -62,7 +61,7 @@ class _ImagePickerWidgetState extends ConsumerState<ImagePickerWidget> {
           pickedItemImage = Utility.imageFromBase64String(value);
         });
       }
-      ref.read(widget.imageProvider.notifier).state = value;
+      ref.read(widget.imageProvider.notifier).update((state) => value);
     });
   }
 }

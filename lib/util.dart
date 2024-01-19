@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ImageCacheManager {
   static final Map<String, Image> _imageCache = {};
@@ -41,8 +42,7 @@ class ImageCacheManager {
     }
   }
 
-  static Image getCachedImage(
-      String base64String, double? height, double? width) {
+  static Image getCachedImage(String base64String, double? height, double? width) {
     if (_imageCache.containsKey(base64String)) {
       final cachedImage = _imageCache[base64String]!;
       _reorderCache(base64String, cachedImage);
@@ -76,16 +76,25 @@ class ImageCacheManager {
 }
 
 class Utility {
+  // make call
+  static makeCall({required String phoneNumber}) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    if (!await launchUrl(launchUri)) {
+      throw Exception('Could not launch $launchUri');
+    }
+  }
+
   // to unfocus keyboard when user touches the white space in screen
   static void unfocus() {
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
-  static Widget imageFromBase64String(String base64String,
-      {double? height, double? width}) {
+  static Widget imageFromBase64String(String base64String, {double? height, double? width}) {
     if (base64String.isNotEmpty) {
-      final decodedImage =
-          ImageCacheManager.getCachedImage(base64String, height, width);
+      final decodedImage = ImageCacheManager.getCachedImage(base64String, height, width);
       return ClipRRect(
         borderRadius: BorderRadius.circular(100.sp),
         child: decodedImage,
@@ -112,8 +121,7 @@ class Utility {
   }
 
   static bool isValidPhoneNumber(String? value) =>
-      RegExp(r'(^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$)')
-          .hasMatch(value ?? '');
+      RegExp(r'(^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$)').hasMatch(value ?? '');
 
   static double reduceDecimals(double value) {
     return double.parse(value.toStringAsFixed(2));
