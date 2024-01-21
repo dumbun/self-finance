@@ -37,10 +37,10 @@ class MyApp extends ConsumerWidget {
         home: ref.watch(asyncUserProvider).when(
               data: (user) {
                 if (user.isNotEmpty) {
-                  // if user is present then build AuthView for autontication
+                  // if user is present then build AuthView for authentication
                   return AuthView(user: user.first);
                 } else {
-                  // if user is not present then build AuthView for autontication
+                  // if user is not present then build AuthView for authentication
                   return const TermsAndConditons();
                 }
               },
