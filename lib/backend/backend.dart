@@ -120,8 +120,8 @@ class BackEnd {
   /// [fetchAllCustomerNumbersWithNames] fetch's the mobile numbers with there id and name from the all customers
   static Future<List<Contact>> fetchAllCustomerNumbersWithNames() async {
     final Database db = await BackEnd.db();
-    final List<Map<String, Object?>> response =
-        await db.rawQuery("""SELECT Customer_ID, Customer_Name, Contact_Number FROM Customers""");
+    final List<Map<String, Object?>> response = await db
+        .rawQuery("""SELECT Customer_ID, Customer_Name, Contact_Number FROM Customers ORDER BY Customer_Name ASC""");
 
     return Contact.toList(response);
   }
