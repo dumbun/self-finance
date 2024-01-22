@@ -48,7 +48,7 @@ class DashboardView extends ConsumerWidget {
                 ActionButton(
                   toolTip: "Add New Transaction to a existing customer",
                   onPressed: () => {
-                    Routes.navigateToAddNewTransactionToExistingContactView(context),
+                    Routes.navigateToContactsView(context),
                   },
                   icon: const Icon(Icons.format_align_left),
                 ),

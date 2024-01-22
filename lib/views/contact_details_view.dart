@@ -10,8 +10,8 @@ import 'package:self_finance/widgets/call_button_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 
-class AddToExistingContactDetailedView extends StatelessWidget {
-  const AddToExistingContactDetailedView({
+class ContactDetailsView extends StatelessWidget {
+  const ContactDetailsView({
     super.key,
     required this.customer,
     required this.transacrtions,

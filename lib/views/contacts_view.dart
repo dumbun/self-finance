@@ -1,5 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/backend/backend.dart';
@@ -12,8 +12,8 @@ import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 
-class AddTransactionToExistingContact extends ConsumerWidget {
-  const AddTransactionToExistingContact({super.key});
+class ContactsView extends ConsumerWidget {
+  const ContactsView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -24,7 +24,7 @@ class AddTransactionToExistingContact extends ConsumerWidget {
       List<Items> customerItems,
       List<Trx> customerTransactions,
     ) {
-      Routes.navigateToAddTransactionToExistingContactDetailedView(
+      Routes.navigateToContactDetailsView(
         context,
         customer: customer.first,
         items: customerItems,
@@ -45,10 +45,11 @@ class AddTransactionToExistingContact extends ConsumerWidget {
                             itemBuilder: (BuildContext context, int index) {
                               return GestureDetector(
                                 onTap: () async {
-                                  final customer = await BackEnd.fetchSingleContactDetails(id: data[index].id);
-                                  final customerItems =
+                                  final List<Customer> customer =
+                                      await BackEnd.fetchSingleContactDetails(id: data[index].id);
+                                  final List<Items> customerItems =
                                       await BackEnd.fetchitemOfRequriedCustomer(customerID: data[index].id);
-                                  final customerTransactions =
+                                  final List<Trx> customerTransactions =
                                       await BackEnd.fetchRequriedCustomerTransactions(customerId: data[index].id);
                                   navigateToDetailsView(customer, customerItems, customerTransactions);
                                 },
@@ -115,7 +116,6 @@ class AddTransactionToExistingContact extends ConsumerWidget {
                   enableIMEPersonalizedLearning: true,
                   style: const TextStyle(color: AppColors.getPrimaryColor, fontWeight: FontWeight.bold),
                   keyboardType: TextInputType.name,
-                  placeholder: AutofillHints.name,
                   onChanged: (value) =>
                       ref.read(asyncCustomersContactsProvider.notifier).searchCustomer(givenInput: value),
                 ),
