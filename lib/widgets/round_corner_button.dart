@@ -1,5 +1,6 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/theme/colors.dart';
 
 class RoundedCornerButton extends StatelessWidget {
@@ -16,11 +17,36 @@ class RoundedCornerButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedButton(
-      pressEvent: onPressed,
-      text: text,
-      color: AppColors.getPrimaryColor,
-      icon: icon,
-    );
+    return icon != null
+        ? SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.getPrimaryColor),
+              icon: Icon(icon),
+              onPressed: onPressed,
+              label: Padding(
+                padding: EdgeInsets.all(14.sp),
+                child: BodyOneDefaultText(
+                  whiteColor: true,
+                  text: text,
+                  bold: true,
+                ),
+              ),
+            ),
+          )
+        : SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.getPrimaryColor),
+                onPressed: onPressed,
+                child: Padding(
+                  padding: EdgeInsets.all(14.sp),
+                  child: BodyOneDefaultText(
+                    whiteColor: true,
+                    text: text,
+                    bold: true,
+                  ),
+                )),
+          );
   }
 }

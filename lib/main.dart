@@ -40,7 +40,7 @@ class MyApp extends ConsumerWidget {
                   // if user is present then build AuthView for authentication
                   return AuthView(user: user.first);
                 } else {
-                  // if user is not present then build AuthView for authentication
+                  // if user is not present then build t&c for register
                   return const TermsAndConditons();
                 }
               },
