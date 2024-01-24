@@ -71,7 +71,7 @@ class Routes {
     );
   }
 
-  static void navigateToAddNewEntry({required BuildContext context}) {
+  static void navigateToAddNewEntry({required BuildContext context}) async {
     Navigator.of(context).pushNamed('/addNewEntry');
   }
 }

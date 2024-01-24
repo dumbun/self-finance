@@ -21,27 +21,27 @@ class ContactEditingView extends ConsumerStatefulWidget {
 }
 
 class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
-  final TextEditingController customerName = TextEditingController();
-  final TextEditingController gaurdianName = TextEditingController();
-  final TextEditingController address = TextEditingController();
-  final TextEditingController mobileNumber = TextEditingController();
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final TextEditingController _customerName = TextEditingController();
+  final TextEditingController _gaurdianName = TextEditingController();
+  final TextEditingController _address = TextEditingController();
+  final TextEditingController _mobileNumber = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
-    customerName.text = widget.contact.name;
-    gaurdianName.text = widget.contact.guardianName;
-    address.text = widget.contact.address;
-    mobileNumber.text = widget.contact.number;
+    _customerName.text = widget.contact.name;
+    _gaurdianName.text = widget.contact.guardianName;
+    _address.text = widget.contact.address;
+    _mobileNumber.text = widget.contact.number;
     super.initState();
   }
 
   @override
   void dispose() {
-    customerName.dispose();
-    gaurdianName.dispose();
-    address.dispose();
-    mobileNumber.dispose();
+    _customerName.dispose();
+    _gaurdianName.dispose();
+    _address.dispose();
+    _mobileNumber.dispose();
     super.dispose();
   }
 
@@ -51,13 +51,13 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
         SizedBox(height: 12.sp),
         InputTextField(
           keyboardType: TextInputType.name,
-          controller: customerName,
+          controller: _customerName,
           hintText: "Customer Name",
         ),
         SizedBox(height: 20.sp),
         InputTextField(
           keyboardType: TextInputType.phone,
-          controller: mobileNumber,
+          controller: _mobileNumber,
           hintText: "Contact Number",
           validator: (value) {
             if (Utility.isValidPhoneNumber(value)) {
@@ -70,13 +70,13 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
         SizedBox(height: 20.sp),
         InputTextField(
           keyboardType: TextInputType.name,
-          controller: gaurdianName,
+          controller: _gaurdianName,
           hintText: "Guardian Name",
         ),
         SizedBox(height: 20.sp),
         InputTextField(
           keyboardType: TextInputType.streetAddress,
-          controller: address,
+          controller: _address,
           hintText: "Address",
         ),
       ],
@@ -94,7 +94,7 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
           child: Padding(
             padding: EdgeInsets.all(18.sp),
             child: Form(
-              key: formKey,
+              key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,22 +106,22 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
                   RoundedCornerButton(
                     text: "update",
                     onPressed: () async {
-                      if (validateAndSave()) {
+                      if (_validateAndSave()) {
                         final int response = await ref.read(asyncCustomersContactsProvider.notifier).updateCustomer(
                               customerId: widget.contact.id!,
-                              newCustomerName: customerName.text,
-                              newGuardianName: gaurdianName.text,
-                              newCustomerAddress: address.text,
-                              newContactNumber: mobileNumber.text,
+                              newCustomerName: _customerName.text,
+                              newGuardianName: _gaurdianName.text,
+                              newCustomerAddress: _address.text,
+                              newContactNumber: _mobileNumber.text,
                               newCustomerPhoto: ref.read(updatedCustomerPhotoStringProvider),
                               newProofPhoto: ref.read(updatedCustomerProofStringProvider),
                               newCreatedDate: DateTime.now().toString(),
                             );
                         if (response != 0) {
-                          navigateToContactsView();
+                          _navigateToContactsView();
                         }
                         if (response == 0) {
-                          showError();
+                          _showError();
                         }
                       }
                     },
@@ -135,12 +135,12 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
     );
   }
 
-  void navigateToContactsView() {
+  void _navigateToContactsView() {
     Navigator.of(context).popUntil(ModalRoute.withName('/contactsView'));
     snackBarWidget(context: context, message: "Contact Updated Successfully ");
   }
 
-  void showError() {
+  void _showError() {
     AlertDilogs.alertDialogWithOneAction(
       context,
       "Error",
@@ -148,8 +148,8 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
     );
   }
 
-  bool validateAndSave() {
-    final FormState? form = formKey.currentState;
+  bool _validateAndSave() {
+    final FormState? form = _formKey.currentState;
     if (form!.validate()) {
       return true;
     } else {

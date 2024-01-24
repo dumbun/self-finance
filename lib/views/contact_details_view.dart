@@ -15,11 +15,16 @@ import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 
-final updatedCustomerPhotoStringProvider = StateProvider<String>((ref) {
+/// [updatedCustomerPhotoStringProvider] and [updatedCustomerProofStringProvider]
+/// are the providers for the new updated images for the updating
+/// this providers must update  the costomers old images as the primary values for the respected views before use
+/// because of this providers have inital value has empty state
+
+final updatedCustomerPhotoStringProvider = StateProvider.autoDispose<String>((ref) {
   return "";
 });
 
-final updatedCustomerProofStringProvider = StateProvider<String>((ref) {
+final updatedCustomerProofStringProvider = StateProvider.autoDispose<String>((ref) {
   return "";
 });
 
@@ -47,6 +52,26 @@ class ContactDetailsView extends ConsumerWidget {
       Routes.navigateToContactEditingView(context: context, contact: customer);
     }
 
+    void popUpMenuSelected(String value) async {
+      switch (value) {
+        case '1':
+          preEditingSettings();
+          break;
+        case '2':
+          if (await AlertDilogs.alertDialogWithTwoAction(
+                context,
+                "Alert",
+                "By Pressing 'YES' you will remove all the details of this customer from your Date Base",
+              ) ==
+              1) {
+            delateTheContact();
+          }
+          break;
+        default:
+          () {};
+      }
+    }
+
     return DefaultTabController(
       initialIndex: 0,
       length: 2,
@@ -64,54 +89,19 @@ class ContactDetailsView extends ConsumerWidget {
         appBar: AppBar(
           actions: [
             PopupMenuButton<String>(
-              onSelected: (String value) async {
-                switch (value) {
-                  case '1':
-                    preEditingSettings();
-                    break;
-                  case '2':
-                    if (await AlertDilogs.alertDialogWithTwoAction(
-                          context,
-                          "Alert",
-                          "By Pressing 'YES' you will remove all the details of this customer from your Date Base",
-                        ) ==
-                        1) {
-                      delateTheContact();
-                    }
-                    break;
-                  default:
-                }
-              },
+              onSelected: (String value) => popUpMenuSelected(value),
               itemBuilder: (BuildContext context) => [
-                PopupMenuItem(
+                _buildPopUpMenuItems(
                   value: '1',
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.edit,
-                        color: AppColors.getPrimaryColor,
-                      ),
-                      SizedBox(width: 10.sp),
-                      const BodyTwoDefaultText(text: "Edit")
-                    ],
-                  ),
+                  icon: Icons.edit_rounded,
+                  iconColor: AppColors.getPrimaryColor,
+                  title: 'Update',
                 ),
-                PopupMenuItem(
+                _buildPopUpMenuItems(
                   value: '2',
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.delete,
-                        color: AppColors.getErrorColor,
-                      ),
-                      SizedBox(width: 10.sp),
-                      const BodyTwoDefaultText(text: "Delete")
-                    ],
-                  ),
+                  icon: Icons.delete_rounded,
+                  iconColor: AppColors.getErrorColor,
+                  title: "Delete",
                 ),
               ],
             ),
@@ -131,8 +121,8 @@ class ContactDetailsView extends ConsumerWidget {
             padding: EdgeInsets.all(16.sp),
             child: TabBarView(
               children: <Widget>[
-                _details(context),
-                _history(),
+                _buildCustomerDetails(context),
+                _buildTransactionsHistory(),
               ],
             ),
           ),
@@ -141,7 +131,31 @@ class ContactDetailsView extends ConsumerWidget {
     );
   }
 
-  Widget _history() {
+  PopupMenuItem<String> _buildPopUpMenuItems({
+    required String value,
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+  }) {
+    return PopupMenuItem<String>(
+      value: value,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: iconColor,
+          ),
+          SizedBox(width: 18.sp),
+          BodyTwoDefaultText(text: title),
+          SizedBox(width: 18.sp),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTransactionsHistory() {
     return ListView.separated(
       itemCount: transacrtions.length,
       separatorBuilder: (context, index) => SizedBox(height: 12.sp),
@@ -173,7 +187,7 @@ class ContactDetailsView extends ConsumerWidget {
     );
   }
 
-  Stack _details(BuildContext context) {
+  Stack _buildCustomerDetails(BuildContext context) {
     return Stack(
       children: [
         Align(
@@ -215,6 +229,7 @@ class ContactDetailsView extends ConsumerWidget {
                       titile: "${customer.name} proof",
                     ),
                     child: Card(
+                      elevation: 0,
                       child: Padding(
                         padding: EdgeInsets.all(14.sp),
                         child: Row(

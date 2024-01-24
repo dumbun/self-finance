@@ -5,7 +5,7 @@ class AppThemeData {
   static final ThemeData lightTheme = ThemeData(
     primarySwatch: Colors.blue,
     primaryColor: AppColors.getPrimaryColor,
-    cardTheme: const CardTheme(color: AppColors.getBackgroundColor),
+    cardTheme: const CardTheme(color: AppColors.getBackgroundColor, elevation: 0),
     fontFamily: "hell",
     colorScheme: ColorScheme.fromSeed(
       seedColor: AppColors.getPrimaryColor,

@@ -5,6 +5,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
@@ -34,6 +35,17 @@ class ContactsView extends ConsumerWidget {
       );
     }
 
+    void contactSelectd(List<Contact> data, int index) async {
+      final List<Customer> customer =
+          await ref.read(asyncCustomersProvider.notifier).fetchRequriedCustomerDetails(customerID: data[index].id);
+      final List<Items> customerItems =
+          await ref.read(asyncItemsProvider.notifier).fetchitemOfRequriedCustomer(customerID: data[index].id);
+      final List<Trx> customerTransactions = await ref
+          .read(asyncTransactionsProvider.notifier)
+          .fetchRequriedCustomerTransactions(customerID: data[index].id);
+      navigateToDetailsView(customer, customerItems, customerTransactions);
+    }
+
     Consumer buildCustomerList() {
       return Consumer(
         builder: (context, ref, child) {
@@ -46,32 +58,31 @@ class ContactsView extends ConsumerWidget {
                             separatorBuilder: (BuildContext context, int index) => SizedBox(height: 8.sp),
                             itemBuilder: (BuildContext context, int index) {
                               return GestureDetector(
-                                onTap: () async {
-                                  final List<Customer> customer = await ref
-                                      .read(asyncCustomersProvider.notifier)
-                                      .fetchRequriedCustomerDetails(customerID: data[index].id);
-                                  final List<Items> customerItems = await ref
-                                      .read(asyncItemsProvider.notifier)
-                                      .fetchitemOfRequriedCustomer(customerID: data[index].id);
-                                  final List<Trx> customerTransactions = await ref
-                                      .read(asyncTransactionsProvider.notifier)
-                                      .fetchRequriedCustomerTransactions(customerID: data[index].id);
-                                  navigateToDetailsView(customer, customerItems, customerTransactions);
-                                },
+                                onTap: () => contactSelectd(data, index),
                                 child: Card(
                                   elevation: 0,
                                   child: Padding(
-                                    padding: EdgeInsets.all(16.sp),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                    padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
-                                        BodyTwoDefaultText(
-                                          text: data[index].name,
-                                          bold: true,
+                                        Column(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            BodyTwoDefaultText(
+                                              text: data[index].name,
+                                              bold: true,
+                                            ),
+                                            BodyTwoDefaultText(
+                                              text: data[index].number,
+                                              color: AppColors.getLigthGreyColor,
+                                            )
+                                          ],
                                         ),
-                                        BodyTwoDefaultText(
-                                          text: data[index].number,
+                                        const Icon(
+                                          Icons.arrow_forward_ios_rounded,
                                           color: AppColors.getLigthGreyColor,
                                         )
                                       ],

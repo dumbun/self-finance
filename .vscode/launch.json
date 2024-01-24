@@ -5,16 +5,18 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "self_finance",
+      "name": "self_finance (debug mode)",
       "request": "launch",
       "type": "dart",
       "noDebug": true,
+      "args": ["--no-enable-impeller"]
     },
     {
       "name": "self_finance (profile mode)",
       "request": "launch",
       "type": "dart",
-      "flutterMode": "release"
+      "flutterMode": "release",
+      "noDebug": true,
     },
     {
       "name": "self_finance (release mode)",
