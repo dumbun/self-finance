@@ -6,7 +6,7 @@ part of 'items_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$asyncItemsHash() => r'25c5b98cd5c64f2a62c26f98334a6d1a7d531539';
+String _$asyncItemsHash() => r'4b30672dfa4cea8781722957435ac1c0df041636';
 
 /// See also [AsyncItems].
 @ProviderFor(AsyncItems)

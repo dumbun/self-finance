@@ -5,6 +5,7 @@ import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
 import 'package:self_finance/views/contact_details_view.dart';
 import 'package:self_finance/views/contacts_view.dart';
+import 'package:self_finance/views/customer_editind_view.dart';
 import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/details_view.dart';
 import 'package:self_finance/views/pin_creating_view.dart';
@@ -12,10 +13,14 @@ import 'package:self_finance/views/image_view.dart';
 import 'package:self_finance/views/user_creating_view.dart';
 
 class Routes {
-  final BuildContext context;
-  const Routes({required this.context});
+  static void navigateToContactEditingView({required BuildContext context, required Customer contact}) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => ContactEditingView(contact: contact)),
+      (route) => true,
+    );
+  }
 
-  static navigateToContactDetailsView(BuildContext context,
+  static void navigateToContactDetailsView(BuildContext context,
       {required Customer customer, required List<Items> items, required List<Trx> transacrtions}) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -24,7 +29,7 @@ class Routes {
     );
   }
 
-  static navigateToContactsView(BuildContext context) {
+  static void navigateToContactsView(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const ContactsView(),
@@ -32,7 +37,7 @@ class Routes {
     );
   }
 
-  static navigateToUserCreationView(BuildContext context, String pin) {
+  static void navigateToUserCreationView(BuildContext context, String pin) {
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
@@ -41,7 +46,7 @@ class Routes {
         (route) => false);
   }
 
-  static navigateToPinCreationView(BuildContext context) {
+  static void navigateToPinCreationView(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -50,7 +55,7 @@ class Routes {
     );
   }
 
-  static navigateToDashboard({required BuildContext context}) {
+  static void navigateToDashboard({required BuildContext context}) {
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (BuildContext context) => const DashboardView(),
@@ -58,7 +63,7 @@ class Routes {
         (route) => false);
   }
 
-  static navigateToDetailsView({required BuildContext context, required Trx data}) {
+  static void navigateToDetailsView({required BuildContext context, required Trx data}) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) => DetailsView(data: data),
@@ -66,7 +71,7 @@ class Routes {
     );
   }
 
-  static navigateToImageView({required BuildContext context, required String imageData, required String titile}) {
+  static void navigateToImageView({required BuildContext context, required String imageData, required String titile}) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) => ImageView(imageString: imageData, titile: titile),
@@ -74,7 +79,7 @@ class Routes {
     );
   }
 
-  static navigateToAddNewEntry({required BuildContext context}) {
+  static void navigateToAddNewEntry({required BuildContext context}) {
     Navigator.of(context).push(
       MaterialPageRoute(
         settings: const RouteSettings(

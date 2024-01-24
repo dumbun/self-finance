@@ -7,7 +7,7 @@ part of 'customer_contacts_provider.dart';
 // **************************************************************************
 
 String _$asyncCustomersContactsHash() =>
-    r'dd512dbb04c25dac0078c07761f492015c351f64';
+    r'9f7155c208e2e8a38d386122b98f176f84aa12a2';
 
 /// See also [AsyncCustomersContacts].
 @ProviderFor(AsyncCustomersContacts)

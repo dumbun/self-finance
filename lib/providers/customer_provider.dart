@@ -38,4 +38,12 @@ class AsyncCustomers extends _$AsyncCustomers {
     });
     return data;
   }
+
+  Future<List<Customer>> fetchRequriedCustomerDetails(int id) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() {
+      return _fetchAllCustomersData();
+    });
+    return await BackEnd.fetchSingleContactDetails(id: id);
+  }
 }

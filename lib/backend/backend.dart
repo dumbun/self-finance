@@ -18,6 +18,7 @@ class BackEnd {
           Customer_Address TEXT NOT NULL,
           Contact_Number   TEXT UNIQUE NOT NULL,
           Customer_Photo   BLOB NOT NULL,
+          Proof_Photo      BLOB NOT NULL,
           Created_Date     TEXT NOT NULL 
           );
       """);
@@ -50,7 +51,6 @@ class BackEnd {
           Interest_Rate    REAL NOT NULL,
           Interest_Amount  REAL NOT NULL,
           Remaining_Amount REAL NOT NULL,
-          Proof_Photo      BLOB NOT NULL,
           Created_Date     TEXT NOT NULL 
           );
         """);
@@ -92,6 +92,7 @@ class BackEnd {
         "Customer_Address": customer.address,
         "Contact_Number": customer.number,
         "Customer_Photo": customer.photo,
+        "Proof_Photo": customer.proof,
         "Created_Date": customer.createdDate,
       };
       final int id = await db.insert('Customers', data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
@@ -140,9 +141,73 @@ class BackEnd {
     }
   }
 
+  static Future deleteTheCustomer({required int customerID}) async {
+    final Database db = await BackEnd.db();
+    try {
+      await db.delete(
+        "Customers",
+        where: 'Customer_ID = ?',
+        whereArgs: [customerID],
+      );
+      await db.delete(
+        "Items",
+        where: 'Customer_ID = ?',
+        whereArgs: [customerID],
+      );
+      final List<Trx> t = Trx.toList(
+        await db.query(
+          "Transactions",
+          where: 'Customer_ID = ?',
+          whereArgs: [customerID],
+        ),
+      );
+      t.map((e) async {
+        await db.delete(
+          "Payments",
+          where: 'Transaction_ID = ?',
+          whereArgs: [e.id],
+        );
+      });
+      await db.delete(
+        "Transactions",
+        where: 'Customer_ID = ?',
+        whereArgs: [customerID],
+      );
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<void> updateCustomerDetails({
+    required int customerId,
+    required String newCustomerName,
+    required String newGuardianName,
+    required String newCustomerAddress,
+    required String newContactNumber,
+    required String newCustomerPhoto,
+    required String newProofPhoto,
+    required String newCreatedDate,
+  }) async {
+    final db = await BackEnd.db();
+    await db.update(
+      'Customers',
+      {
+        'Customer_Name': newCustomerName,
+        'Gaurdian_Name': newGuardianName,
+        'Customer_Address': newCustomerAddress,
+        'Contact_Number': newContactNumber,
+        'Customer_Photo': newCustomerPhoto,
+        'Proof_Photo': newProofPhoto,
+        'Created_Date': newCreatedDate,
+      },
+      where: 'Customer_ID = ?',
+      whereArgs: [customerId],
+    );
+  }
+
   //// I T E M S
   /// create a new item row
-  static Future createNewItem(Items item) async {
+  static Future<int> createNewItem(Items item) async {
     try {
       final db = await BackEnd.db();
       final Map<String, Object> data = {
@@ -198,7 +263,6 @@ class BackEnd {
         "Interest_Rate": transasction.intrestRate,
         "Interest_Amount": transasction.intrestAmount,
         "Remaining_Amount": transasction.remainingAmount,
-        "Proof_Photo": transasction.proofPhoto,
         "Created_Date": transasction.createdDate,
       };
       final response = await db.insert("Transactions", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);

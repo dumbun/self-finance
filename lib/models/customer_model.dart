@@ -7,6 +7,7 @@ class Customer {
   final String address;
   final String number;
   final String photo;
+  final String proof;
   final String createdDate;
 
   Customer({
@@ -16,6 +17,7 @@ class Customer {
     required this.address,
     required this.number,
     required this.photo,
+    required this.proof,
     required this.createdDate,
   });
 
@@ -31,6 +33,7 @@ class Customer {
         address: e["Customer_Address"] as String,
         number: e["Contact_Number"] as String,
         photo: e["Customer_Photo"] as String,
+        proof: e["Proof_Photo"] as String,
         createdDate: e["Created_Date"] as String,
       );
     }).toList();
@@ -43,6 +46,7 @@ class Customer {
     String? address,
     String? number,
     String? photo,
+    String? proof,
     String? createdDate,
   }) {
     return Customer(
@@ -52,6 +56,7 @@ class Customer {
       address: address ?? this.address,
       number: number ?? this.number,
       photo: photo ?? this.photo,
+      proof: proof ?? this.proof,
       createdDate: createdDate ?? this.createdDate,
     );
   }
@@ -64,6 +69,7 @@ class Customer {
       'address': address,
       'number': number,
       'photo': photo,
+      'proof': proof,
       'createdDate': createdDate,
     };
   }
@@ -76,6 +82,7 @@ class Customer {
       address: map['address'] as String,
       number: map['number'] as String,
       photo: map['photo'] as String,
+      proof: map['proof'] as String,
       createdDate: map['createdDate'] as String,
     );
   }
@@ -86,7 +93,7 @@ class Customer {
 
   @override
   String toString() {
-    return 'Customer(id: $id, name: $name, guardianName: $guardianName, address: $address, number: $number, photo: $photo, createdDate: $createdDate)';
+    return 'Customer(id: $id, name: $name, guardianName: $guardianName, address: $address, number: $number, photo: $photo, proof: $proof, createdDate: $createdDate)';
   }
 
   @override
@@ -99,6 +106,7 @@ class Customer {
         other.address == address &&
         other.number == number &&
         other.photo == photo &&
+        other.proof == proof &&
         other.createdDate == createdDate;
   }
 
@@ -110,6 +118,7 @@ class Customer {
         address.hashCode ^
         number.hashCode ^
         photo.hashCode ^
+        proof.hashCode ^
         createdDate.hashCode;
   }
 }

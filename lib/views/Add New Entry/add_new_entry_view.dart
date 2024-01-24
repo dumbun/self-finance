@@ -187,6 +187,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
           address: _address.text,
           number: _mobileNumber.text,
           photo: ref.read(pickedCustomerProfileImageStringProvider),
+          proof: ref.read(pickedCustomerProofImageStringProvider),
           createdDate: DateTime.now().toString(),
         );
         final int customerCreatedResponse =
@@ -216,7 +217,6 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
           intrestRate: _doubleCheck(_rateOfIntrest.text),
           intrestAmount: _doubleCheck(_takenAmount.text) * (_doubleCheck(_rateOfIntrest.text) / 100),
           remainingAmount: 0,
-          proofPhoto: ref.read(pickedCustomerProofImageStringProvider),
           createdDate: DateTime.now().toString(),
         );
         final int transactionCreatedResponse =

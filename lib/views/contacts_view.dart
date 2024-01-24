@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
@@ -10,6 +9,9 @@ import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
+import 'package:self_finance/providers/customer_provider.dart';
+import 'package:self_finance/providers/items_provider.dart';
+import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 
 class ContactsView extends ConsumerWidget {
@@ -45,21 +47,24 @@ class ContactsView extends ConsumerWidget {
                             itemBuilder: (BuildContext context, int index) {
                               return GestureDetector(
                                 onTap: () async {
-                                  final List<Customer> customer =
-                                      await BackEnd.fetchSingleContactDetails(id: data[index].id);
-                                  final List<Items> customerItems =
-                                      await BackEnd.fetchitemOfRequriedCustomer(customerID: data[index].id);
-                                  final List<Trx> customerTransactions =
-                                      await BackEnd.fetchRequriedCustomerTransactions(customerId: data[index].id);
+                                  final List<Customer> customer = await ref
+                                      .read(asyncCustomersProvider.notifier)
+                                      .fetchRequriedCustomerDetails(data[index].id);
+                                  final List<Items> customerItems = await ref
+                                      .read(asyncItemsProvider.notifier)
+                                      .fetchitemOfRequriedCustomer(customerID: data[index].id);
+                                  final List<Trx> customerTransactions = await ref
+                                      .read(asyncTransactionsProvider.notifier)
+                                      .fetchRequriedCustomerTransactions(customerID: data[index].id);
                                   navigateToDetailsView(customer, customerItems, customerTransactions);
                                 },
                                 child: Card(
                                   elevation: 0,
                                   child: Padding(
                                     padding: EdgeInsets.all(16.sp),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         BodyTwoDefaultText(
                                           text: data[index].name,

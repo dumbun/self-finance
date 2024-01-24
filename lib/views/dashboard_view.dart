@@ -20,6 +20,7 @@ class DashboardView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final PageController pageController = PageController();
     return Scaffold(
+      floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       drawer: const Drawer(
         child: Column(
           children: [],

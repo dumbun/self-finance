@@ -35,4 +35,38 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
       });
     }
   }
+
+  Future<void> deleteCustomer({required int customerID}) async {
+    await BackEnd.deleteTheCustomer(customerID: customerID);
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() {
+      return _fetchAllCustomersContactsData();
+    });
+  }
+
+  Future<void> updateCustomer({
+    required int customerId,
+    required String newCustomerName,
+    required String newGuardianName,
+    required String newCustomerAddress,
+    required String newContactNumber,
+    required String newCustomerPhoto,
+    required String newProofPhoto,
+    required String newCreatedDate,
+  }) async {
+    state = const AsyncValue.loading();
+    await BackEnd.updateCustomerDetails(
+      customerId: customerId,
+      newContactNumber: newContactNumber,
+      newCustomerAddress: newCustomerAddress,
+      newCreatedDate: newCreatedDate,
+      newCustomerName: newCustomerName,
+      newCustomerPhoto: newCustomerPhoto,
+      newGuardianName: newGuardianName,
+      newProofPhoto: newProofPhoto,
+    );
+    state = await AsyncValue.guard(() async {
+      return _fetchAllCustomersContactsData();
+    });
+  }
 }

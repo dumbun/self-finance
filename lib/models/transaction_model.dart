@@ -22,7 +22,6 @@ class Trx {
   final double intrestRate;
   final double intrestAmount;
   final double remainingAmount;
-  final String proofPhoto;
   final String createdDate;
 
   Trx({
@@ -35,7 +34,6 @@ class Trx {
     required this.intrestRate,
     required this.intrestAmount,
     required this.remainingAmount,
-    required this.proofPhoto,
     required this.createdDate,
   });
 
@@ -55,7 +53,6 @@ class Trx {
         intrestRate: e["Interest_Rate"],
         intrestAmount: e["Interest_Amount"],
         remainingAmount: e["Remaining_Amount"],
-        proofPhoto: e["Proof_Photo"],
         createdDate: e["Created_Date"],
       );
     }).toList();
@@ -84,7 +81,6 @@ class Trx {
       intrestRate: intrestRate ?? this.intrestRate,
       intrestAmount: intrestAmount ?? this.intrestAmount,
       remainingAmount: remainingAmount ?? this.remainingAmount,
-      proofPhoto: proofPhoto ?? this.proofPhoto,
       createdDate: createdDate ?? this.createdDate,
     );
   }
@@ -100,7 +96,6 @@ class Trx {
       'intrestRate': intrestRate,
       'intrestAmount': intrestAmount,
       'remainingAmount': remainingAmount,
-      'proofPhoto': proofPhoto,
       'createdDate': createdDate,
     };
   }
@@ -116,7 +111,6 @@ class Trx {
       intrestRate: map['intrestRate'] as double,
       intrestAmount: map['intrestAmount'] as double,
       remainingAmount: map['remainingAmount'] as double,
-      proofPhoto: map['proofPhoto'] as String,
       createdDate: map['createdDate'] as String,
     );
   }
@@ -127,7 +121,7 @@ class Trx {
 
   @override
   String toString() {
-    return 'Transaction(id: $id, customerId: $customerId, itemId: $itemId, transacrtionDate: $transacrtionDate, transacrtionType: $transacrtionType, amount: $amount, intrestRate: $intrestRate, intrestAmount: $intrestAmount, remainingAmount: $remainingAmount, proofPhoto: $proofPhoto, createdDate: $createdDate)';
+    return 'Transaction(id: $id, customerId: $customerId, itemId: $itemId, transacrtionDate: $transacrtionDate, transacrtionType: $transacrtionType, amount: $amount, intrestRate: $intrestRate, intrestAmount: $intrestAmount, remainingAmount: $remainingAmount, createdDate: $createdDate)';
   }
 
   @override
@@ -143,7 +137,6 @@ class Trx {
         other.intrestRate == intrestRate &&
         other.intrestAmount == intrestAmount &&
         other.remainingAmount == remainingAmount &&
-        other.proofPhoto == proofPhoto &&
         other.createdDate == createdDate;
   }
 
@@ -158,7 +151,6 @@ class Trx {
         intrestRate.hashCode ^
         intrestAmount.hashCode ^
         remainingAmount.hashCode ^
-        proofPhoto.hashCode ^
         createdDate.hashCode;
   }
 }

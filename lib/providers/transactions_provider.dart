@@ -27,4 +27,14 @@ class AsyncTransactions extends _$AsyncTransactions {
     });
     return result;
   }
+
+  Future<List<Trx>> fetchRequriedCustomerTransactions({required int customerID}) async {
+    // Set the state to loading
+    state = const AsyncValue.loading();
+    // Add the new todo and reload the todo list from the remote repository
+    state = await AsyncValue.guard(() async {
+      return _fetchAllTransactionsData();
+    });
+    return await BackEnd.fetchRequriedCustomerTransactions(customerId: customerID);
+  }
 }

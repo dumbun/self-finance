@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -40,16 +39,10 @@ class _CallButtonWidgetState extends State<CallButtonWidget> {
     }
   }
 
-  Card _buildDisabledPhone() {
-    return Card(
-      shape: const CircleBorder(),
-      child: Padding(
-        padding: EdgeInsets.all(16.sp),
-        child: const Icon(
-          Icons.phone_disabled_rounded,
-          color: AppColors.getErrorColor,
-        ),
-      ),
+  Icon _buildDisabledPhone() {
+    return const Icon(
+      Icons.phone_disabled_rounded,
+      color: AppColors.getErrorColor,
     );
   }
 }
