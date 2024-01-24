@@ -20,11 +20,11 @@ import 'package:self_finance/widgets/title_widget.dart';
 /// this providers must update  the costomers old images as the primary values for the respected views before use
 /// because of this providers have inital value has empty state
 
-final updatedCustomerPhotoStringProvider = StateProvider.autoDispose<String>((ref) {
+final updatedCustomerPhotoStringProvider = StateProvider<String>((ref) {
   return "";
 });
 
-final updatedCustomerProofStringProvider = StateProvider.autoDispose<String>((ref) {
+final updatedCustomerProofStringProvider = StateProvider<String>((ref) {
   return "";
 });
 
