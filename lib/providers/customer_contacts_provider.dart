@@ -37,14 +37,14 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
   }
 
   Future<void> deleteCustomer({required int customerID}) async {
-    await BackEnd.deleteTheCustomer(customerID: customerID);
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() {
+    state = await AsyncValue.guard(() async {
+      await BackEnd.deleteTheCustomer(customerID: customerID);
       return _fetchAllCustomersContactsData();
     });
   }
 
-  Future<void> updateCustomer({
+  Future<int> updateCustomer({
     required int customerId,
     required String newCustomerName,
     required String newGuardianName,
@@ -54,8 +54,9 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
     required String newProofPhoto,
     required String newCreatedDate,
   }) async {
+    int response;
     state = const AsyncValue.loading();
-    await BackEnd.updateCustomerDetails(
+    response = await BackEnd.updateCustomerDetails(
       customerId: customerId,
       newContactNumber: newContactNumber,
       newCustomerAddress: newCustomerAddress,
@@ -68,5 +69,6 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
     state = await AsyncValue.guard(() async {
       return _fetchAllCustomersContactsData();
     });
+    return response;
   }
 }

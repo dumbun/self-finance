@@ -178,7 +178,7 @@ class BackEnd {
     }
   }
 
-  static Future<void> updateCustomerDetails({
+  static Future<int> updateCustomerDetails({
     required int customerId,
     required String newCustomerName,
     required String newGuardianName,
@@ -189,7 +189,7 @@ class BackEnd {
     required String newCreatedDate,
   }) async {
     final db = await BackEnd.db();
-    await db.update(
+    int count = await db.update(
       'Customers',
       {
         'Customer_Name': newCustomerName,
@@ -203,6 +203,7 @@ class BackEnd {
       where: 'Customer_ID = ?',
       whereArgs: [customerId],
     );
+    return count;
   }
 
   //// I T E M S

@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
 import 'package:self_finance/views/contact_details_view.dart';
-import 'package:self_finance/views/contacts_view.dart';
 import 'package:self_finance/views/customer_editind_view.dart';
-import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/details_view.dart';
 import 'package:self_finance/views/pin_creating_view.dart';
 import 'package:self_finance/views/image_view.dart';
@@ -30,11 +27,7 @@ class Routes {
   }
 
   static void navigateToContactsView(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const ContactsView(),
-      ),
-    );
+    Navigator.of(context).pushNamed('/contactsView');
   }
 
   static void navigateToUserCreationView(BuildContext context, String pin) {
@@ -56,11 +49,7 @@ class Routes {
   }
 
   static void navigateToDashboard({required BuildContext context}) {
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (BuildContext context) => const DashboardView(),
-        ),
-        (route) => false);
+    Navigator.of(context).pushNamed('/dashboardview');
   }
 
   static void navigateToDetailsView({required BuildContext context, required Trx data}) {
@@ -80,13 +69,6 @@ class Routes {
   }
 
   static void navigateToAddNewEntry({required BuildContext context}) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        settings: const RouteSettings(
-          name: "add new transacrtion with new contact",
-        ),
-        builder: (context) => const AddNewEntery(),
-      ),
-    );
+    Navigator.of(context).pushNamed('/addNewEntry');
   }
 }

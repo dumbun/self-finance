@@ -49,7 +49,7 @@ class ContactsView extends ConsumerWidget {
                                 onTap: () async {
                                   final List<Customer> customer = await ref
                                       .read(asyncCustomersProvider.notifier)
-                                      .fetchRequriedCustomerDetails(data[index].id);
+                                      .fetchRequriedCustomerDetails(customerID: data[index].id);
                                   final List<Items> customerItems = await ref
                                       .read(asyncItemsProvider.notifier)
                                       .fetchitemOfRequriedCustomer(customerID: data[index].id);

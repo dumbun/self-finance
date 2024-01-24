@@ -173,7 +173,7 @@ class ContactDetailsView extends ConsumerWidget {
     );
   }
 
-  _details(BuildContext context) {
+  Stack _details(BuildContext context) {
     return Stack(
       children: [
         Align(

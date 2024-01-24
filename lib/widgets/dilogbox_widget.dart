@@ -12,30 +12,24 @@ class AlertDilogs {
         title: Text(title),
         content: BodyTwoDefaultText(text: content),
         actions: [
-          TextButton.icon(
+          TextButton(
             onPressed: () {
               value = 1;
               Navigator.of(context).pop(context);
             },
-            icon: const Icon(
-              Icons.done,
+            child: const BodyOneDefaultText(
+              text: "Yes",
               color: AppColors.getGreenColor,
             ),
-            label: const BodyOneDefaultText(
-              text: "Yes",
-            ),
           ),
-          TextButton.icon(
+          TextButton(
             onPressed: () {
               value = 2;
               Navigator.of(context).pop(context);
             },
-            icon: const Icon(
-              Icons.cancel_rounded,
-              color: AppColors.getErrorColor,
-            ),
-            label: const BodyOneDefaultText(
+            child: const BodyOneDefaultText(
               text: "No",
+              color: AppColors.getErrorColor,
             ),
           ),
         ],
@@ -48,15 +42,12 @@ class AlertDilogs {
     return showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog.adaptive(
-        title: Text(title),
-        content: Text(content, style: const TextStyle(fontSize: 22)),
+        title: BodyOneDefaultText(text: title),
+        content: BodyOneDefaultText(text: content),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(context, 'OK'),
-            child: const Text(
-              'OK',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            child: const BodyOneDefaultText(text: 'OK'),
           ),
         ],
       ),
