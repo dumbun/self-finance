@@ -9,6 +9,8 @@ import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/theme/theme_data.dart';
 import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
 import 'package:self_finance/views/auth_view.dart';
+import 'package:self_finance/views/contacts_view.dart';
+import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/terms_and_conditions.dart';
 
 void main() async {
@@ -26,7 +28,9 @@ class MyApp extends ConsumerWidget {
     return ResponsiveSizer(
       builder: (context, orientation, screenType) => MaterialApp(
         routes: {
+          '/dashboardview': (context) => const DashboardView(),
           '/addNewEntry': (context) => const AddNewEntery(),
+          '/contactsView': (context) => const ContactsView(),
         },
         color: AppColors.getPrimaryColor,
         title: 'Self Finance',
@@ -37,10 +41,10 @@ class MyApp extends ConsumerWidget {
         home: ref.watch(asyncUserProvider).when(
               data: (user) {
                 if (user.isNotEmpty) {
-                  // if user is present then build AuthView for autontication
+                  // if user is present then build AuthView for authentication
                   return AuthView(user: user.first);
                 } else {
-                  // if user is not present then build AuthView for autontication
+                  // if user is not present then build t&c for register
                   return const TermsAndConditons();
                 }
               },

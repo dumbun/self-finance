@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -15,16 +14,6 @@ class CallButtonWidget extends StatefulWidget {
 class _CallButtonWidgetState extends State<CallButtonWidget> {
   bool _hasCallSupport = false;
 
-  Future<void> _makePhoneCall(String phoneNumber) async {
-    final Uri launchUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
-    );
-    if (!await launchUrl(launchUri)) {
-      throw Exception('Could not launch $launchUri');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -38,24 +27,11 @@ class _CallButtonWidgetState extends State<CallButtonWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final String phoneNumber = widget.phoneNumber;
-    if (Utility.isValidPhoneNumber(phoneNumber)) {
+    if (Utility.isValidPhoneNumber(widget.phoneNumber)) {
       return _hasCallSupport
-          ? ElevatedButton(
-              style: ButtonStyle(
-                alignment: Alignment.center,
-                enableFeedback: true,
-                animationDuration: Durations.long1,
-                shape: const MaterialStatePropertyAll<OutlinedBorder?>(CircleBorder()),
-                padding: MaterialStatePropertyAll(EdgeInsets.all(16.sp)),
-              ),
-              onPressed: () async {
-                await _makePhoneCall(widget.phoneNumber);
-              },
-              child: const Icon(
-                Icons.call,
-                color: AppColors.getPrimaryColor,
-              ),
+          ? const Icon(
+              Icons.call,
+              color: AppColors.getPrimaryColor,
             )
           : _buildDisabledPhone();
     } else {
@@ -63,16 +39,10 @@ class _CallButtonWidgetState extends State<CallButtonWidget> {
     }
   }
 
-  Card _buildDisabledPhone() {
-    return Card(
-      shape: const CircleBorder(),
-      child: Padding(
-        padding: EdgeInsets.all(16.sp),
-        child: const Icon(
-          Icons.phone_disabled_rounded,
-          color: AppColors.getErrorColor,
-        ),
-      ),
+  Icon _buildDisabledPhone() {
+    return const Icon(
+      Icons.phone_disabled_rounded,
+      color: AppColors.getErrorColor,
     );
   }
 }

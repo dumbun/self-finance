@@ -48,7 +48,7 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>using image to save in your database</string>
+	<string>using images from gallary to save in your database</string>
 	<key>NSCameraUsageDescription</key>
 	<string>using image to save in your database</string>
 	<key>NSMicrophoneUsageDescription</key>

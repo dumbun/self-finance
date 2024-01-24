@@ -25,22 +25,22 @@ class Items {
     required this.createdDate,
   });
 
-  static List<Items> toList(List<Map<String, dynamic>> data) {
+  static List<Items> toList(List<Map<String, Object?>> data) {
     if (data.isEmpty) {
       return []; // If data is empty, return an empty list directly
     }
     return data.map((e) {
       return Items(
-        id: e["Item_ID"],
-        customerid: e["Customer_ID"],
-        name: e["Item_Name"],
-        description: e["Item_Description"],
-        pawnedDate: e["Pawned_Date"],
-        expiryDate: e["Expiry_Date"],
-        pawnAmount: e["Pawn_Amount"],
-        status: e["Item_Status"],
-        photo: e["Item_Photo"],
-        createdDate: e["Created_Date"],
+        id: e["Item_ID"] as int,
+        customerid: e["Customer_ID"] as int,
+        name: e["Item_Name"] as String,
+        description: e["Item_Description"] as String,
+        pawnedDate: e["Pawned_Date"] as String,
+        expiryDate: e["Expiry_Date"] as String,
+        pawnAmount: e["Pawn_Amount"] as double,
+        status: e["Item_Status"] as String,
+        photo: e["Item_Photo"] as String,
+        createdDate: e["Created_Date"] as String,
       );
     }).toList();
   }

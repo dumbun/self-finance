@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 class Customer {
-  int? id;
+  final int? id;
   final String name;
   final String guardianName;
   final String address;
   final String number;
   final String photo;
+  final String proof;
   final String createdDate;
 
   Customer({
@@ -16,22 +17,24 @@ class Customer {
     required this.address,
     required this.number,
     required this.photo,
+    required this.proof,
     required this.createdDate,
   });
 
-  static List<Customer> toList(List<Map<String, dynamic>> data) {
+  static List<Customer> toList(List<Map<String, Object?>> data) {
     if (data.isEmpty) {
       return []; // If data is empty, return an empty list directly
     }
     return data.map((e) {
       return Customer(
-        id: e["Customer_ID"],
-        name: e["Customer_Name"],
-        guardianName: e["Guardian_Name"], // Corrected the spelling of 'Guardian_Name'
-        address: e["Customer_Address"],
-        number: e["Contact_Number"],
-        photo: e["Customer_Photo"],
-        createdDate: e["Created_Date"],
+        id: e["Customer_ID"] as int,
+        name: e["Customer_Name"] as String,
+        guardianName: e["Gaurdian_Name"] as String,
+        address: e["Customer_Address"] as String,
+        number: e["Contact_Number"] as String,
+        photo: e["Customer_Photo"] as String,
+        proof: e["Proof_Photo"] as String,
+        createdDate: e["Created_Date"] as String,
       );
     }).toList();
   }
@@ -43,6 +46,7 @@ class Customer {
     String? address,
     String? number,
     String? photo,
+    String? proof,
     String? createdDate,
   }) {
     return Customer(
@@ -52,6 +56,7 @@ class Customer {
       address: address ?? this.address,
       number: number ?? this.number,
       photo: photo ?? this.photo,
+      proof: proof ?? this.proof,
       createdDate: createdDate ?? this.createdDate,
     );
   }
@@ -64,6 +69,7 @@ class Customer {
       'address': address,
       'number': number,
       'photo': photo,
+      'proof': proof,
       'createdDate': createdDate,
     };
   }
@@ -76,6 +82,7 @@ class Customer {
       address: map['address'] as String,
       number: map['number'] as String,
       photo: map['photo'] as String,
+      proof: map['proof'] as String,
       createdDate: map['createdDate'] as String,
     );
   }
@@ -86,7 +93,7 @@ class Customer {
 
   @override
   String toString() {
-    return 'Customer(id: $id, name: $name, guardianName: $guardianName, address: $address, number: $number, photo: $photo, createdDate: $createdDate)';
+    return 'Customer(id: $id, name: $name, guardianName: $guardianName, address: $address, number: $number, photo: $photo, proof: $proof, createdDate: $createdDate)';
   }
 
   @override
@@ -99,6 +106,7 @@ class Customer {
         other.address == address &&
         other.number == number &&
         other.photo == photo &&
+        other.proof == proof &&
         other.createdDate == createdDate;
   }
 
@@ -110,6 +118,7 @@ class Customer {
         address.hashCode ^
         number.hashCode ^
         photo.hashCode ^
+        proof.hashCode ^
         createdDate.hashCode;
   }
 }

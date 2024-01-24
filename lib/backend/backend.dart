@@ -1,4 +1,5 @@
 import 'package:path_provider/path_provider.dart';
+import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
@@ -12,12 +13,13 @@ class BackEnd {
           -- Customers Table
           CREATE TABLE Customers (
           Customer_ID      INTEGER PRIMARY KEY AUTOINCREMENT,
-          Customer_Name    TEXT,
-          Gaurdian_Name    TEXT,
-          Customer_Address TEXT,
+          Customer_Name    TEXT NOT NULL,
+          Gaurdian_Name    TEXT NOT NULL,
+          Customer_Address TEXT NOT NULL,
           Contact_Number   TEXT UNIQUE NOT NULL,
-          Customer_Photo   TEXT,
-          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          Customer_Photo   BLOB NOT NULL,
+          Proof_Photo      BLOB NOT NULL,
+          Created_Date     TEXT NOT NULL 
           );
       """);
 
@@ -26,14 +28,14 @@ class BackEnd {
           CREATE TABLE Items (
           Item_ID          INTEGER PRIMARY KEY AUTOINCREMENT,
           Customer_ID      INTEGER REFERENCES Customers(Customer_ID),
-          Item_Name        TEXT,
-          Item_Description TEXT,
-          Pawned_Date      TEXT,
-          Expiry_Date      TEXT,
-          Pawn_Amount      REAL,
-          Item_Status      TEXT,
-          Item_Photo       TEXT,
-          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          Item_Name        TEXT NOT NULL,
+          Item_Description TEXT NOT NULL,
+          Pawned_Date      TEXT NOT NULL,
+          Expiry_Date      TEXT NOT NULL,
+          Pawn_Amount      REAL NOT NULL,
+          Item_Status      TEXT NOT NULL,
+          Item_Photo       BLOB NOT NULL,
+          Created_Date     TEXT NOT NULL
           );
         """);
 
@@ -43,14 +45,13 @@ class BackEnd {
           Transaction_ID   INTEGER PRIMARY KEY AUTOINCREMENT,
           Customer_ID      INTEGER REFERENCES Customers(Customer_ID),
           Item_ID          INTEGER REFERENCES Items(Item_ID),
-          Transaction_Date TEXT,
-          Transaction_Type TEXT,
-          Amount           REAL,
-          Interest_Rate    REAL,
-          Interest_Amount  REAL,
-          Remaining_Amount REAL,
-          Proof_Photo      TEXT,
-          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          Transaction_Date TEXT NOT NULL,
+          Transaction_Type TEXT NOT NULL,
+          Amount           REAL NOT NULL,
+          Interest_Rate    REAL NOT NULL,
+          Interest_Amount  REAL NOT NULL,
+          Remaining_Amount REAL NOT NULL,
+          Created_Date     TEXT NOT NULL 
           );
         """);
     await database.execute("""
@@ -58,10 +59,10 @@ class BackEnd {
           CREATE TABLE Payments (
           Payment_ID       INTEGER PRIMARY KEY AUTOINCREMENT,
           Transaction_ID   INTEGER REFERENCES Transactions(Transaction_ID),
-          Payment_Date     TEXT,
-          Amount_Paid      REAL,
-          Payment_Type     TEXT,
-          Created_Date     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          Payment_Date     TEXT NOT NULL,
+          Amount_Paid      REAL NOT NULL,
+          Payment_Type     TEXT NOT NULL,
+          Created_Date     TEXT NOT NULL
           );
         """);
     await database.execute("""
@@ -91,6 +92,7 @@ class BackEnd {
         "Customer_Address": customer.address,
         "Contact_Number": customer.number,
         "Customer_Photo": customer.photo,
+        "Proof_Photo": customer.proof,
         "Created_Date": customer.createdDate,
       };
       final int id = await db.insert('Customers', data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
@@ -107,9 +109,106 @@ class BackEnd {
     return Customer.toList(response);
   }
 
+  /// [fetchAllCustomerNumbers] fetch's the mobile numbers from the all customers
+  static Future<List<String>> fetchAllCustomerNumbers() async {
+    final Database db = await BackEnd.db();
+    final response = await db.rawQuery("""SELECT Contact_Number FROM Customers""");
+    return response.map((e) {
+      return e["Contact_Number"] as String;
+    }).toList();
+  }
+
+  /// [fetchAllCustomerNumbersWithNames] fetch's the mobile numbers with there id and name from the all customers
+  static Future<List<Contact>> fetchAllCustomerNumbersWithNames() async {
+    final Database db = await BackEnd.db();
+    final List<Map<String, Object?>> response = await db
+        .rawQuery("""SELECT Customer_ID, Customer_Name, Contact_Number FROM Customers ORDER BY Customer_Name ASC""");
+
+    return Contact.toList(response);
+  }
+
+  static Future<List<Customer>> fetchSingleContactDetails({required int id}) async {
+    try {
+      final db = await BackEnd.db();
+      final response = await db.query(
+        'Customers',
+        where: 'Customer_ID = ?',
+        whereArgs: [id],
+      );
+      return Customer.toList(response);
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static Future deleteTheCustomer({required int customerID}) async {
+    final Database db = await BackEnd.db();
+    try {
+      await db.delete(
+        "Customers",
+        where: 'Customer_ID = ?',
+        whereArgs: [customerID],
+      );
+      await db.delete(
+        "Items",
+        where: 'Customer_ID = ?',
+        whereArgs: [customerID],
+      );
+      final List<Trx> t = Trx.toList(
+        await db.query(
+          "Transactions",
+          where: 'Customer_ID = ?',
+          whereArgs: [customerID],
+        ),
+      );
+      t.map((e) async {
+        await db.delete(
+          "Payments",
+          where: 'Transaction_ID = ?',
+          whereArgs: [e.id],
+        );
+      });
+      await db.delete(
+        "Transactions",
+        where: 'Customer_ID = ?',
+        whereArgs: [customerID],
+      );
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<int> updateCustomerDetails({
+    required int customerId,
+    required String newCustomerName,
+    required String newGuardianName,
+    required String newCustomerAddress,
+    required String newContactNumber,
+    required String newCustomerPhoto,
+    required String newProofPhoto,
+    required String newCreatedDate,
+  }) async {
+    final db = await BackEnd.db();
+    int count = await db.update(
+      'Customers',
+      {
+        'Customer_Name': newCustomerName,
+        'Gaurdian_Name': newGuardianName,
+        'Customer_Address': newCustomerAddress,
+        'Contact_Number': newContactNumber,
+        'Customer_Photo': newCustomerPhoto,
+        'Proof_Photo': newProofPhoto,
+        'Created_Date': newCreatedDate,
+      },
+      where: 'Customer_ID = ?',
+      whereArgs: [customerId],
+    );
+    return count;
+  }
+
   //// I T E M S
   /// create a new item row
-  static Future createNewItem(Items item) async {
+  static Future<int> createNewItem(Items item) async {
     try {
       final db = await BackEnd.db();
       final Map<String, Object> data = {
@@ -126,7 +225,6 @@ class BackEnd {
       final int id = await db.insert("Items", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
       return id;
     } catch (e) {
-      print(e.toString());
       return 0;
     }
   }
@@ -135,7 +233,18 @@ class BackEnd {
   static fetchAllItems() async {
     final Database db = await BackEnd.db();
     final List<Map<String, Object?>> response = await db.rawQuery("""SELECT * FROM Items""");
-    return Customer.toList(response);
+    return Items.toList(response);
+  }
+
+  // fetch all items of a requried customer
+  static Future<List<Items>> fetchitemOfRequriedCustomer({required int customerID}) async {
+    final Database db = await BackEnd.db();
+    final List<Map<String, Object?>> response = await db.query(
+      "Items",
+      where: 'Customer_ID = ?',
+      whereArgs: [customerID],
+    );
+    return Items.toList(response);
   }
 
   //// T R A N S A C T I O N S
@@ -155,7 +264,6 @@ class BackEnd {
         "Interest_Rate": transasction.intrestRate,
         "Interest_Amount": transasction.intrestAmount,
         "Remaining_Amount": transasction.remainingAmount,
-        "Proof_Photo": transasction.proofPhoto,
         "Created_Date": transasction.createdDate,
       };
       final response = await db.insert("Transactions", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
@@ -175,6 +283,16 @@ class BackEnd {
     } catch (e) {
       return [];
     }
+  }
+
+  static Future<List<Trx>> fetchRequriedCustomerTransactions({required int customerId}) async {
+    final Database db = await BackEnd.db();
+    final response = await db.query(
+      "Transactions",
+      where: 'Customer_ID = ?',
+      whereArgs: [customerId],
+    );
+    return Trx.toList(response);
   }
 
   // ///[createNewTransaction] creates a new transaction in the DataBase

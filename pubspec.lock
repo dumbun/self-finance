@@ -49,14 +49,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
-  awesome_dialog:
-    dependency: "direct main"
-    description:
-      name: awesome_dialog
-      sha256: c5bccfc0cd94f2025ba6af324e723b99241859e49d9951933d0e1a7952f4f8bb
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.2.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -436,10 +428,10 @@ packages:
     dependency: transitive
     description:
       name: http
-      sha256: d4872660c46d929f6b8a9ef4e7a7eff7e49bbf0c4ec3f385ee32df5119175139
+      sha256: a2bbf9d017fcced29139daa8ed2bba4ece450ab222871df93ca9eec6f80c34ba
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.2"
+    version: "1.2.0"
   http_multi_server:
     dependency: transitive
     description:
@@ -456,14 +448,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
-  icon_animated:
-    dependency: "direct main"
-    description:
-      name: icon_animated
-      sha256: "0847039648c98e53ac9be16cac170c025461caeb4d890cf4f88c78578ef9e7aa"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.1"
   image:
     dependency: transitive
     description:
@@ -472,30 +456,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.4"
-  image_cropper:
-    dependency: "direct main"
-    description:
-      name: image_cropper
-      sha256: f4bad5ed2dfff5a7ce0dfbad545b46a945c702bb6182a921488ef01ba7693111
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.1"
-  image_cropper_for_web:
-    dependency: transitive
-    description:
-      name: image_cropper_for_web
-      sha256: "865d798b5c9d826f1185b32e5d0018c4183ddb77b7b82a931e1a06aa3b74974e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0"
-  image_cropper_platform_interface:
-    dependency: transitive
-    description:
-      name: image_cropper_platform_interface
-      sha256: ee160d686422272aa306125f3b6fb1c1894d9b87a5e20ed33fa008e7285da11e
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.0"
   image_picker:
     dependency: "direct main"
     description:
@@ -580,10 +540,10 @@ packages:
     dependency: transitive
     description:
       name: js
-      sha256: f2c445dce49627136094980615a031419f7f3eb393237e4ecd97ac15dea343f3
+      sha256: "4186c61b32f99e60f011f7160e32c89a758ae9b1d0c6d28e2c02ef0382300e2b"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.7"
+    version: "0.7.0"
   json_annotation:
     dependency: transitive
     description:
@@ -796,10 +756,10 @@ packages:
     dependency: transitive
     description:
       name: pointycastle
-      sha256: "7c1e5f0d23c9016c5bbd8b1473d0d3fb3fc851b876046039509e18e0c7485f2c"
+      sha256: "43ac87de6e10afabc85c445745a7b799e04de84cebaa4fd7bf55a5e1e9604d29"
       url: "https://pub.dev"
     source: hosted
-    version: "3.7.3"
+    version: "3.7.4"
   pool:
     dependency: transitive
     description:
@@ -832,22 +792,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.0"
-  rive:
-    dependency: transitive
-    description:
-      name: rive
-      sha256: ae75a6e9cfbf146630bfb1feba97ee582d935508be6b362e4bd197b9c55a6dd3
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.12.4"
-  rive_common:
-    dependency: transitive
-    description:
-      name: rive_common
-      sha256: f4e20d0a99c5040c85624a3eb2b0b6b19e614d93a693c3bb25cf6e7bb2d3d6d3
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.8"
   riverpod:
     dependency: transitive
     description:

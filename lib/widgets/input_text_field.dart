@@ -14,6 +14,7 @@ class InputTextField extends StatelessWidget {
     this.onChanged,
     this.keyboardType,
     this.validator,
+    this.initialValue,
   });
 
   final TextEditingController? controller;
@@ -21,12 +22,13 @@ class InputTextField extends StatelessWidget {
   final Color? fillColor;
   final Function? onChanged;
   final String? Function(String?)? validator;
-
+  final String? initialValue;
   final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      initialValue: initialValue,
       onChanged: onChanged as void Function(String)?,
       validator: validator ??
           (value) {
