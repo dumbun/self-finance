@@ -17,7 +17,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await UserBackEnd.db();
   await BackEnd.db();
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends ConsumerWidget {
@@ -55,7 +59,9 @@ class MyApp extends ConsumerWidget {
               //if any error happens
               error: (error, stackTrace) => const Scaffold(
                 body: Center(
-                  child: BodyOneDefaultText(text: 'Error fetching user data'),
+                  child: BodyOneDefaultText(
+                    text: 'Error fetching user data',
+                  ),
                 ),
               ),
             ),

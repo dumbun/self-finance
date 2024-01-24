@@ -1,4 +1,4 @@
-# self_finance
+# self-finance
 
 The self-finance app is a mobile application specifically designed for shopkeepers and small finance companies. It offers secure data storage, calculates monthly interest, and provides offline capabilities. Currently, the app is being developed by Sai Keerthi as the UI/UX Designer, and Vamshi and Akhilesh Kiran as the Developers. The development team emphasizes thorough testing, effective project management, and collaboration among team members. The app aims to simplify financial operations and enhance efficiency for its target users. 
 
@@ -21,6 +21,6 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
-# self-finance
+
 
 

@@ -49,7 +49,10 @@ class Routes {
   }
 
   static void navigateToDashboard({required BuildContext context}) {
-    Navigator.of(context).pushNamed('/dashboardview');
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      '/dashboardview',
+      (route) => false,
+    );
   }
 
   static void navigateToDetailsView({required BuildContext context, required Trx data}) {
