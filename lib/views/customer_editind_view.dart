@@ -152,7 +152,7 @@ class ContactEditingView extends ConsumerWidget {
                   SizedBox(height: 32.sp),
                   RoundedCornerButton(
                     text: "update",
-                    onPressed: () async {
+                    onPressed: () {
                       ref.read(asyncCustomersContactsProvider.notifier).updateCustomer(
                             customerId: contact.id!,
                             newCustomerName: customerName.text,
@@ -164,15 +164,7 @@ class ContactEditingView extends ConsumerWidget {
                             newCreatedDate: DateTime.now().toString(),
                           );
 
-                      final List<Customer> customer =
-                          await ref.read(asyncCustomersProvider.notifier).fetchRequriedCustomerDetails(contact.id!);
-                      final List<Items> customerItems = await ref
-                          .read(asyncItemsProvider.notifier)
-                          .fetchitemOfRequriedCustomer(customerID: contact.id!);
-                      final List<Trx> customerTransactions = await ref
-                          .read(asyncTransactionsProvider.notifier)
-                          .fetchRequriedCustomerTransactions(customerID: contact.id!);
-                      navigateToDetailsView(customer, customerItems, customerTransactions);
+                      Routes.navigateToContactsView(context);
                     },
                   ),
                 ],
