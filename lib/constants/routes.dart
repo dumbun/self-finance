@@ -11,6 +11,10 @@ import 'package:self_finance/views/image_view.dart';
 import 'package:self_finance/views/user_creating_view.dart';
 
 class Routes {
+  static void navigateToUserDetailsView({required BuildContext context}) {
+    Navigator.of(context).pushNamed('/userDetailsView');
+  }
+
   static void navigateToAddNewTransactionToCustomerView({required BuildContext context, required Customer customer}) {
     Navigator.of(context).push(
       MaterialPageRoute(

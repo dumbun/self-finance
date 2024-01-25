@@ -5,12 +5,12 @@ part 'user_provider.g.dart';
 
 @Riverpod(keepAlive: false)
 class AsyncUser extends _$AsyncUser {
-  Future<List> _fetchAllUsers() async {
+  Future<List<User>> _fetchAllUsers() async {
     return UserBackEnd.fetchIDOneUser();
   }
 
   @override
-  FutureOr<List> build() {
+  FutureOr<List<User>> build() {
     // Load initial todo list from the remote repository
     return _fetchAllUsers();
   }

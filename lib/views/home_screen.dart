@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
-import 'package:self_finance/widgets/center_title_text_widget.dart';
+import 'package:self_finance/widgets/title_widget.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -23,10 +24,11 @@ class HomeScreen extends ConsumerWidget {
 
   Widget _buildHeaderWidget(WidgetRef ref) {
     return ref.watch(asyncUserProvider).when(
-          data: (data) {
-            return CenterTitleTextWidget(
-              user: data.first,
-              showUserProfile: true,
+          data: (List<User> data) {
+            return Center(
+              child: TitleWidget(
+                text: data.first.userName,
+              ),
             );
           },
           error: (error, stackTrace) => const Text("Welcome"),

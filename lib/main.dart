@@ -12,6 +12,7 @@ import 'package:self_finance/views/auth_view.dart';
 import 'package:self_finance/views/contacts_view.dart';
 import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/terms_and_conditions.dart';
+import 'package:self_finance/views/user_details_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +36,7 @@ class MyApp extends ConsumerWidget {
           '/dashboardview': (context) => const DashboardView(),
           '/addNewEntry': (context) => const AddNewEntery(),
           '/contactsView': (context) => const ContactsView(),
+          '/userDetailsView': (context) => const UserDetails(),
         },
         color: AppColors.getPrimaryColor,
         title: 'Self Finance',

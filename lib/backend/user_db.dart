@@ -59,12 +59,12 @@ class UserBackEnd {
     return User.toList(result);
   }
 
-  static Future<List> fetchIDOneUser() async {
+  static Future<List<User>> fetchIDOneUser() async {
     final db = await UserBackEnd.db();
     List<Map<String, Object?>> result = await db.rawQuery("""
       SELECT * FROM USER WHERE ID = 1
     """);
-    return result.isNotEmpty ? User.toList(result) : result;
+    return result.isNotEmpty ? User.toList(result) : [];
   }
 
   // fetch user pin
