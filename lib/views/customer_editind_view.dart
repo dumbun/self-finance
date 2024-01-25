@@ -45,44 +45,6 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
     super.dispose();
   }
 
-  _buildTextFields() {
-    return Column(
-      children: [
-        SizedBox(height: 12.sp),
-        InputTextField(
-          keyboardType: TextInputType.name,
-          controller: _customerName,
-          hintText: "Customer Name",
-        ),
-        SizedBox(height: 20.sp),
-        InputTextField(
-          keyboardType: TextInputType.phone,
-          controller: _mobileNumber,
-          hintText: "Contact Number",
-          validator: (value) {
-            if (Utility.isValidPhoneNumber(value)) {
-              return null;
-            } else {
-              return "please enter correct mobile number ";
-            }
-          },
-        ),
-        SizedBox(height: 20.sp),
-        InputTextField(
-          keyboardType: TextInputType.name,
-          controller: _gaurdianName,
-          hintText: "Guardian Name",
-        ),
-        SizedBox(height: 20.sp),
-        InputTextField(
-          keyboardType: TextInputType.streetAddress,
-          controller: _address,
-          hintText: "Address",
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,6 +117,44 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
     } else {
       return false;
     }
+  }
+
+  _buildTextFields() {
+    return Column(
+      children: [
+        SizedBox(height: 12.sp),
+        InputTextField(
+          keyboardType: TextInputType.name,
+          controller: _customerName,
+          hintText: "Customer Name",
+        ),
+        SizedBox(height: 20.sp),
+        InputTextField(
+          keyboardType: TextInputType.phone,
+          controller: _mobileNumber,
+          hintText: "Contact Number",
+          validator: (value) {
+            if (Utility.isValidPhoneNumber(value)) {
+              return null;
+            } else {
+              return "please enter correct mobile number ";
+            }
+          },
+        ),
+        SizedBox(height: 20.sp),
+        InputTextField(
+          keyboardType: TextInputType.name,
+          controller: _gaurdianName,
+          hintText: "Guardian Name",
+        ),
+        SizedBox(height: 20.sp),
+        InputTextField(
+          keyboardType: TextInputType.streetAddress,
+          controller: _address,
+          hintText: "Address",
+        ),
+      ],
+    );
   }
 
   Row _buildImagePickers() {

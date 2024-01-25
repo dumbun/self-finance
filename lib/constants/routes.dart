@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/views/add_new_transaction_view.dart';
 import 'package:self_finance/views/contact_details_view.dart';
 import 'package:self_finance/views/customer_editind_view.dart';
 import 'package:self_finance/views/details_view.dart';
@@ -10,6 +11,14 @@ import 'package:self_finance/views/image_view.dart';
 import 'package:self_finance/views/user_creating_view.dart';
 
 class Routes {
+  static void navigateToAddNewTransactionToCustomerView({required BuildContext context, required Customer customer}) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AddNewTransactionView(customer: customer),
+      ),
+    );
+  }
+
   static void navigateToContactEditingView({required BuildContext context, required Customer contact}) {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => ContactEditingView(contact: contact)),

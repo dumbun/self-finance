@@ -136,6 +136,17 @@ class Utility {
   static DateTime presentDate() {
     return DateTime.now();
   }
+
+  static String? amountValidation({required String? value}) {
+    if (value == null || value.isEmpty || value == "") {
+      return 'Please enter a valid value';
+    }
+    if (value.contains(",") || value.contains(" ") || value.contains("-")) {
+      return "please enter the correct value";
+    } else {
+      return null;
+    }
+  }
 }
 
 Future<String> pickImageFromCamera() async {

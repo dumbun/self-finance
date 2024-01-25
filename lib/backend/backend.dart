@@ -255,7 +255,6 @@ class BackEnd {
     try {
       final db = await BackEnd.db();
       final Map<String, dynamic> data = {
-        "Transaction_ID": transasction.customerId,
         "Customer_ID": transasction.customerId,
         "Item_ID": transasction.itemId,
         "Transaction_Date": transasction.transacrtionDate,
@@ -269,6 +268,7 @@ class BackEnd {
       final response = await db.insert("Transactions", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
       return response;
     } catch (e) {
+      print(e);
       return 0;
     }
   }
