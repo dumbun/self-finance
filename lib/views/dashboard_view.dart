@@ -8,15 +8,15 @@ import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_view.dart';
-
 import 'package:self_finance/views/history/history_view.dart';
 import 'package:self_finance/views/home_screen.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/expandable_fab.dart';
+import 'package:self_finance/widgets/title_widget.dart';
 
-final selectedPageIndexProvider = StateProvider<int>((ref) {
+final StateProvider<int> selectedPageIndexProvider = StateProvider<int>((ref) {
   return 0;
 });
 
@@ -42,6 +42,21 @@ class DashboardView extends StatelessWidget {
 
     final PageController pageController = PageController();
     return Scaffold(
+      appBar: AppBar(
+        forceMaterialTransparency: true,
+        title: Consumer(
+          builder: (context, ref, child) {
+            final int pageIndex = ref.watch(selectedPageIndexProvider);
+            return TitleWidget(
+              text: pageIndex == 0
+                  ? "Home Screen"
+                  : pageIndex == 1
+                      ? "EMI Calculator"
+                      : "History",
+            );
+          },
+        ),
+      ),
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       drawer: Drawer(
         child: SafeArea(
@@ -52,9 +67,9 @@ class DashboardView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Consumer(
-                  builder: (context, ref, child) {
+                  builder: (BuildContext context, WidgetRef ref, Widget? child) {
                     return ref.watch(asyncUserProvider).when(
-                          data: (data) {
+                          data: (List<User> data) {
                             return data.first.profilePicture.isNotEmpty
                                 ? Utility.imageFromBase64String(
                                     data.first.profilePicture,
@@ -66,7 +81,7 @@ class DashboardView extends StatelessWidget {
                                     width: 45.sp,
                                   );
                           },
-                          error: (_, __) => const Center(
+                          error: (Object _, StackTrace __) => const Center(
                             child: Text("error"),
                           ),
                           loading: () => const Center(
@@ -77,9 +92,12 @@ class DashboardView extends StatelessWidget {
                 ),
                 SizedBox(height: 24.sp),
                 _buildDrawerButtons(
-                  text: "Settings",
-                  icon: Icons.settings,
-                  onTap: () {},
+                  text: "Account",
+                  icon: Icons.vpn_key_rounded,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Routes.navigateToUserDetailsView(context: context);
+                  },
                 ),
                 SizedBox(height: 12.sp),
                 Consumer(
@@ -124,7 +142,7 @@ class DashboardView extends StatelessWidget {
         ),
       ),
       floatingActionButton: Consumer(
-        builder: (context, ref, child) {
+        builder: (BuildContext context, WidgetRef ref, Widget? child) {
           return ref.watch(selectedPageIndexProvider) == 0
               ? ExpandableFab(
                   distance: 32.sp,
@@ -147,7 +165,7 @@ class DashboardView extends StatelessWidget {
         },
       ),
       bottomNavigationBar: Consumer(
-        builder: (context, ref, child) {
+        builder: (BuildContext context, WidgetRef ref, Widget? child) {
           return BottomNavigationBar(
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
@@ -172,7 +190,6 @@ class DashboardView extends StatelessWidget {
             selectedItemColor: AppColors.getPrimaryColor,
             currentIndex: ref.watch(selectedPageIndexProvider),
             onTap: (index) {
-              ref.read(selectedPageIndexProvider.notifier).update((state) => index);
               pageController.animateToPage(
                 index,
                 duration: const Duration(milliseconds: 450),

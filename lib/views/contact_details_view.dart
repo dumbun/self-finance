@@ -77,6 +77,7 @@ class ContactDetailsView extends ConsumerWidget {
       length: 2,
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
+          heroTag: "save-button",
           enableFeedback: true,
           isExtended: true,
           tooltip: "Add new trancation to this customer",
@@ -87,6 +88,7 @@ class ContactDetailsView extends ConsumerWidget {
           onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(context: context, customer: customer),
         ),
         appBar: AppBar(
+          forceMaterialTransparency: true,
           actions: [
             PopupMenuButton<String>(
               onSelected: (String value) => popUpMenuSelected(value),
