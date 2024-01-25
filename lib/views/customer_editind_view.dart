@@ -65,29 +65,7 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
                   SizedBox(height: 20.sp),
                   _buildImagePickers(),
                   SizedBox(height: 32.sp),
-                  RoundedCornerButton(
-                    text: "update",
-                    onPressed: () async {
-                      if (_validateAndSave()) {
-                        final int response = await ref.read(asyncCustomersContactsProvider.notifier).updateCustomer(
-                              customerId: widget.contact.id!,
-                              newCustomerName: _customerName.text,
-                              newGuardianName: _gaurdianName.text,
-                              newCustomerAddress: _address.text,
-                              newContactNumber: _mobileNumber.text,
-                              newCustomerPhoto: ref.read(updatedCustomerPhotoStringProvider),
-                              newProofPhoto: ref.read(updatedCustomerProofStringProvider),
-                              newCreatedDate: DateTime.now().toString(),
-                            );
-                        if (response != 0) {
-                          _navigateToContactsView();
-                        }
-                        if (response == 0) {
-                          _showError();
-                        }
-                      }
-                    },
-                  ),
+                  RoundedCornerButton(text: "update", onPressed: _save),
                 ],
               ),
             ),
@@ -95,6 +73,27 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
         ),
       ),
     );
+  }
+
+  void _save() async {
+    if (_validateAndSave()) {
+      final int response = await ref.read(asyncCustomersContactsProvider.notifier).updateCustomer(
+            customerId: widget.contact.id!,
+            newCustomerName: _customerName.text,
+            newGuardianName: _gaurdianName.text,
+            newCustomerAddress: _address.text,
+            newContactNumber: _mobileNumber.text,
+            newCustomerPhoto: ref.read(updatedCustomerPhotoStringProvider),
+            newProofPhoto: ref.read(updatedCustomerProofStringProvider),
+            newCreatedDate: DateTime.now().toString(),
+          );
+      if (response != 0) {
+        _navigateToContactsView();
+      }
+      if (response == 0) {
+        _showError();
+      }
+    }
   }
 
   void _navigateToContactsView() {
@@ -119,7 +118,7 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
     }
   }
 
-  _buildTextFields() {
+  Column _buildTextFields() {
     return Column(
       children: [
         SizedBox(height: 12.sp),

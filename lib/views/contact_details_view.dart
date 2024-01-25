@@ -118,7 +118,7 @@ class ContactDetailsView extends ConsumerWidget {
         ),
         body: SafeArea(
           child: Padding(
-            padding: EdgeInsets.all(16.sp),
+            padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 16.sp),
             child: TabBarView(
               children: <Widget>[_buildCustomerDetails(context), _buildTransactionsHistory()],
             ),

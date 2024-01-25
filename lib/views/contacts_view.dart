@@ -119,7 +119,7 @@ class ContactsView extends ConsumerWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(20.sp),
+          padding: EdgeInsets.symmetric(vertical: 20.sp, horizontal: 16.sp),
           child: RefreshIndicator.adaptive(
             onRefresh: () => ref.refresh(asyncCustomersContactsProvider.future),
             child: Column(
