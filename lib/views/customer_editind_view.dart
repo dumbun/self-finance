@@ -45,7 +45,80 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
     super.dispose();
   }
 
-  _buildTextFields() {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: BodyOneDefaultText(text: widget.contact.name),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(18.sp),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildTextFields(),
+                  SizedBox(height: 20.sp),
+                  _buildImagePickers(),
+                  SizedBox(height: 32.sp),
+                  RoundedCornerButton(text: "update", onPressed: _save),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _save() async {
+    if (_validateAndSave()) {
+      final int response = await ref.read(asyncCustomersContactsProvider.notifier).updateCustomer(
+            customerId: widget.contact.id!,
+            newCustomerName: _customerName.text,
+            newGuardianName: _gaurdianName.text,
+            newCustomerAddress: _address.text,
+            newContactNumber: _mobileNumber.text,
+            newCustomerPhoto: ref.read(updatedCustomerPhotoStringProvider),
+            newProofPhoto: ref.read(updatedCustomerProofStringProvider),
+            newCreatedDate: DateTime.now().toString(),
+          );
+      if (response != 0) {
+        _navigateToContactsView();
+      }
+      if (response == 0) {
+        _showError();
+      }
+    }
+  }
+
+  void _navigateToContactsView() {
+    Navigator.of(context).popUntil(ModalRoute.withName('/contactsView'));
+    snackBarWidget(context: context, message: "Contact Updated Successfully ");
+  }
+
+  void _showError() {
+    AlertDilogs.alertDialogWithOneAction(
+      context,
+      "Error",
+      "Error while updating the contact please try again some other time",
+    );
+  }
+
+  bool _validateAndSave() {
+    final FormState? form = _formKey.currentState;
+    if (form!.validate()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Column _buildTextFields() {
     return Column(
       children: [
         SizedBox(height: 12.sp),
@@ -81,80 +154,6 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
         ),
       ],
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: BodyOneDefaultText(text: widget.contact.name),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(18.sp),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildTextFields(),
-                  SizedBox(height: 20.sp),
-                  _buildImagePickers(),
-                  SizedBox(height: 32.sp),
-                  RoundedCornerButton(
-                    text: "update",
-                    onPressed: () async {
-                      if (_validateAndSave()) {
-                        final int response = await ref.read(asyncCustomersContactsProvider.notifier).updateCustomer(
-                              customerId: widget.contact.id!,
-                              newCustomerName: _customerName.text,
-                              newGuardianName: _gaurdianName.text,
-                              newCustomerAddress: _address.text,
-                              newContactNumber: _mobileNumber.text,
-                              newCustomerPhoto: ref.read(updatedCustomerPhotoStringProvider),
-                              newProofPhoto: ref.read(updatedCustomerProofStringProvider),
-                              newCreatedDate: DateTime.now().toString(),
-                            );
-                        if (response != 0) {
-                          _navigateToContactsView();
-                        }
-                        if (response == 0) {
-                          _showError();
-                        }
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _navigateToContactsView() {
-    Navigator.of(context).popUntil(ModalRoute.withName('/contactsView'));
-    snackBarWidget(context: context, message: "Contact Updated Successfully ");
-  }
-
-  void _showError() {
-    AlertDilogs.alertDialogWithOneAction(
-      context,
-      "Error",
-      "Error while updating the contact please try again some other time",
-    );
-  }
-
-  bool _validateAndSave() {
-    final FormState? form = _formKey.currentState;
-    if (form!.validate()) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   Row _buildImagePickers() {

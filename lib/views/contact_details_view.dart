@@ -84,7 +84,7 @@ class ContactDetailsView extends ConsumerWidget {
           backgroundColor: AppColors.getPrimaryColor,
           shape: const CircleBorder(),
           child: const Icon(Icons.add),
-          onPressed: () {},
+          onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(context: context, customer: customer),
         ),
         appBar: AppBar(
           actions: [
@@ -107,7 +107,7 @@ class ContactDetailsView extends ConsumerWidget {
             ),
           ],
           toolbarHeight: 32.sp,
-          title: BodyTwoDefaultText(text: customer.name),
+          title: BodyOneDefaultText(text: customer.name),
           bottom: const TabBar(
             dividerColor: Colors.transparent,
             tabs: [
@@ -118,12 +118,9 @@ class ContactDetailsView extends ConsumerWidget {
         ),
         body: SafeArea(
           child: Padding(
-            padding: EdgeInsets.all(16.sp),
+            padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 16.sp),
             child: TabBarView(
-              children: <Widget>[
-                _buildCustomerDetails(context),
-                _buildTransactionsHistory(),
-              ],
+              children: <Widget>[_buildCustomerDetails(context), _buildTransactionsHistory()],
             ),
           ),
         ),
@@ -198,7 +195,10 @@ class ContactDetailsView extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 SizedBox(height: 20.sp),
-                _buildImage(),
+                Hero(
+                  tag: "customer-profile-picture",
+                  child: _buildImage(),
+                ),
                 SizedBox(height: 16.sp),
                 _buildCustomerName(),
                 SizedBox(height: 16.sp),
@@ -245,7 +245,7 @@ class ContactDetailsView extends ConsumerWidget {
                             const BodyOneDefaultText(
                               text: "Show Customer proof",
                               color: AppColors.getPrimaryColor,
-                            )
+                            ),
                           ],
                         ),
                       ),

@@ -113,14 +113,14 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                   InputTextField(
                     keyboardType: TextInputType.number,
                     hintText: " Taken amount ",
-                    validator: (value) => _amountValidation(value: value),
+                    validator: (value) => Utility.amountValidation(value: value),
                     controller: _takenAmount,
                   ),
 
                   // rate of intrest
                   SizedBox(height: 20.sp),
                   InputTextField(
-                    validator: (value) => _amountValidation(value: value),
+                    validator: (value) => Utility.amountValidation(value: value),
                     hintText: " Rate of Intrest % ",
                     controller: _rateOfIntrest,
                     keyboardType: const TextInputType.numberWithOptions(signed: false, decimal: true),
@@ -271,17 +271,6 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
         _isloading = false;
       });
       return AlertDilogs.alertDialogWithOneAction(context, errorString, e.toString());
-    }
-  }
-
-  String? _amountValidation({required String? value}) {
-    if (value == null || value.isEmpty || value == "") {
-      return 'Please enter a valid value';
-    }
-    if (value.contains(",") || value.contains(" ") || value.contains("-")) {
-      return "please enter the correct value";
-    } else {
-      return null;
     }
   }
 

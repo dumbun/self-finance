@@ -33,8 +33,9 @@ class AsyncTransactions extends _$AsyncTransactions {
     state = const AsyncValue.loading();
     // Add the new todo and reload the todo list from the remote repository
     state = await AsyncValue.guard(() async {
-      return _fetchAllTransactionsData();
+      return await BackEnd.fetchRequriedCustomerTransactions(customerId: customerID);
     });
+
     return await BackEnd.fetchRequriedCustomerTransactions(customerId: customerID);
   }
 }
