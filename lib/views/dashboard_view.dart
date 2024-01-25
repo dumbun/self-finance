@@ -1,6 +1,3 @@
-import 'dart:io';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -86,9 +83,9 @@ class DashboardView extends StatelessWidget {
                 ),
                 SizedBox(height: 12.sp),
                 Consumer(
-                  builder: (context, ref, child) {
+                  builder: (BuildContext context, WidgetRef ref, Widget? child) {
                     return ref.watch(asyncUserProvider).when(
-                          data: (data) {
+                          data: (List<User> data) {
                             return _buildDrawerButtons(
                               text: "Logout",
                               icon: Icons.login_rounded,
