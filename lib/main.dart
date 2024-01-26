@@ -9,10 +9,11 @@ import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/theme/theme_data.dart';
 import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
 import 'package:self_finance/views/auth_view.dart';
+import 'package:self_finance/views/change_pin_view.dart';
 import 'package:self_finance/views/contacts_view.dart';
 import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/terms_and_conditions.dart';
-import 'package:self_finance/views/user_details_view.dart';
+import 'package:self_finance/views/account_setting_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,10 +34,11 @@ class MyApp extends ConsumerWidget {
     return ResponsiveSizer(
       builder: (context, orientation, screenType) => MaterialApp(
         routes: {
+          '/changePinView': (context) => const ChangePinView(),
           '/dashboardview': (context) => const DashboardView(),
           '/addNewEntry': (context) => const AddNewEntery(),
           '/contactsView': (context) => const ContactsView(),
-          '/userDetailsView': (context) => const UserDetails(),
+          '/AccountSettingsView': (context) => const AccountSettingsView(),
         },
         color: AppColors.getPrimaryColor,
         title: 'Self Finance',

@@ -66,29 +66,32 @@ class DashboardView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Consumer(
-                  builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                    return ref.watch(asyncUserProvider).when(
-                          data: (List<User> data) {
-                            return data.first.profilePicture.isNotEmpty
-                                ? Utility.imageFromBase64String(
-                                    data.first.profilePicture,
-                                    height: 45.sp,
-                                    width: 45.sp,
-                                  )
-                                : DefaultUserImage(
-                                    height: 45.sp,
-                                    width: 45.sp,
-                                  );
-                          },
-                          error: (Object _, StackTrace __) => const Center(
-                            child: Text("error"),
-                          ),
-                          loading: () => const Center(
-                            child: CircularProgressIndicator.adaptive(),
-                          ),
-                        );
-                  },
+                Hero(
+                  tag: "user-profile-pic",
+                  child: Consumer(
+                    builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                      return ref.watch(asyncUserProvider).when(
+                            data: (List<User> data) {
+                              return data.first.profilePicture.isNotEmpty
+                                  ? Utility.imageFromBase64String(
+                                      data.first.profilePicture,
+                                      height: 45.sp,
+                                      width: 45.sp,
+                                    )
+                                  : DefaultUserImage(
+                                      height: 45.sp,
+                                      width: 45.sp,
+                                    );
+                            },
+                            error: (Object _, StackTrace __) => const Center(
+                              child: Text("error"),
+                            ),
+                            loading: () => const Center(
+                              child: CircularProgressIndicator.adaptive(),
+                            ),
+                          );
+                    },
+                  ),
                 ),
                 SizedBox(height: 24.sp),
                 _buildDrawerButtons(
@@ -96,7 +99,7 @@ class DashboardView extends StatelessWidget {
                   icon: Icons.vpn_key_rounded,
                   onTap: () {
                     Navigator.of(context).pop();
-                    Routes.navigateToUserDetailsView(context: context);
+                    Routes.navigateToAccountSettingsView(context: context);
                   },
                 ),
                 SizedBox(height: 12.sp),

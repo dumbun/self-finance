@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/theme/colors.dart';
 
 class PinInputWidget extends StatelessWidget {
-  const PinInputWidget({super.key, required this.pinController, required this.obscureText});
+  const PinInputWidget({
+    super.key,
+    required this.pinController,
+    required this.obscureText,
+    this.validator,
+    this.readOnly = false,
+  });
 
   final TextEditingController pinController;
   final bool obscureText;
+  final String? Function(String?)? validator;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +28,8 @@ class PinInputWidget extends StatelessWidget {
       height: 30.sp,
       textStyle: TextStyle(
         fontSize: 22.sp,
-        color: const Color.fromRGBO(30, 60, 87, 1),
+        // color: const Color.fromRGBO(30, 60, 87, 1),
+        color: AppColors.getPrimaryColor,
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(19.sp),
@@ -30,6 +40,7 @@ class PinInputWidget extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Pinput(
+        readOnly: readOnly,
         obscureText: obscureText,
         length: 4,
         closeKeyboardWhenCompleted: true,
@@ -48,6 +59,13 @@ class PinInputWidget extends StatelessWidget {
           ),
         ),
         controller: pinController,
+        validator: validator ??
+            (value) {
+              if (value == null || value.isEmpty || value == "") {
+                return 'Please enter a valid value';
+              }
+              return null;
+            },
         defaultPinTheme: defaultPinTheme,
         separatorBuilder: (index) => SizedBox(width: 8.sp),
         hapticFeedbackType: HapticFeedbackType.lightImpact,

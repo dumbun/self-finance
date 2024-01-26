@@ -93,6 +93,19 @@ class UserBackEnd {
     final result = await db.update('USER', data, where: "id = ?", whereArgs: [id]);
     return result;
   }
+  // Update the USER
+
+  static Future<int> updateUser(User user) async {
+    final db = await UserBackEnd.db();
+    final data = {
+      'ID': user.id!,
+      'USER_NAME': user.userName,
+      'USER_PIN': user.userPin,
+      'USER_PROFILE_PICTURE': user.profilePicture,
+    };
+    final result = await db.update('USER', data, where: "id = ?", whereArgs: [user.id]);
+    return result;
+  }
 
   // fetch the security PIN transactions of a requried number
 

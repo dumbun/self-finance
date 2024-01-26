@@ -26,4 +26,13 @@ class AsyncUser extends _$AsyncUser {
     });
     return result;
   }
+
+  Future<void> updateUserProfile({required int userId, required String updatedImageString}) async {
+    state = const AsyncValue.loading();
+    // Add the new todo and reload the todo list from the remote repository
+    state = await AsyncValue.guard(() async {
+      await UserBackEnd.updateProfilePic(userId, updatedImageString);
+      return _fetchAllUsers();
+    });
+  }
 }
