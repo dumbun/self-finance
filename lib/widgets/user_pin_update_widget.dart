@@ -3,16 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
-import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/widgets/input_text_field.dart';
+import 'package:self_finance/widgets/pin_input_widget.dart';
 
-class UserNameUpdateWidget extends ConsumerWidget {
-  const UserNameUpdateWidget({super.key});
+class UserPinUpdateWidget extends ConsumerWidget {
+  const UserPinUpdateWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    TextEditingController pin = TextEditingController();
+    TextEditingController conformPin = TextEditingController();
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
     bool validateAndSave() {
       final FormState? form = formKey.currentState;
@@ -24,63 +25,68 @@ class UserNameUpdateWidget extends ConsumerWidget {
     }
 
     return ref.watch(asyncUserProvider).when(
-          data: (List<User> data) {
-            final TextEditingController newUserName = TextEditingController(text: data.first.userName);
+          data: (data) {
             return Card(
               child: Padding(
                 padding: EdgeInsets.all(16.sp),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    BodyOneDefaultText(
-                      text: data.first.userName,
+                    const BodyOneDefaultText(
+                      text: "Change App Pin",
                       bold: true,
                     ),
                     IconButton(
                       onPressed: () {
                         showBottomSheet(
-                          enableDrag: true,
                           context: context,
                           builder: (context) {
                             return Container(
-                              height: 60.sp,
                               padding: EdgeInsets.all(16.sp),
+                              width: double.infinity,
+                              height: 80.sp,
                               child: Form(
                                 key: formKey,
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      SizedBox(height: 18.sp),
-                                      InputTextField(
-                                        keyboardType: TextInputType.name,
-                                        hintText: "New User Name",
-                                        controller: newUserName,
-                                      ),
-                                      SizedBox(height: 18.sp),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          ElevatedButton.icon(
+                                child: Column(
+                                  children: [
+                                    SizedBox(height: 18.sp),
+                                    const BodyOneDefaultText(text: "Please provide new pin "),
+                                    PinInputWidget(
+                                      pinController: pin,
+                                      obscureText: false,
+                                    ),
+                                    SizedBox(height: 18.sp),
+                                    const BodyOneDefaultText(text: "Please conform new pin "),
+                                    PinInputWidget(
+                                      validator: (p0) => pin.text != conformPin.text ? "Please provide same pin" : null,
+                                      pinController: conformPin,
+                                      obscureText: false,
+                                    ),
+                                    SizedBox(height: 18.sp),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: ElevatedButton.icon(
                                             style: const ButtonStyle(elevation: MaterialStatePropertyAll(0)),
                                             onPressed: () {
-                                              if (newUserName.text == data.first.userName) {
-                                                Navigator.pop(context);
-                                              } else if (validateAndSave()) {
-                                                ref.read(asyncUserProvider.notifier).updateUserName(
-                                                    userId: data.first.id!, updateUserName: newUserName.text);
+                                              if (validateAndSave()) {
+                                                ref.read(asyncUserProvider.notifier).updateUserPin(
+                                                    userId: data.first.id!, updateUserPin: conformPin.text);
                                                 Navigator.pop(context);
                                               }
                                             },
-                                            icon: const Icon(Icons.done_rounded),
                                             label: const BodyTwoDefaultText(
-                                              text: "Done",
-                                              maxLines: 5,
+                                              text: "Conform",
                                             ),
+                                            icon: const Icon(Icons.done_rounded),
                                           ),
-                                          ElevatedButton.icon(
+                                        ),
+                                        SizedBox(width: 12.sp),
+                                        Expanded(
+                                          child: ElevatedButton.icon(
                                             style: const ButtonStyle(elevation: MaterialStatePropertyAll(0)),
                                             onPressed: () => Navigator.pop(context),
                                             icon: const Icon(
@@ -89,10 +95,10 @@ class UserNameUpdateWidget extends ConsumerWidget {
                                             ),
                                             label: const BodyTwoDefaultText(text: "Cancel"),
                                           ),
-                                        ],
-                                      )
-                                    ],
-                                  ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
                                 ),
                               ),
                             );
@@ -100,7 +106,7 @@ class UserNameUpdateWidget extends ConsumerWidget {
                         );
                       },
                       icon: const Icon(
-                        Icons.edit,
+                        Icons.password,
                         color: AppColors.getPrimaryColor,
                       ),
                     ),
@@ -109,13 +115,11 @@ class UserNameUpdateWidget extends ConsumerWidget {
               ),
             );
           },
-          error: (Object error, StackTrace stackTrace) => const Center(
-            child: BodyOneDefaultText(
-              text: "Error fetching user name, please restart the app",
-            ),
-          ),
           loading: () => const Center(
             child: CircularProgressIndicator.adaptive(),
+          ),
+          error: (error, stackTrace) => const Center(
+            child: BodyTwoDefaultText(text: "Con't change pin please try again"),
           ),
         );
   }

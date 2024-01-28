@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/fonts/body_text.dart';
+import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/widgets/user_image_update_widget.dart';
 import 'package:self_finance/widgets/user_name_update_widget.dart';
+import 'package:self_finance/widgets/user_pin_update_widget.dart';
 
 class AccountSettingsView extends StatelessWidget {
   const AccountSettingsView({super.key});
@@ -19,20 +22,33 @@ class AccountSettingsView extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(16.sp),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SizedBox(height: 20.sp),
-                const Hero(
-                  tag: "user-profile-pic",
-                  child: UserImageUpdateWidget(),
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.topCenter,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20.sp),
+                    const Hero(
+                      tag: "user-profile-pic",
+                      child: UserImageUpdateWidget(),
+                    ),
+                    SizedBox(height: 20.sp),
+                    const UserNameUpdateWidget(),
+                    SizedBox(height: 18.sp),
+                    const UserPinUpdateWidget(),
+                  ],
                 ),
-                SizedBox(height: 20.sp),
-                const UserNameUpdateWidget()
-                // _buildChangePinButton(context),
-              ],
-            ),
+              ),
+              const Align(
+                alignment: Alignment.bottomCenter,
+                child: BodyTwoDefaultText(
+                  text: "self-finance ❤️ India",
+                  color: AppColors.getLigthGreyColor,
+                ),
+              ),
+            ],
           ),
         ),
       ),

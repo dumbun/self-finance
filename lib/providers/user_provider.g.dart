@@ -6,7 +6,7 @@ part of 'user_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$asyncUserHash() => r'01bee9f41d9a470987e5500117a6e0cc902fc03e';
+String _$asyncUserHash() => r'05a3abbebc67930b573f300e8de267ef8ec63a66';
 
 /// See also [AsyncUser].
 @ProviderFor(AsyncUser)

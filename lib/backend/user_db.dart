@@ -85,6 +85,14 @@ class UserBackEnd {
     final result = await db.update('USER', data, where: "id = ?", whereArgs: [id]);
     return result;
   }
+  // Update the USER_PIN
+
+  static Future<int> updateUserPin(int id, String pin) async {
+    final db = await UserBackEnd.db();
+    final data = {'USER_PIN': pin};
+    final result = await db.update('USER', data, where: "id = ?", whereArgs: [id]);
+    return result;
+  }
   // Update the USER_PROFILE_PIC
 
   static Future<int> updateProfilePic(int id, String imageString) async {
