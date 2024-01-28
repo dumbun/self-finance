@@ -6,12 +6,11 @@ part of 'user_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$asyncUserHash() => r'0ab7d4f06777cb85f675cda94573ae173939c3c5';
+String _$asyncUserHash() => r'01bee9f41d9a470987e5500117a6e0cc902fc03e';
 
 /// See also [AsyncUser].
 @ProviderFor(AsyncUser)
-final asyncUserProvider =
-    AutoDisposeAsyncNotifierProvider<AsyncUser, List<User>>.internal(
+final asyncUserProvider = AsyncNotifierProvider<AsyncUser, List<User>>.internal(
   AsyncUser.new,
   name: r'asyncUserProvider',
   debugGetCreateSourceHash:
@@ -20,6 +19,6 @@ final asyncUserProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$AsyncUser = AutoDisposeAsyncNotifier<List<User>>;
+typedef _$AsyncUser = AsyncNotifier<List<User>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

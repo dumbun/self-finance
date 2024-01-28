@@ -3,7 +3,7 @@ import 'package:self_finance/backend/user_db.dart';
 import 'package:self_finance/models/user_model.dart';
 part 'user_provider.g.dart';
 
-@Riverpod(keepAlive: false)
+@Riverpod(keepAlive: true)
 class AsyncUser extends _$AsyncUser {
   Future<List<User>> _fetchAllUsers() async {
     return UserBackEnd.fetchIDOneUser();
@@ -32,6 +32,14 @@ class AsyncUser extends _$AsyncUser {
     // Add the new todo and reload the todo list from the remote repository
     state = await AsyncValue.guard(() async {
       await UserBackEnd.updateProfilePic(userId, updatedImageString);
+      return _fetchAllUsers();
+    });
+  }
+
+  Future<void> updateUserName({required int userId, required String updateUserName}) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await UserBackEnd.updateUserName(userId, updateUserName);
       return _fetchAllUsers();
     });
   }

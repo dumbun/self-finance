@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
-import 'package:self_finance/views/change_pin_view.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
+import 'package:self_finance/widgets/user_name_update_widget.dart';
 
 class AccountSettingsView extends StatelessWidget {
   const AccountSettingsView({super.key});
@@ -34,7 +33,8 @@ class AccountSettingsView extends StatelessWidget {
                   child: _buildImagePicker(),
                 ),
                 SizedBox(height: 20.sp),
-                _buildChangePinButton(context),
+                const UserNameUpdateWidget()
+                // _buildChangePinButton(context),
               ],
             ),
           ),
