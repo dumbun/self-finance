@@ -28,6 +28,7 @@ class PinCreatingView extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(18.sp),
           child: Form(
+            key: formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -49,7 +50,7 @@ class PinCreatingView extends StatelessWidget {
                 RoundedCornerButton(
                   onPressed: () {
                     if (validateAndSave()) {
-                      Routes.navigateToUserCreationView(context, p1.text);
+                      Routes.navigateToUserCreationView(context, p2.text);
                     }
                   },
                   text: "save",
