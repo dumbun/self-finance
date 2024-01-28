@@ -24,11 +24,11 @@ void main() async {
   );
 }
 
-class MyApp extends ConsumerWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return ResponsiveSizer(
       builder: (context, orientation, screenType) => MaterialApp(
         routes: {
