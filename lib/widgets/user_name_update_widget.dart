@@ -47,48 +47,52 @@ class UserNameUpdateWidget extends ConsumerWidget {
                               padding: EdgeInsets.all(16.sp),
                               child: Form(
                                 key: formKey,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    SizedBox(height: 18.sp),
-                                    InputTextField(
-                                      keyboardType: TextInputType.name,
-                                      hintText: "New User Name",
-                                      controller: newUserName,
-                                    ),
-                                    SizedBox(height: 18.sp),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        ElevatedButton.icon(
-                                          style: const ButtonStyle(elevation: MaterialStatePropertyAll(0)),
-                                          onPressed: () {
-                                            if (validateAndSave()) {
-                                              ref.read(asyncUserProvider.notifier).updateUserName(
-                                                  userId: data.first.id!, updateUserName: newUserName.text);
-                                              Navigator.of(context).pop();
-                                            }
-                                          },
-                                          icon: const Icon(Icons.done_rounded),
-                                          label: const BodyTwoDefaultText(
-                                            text: "Done",
-                                            maxLines: 5,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      SizedBox(height: 18.sp),
+                                      InputTextField(
+                                        keyboardType: TextInputType.name,
+                                        hintText: "New User Name",
+                                        controller: newUserName,
+                                      ),
+                                      SizedBox(height: 18.sp),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          ElevatedButton.icon(
+                                            style: const ButtonStyle(elevation: MaterialStatePropertyAll(0)),
+                                            onPressed: () {
+                                              if (newUserName.text == data.first.userName) {
+                                                Navigator.of(context).pop();
+                                              } else if (validateAndSave()) {
+                                                ref.read(asyncUserProvider.notifier).updateUserName(
+                                                    userId: data.first.id!, updateUserName: newUserName.text);
+                                                Navigator.of(context).pop();
+                                              }
+                                            },
+                                            icon: const Icon(Icons.done_rounded),
+                                            label: const BodyTwoDefaultText(
+                                              text: "Done",
+                                              maxLines: 5,
+                                            ),
                                           ),
-                                        ),
-                                        ElevatedButton.icon(
-                                          style: const ButtonStyle(elevation: MaterialStatePropertyAll(0)),
-                                          onPressed: () => Navigator.of(context).pop(),
-                                          icon: const Icon(
-                                            Icons.cancel_rounded,
-                                            color: AppColors.getErrorColor,
+                                          ElevatedButton.icon(
+                                            style: const ButtonStyle(elevation: MaterialStatePropertyAll(0)),
+                                            onPressed: () => Navigator.of(context).pop(),
+                                            icon: const Icon(
+                                              Icons.cancel_rounded,
+                                              color: AppColors.getErrorColor,
+                                            ),
+                                            label: const BodyTwoDefaultText(text: "Cancel"),
                                           ),
-                                          label: const BodyTwoDefaultText(text: "Cancel"),
-                                        ),
-                                      ],
-                                    )
-                                  ],
+                                        ],
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
                             );
