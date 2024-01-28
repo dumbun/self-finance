@@ -12,11 +12,11 @@ import 'package:self_finance/views/user_creating_view.dart';
 
 class Routes {
   static void navigateToChangePinView({required BuildContext context}) {
-    Navigator.of(context).pushNamed("'/changePinView'");
+    Navigator.of(context).pushNamed("/changePinView/");
   }
 
   static void navigateToAccountSettingsView({required BuildContext context}) {
-    Navigator.of(context).pushNamed('/AccountSettingsView');
+    Navigator.of(context).pushNamed('/AccountSettingsView/');
   }
 
   static void navigateToAddNewTransactionToCustomerView({required BuildContext context, required Customer customer}) {
@@ -44,7 +44,7 @@ class Routes {
   }
 
   static void navigateToContactsView(BuildContext context) {
-    Navigator.of(context).pushNamed('/contactsView');
+    Navigator.of(context).pushNamed('/contactsView/');
   }
 
   static void navigateToUserCreationView(BuildContext context, String pin) {
@@ -67,7 +67,7 @@ class Routes {
 
   static void navigateToDashboard({required BuildContext context}) {
     Navigator.of(context).pushNamedAndRemoveUntil(
-      '/dashboardview',
+      '/dashboardview/',
       (route) => false,
     );
   }
@@ -89,6 +89,6 @@ class Routes {
   }
 
   static void navigateToAddNewEntry({required BuildContext context}) async {
-    Navigator.of(context).pushNamed('/addNewEntry');
+    Navigator.of(context).pushNamed('/addNewEntry/');
   }
 }

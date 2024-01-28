@@ -175,7 +175,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   void _safeSuccuse() {
     _isloading = false;
     snackBarWidget(context: context, message: "Transaction added Successfully");
-    Navigator.of(context).popUntil(ModalRoute.withName('/contactsView'));
+    Navigator.of(context).popUntil(ModalRoute.withName('/contactsView/'));
   }
 
   void _saveUnSuccessfull() {
