@@ -134,10 +134,6 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     );
   }
 
-  // SizedBox _space() {
-  //   return
-  // }
-
   Center _getIcon() {
     return Center(
       child: Container(

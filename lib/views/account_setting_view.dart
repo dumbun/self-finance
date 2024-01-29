@@ -20,36 +20,55 @@ class AccountSettingsView extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(16.sp),
-          child: Stack(
-            children: [
-              Align(
+        child: Stack(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(12.sp),
+              child: Align(
                 alignment: Alignment.topCenter,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 20.sp),
-                    const Hero(
-                      tag: "user-profile-pic",
-                      child: UserImageUpdateWidget(),
-                    ),
-                    SizedBox(height: 20.sp),
-                    const UserNameUpdateWidget(),
-                    SizedBox(height: 18.sp),
-                    const UserPinUpdateWidget(),
-                  ],
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 20.sp),
+                      const Hero(
+                        tag: "user-profile-pic",
+                        child: UserImageUpdateWidget(),
+                      ),
+                      SizedBox(height: 20.sp),
+                      const UserNameUpdateWidget(),
+                      SizedBox(height: 12.sp),
+                      const UserPinUpdateWidget(),
+                      SizedBox(height: 12.sp),
+                      Card(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 14.sp),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              BodyOneDefaultText(
+                                text: "Terms and Conditions",
+                                bold: true,
+                              ),
+                              IconButton(onPressed: () {}, icon: Icon(Icons.arrow_forward_ios_rounded))
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
-              const Align(
-                alignment: Alignment.bottomCenter,
-                child: BodyTwoDefaultText(
-                  text: "self-finance ❤️ India",
-                  color: AppColors.getLigthGreyColor,
-                ),
+            ),
+            const Align(
+              alignment: Alignment.bottomCenter,
+              child: BodyTwoDefaultText(
+                text: "self-finance ❤️ India",
+                color: AppColors.getLigthGreyColor,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

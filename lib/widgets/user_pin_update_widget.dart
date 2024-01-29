@@ -28,7 +28,7 @@ class UserPinUpdateWidget extends ConsumerWidget {
           data: (data) {
             return Card(
               child: Padding(
-                padding: EdgeInsets.all(16.sp),
+                padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 14.sp),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,

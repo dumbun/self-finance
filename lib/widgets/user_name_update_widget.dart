@@ -28,7 +28,7 @@ class UserNameUpdateWidget extends ConsumerWidget {
             final TextEditingController newUserName = TextEditingController(text: data.first.userName);
             return Card(
               child: Padding(
-                padding: EdgeInsets.all(16.sp),
+                padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 14.sp),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -63,31 +63,36 @@ class UserNameUpdateWidget extends ConsumerWidget {
                                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
-                                          ElevatedButton.icon(
-                                            style: const ButtonStyle(elevation: MaterialStatePropertyAll(0)),
-                                            onPressed: () {
-                                              if (newUserName.text == data.first.userName) {
-                                                Navigator.pop(context);
-                                              } else if (validateAndSave()) {
-                                                ref.read(asyncUserProvider.notifier).updateUserName(
-                                                    userId: data.first.id!, updateUserName: newUserName.text);
-                                                Navigator.pop(context);
-                                              }
-                                            },
-                                            icon: const Icon(Icons.done_rounded),
-                                            label: const BodyTwoDefaultText(
-                                              text: "Done",
-                                              maxLines: 5,
+                                          Expanded(
+                                            child: ElevatedButton.icon(
+                                              style: const ButtonStyle(elevation: MaterialStatePropertyAll(0)),
+                                              onPressed: () {
+                                                if (newUserName.text == data.first.userName) {
+                                                  Navigator.pop(context);
+                                                } else if (validateAndSave()) {
+                                                  ref.read(asyncUserProvider.notifier).updateUserName(
+                                                      userId: data.first.id!, updateUserName: newUserName.text);
+                                                  Navigator.pop(context);
+                                                }
+                                              },
+                                              icon: const Icon(Icons.done_rounded),
+                                              label: const BodyTwoDefaultText(
+                                                text: "Done",
+                                                maxLines: 5,
+                                              ),
                                             ),
                                           ),
-                                          ElevatedButton.icon(
-                                            style: const ButtonStyle(elevation: MaterialStatePropertyAll(0)),
-                                            onPressed: () => Navigator.pop(context),
-                                            icon: const Icon(
-                                              Icons.cancel_rounded,
-                                              color: AppColors.getErrorColor,
+                                          SizedBox(width: 12.sp),
+                                          Expanded(
+                                            child: ElevatedButton.icon(
+                                              style: const ButtonStyle(elevation: MaterialStatePropertyAll(0)),
+                                              onPressed: () => Navigator.pop(context),
+                                              icon: const Icon(
+                                                Icons.cancel_rounded,
+                                                color: AppColors.getErrorColor,
+                                              ),
+                                              label: const BodyTwoDefaultText(text: "Cancel"),
                                             ),
-                                            label: const BodyTwoDefaultText(text: "Cancel"),
                                           ),
                                         ],
                                       )
