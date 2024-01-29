@@ -33,8 +33,7 @@ class AccountSettingsView extends StatelessWidget {
       }
     }
 
-    //todo change the uri after the edditing is done
-    final Uri toLaunch = Uri(scheme: 'https', host: 'www.kamsalivamshikrishna.com');
+    final Uri toLaunch = Uri.parse('https://dumbun.github.io/self-finance/terms_template');
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
