@@ -85,6 +85,12 @@ class Utility {
     }
   }
 
+  static Future<void> launchInBrowserView(Uri url) async {
+    if (!await launchUrl(url, mode: LaunchMode.inAppBrowserView)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
   // to unfocus keyboard when user touches the white space in screen
   static void unfocus() {
     FocusManager.instance.primaryFocus?.unfocus();

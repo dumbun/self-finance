@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/models/user_model.dart';
+import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/util.dart';
+import 'package:self_finance/views/pin_auth_view.dart';
+import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/user_image_update_widget.dart';
 import 'package:self_finance/widgets/user_name_update_widget.dart';
 import 'package:self_finance/widgets/user_pin_update_widget.dart';
@@ -12,6 +18,23 @@ class AccountSettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void navigateToPinAuthView(User user) {
+      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
+        builder: (context) {
+          return PinAuthView(user: user);
+        },
+      ), (route) => false);
+    }
+
+    void logout(User user) async {
+      int response = await AlertDilogs.alertDialogWithTwoAction(context, "Exit", "Press yes to signout");
+      if (response == 1) {
+        navigateToPinAuthView(user);
+      }
+    }
+
+    //todo change the uri after the edditing is done
+    final Uri toLaunch = Uri(scheme: 'https', host: 'www.kamsalivamshikrishna.com');
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
@@ -40,22 +63,39 @@ class AccountSettingsView extends StatelessWidget {
                       SizedBox(height: 12.sp),
                       const UserPinUpdateWidget(),
                       SizedBox(height: 12.sp),
-                      Card(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 14.sp),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              BodyOneDefaultText(
-                                text: "Terms and Conditions",
-                                bold: true,
-                              ),
-                              IconButton(onPressed: () {}, icon: Icon(Icons.arrow_forward_ios_rounded))
-                            ],
-                          ),
+                      _buidCard(
+                        color: AppColors.getPrimaryColor,
+                        icon: const Icon(
+                          Icons.arrow_forward_ios_rounded,
                         ),
-                      )
+                        onPressed: () {
+                          Utility.launchInBrowserView(toLaunch);
+                        },
+                        title: "Terms and Conditions",
+                      ),
+                      SizedBox(height: 12.sp),
+                      Consumer(
+                        builder: (context, ref, child) => ref.watch(asyncUserProvider).when(
+                              data: (List<User> data) {
+                                return _buidCard(
+                                  color: AppColors.getErrorColor,
+                                  icon: const Icon(
+                                    Icons.logout,
+                                  ),
+                                  onPressed: () async {
+                                    logout(data.first);
+                                  },
+                                  title: "Logout",
+                                );
+                              },
+                              error: (error, stackTrace) => const Center(
+                                child: BodyOneDefaultText(text: "error fetching user data"),
+                              ),
+                              loading: () => const Center(
+                                child: CircularProgressIndicator.adaptive(),
+                              ),
+                            ),
+                      ),
                     ],
                   ),
                 ),
@@ -67,6 +107,34 @@ class AccountSettingsView extends StatelessWidget {
                 text: "self-finance ❤️ India",
                 color: AppColors.getLigthGreyColor,
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Card _buidCard({
+    required String title,
+    required void Function()? onPressed,
+    required Widget icon,
+    required Color? color,
+  }) {
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 14.sp),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            BodyOneDefaultText(
+              text: title,
+              bold: true,
+            ),
+            IconButton(
+              onPressed: onPressed,
+              icon: icon,
+              color: color,
             ),
           ],
         ),

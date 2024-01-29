@@ -98,7 +98,6 @@ class DashboardView extends StatelessWidget {
                   text: "Account",
                   icon: Icons.vpn_key_rounded,
                   onTap: () {
-                    Navigator.of(context).pop();
                     Routes.navigateToAccountSettingsView(context: context);
                   },
                 ),
