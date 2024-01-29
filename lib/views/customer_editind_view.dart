@@ -65,7 +65,10 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
                   SizedBox(height: 20.sp),
                   _buildImagePickers(),
                   SizedBox(height: 32.sp),
-                  RoundedCornerButton(text: "update", onPressed: _save),
+                  Hero(
+                    tag: "save-button",
+                    child: RoundedCornerButton(text: "update", onPressed: _save),
+                  ),
                 ],
               ),
             ),
@@ -97,7 +100,7 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
   }
 
   void _navigateToContactsView() {
-    Navigator.of(context).popUntil(ModalRoute.withName('/contactsView'));
+    Navigator.of(context).popUntil(ModalRoute.withName('/contactsView/'));
     snackBarWidget(context: context, message: "Contact Updated Successfully ");
   }
 

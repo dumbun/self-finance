@@ -13,11 +13,11 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   flutter_launcher_icons: ^0.13.1
-  flutter_svg: ^2.0.7
-  responsive_sizer: ^3.2.0
+  flutter_svg: ^2.0.9
+  responsive_sizer: ^3.3.0+1
   url_launcher: ^6.1.14
   pinput: ^3.0.1
-  sqflite: ^2.3.0
+  sqflite: ^2.3.2
   path_provider: ^2.1.1
   local_auth: ^2.1.6
   flutter_svg_provider: ^1.0.6

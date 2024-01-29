@@ -56,6 +56,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        forceMaterialTransparency: true,
         elevation: 0,
         title: const BodyTwoDefaultText(text: "Add new Entry with new Customer"),
       ),

@@ -9,7 +9,6 @@ import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_providers.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
-import 'package:self_finance/widgets/title_widget.dart';
 import 'package:self_finance/widgets/two_slice_pie_chart_widget.dart';
 
 class EMICalculatorView extends ConsumerWidget {
@@ -73,10 +72,6 @@ class EMICalculatorView extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const Center(
-              child: TitleWidget(text: emiCalculatorTitle),
-            ),
-            SizedBox(height: 20.sp),
             // Taken Date
             _datePicker(
               takenDate,

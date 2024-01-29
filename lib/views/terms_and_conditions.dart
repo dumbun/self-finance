@@ -34,7 +34,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: <Widget>[
               _getIcon(),
               _getHeading(),
               SizedBox(height: 16.sp),
@@ -83,7 +83,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
       child: ListView.builder(
         scrollDirection: Axis.vertical,
         itemCount: result.length,
-        itemBuilder: (context, index) => result[index],
+        itemBuilder: (BuildContext context, int index) => result[index],
       ),
     );
   }
@@ -99,7 +99,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
           children: [
             Checkbox(
               value: ticked,
-              onChanged: (value) => _getClicked(),
+              onChanged: (bool? value) => _getClicked(),
               activeColor: AppColors.getPrimaryColor,
             ),
             SizedBox(width: 10.sp),
@@ -133,10 +133,6 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
       ),
     );
   }
-
-  // SizedBox _space() {
-  //   return
-  // }
 
   Center _getIcon() {
     return Center(

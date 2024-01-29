@@ -115,6 +115,7 @@ class ContactsView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        forceMaterialTransparency: true,
         title: const BodyOneDefaultText(text: "Please select the contact"),
       ),
       body: SafeArea(

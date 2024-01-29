@@ -59,12 +59,12 @@ class UserBackEnd {
     return User.toList(result);
   }
 
-  static Future<List> fetchIDOneUser() async {
+  static Future<List<User>> fetchIDOneUser() async {
     final db = await UserBackEnd.db();
     List<Map<String, Object?>> result = await db.rawQuery("""
       SELECT * FROM USER WHERE ID = 1
     """);
-    return result.isNotEmpty ? User.toList(result) : result;
+    return result.isNotEmpty ? User.toList(result) : [];
   }
 
   // fetch user pin
@@ -85,12 +85,33 @@ class UserBackEnd {
     final result = await db.update('USER', data, where: "id = ?", whereArgs: [id]);
     return result;
   }
+  // Update the USER_PIN
+
+  static Future<int> updateUserPin(int id, String pin) async {
+    final db = await UserBackEnd.db();
+    final data = {'USER_PIN': pin};
+    final result = await db.update('USER', data, where: "id = ?", whereArgs: [id]);
+    return result;
+  }
   // Update the USER_PROFILE_PIC
 
   static Future<int> updateProfilePic(int id, String imageString) async {
     final db = await UserBackEnd.db();
     final data = {'USER_PROFILE_PICTURE': imageString};
     final result = await db.update('USER', data, where: "id = ?", whereArgs: [id]);
+    return result;
+  }
+  // Update the USER
+
+  static Future<int> updateUser(User user) async {
+    final db = await UserBackEnd.db();
+    final data = {
+      'ID': user.id!,
+      'USER_NAME': user.userName,
+      'USER_PIN': user.userPin,
+      'USER_PROFILE_PICTURE': user.profilePicture,
+    };
+    final result = await db.update('USER', data, where: "id = ?", whereArgs: [user.id]);
     return result;
   }
 

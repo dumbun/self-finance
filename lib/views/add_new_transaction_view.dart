@@ -55,11 +55,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Hero(
-              transitionOnUserGestures: true,
-              tag: "customer-profile-picture",
-              child: _buildUserProfilePic(),
-            ),
+            _buildUserProfilePic(),
             SizedBox(width: 16.sp),
             BodyOneDefaultText(
               text: widget.customer.name,
@@ -107,10 +103,13 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                   SizedBox(height: 20.sp),
                   _buldItemImagePicker(),
                   SizedBox(height: 40.sp),
-                  Visibility(
-                    visible: _isloading,
-                    replacement: RoundedCornerButton(text: "Save", onPressed: _save),
-                    child: const CircularProgressIndicator.adaptive(),
+                  Hero(
+                    tag: "save-button",
+                    child: Visibility(
+                      visible: _isloading,
+                      replacement: RoundedCornerButton(text: "Save", onPressed: _save),
+                      child: const CircularProgressIndicator.adaptive(),
+                    ),
                   ),
                 ],
               ),
@@ -176,7 +175,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   void _safeSuccuse() {
     _isloading = false;
     snackBarWidget(context: context, message: "Transaction added Successfully");
-    Navigator.of(context).popUntil(ModalRoute.withName('/contactsView'));
+    Navigator.of(context).popUntil(ModalRoute.withName('/contactsView/'));
   }
 
   void _saveUnSuccessfull() {
