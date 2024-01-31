@@ -8,13 +8,25 @@ import 'package:self_finance/widgets/app_icon.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
-class PinAuthView extends StatelessWidget {
+class PinAuthView extends StatefulWidget {
   const PinAuthView({super.key, required this.user});
   final User user;
 
   @override
+  State<PinAuthView> createState() => _PinAuthViewState();
+}
+
+class _PinAuthViewState extends State<PinAuthView> {
+  final TextEditingController pinController = TextEditingController();
+
+  @override
+  void dispose() {
+    pinController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final TextEditingController pinController = TextEditingController();
     void getLogin(User user) {
       if (user.userPin == pinController.text) {
         Routes.navigateToDashboard(context: context);
@@ -33,8 +45,8 @@ class PinAuthView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                user.profilePicture != ""
-                    ? Hero(tag: "User-image", child: Utility.imageFromBase64String(user.profilePicture))
+                widget.user.profilePicture != ""
+                    ? Hero(tag: "User-image", child: Utility.imageFromBase64String(widget.user.profilePicture))
                     : const AppIcon(),
                 SizedBox(height: 20.sp),
                 const StrongHeadingOne(
@@ -46,7 +58,7 @@ class PinAuthView extends StatelessWidget {
                   pinController: pinController,
                   obscureText: true,
                   validator: (String? p0) {
-                    if (p0 != user.userPin) {
+                    if (p0 != widget.user.userPin) {
                       pinController.clear();
                       return "Please enter the correct pin";
                     } else {
@@ -56,7 +68,7 @@ class PinAuthView extends StatelessWidget {
                   },
                 ),
                 SizedBox(height: 20.sp),
-                RoundedCornerButton(text: "Login", onPressed: () => getLogin(user)),
+                RoundedCornerButton(text: "Login", onPressed: () => getLogin(widget.user)),
               ],
             ),
           ),

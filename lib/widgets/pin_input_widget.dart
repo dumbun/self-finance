@@ -21,25 +21,30 @@ class PinInputWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     const focusedBorderColor = Color(0xFF2196F3);
     const fillColor = Color.fromRGBO(243, 246, 249, 0);
-    const borderColor = Color(0xFF90CAF9);
 
     final defaultPinTheme = PinTheme(
       width: 30.sp,
       height: 30.sp,
       textStyle: TextStyle(
         fontSize: 22.sp,
-        // color: const Color.fromRGBO(30, 60, 87, 1),
         color: AppColors.getPrimaryColor,
       ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(19.sp),
-        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(16.sp),
+        border: Border.all(color: AppColors.getPrimaryColor),
       ),
     );
 
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Pinput(
+        toolbarEnabled: true,
+        errorTextStyle: const TextStyle(
+          fontFamily: "hell",
+          fontStyle: FontStyle.italic,
+          fontWeight: FontWeight.bold,
+          color: AppColors.getErrorColor,
+        ),
         readOnly: readOnly,
         obscureText: obscureText,
         length: 4,
@@ -67,8 +72,8 @@ class PinInputWidget extends StatelessWidget {
               return null;
             },
         defaultPinTheme: defaultPinTheme,
-        separatorBuilder: (index) => SizedBox(width: 8.sp),
-        hapticFeedbackType: HapticFeedbackType.lightImpact,
+        separatorBuilder: (index) => SizedBox(width: 12.sp),
+        hapticFeedbackType: HapticFeedbackType.vibrate,
       ),
     );
   }

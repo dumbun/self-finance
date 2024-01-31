@@ -19,11 +19,14 @@ class AccountSettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void navigateToPinAuthView(User user) {
-      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-        builder: (context) {
-          return PinAuthView(user: user);
-        },
-      ), (route) => false);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) {
+            return PinAuthView(user: user);
+          },
+        ),
+        (route) => false,
+      );
     }
 
     void logout(User user) async {
