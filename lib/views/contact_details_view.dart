@@ -84,7 +84,10 @@ class ContactDetailsView extends ConsumerWidget {
           splashColor: AppColors.getPrimaryColor,
           backgroundColor: AppColors.getPrimaryColor,
           shape: const CircleBorder(),
-          child: const Icon(Icons.add),
+          child: const Icon(
+            Icons.add,
+            color: AppColors.getBackgroundColor,
+          ),
           onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(context: context, customer: customer),
         ),
         appBar: AppBar(

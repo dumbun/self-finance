@@ -1,4 +1,4 @@
-# **SELF-FINANCE** TERMS OF SERVICE
+# TERMS OF SERVICE
 
 Last Updated: **29-JAN-2024**
 

@@ -27,6 +27,34 @@ class AsyncCustomers extends _$AsyncCustomers {
     return result;
   }
 
+  Future<int> updateCustomer({
+    required int customerId,
+    required String newCustomerName,
+    required String newGuardianName,
+    required String newCustomerAddress,
+    required String newContactNumber,
+    required String newCustomerPhoto,
+    required String newProofPhoto,
+    required String newCreatedDate,
+  }) async {
+    int response;
+    state = const AsyncValue.loading();
+    response = await BackEnd.updateCustomerDetails(
+      customerId: customerId,
+      newContactNumber: newContactNumber,
+      newCustomerAddress: newCustomerAddress,
+      newCreatedDate: newCreatedDate,
+      newCustomerName: newCustomerName,
+      newCustomerPhoto: newCustomerPhoto,
+      newGuardianName: newGuardianName,
+      newProofPhoto: newProofPhoto,
+    );
+    state = await AsyncValue.guard(() async {
+      return _fetchAllCustomersData();
+    });
+    return response;
+  }
+
   Future<List<String>> fetchAllCustomersNumbers() async {
     List<String> data = [];
     // Set the state to loading

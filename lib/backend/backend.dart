@@ -3,8 +3,61 @@ import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/models/user_history.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
+
+/*
+
+Customers Table:
+
+Customer_ID: Unique identifier for each customer (auto-incremented).
+Customer_Name: Name of the customer (text, not null).
+Guardian_Name: Name of the guardian (text, not null).
+Customer_Address: Address of the customer (text, not null).
+Contact_Number: Unique contact number for the customer (text, unique, not null).
+Customer_Photo: Binary Large Object (BLOB) storing customer's photo (not null).
+Proof_Photo: BLOB storing proof photo (not null).
+Created_Date: Date when the record was created (text, not null).
+
+Items Table:
+
+Item_ID: Unique identifier for each item (auto-incremented).
+Customer_ID: Foreign key referencing Customer_ID in Customers table.
+Item_Name: Name of the item (text, not null).
+Item_Description: Description of the item (text, not null).
+Pawned_Date: Date when the item was pawned (text, not null).
+Expiry_Date: Date when the pawn expires (text, not null).
+Pawn_Amount: Pawn amount (real, not null).
+Item_Status: Status of the item (text, not null).
+Item_Photo: BLOB storing item's photo (not null).
+Created_Date: Date when the record was created (text, not null).
+
+Transactions Table:
+
+Transaction_ID: Unique identifier for each transaction (auto-incremented).
+Customer_ID: Foreign key referencing Customer_ID in Customers table.
+Item_ID: Foreign key referencing Item_ID in Items table.
+Transaction_Date: Date of the transaction (text, not null).
+Transaction_Type: Type of the transaction (text, not null).
+Amount: Transaction amount (real, not null).
+Interest_Rate: Interest rate for the transaction (real, not null).
+Interest_Amount: Amount of interest (real, not null).
+Remaining_Amount: Remaining amount after payment (real, not null).
+Created_Date: Date when the record was created (text, not null).
+
+Payments Table:
+
+Payment_ID: Unique identifier for each payment (auto-incremented).
+Transaction_ID: Foreign key referencing Transaction_ID in Transactions table.
+Payment_Date: Date of the payment (text, not null).
+Amount_Paid: Amount paid in the payment (real, not null).
+Payment_Type: Type of the payment (text, not null).
+Created_Date: Date when the record was created (text, not null).
+
+The PRAGMA foreign_keys = ON statement at the end is used to enable foreign key support in SQLite. This ensures referential integrity between tables using foreign keys.
+
+*/
 
 class BackEnd {
   static Future<void> createTable(sql.Database database) async {
@@ -66,6 +119,20 @@ class BackEnd {
           );
         """);
     await database.execute("""
+          -- History Table
+          CREATE TABLE History (
+          Histoy_ID        INTEGER PRIMARY KEY AUTOINCREMENT,
+          User_ID          INTEGER NOT NULL,
+          Customer_ID      INTEGER NOT NULL,
+          Item_ID          INTEGER NOT NULL,
+          Transacrtion_ID  INTEGER NOT NULL,
+          Amount           REAL NOT NULL,
+          Event_Date       TEXT NOT NULL,
+          Event_Type       TEXT NOT NULL
+          );
+        """);
+
+    await database.execute("""
              PRAGMA foreign_keys = ON
         """);
   }
@@ -125,6 +192,16 @@ class BackEnd {
         .rawQuery("""SELECT Customer_ID, Customer_Name, Contact_Number FROM Customers ORDER BY Customer_Name ASC""");
 
     return Contact.toList(response);
+  }
+
+  static Future<String> fetchRequriedCustomerName(int id) async {
+    final Database db = await BackEnd.db();
+    try {
+      final response = await db.rawQuery("""SELECT Customer_Name FROM Customers WHERE Customer_ID == $id""");
+      return response.first["Customer_Name"].toString();
+    } catch (e) {
+      return "";
+    }
   }
 
   static Future<List<Customer>> fetchSingleContactDetails({required int id}) async {
@@ -293,6 +370,38 @@ class BackEnd {
       whereArgs: [customerId],
     );
     return Trx.toList(response);
+  }
+
+  //// H I S T O R Y
+  /// fetch all history
+  static fetchAllUserHistory() async {
+    final Database db = await BackEnd.db();
+    final List<Map<String, Object?>> response = await db.rawQuery("""SELECT * FROM History ORDER BY Event_Date DESC""");
+    return UserHistory.toList(response);
+  }
+
+  static Future<int> createNewHistory(UserHistory history) async {
+    try {
+      final db = await BackEnd.db();
+      final Map<String, Object> data = {
+        "User_ID": history.userID,
+        "Customer_ID": history.customerID,
+        "Item_ID": history.itemID,
+        "Transacrtion_ID": history.transactionID,
+        "Amount": history.amount,
+        "Event_Date": history.eventDate,
+        "Event_Type": history.eventType,
+      };
+      try {
+        final int id = await db.insert("History", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
+        return id;
+      } catch (e) {
+        print(e);
+        return 0;
+      }
+    } catch (e) {
+      return 0;
+    }
   }
 
   // ///[createNewTransaction] creates a new transaction in the DataBase

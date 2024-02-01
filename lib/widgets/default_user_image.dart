@@ -17,8 +17,8 @@ class DefaultUserImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SvgPicture.asset(
-      height: height ?? 30.sp,
-      width: width ?? 30.sp,
+      height: height ?? 28.sp,
+      width: width ?? 28.sp,
       defaultProfileImagePath,
     );
   }

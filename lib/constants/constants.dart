@@ -26,3 +26,5 @@ const String error = "Error";
 const String customerPhoto = "Customer Photo";
 const String takenDate = "Taken Data ( dd - MM - yyyy )";
 const String tenureDate = "Tenure Date ( dd - MM - yyyy )";
+const String debited = "Debited";
+const String credit = "Credit";
