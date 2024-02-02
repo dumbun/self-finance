@@ -83,7 +83,7 @@ class _AuthViewState extends State<AuthView> {
           List<User> users = snapshot.data ?? [];
 
           if (users.isNotEmpty) {
-            return _isAuthenticated ? const DashboardView() : PinAuthView(user: users.first);
+            return _isAuthenticated ? const DashboardView() : const PinAuthView();
           } else {
             return const TermsAndConditons();
           }

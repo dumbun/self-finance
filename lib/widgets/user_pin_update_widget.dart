@@ -79,7 +79,7 @@ class UserPinUpdateWidget extends ConsumerWidget {
                                               }
                                             },
                                             label: const BodyTwoDefaultText(
-                                              text: "Conform",
+                                              text: "Confirm",
                                             ),
                                             icon: const Icon(Icons.done_rounded),
                                           ),

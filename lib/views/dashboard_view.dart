@@ -28,7 +28,7 @@ class DashboardView extends StatelessWidget {
     navigateToPinAuthView(User user) {
       Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
         builder: (context) {
-          return PinAuthView(user: user);
+          return const PinAuthView();
         },
       ), (route) => false);
     }
