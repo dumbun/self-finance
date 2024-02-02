@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
@@ -42,13 +43,17 @@ class ContactDetailsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     void delateTheContact() {
-      ref.read(asyncCustomersContactsProvider.notifier).deleteCustomer(customerID: customer.id!);
+      ref
+          .read(asyncCustomersContactsProvider.notifier)
+          .deleteCustomer(customerID: customer.id!);
       Navigator.pop(context);
     }
 
     void preEditingSettings() {
-      ref.read(updatedCustomerPhotoStringProvider.notifier).state = customer.photo;
-      ref.read(updatedCustomerProofStringProvider.notifier).state = customer.proof;
+      ref.read(updatedCustomerPhotoStringProvider.notifier).state =
+          customer.photo;
+      ref.read(updatedCustomerProofStringProvider.notifier).state =
+          customer.proof;
       Routes.navigateToContactEditingView(context: context, contact: customer);
     }
 
@@ -88,7 +93,8 @@ class ContactDetailsView extends ConsumerWidget {
             Icons.add,
             color: AppColors.getBackgroundColor,
           ),
-          onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(context: context, customer: customer),
+          onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(
+              context: context, customer: customer),
         ),
         appBar: AppBar(
           forceMaterialTransparency: true,
@@ -125,7 +131,10 @@ class ContactDetailsView extends ConsumerWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 16.sp),
             child: TabBarView(
-              children: <Widget>[_buildCustomerDetails(context), _buildTransactionsHistory()],
+              children: <Widget>[
+                _buildCustomerDetails(context),
+                _buildTransactionsHistory()
+              ],
             ),
           ),
         ),
@@ -175,10 +184,17 @@ class ContactDetailsView extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    BodyOneDefaultText(text: "Taken Amount : ${Utility.doubleFormate(transacrtions[index].amount)}"),
-                    BodyOneDefaultText(text: "Taken Date : ${transacrtions[index].transacrtionDate}"),
-                    BodyOneDefaultText(text: "Rate of Intrest : ${transacrtions[index].intrestRate}"),
-                    BodyTwoDefaultText(text: transacrtions[index].transacrtionType),
+                    BodyOneDefaultText(
+                        text:
+                            "Taken Amount : ${Utility.doubleFormate(transacrtions[index].amount)}"),
+                    BodyOneDefaultText(
+                        text:
+                            "Taken Date : ${transacrtions[index].transacrtionDate}"),
+                    BodyOneDefaultText(
+                        text:
+                            "Rate of Intrest : ${transacrtions[index].intrestRate}"),
+                    BodyTwoDefaultText(
+                        text: transacrtions[index].transacrtionType),
                   ],
                 )
               ],
@@ -284,7 +300,9 @@ class ContactDetailsView extends ConsumerWidget {
             icon,
             SizedBox(width: 20.sp),
             Column(
-              mainAxisAlignment: title.isNotEmpty ? MainAxisAlignment.start : MainAxisAlignment.center,
+              mainAxisAlignment: title.isNotEmpty
+                  ? MainAxisAlignment.start
+                  : MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (title.isNotEmpty)
@@ -361,6 +379,8 @@ class ContactDetailsView extends ConsumerWidget {
 
   /// [ _buildImage()] method to build the image of the customer
   Center _buildImage() {
-    return Center(child: CircularImageWidget(imageData: customer.photo, titile: "customer photo"));
+    return Center(
+        child: CircularImageWidget(
+            imageData: customer.photo, titile: "customer photo"));
   }
 }

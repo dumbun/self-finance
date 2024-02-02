@@ -179,7 +179,7 @@ class BackEnd {
   /// [fetchAllCustomerNumbers] fetch's the mobile numbers from the all customers
   static Future<List<String>> fetchAllCustomerNumbers() async {
     final Database db = await BackEnd.db();
-    final response = await db.rawQuery("""SELECT Contact_Number FROM Customers""");
+    final List<Map<String, Object?>> response = await db.rawQuery("""SELECT Contact_Number FROM Customers""");
     return response.map((e) {
       return e["Contact_Number"] as String;
     }).toList();

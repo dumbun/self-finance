@@ -73,7 +73,7 @@ class PinInputWidget extends StatelessWidget {
             },
         defaultPinTheme: defaultPinTheme,
         separatorBuilder: (index) => SizedBox(width: 12.sp),
-        hapticFeedbackType: HapticFeedbackType.vibrate,
+        hapticFeedbackType: HapticFeedbackType.lightImpact,
       ),
     );
   }

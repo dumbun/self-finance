@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/customer_model.dart';
+
 part 'customer_provider.g.dart';
 
 @Riverpod(keepAlive: false)
@@ -22,6 +23,7 @@ class AsyncCustomers extends _$AsyncCustomers {
     // Add the new todo and reload the todo list from the remote repository
     state = await AsyncValue.guard(() async {
       result = await BackEnd.createNewCustomer(customer);
+      // creating new item becacuse every new transaction will have a proof item
       return _fetchAllCustomersData();
     });
     return result;

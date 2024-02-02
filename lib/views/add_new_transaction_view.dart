@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/models/user_history.dart';
+import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/items_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/util.dart';
@@ -140,6 +143,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
 
   void _save() async {
     if (_validateAndSave()) {
+      final String presentDate = DateTime.now().toString();
       _isloading = true;
       final int itemId = await ref.read(asyncItemsProvider.notifier).addItem(
             item: Items(
@@ -147,28 +151,43 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
               name: _description.text,
               description: _description.text,
               pawnedDate: _transacrtionDate.text,
-              expiryDate: DateTime.now().toString(),
+              expiryDate: presentDate,
               pawnAmount: _doubleCheck(_amount.text),
               status: "Active",
               photo: ref.read(newItemImageProvider),
               createdDate: DateTime.now().toString(),
             ),
           );
-      final int transacrtionId = await ref.read(asyncTransactionsProvider.notifier).addTransaction(
-            transaction: Trx(
-              customerId: widget.customer.id!,
-              itemId: itemId,
-              transacrtionDate: _transacrtionDate.text,
-              transacrtionType: "Active",
-              amount: _doubleCheck(_amount.text),
-              intrestRate: _doubleCheck(_rateOfIntrest.text),
-              intrestAmount: _doubleCheck(_amount.text) * (_doubleCheck(_rateOfIntrest.text) / 100),
-              remainingAmount: 0.0,
-              createdDate: DateTime.now().toString(),
-            ),
-          );
+      if (itemId != 0) {
+        final int transacrtionId = await ref.read(asyncTransactionsProvider.notifier).addTransaction(
+              transaction: Trx(
+                customerId: widget.customer.id!,
+                itemId: itemId,
+                transacrtionDate: _transacrtionDate.text,
+                transacrtionType: "Active",
+                amount: _doubleCheck(_amount.text),
+                intrestRate: _doubleCheck(_rateOfIntrest.text),
+                intrestAmount: _doubleCheck(_amount.text) * (_doubleCheck(_rateOfIntrest.text) / 100),
+                remainingAmount: 0.0,
+                createdDate: presentDate,
+              ),
+            );
 
-      itemId != 0 && transacrtionId != 0 ? _safeSuccuse() : _saveUnSuccessfull();
+        if (transacrtionId != 0) {
+          final int historyId = await ref.read(asyncHistoryProvider.notifier).addHistory(
+                history: UserHistory(
+                  userID: 1,
+                  customerID: widget.customer.id!,
+                  itemID: itemId,
+                  transactionID: transacrtionId,
+                  eventDate: presentDate,
+                  eventType: debited,
+                  amount: _doubleCheck(_amount.text),
+                ),
+              );
+          historyId != 0 ? _safeSuccuse() : _saveUnSuccessfull();
+        }
+      }
     }
   }
 
@@ -210,7 +229,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                       ? Utility.imageFromBase64String(newItemImageString)
                       : const DefaultUserImage(),
                   SizedBox(height: 12.sp),
-                  const BodyOneDefaultText(text: "Add Item Imgage"),
+                  const BodyOneDefaultText(text: "Add Item Image"),
                 ],
               ),
             );

@@ -178,8 +178,9 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
       final List<String> customerNumbers = await ref.read(asyncCustomersProvider.notifier).fetchAllCustomersNumbers();
       if (customerNumbers.contains(_mobileNumber.text) == false) {
         final String presentDateTime = DateTime.now().toString();
-        // creating the new customer
+        final takenAmount = _doubleCheck(_takenAmount.text);
 
+        // creating the new customer
         final int customerCreatedResponse = await ref.read(asyncCustomersProvider.notifier).addCustomer(
               customer: Customer(
                 name: _customerName.text,
@@ -191,69 +192,73 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                 createdDate: presentDateTime,
               ),
             );
-
-        // creating new item becacuse every new transaction will have a proof item
-        final int itemCreatedResponse = await ref.read(asyncItemsProvider.notifier).addItem(
-                item: Items(
-              customerid: customerCreatedResponse,
-              name: _itemDescription.text,
-              description: _itemDescription.text,
-              pawnedDate: _takenDate.text,
-              expiryDate: presentDateTime,
-              pawnAmount: _doubleCheck(_takenAmount.text),
-              status: "Active",
-              photo: ref.read(pickedCustomerItemImageStringProvider),
-              createdDate: presentDateTime,
-            ));
-
-        // creating new transaction
-        final int transactionCreatedResponse = await ref.read(asyncTransactionsProvider.notifier).addTransaction(
-                transaction: Trx(
-              customerId: customerCreatedResponse,
-              itemId: itemCreatedResponse,
-              transacrtionDate: _takenDate.text,
-              transacrtionType: "Active",
-              amount: _doubleCheck(_takenAmount.text),
-              intrestRate: _doubleCheck(_rateOfIntrest.text),
-              intrestAmount: _doubleCheck(_takenAmount.text) * (_doubleCheck(_rateOfIntrest.text) / 100),
-              remainingAmount: 0,
-              createdDate: presentDateTime,
-            ));
-
-        // creating history
-        final int historyResponse = await ref.read(asyncHistoryProvider.notifier).addHistory(
-              history: UserHistory(
-                userID: 1,
-                customerID: customerCreatedResponse,
-                itemID: itemCreatedResponse,
-                transactionID: transactionCreatedResponse,
-                eventDate: presentDateTime,
-                eventType: debited,
-                amount: _doubleCheck(_takenAmount.text),
-              ),
-            );
-
-        // final response
-        if (customerCreatedResponse != 0 &&
-            itemCreatedResponse != 0 &&
-            transactionCreatedResponse != 0 &&
-            historyResponse != 0) {
-          _afterSuccess();
-        } else {
-          _afterFail();
+        if (customerCreatedResponse != 0) {
+          // creating new item becacuse every new transaction will have a proof item
+          final int itemCreatedResponse = await ref.read(asyncItemsProvider.notifier).addItem(
+                  item: Items(
+                customerid: customerCreatedResponse,
+                name: _itemDescription.text,
+                description: _itemDescription.text,
+                pawnedDate: _takenDate.text,
+                expiryDate: presentDateTime,
+                pawnAmount: takenAmount,
+                status: "Active",
+                photo: ref.read(pickedCustomerItemImageStringProvider),
+                createdDate: presentDateTime,
+              ));
+          if (itemCreatedResponse != 0) {
+            // creating new transaction
+            final int transactionCreatedResponse = await ref.read(asyncTransactionsProvider.notifier).addTransaction(
+                    transaction: Trx(
+                  customerId: customerCreatedResponse,
+                  itemId: itemCreatedResponse,
+                  transacrtionDate: _takenDate.text,
+                  transacrtionType: "Active",
+                  amount: takenAmount,
+                  intrestRate: _doubleCheck(_rateOfIntrest.text),
+                  intrestAmount: _doubleCheck(_takenAmount.text) * (_doubleCheck(_rateOfIntrest.text) / 100),
+                  remainingAmount: 0,
+                  createdDate: presentDateTime,
+                ));
+            if (transactionCreatedResponse != 0) {
+              // creating history
+              final int historyResponse = await ref.read(asyncHistoryProvider.notifier).addHistory(
+                    history: UserHistory(
+                      userID: 1,
+                      customerID: customerCreatedResponse,
+                      itemID: itemCreatedResponse,
+                      transactionID: transactionCreatedResponse,
+                      eventDate: presentDateTime,
+                      eventType: debited,
+                      amount: takenAmount,
+                    ),
+                  );
+              // final response
+              (customerCreatedResponse != 0 &&
+                      itemCreatedResponse != 0 &&
+                      transactionCreatedResponse != 0 &&
+                      historyResponse != 0)
+                  ? _afterSuccess()
+                  : _afterFail();
+            }
+          }
         }
-      } else if (customerNumbers.contains(_mobileNumber.text)) {
-        setState(() {
-          _isloading = false;
-        });
-        _mobileNumber.clear();
-        _alertDilog(
-          title: "",
-          content:
-              "Contact number is already present in your database please change the number or if you want to add the transacrtion to existing constact please select the add transaction to existing contact in Home Screen",
-        );
+      } else {
+        _containsSameNumberInDB();
       }
     }
+  }
+
+  void _containsSameNumberInDB() {
+    setState(() {
+      _isloading = false;
+    });
+    _mobileNumber.clear();
+    _alertDilog(
+      title: "",
+      content:
+          "Contact number is already present in your database please change the number or if you want to add the transacrtion to existing constact please select the add transaction to existing contact in Home Screen",
+    );
   }
 
   void _alertDilog({required String title, required String content}) {
