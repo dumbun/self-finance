@@ -2,6 +2,7 @@ import 'dart:convert';
 
 class Customer {
   final int? id;
+  final int userID;
   final String name;
   final String guardianName;
   final String address;
@@ -12,6 +13,7 @@ class Customer {
 
   Customer({
     this.id,
+    required this.userID,
     required this.name,
     required this.guardianName,
     required this.address,
@@ -28,6 +30,7 @@ class Customer {
     return data.map((e) {
       return Customer(
         id: e["Customer_ID"] as int,
+        userID: e["User_ID"] as int,
         name: e["Customer_Name"] as String,
         guardianName: e["Gaurdian_Name"] as String,
         address: e["Customer_Address"] as String,
@@ -41,6 +44,7 @@ class Customer {
 
   Customer copyWith({
     int? id,
+    int? userID,
     String? name,
     String? guardianName,
     String? address,
@@ -51,6 +55,7 @@ class Customer {
   }) {
     return Customer(
       id: id ?? this.id,
+      userID: userID ?? this.userID,
       name: name ?? this.name,
       guardianName: guardianName ?? this.guardianName,
       address: address ?? this.address,
@@ -84,6 +89,7 @@ class Customer {
       photo: map['photo'] as String,
       proof: map['proof'] as String,
       createdDate: map['createdDate'] as String,
+      userID: map['userID'] as int,
     );
   }
 

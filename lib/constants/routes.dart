@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:self_finance/models/customer_model.dart';
-import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/views/add_new_transaction_view.dart';
 import 'package:self_finance/views/contact_details_view.dart';
@@ -19,10 +18,10 @@ class Routes {
     Navigator.of(context).pushNamed('/AccountSettingsView/');
   }
 
-  static void navigateToAddNewTransactionToCustomerView({required BuildContext context, required Customer customer}) {
+  static void navigateToAddNewTransactionToCustomerView({required BuildContext context, required int customerID}) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => AddNewTransactionView(customer: customer),
+        builder: (context) => AddNewTransactionView(customerID: customerID),
       ),
     );
   }
@@ -34,11 +33,10 @@ class Routes {
     );
   }
 
-  static void navigateToContactDetailsView(BuildContext context,
-      {required Customer customer, required List<Items> items, required List<Trx> transacrtions}) {
+  static void navigateToContactDetailsView(BuildContext context, {required int customerID}) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ContactDetailsView(customer: customer, items: items, transacrtions: transacrtions),
+        builder: (context) => ContactDetailsView(customerID: customerID),
       ),
     );
   }

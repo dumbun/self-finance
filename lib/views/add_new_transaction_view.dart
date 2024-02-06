@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_text.dart';
+import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
@@ -12,7 +15,6 @@ import 'package:self_finance/providers/items_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/widgets/date_picker_widget.dart';
-import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
@@ -24,9 +26,9 @@ final newItemImageProvider = StateProvider.autoDispose<String>((ref) {
 });
 
 class AddNewTransactionView extends ConsumerStatefulWidget {
-  const AddNewTransactionView({super.key, required this.customer});
+  const AddNewTransactionView({super.key, required this.customerID});
 
-  final Customer customer;
+  final int customerID;
 
   @override
   ConsumerState<AddNewTransactionView> createState() => _AddNewTransactionViewState();
@@ -54,17 +56,9 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _buildUserProfilePic(),
-            SizedBox(width: 16.sp),
-            BodyOneDefaultText(
-              text: widget.customer.name,
-              bold: true,
-            ),
-          ],
+        title: const BodyTwoDefaultText(
+          text: "Add New Transaction",
+          bold: true,
         ),
       ),
       body: SafeArea(
@@ -143,11 +137,12 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
 
   void _save() async {
     if (_validateAndSave()) {
+      final List<Customer> customer = await BackEnd.fetchSingleContactDetails(id: widget.customerID);
       final String presentDate = DateTime.now().toString();
       _isloading = true;
       final int itemId = await ref.read(asyncItemsProvider.notifier).addItem(
             item: Items(
-              customerid: widget.customer.id!,
+              customerid: widget.customerID,
               name: _description.text,
               description: _description.text,
               pawnedDate: _transacrtionDate.text,
@@ -161,7 +156,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
       if (itemId != 0) {
         final int transacrtionId = await ref.read(asyncTransactionsProvider.notifier).addTransaction(
               transaction: Trx(
-                customerId: widget.customer.id!,
+                customerId: widget.customerID,
                 itemId: itemId,
                 transacrtionDate: _transacrtionDate.text,
                 transacrtionType: "Active",
@@ -177,7 +172,9 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
           final int historyId = await ref.read(asyncHistoryProvider.notifier).addHistory(
                 history: UserHistory(
                   userID: 1,
-                  customerID: widget.customer.id!,
+                  customerID: widget.customerID,
+                  customerName: customer.first.name,
+                  customerNumber: customer.first.number,
                   itemID: itemId,
                   transactionID: transacrtionId,
                   eventDate: presentDate,
@@ -194,7 +191,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   void _safeSuccuse() {
     _isloading = false;
     snackBarWidget(context: context, message: "Transaction added Successfully");
-    Navigator.of(context).popUntil(ModalRoute.withName('/contactsView/'));
+    Navigator.of(context).pop();
   }
 
   void _saveUnSuccessfull() {
@@ -227,7 +224,11 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                 children: [
                   newItemImageString.isNotEmpty
                       ? Utility.imageFromBase64String(newItemImageString)
-                      : const DefaultUserImage(),
+                      : SvgPicture.asset(
+                          height: 28.sp,
+                          width: 28.sp,
+                          defaultItemImagePath,
+                        ),
                   SizedBox(height: 12.sp),
                   const BodyOneDefaultText(text: "Add Item Image"),
                 ],
@@ -237,19 +238,5 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
         ),
       ),
     );
-  }
-
-  Widget _buildUserProfilePic() {
-    return widget.customer.photo.isEmpty
-        ? SizedBox(
-            height: 28.sp,
-            width: 28.sp,
-            child: const DefaultUserImage(),
-          )
-        : SizedBox(
-            height: 28.sp,
-            width: 28.sp,
-            child: Utility.imageFromBase64String(widget.customer.photo),
-          );
   }
 }

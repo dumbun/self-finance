@@ -6,6 +6,8 @@ class UserHistory {
   final int userID;
   final int customerID;
   final int itemID;
+  final String customerNumber;
+  final String customerName;
   final int transactionID;
   final String eventDate;
   final String eventType; // credited or debited
@@ -16,6 +18,8 @@ class UserHistory {
     required this.userID,
     required this.customerID,
     required this.itemID,
+    required this.customerNumber,
+    required this.customerName,
     required this.transactionID,
     required this.eventDate,
     required this.eventType,
@@ -34,6 +38,8 @@ class UserHistory {
         eventDate: e["Event_Date"] as String,
         eventType: e["Event_Type"] as String,
         itemID: e["Item_ID"] as int,
+        customerName: e["Customer_Name"] as String,
+        customerNumber: e["Contact_Number"] as String,
         transactionID: e["Transacrtion_ID"] as int,
         userID: e["User_ID"] as int,
       );
@@ -45,6 +51,8 @@ class UserHistory {
     int? userID,
     int? customerID,
     int? itemID,
+    String? customerNumber,
+    String? customerName,
     int? transactionID,
     String? eventDate,
     String? eventType,
@@ -55,6 +63,8 @@ class UserHistory {
       userID: userID ?? this.userID,
       customerID: customerID ?? this.customerID,
       itemID: itemID ?? this.itemID,
+      customerNumber: customerNumber ?? this.customerNumber,
+      customerName: customerName ?? this.customerName,
       transactionID: transactionID ?? this.transactionID,
       eventDate: eventDate ?? this.eventDate,
       eventType: eventType ?? this.eventType,
@@ -68,6 +78,8 @@ class UserHistory {
       'userID': userID,
       'customerID': customerID,
       'itemID': itemID,
+      'customerNumber': customerNumber,
+      'customerName': customerName,
       'transactionID': transactionID,
       'eventDate': eventDate,
       'eventType': eventType,
@@ -81,6 +93,8 @@ class UserHistory {
       userID: map['userID'] as int,
       customerID: map['customerID'] as int,
       itemID: map['itemID'] as int,
+      customerNumber: map['customerNumber'] as String,
+      customerName: map['customerName'] as String,
       transactionID: map['transactionID'] as int,
       eventDate: map['eventDate'] as String,
       eventType: map['eventType'] as String,
@@ -94,7 +108,7 @@ class UserHistory {
 
   @override
   String toString() {
-    return 'UserHistory(id: $id, userID: $userID, customerID: $customerID, itemID: $itemID, transactionID: $transactionID, eventDate: $eventDate, eventType: $eventType, amount: $amount)';
+    return 'UserHistory(id: $id, userID: $userID, customerID: $customerID, itemID: $itemID, customerNumber: $customerNumber, customerName: $customerName, transactionID: $transactionID, eventDate: $eventDate, eventType: $eventType, amount: $amount)';
   }
 
   @override
@@ -105,6 +119,8 @@ class UserHistory {
         other.userID == userID &&
         other.customerID == customerID &&
         other.itemID == itemID &&
+        other.customerNumber == customerNumber &&
+        other.customerName == customerName &&
         other.transactionID == transactionID &&
         other.eventDate == eventDate &&
         other.eventType == eventType &&
@@ -117,6 +133,8 @@ class UserHistory {
         userID.hashCode ^
         customerID.hashCode ^
         itemID.hashCode ^
+        customerNumber.hashCode ^
+        customerName.hashCode ^
         transactionID.hashCode ^
         eventDate.hashCode ^
         eventType.hashCode ^

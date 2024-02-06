@@ -183,6 +183,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
         // creating the new customer
         final int customerCreatedResponse = await ref.read(asyncCustomersProvider.notifier).addCustomer(
               customer: Customer(
+                userID: 1, //? later updates if there are more users
                 name: _customerName.text,
                 guardianName: _gaurdianName.text,
                 address: _address.text,
@@ -227,6 +228,8 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                       userID: 1,
                       customerID: customerCreatedResponse,
                       itemID: itemCreatedResponse,
+                      customerName: _customerName.text,
+                      customerNumber: _mobileNumber.text,
                       transactionID: transactionCreatedResponse,
                       eventDate: presentDateTime,
                       eventType: debited,
@@ -272,6 +275,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
     setState(() {
       _isloading = false;
     });
+
     snackBarWidget(context: context, message: "Saved Successfully 👍");
     Navigator.pop(context);
   }

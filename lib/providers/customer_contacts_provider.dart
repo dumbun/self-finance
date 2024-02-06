@@ -1,12 +1,13 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/contacts_model.dart';
+import 'package:self_finance/providers/customer_provider.dart';
 part 'customer_contacts_provider.g.dart';
 
 @Riverpod(keepAlive: false)
 class AsyncCustomersContacts extends _$AsyncCustomersContacts {
   Future<List<Contact>> _fetchAllCustomersContactsData() async {
-    return BackEnd.fetchAllCustomerNumbersWithNames();
+    return await BackEnd.fetchAllCustomerNumbersWithNames();
   }
 
   @override
@@ -56,16 +57,16 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
   }) async {
     int response;
     state = const AsyncValue.loading();
-    response = await BackEnd.updateCustomerDetails(
-      customerId: customerId,
-      newContactNumber: newContactNumber,
-      newCustomerAddress: newCustomerAddress,
-      newCreatedDate: newCreatedDate,
-      newCustomerName: newCustomerName,
-      newCustomerPhoto: newCustomerPhoto,
-      newGuardianName: newGuardianName,
-      newProofPhoto: newProofPhoto,
-    );
+    response = await ref.read(asyncCustomersProvider.notifier).updateCustomer(
+          customerId: customerId,
+          newCustomerName: newCustomerName,
+          newGuardianName: newGuardianName,
+          newCustomerAddress: newCustomerAddress,
+          newContactNumber: newContactNumber,
+          newCustomerPhoto: newCustomerPhoto,
+          newProofPhoto: newProofPhoto,
+          newCreatedDate: newCreatedDate,
+        );
     state = await AsyncValue.guard(() async {
       return _fetchAllCustomersContactsData();
     });

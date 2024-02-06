@@ -1,11 +1,10 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
-import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/user_history.dart';
 
 part 'history_provider.g.dart';
 
-@Riverpod(keepAlive: false)
+@Riverpod(keepAlive: true)
 class AsyncHistory extends _$AsyncHistory {
   Future<List<UserHistory>> _fetchAllItemsData() async {
     final data = await BackEnd.fetchAllUserHistory();
@@ -41,33 +40,10 @@ class AsyncHistory extends _$AsyncHistory {
     }
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final List<Contact> data = await BackEnd.fetchAllCustomerNumbersWithNames();
-      if (data.isNotEmpty) {
-        List<Contact> contacts = data.where((element) {
-          return "${element.number} ${element.name.toLowerCase()} ".contains(givenInput.toLowerCase());
+      if (historyData.isNotEmpty) {
+        return historyData.where((element) {
+          return "${element.customerNumber} ${element.customerName.toLowerCase()}".contains(givenInput.toLowerCase());
         }).toList();
-
-        List<UserHistory> matchingUserHistoryList = [];
-
-        for (Contact contact in contacts) {
-          UserHistory matchingUserHistory = historyData.firstWhere(
-            (userHistory) => userHistory.id == contact.id,
-            orElse: () => UserHistory(
-              id: -1,
-              userID: -1,
-              customerID: -1,
-              transactionID: -1,
-              amount: 0,
-              eventDate: "",
-              eventType: "",
-              itemID: -1,
-            ),
-          );
-          if (matchingUserHistory.id != -1) {
-            matchingUserHistoryList.add(matchingUserHistory);
-          }
-        }
-        return matchingUserHistoryList;
       } else {
         return [];
       }

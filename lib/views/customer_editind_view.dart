@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
@@ -52,7 +51,10 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: BodyOneDefaultText(text: widget.contact.name),
+        title: const BodyTwoDefaultText(
+          text: "Edit Contact",
+          bold: true,
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -103,7 +105,8 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
   }
 
   void _navigateToContactsView() {
-    Navigator.of(context).popUntil(ModalRoute.withName('/contactsView/'));
+    Navigator.of(context).pop();
+    // Navigator.of(context).popUntil(ModalRoute.withName('/contactsView/'));
     snackBarWidget(context: context, message: "Contact Updated Successfully ");
   }
 

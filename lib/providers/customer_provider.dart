@@ -70,10 +70,14 @@ class AsyncCustomers extends _$AsyncCustomers {
   }
 
   Future<List<Customer>> fetchRequriedCustomerDetails({required int customerID}) async {
+    return await BackEnd.fetchSingleContactDetails(id: customerID);
+  }
+
+  Future<void> deleteCustomer({required int customerID}) async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() {
+    state = await AsyncValue.guard(() async {
+      await BackEnd.deleteTheCustomer(customerID: customerID);
       return _fetchAllCustomersData();
     });
-    return await BackEnd.fetchSingleContactDetails(id: customerID);
   }
 }

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/customer_model.dart';
-import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
+import 'package:self_finance/providers/customer_provider.dart';
+import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/widgets/call_button_widget.dart';
@@ -29,27 +31,25 @@ final updatedCustomerProofStringProvider = StateProvider<String>((ref) {
 });
 
 class ContactDetailsView extends ConsumerWidget {
-  const ContactDetailsView({
-    super.key,
-    required this.customer,
-    required this.transacrtions,
-    required this.items,
-  });
-  final Customer customer;
-  final List<Trx> transacrtions;
-  final List<Items> items;
+  const ContactDetailsView({super.key, required this.customerID});
+  final int customerID;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     void delateTheContact() {
-      ref.read(asyncCustomersContactsProvider.notifier).deleteCustomer(customerID: customer.id!);
-      Navigator.pop(context);
+      ref.read(asyncCustomersContactsProvider.notifier).deleteCustomer(customerID: customerID);
+      Navigator.of(context).pop();
     }
 
-    void preEditingSettings() {
-      ref.read(updatedCustomerPhotoStringProvider.notifier).state = customer.photo;
-      ref.read(updatedCustomerProofStringProvider.notifier).state = customer.proof;
-      Routes.navigateToContactEditingView(context: context, contact: customer);
+    void navigateToEditingPage(Customer c) {
+      Routes.navigateToContactEditingView(context: context, contact: c);
+    }
+
+    void preEditingSettings() async {
+      final List<Customer> response = await BackEnd.fetchSingleContactDetails(id: customerID);
+      ref.read(updatedCustomerPhotoStringProvider.notifier).state = response.first.photo;
+      ref.read(updatedCustomerProofStringProvider.notifier).state = response.first.proof;
+      navigateToEditingPage(response.first);
     }
 
     void popUpMenuSelected(String value) async {
@@ -58,11 +58,8 @@ class ContactDetailsView extends ConsumerWidget {
           preEditingSettings();
           break;
         case '2':
-          if (await AlertDilogs.alertDialogWithTwoAction(
-                context,
-                "Alert",
-                "By Pressing 'YES' you will remove all the details of this customer from your Date Base",
-              ) ==
+          if (await AlertDilogs.alertDialogWithTwoAction(context, "Alert",
+                  "By Pressing 'YES' you will remove all the details of this customer from your Date Base") ==
               1) {
             delateTheContact();
           }
@@ -88,7 +85,7 @@ class ContactDetailsView extends ConsumerWidget {
             Icons.add,
             color: AppColors.getBackgroundColor,
           ),
-          onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(context: context, customer: customer),
+          onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(context: context, customerID: customerID),
         ),
         appBar: AppBar(
           forceMaterialTransparency: true,
@@ -100,7 +97,7 @@ class ContactDetailsView extends ConsumerWidget {
                   value: '1',
                   icon: Icons.edit_rounded,
                   iconColor: AppColors.getPrimaryColor,
-                  title: 'Update',
+                  title: 'Edit',
                 ),
                 _buildPopUpMenuItems(
                   value: '2',
@@ -112,7 +109,7 @@ class ContactDetailsView extends ConsumerWidget {
             ),
           ],
           toolbarHeight: 32.sp,
-          title: BodyOneDefaultText(text: customer.name),
+          title: const BodyTwoDefaultText(text: "Contact Info", bold: true),
           bottom: const TabBar(
             dividerColor: Colors.transparent,
             tabs: [
@@ -125,7 +122,10 @@ class ContactDetailsView extends ConsumerWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 16.sp),
             child: TabBarView(
-              children: <Widget>[_buildCustomerDetails(context), _buildTransactionsHistory()],
+              children: <Widget>[
+                _buildCustomerDetails(),
+                _buildTransactionsHistory(),
+              ],
             ),
           ),
         ),
@@ -157,114 +157,150 @@ class ContactDetailsView extends ConsumerWidget {
     );
   }
 
-  Widget _buildTransactionsHistory() {
-    return ListView.separated(
-      itemCount: transacrtions.length,
-      separatorBuilder: (context, index) => SizedBox(height: 12.sp),
-      itemBuilder: (context, index) {
-        return Card(
-          child: Padding(
-            padding: EdgeInsets.all(16.sp),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Icon(Icons.auto_stories, size: 24.sp),
-                SizedBox(width: 18.sp),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    BodyOneDefaultText(text: "Taken Amount : ${Utility.doubleFormate(transacrtions[index].amount)}"),
-                    BodyOneDefaultText(text: "Taken Date : ${transacrtions[index].transacrtionDate}"),
-                    BodyOneDefaultText(text: "Rate of Intrest : ${transacrtions[index].intrestRate}"),
-                    BodyTwoDefaultText(text: transacrtions[index].transacrtionType),
-                  ],
-                )
-              ],
-            ),
-          ),
-        );
+  Consumer _buildTransactionsHistory() {
+    return Consumer(
+      builder: (BuildContext context, WidgetRef ref, Widget? child) {
+        return ref.watch(asyncTransactionsProvider).when(
+              data: (List<Trx> data) {
+                final List<Trx> transactions = data.where((Trx element) => element.customerId == customerID).toList();
+                return transactions.isNotEmpty
+                    ? ListView.separated(
+                        itemCount: transactions.length,
+                        separatorBuilder: (BuildContext context, int index) => SizedBox(height: 12.sp),
+                        itemBuilder: (BuildContext context, int index) {
+                          return Card(
+                            child: Padding(
+                              padding: EdgeInsets.all(16.sp),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Icon(Icons.auto_stories, size: 24.sp),
+                                  SizedBox(width: 18.sp),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      BodyOneDefaultText(
+                                          text: "Taken Amount : ${Utility.doubleFormate(transactions[index].amount)}"),
+                                      BodyOneDefaultText(text: "Taken Date : ${transactions[index].transacrtionDate}"),
+                                      BodyOneDefaultText(text: "Rate of Intrest : ${transactions[index].intrestRate}"),
+                                      BodyTwoDefaultText(text: transactions[index].transacrtionType),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : const Center(
+                        child: BodyOneDefaultText(
+                          text: "No Transactions present. Add a transaction by pressing the + below ",
+                        ),
+                      );
+              },
+              error: (Object error, StackTrace stackTrace) => const Center(
+                child: BodyOneDefaultText(text: "Error fetching the transactions please restart the application"),
+              ),
+              loading: () => const Center(
+                child: CircularProgressIndicator.adaptive(),
+              ),
+            );
       },
     );
   }
 
-  Stack _buildCustomerDetails(BuildContext context) {
-    return Stack(
-      children: [
-        Align(
-          alignment: Alignment.topCenter,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(height: 20.sp),
-                _buildImage(customer.photo),
-                SizedBox(height: 16.sp),
-                _buildCustomerName(customer.name),
-                SizedBox(height: 16.sp),
-                _buildNumberDetails(),
-                SizedBox(height: 12.sp),
-                _buildDetails(
-                  const Icon(
-                    Icons.location_on,
-                    color: AppColors.getPrimaryColor,
-                  ),
-                  "Contact Address",
-                  customer.address,
-                ),
-                SizedBox(height: 12.sp),
-                _buildDetails(
-                    const Icon(
-                      Icons.family_restroom,
-                      color: AppColors.getPrimaryColor,
-                    ),
-                    "Gaurdian",
-                    customer.guardianName),
-                SizedBox(height: 12.sp),
-                if (customer.proof.isNotEmpty)
-                  GestureDetector(
-                    onTap: () => Routes.navigateToImageView(
-                      context: context,
-                      imageData: customer.proof,
-                      titile: "${customer.name} proof",
-                    ),
-                    child: Card(
-                      elevation: 0,
-                      child: Padding(
-                        padding: EdgeInsets.all(14.sp),
-                        child: Row(
+  Consumer _buildCustomerDetails() {
+    return Consumer(
+      builder: (BuildContext context, WidgetRef ref, Widget? child) {
+        return ref.watch(asyncCustomersProvider).when(
+              data: (List<Customer> data) {
+                final Customer customer = data.where((Customer element) => element.id! == customerID).toList().first;
+                return Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: SingleChildScrollView(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SizedBox(width: 12.sp),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              color: AppColors.getPrimaryColor,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            SizedBox(height: 20.sp),
+                            _buildImage(customer.photo),
+                            SizedBox(height: 16.sp),
+                            _buildCustomerName(customer.name),
+                            SizedBox(height: 16.sp),
+                            _buildNumberDetails(customer.number),
+                            SizedBox(height: 12.sp),
+                            _buildDetails(
+                              const Icon(
+                                Icons.location_on,
+                                color: AppColors.getPrimaryColor,
+                              ),
+                              "Contact Address",
+                              customer.address,
                             ),
-                            SizedBox(width: 20.sp),
-                            const BodyOneDefaultText(
-                              text: "Show Customer proof",
-                              color: AppColors.getPrimaryColor,
+                            SizedBox(height: 12.sp),
+                            _buildDetails(
+                              const Icon(
+                                Icons.family_restroom,
+                                color: AppColors.getPrimaryColor,
+                              ),
+                              "Gaurdian",
+                              customer.guardianName,
                             ),
+                            SizedBox(height: 12.sp),
+                            if (customer.proof.isNotEmpty)
+                              GestureDetector(
+                                onTap: () => Routes.navigateToImageView(
+                                  context: context,
+                                  imageData: customer.proof,
+                                  titile: "${customer.name} proof",
+                                ),
+                                child: Card(
+                                  elevation: 0,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(14.sp),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        SizedBox(width: 12.sp),
+                                        const Icon(
+                                          Icons.arrow_forward_ios_rounded,
+                                          color: AppColors.getPrimaryColor,
+                                        ),
+                                        SizedBox(width: 20.sp),
+                                        const BodyOneDefaultText(
+                                          text: "Show Customer proof",
+                                          color: AppColors.getPrimaryColor,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
                           ],
                         ),
                       ),
                     ),
-                  ),
-              ],
-            ),
-          ),
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: BodyTwoDefaultText(
-            text: "customer created on ${customer.createdDate}",
-            color: AppColors.getLigthGreyColor,
-          ),
-        )
-      ],
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: BodyTwoDefaultText(
+                        text: "customer created on ${customer.createdDate}",
+                        color: AppColors.getLigthGreyColor,
+                      ),
+                    )
+                  ],
+                );
+              },
+              error: (Object error, StackTrace stackTrace) => const Center(
+                child: BodyOneDefaultText(text: "Error Fetching Customer contact details. Please restart the app"),
+              ),
+              loading: () => const Center(child: CircularProgressIndicator.adaptive()),
+            );
+      },
     );
   }
 
@@ -307,9 +343,9 @@ class ContactDetailsView extends ConsumerWidget {
     );
   }
 
-  GestureDetector _buildNumberDetails() {
+  GestureDetector _buildNumberDetails(String customerNumber) {
     return GestureDetector(
-      onTap: () => Utility.makeCall(phoneNumber: customer.number),
+      onTap: () => Utility.makeCall(phoneNumber: customerNumber),
       child: Card(
         elevation: 0,
         child: Padding(
@@ -319,7 +355,7 @@ class ContactDetailsView extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(width: 12.sp),
-              CallButtonWidget(phoneNumber: customer.number),
+              CallButtonWidget(phoneNumber: customerNumber),
               SizedBox(width: 20.sp),
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -331,7 +367,7 @@ class ContactDetailsView extends ConsumerWidget {
                   ),
                   SizedBox(height: 8.sp),
                   SelectableText(
-                    customer.number,
+                    customerNumber,
                     style: TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 18.sp,

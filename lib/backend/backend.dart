@@ -65,6 +65,7 @@ class BackEnd {
     await database.execute("""
           -- Customers Table
           CREATE TABLE Customers (
+          User_ID          INTEGER NOT NULL,
           Customer_ID      INTEGER PRIMARY KEY AUTOINCREMENT,
           Customer_Name    TEXT NOT NULL,
           Gaurdian_Name    TEXT NOT NULL,
@@ -124,6 +125,8 @@ class BackEnd {
           Histoy_ID        INTEGER PRIMARY KEY AUTOINCREMENT,
           User_ID          INTEGER NOT NULL,
           Customer_ID      INTEGER NOT NULL,
+          Customer_Name    TEXT NOT NULL,
+          Contact_Number   TEXT NOT NULL,
           Item_ID          INTEGER NOT NULL,
           Transacrtion_ID  INTEGER NOT NULL,
           Amount           REAL NOT NULL,
@@ -142,7 +145,7 @@ class BackEnd {
   static Future<sql.Database> db() async {
     final directory = await getApplicationDocumentsDirectory();
     final path = '${directory.path}/itdata.db';
-    print(path);
+    // print(path);
     return sql.openDatabase(path, version: 1, onCreate: (sql.Database database, int version) async {
       await createTable(database);
     });
@@ -154,6 +157,7 @@ class BackEnd {
     try {
       final db = await BackEnd.db();
       final Map<String, Object> data = {
+        "User_ID": customer.userID,
         "Customer_Name": customer.name,
         "Gaurdian_Name": customer.guardianName,
         "Customer_Address": customer.address,
@@ -386,6 +390,8 @@ class BackEnd {
       final Map<String, Object> data = {
         "User_ID": history.userID,
         "Customer_ID": history.customerID,
+        "Customer_Name": history.customerName,
+        "Contact_Number": history.customerNumber,
         "Item_ID": history.itemID,
         "Transacrtion_ID": history.transactionID,
         "Amount": history.amount,
