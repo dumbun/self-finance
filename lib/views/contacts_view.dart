@@ -6,7 +6,6 @@ import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/contacts_model.dart';
-
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 
@@ -39,8 +38,8 @@ class ContactsView extends ConsumerWidget {
                   onChanged: (value) =>
                       ref.read(asyncCustomersContactsProvider.notifier).searchCustomer(givenInput: value),
                 ),
-                SizedBox(height: 16.sp),
-                buildCustomerList(),
+                SizedBox(height: 8.sp),
+                _buildCustomerList(),
               ],
             ),
           ),
@@ -49,20 +48,20 @@ class ContactsView extends ConsumerWidget {
     );
   }
 
-  Consumer buildCustomerList() {
+  Consumer _buildCustomerList() {
     return Consumer(
       builder: (context, ref, child) {
         return ref.watch(asyncCustomersContactsProvider).when(
               data: (data) {
                 return data.isNotEmpty
                     ? Expanded(
-                        child: ListView.separated(
+                        child: ListView.builder(
                           itemCount: data.length,
-                          separatorBuilder: (BuildContext context, int index) => SizedBox(height: 8.sp),
                           itemBuilder: (BuildContext context, int index) {
                             return GestureDetector(
                               onTap: () => contactSelected(data, index, context),
                               child: Card(
+                                margin: EdgeInsets.only(top: 16.sp),
                                 elevation: 0,
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),

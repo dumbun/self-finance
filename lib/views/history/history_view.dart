@@ -31,29 +31,34 @@ class HistoryView extends ConsumerWidget {
               keyboardType: TextInputType.name,
               onChanged: (value) => ref.read(asyncHistoryProvider.notifier).doSearch(givenInput: value),
             ),
-            Consumer(
-              builder: (context, ref, child) {
-                return ref.watch(asyncHistoryProvider).when(
-                      data: (List<UserHistory> data) {
-                        return Expanded(
-                          child: ListView.builder(
-                            itemBuilder: (context, index) {
-                              return _buildHistoryCard(data[index]);
-                            },
-                            itemCount: data.length,
-                          ),
-                        );
-                      },
-                      error: (error, stackTrace) => Text(error.toString()),
-                      loading: () => const Center(
-                        child: CircularProgressIndicator.adaptive(),
-                      ),
-                    );
-              },
-            )
+            SizedBox(height: 16.sp),
+            _buildhistoryList(),
           ],
         ),
       ),
+    );
+  }
+
+  Consumer _buildhistoryList() {
+    return Consumer(
+      builder: (context, ref, child) {
+        return ref.watch(asyncHistoryProvider).when(
+              data: (List<UserHistory> data) {
+                return Expanded(
+                  child: ListView.builder(
+                    itemBuilder: (context, index) {
+                      return _buildHistoryCard(data[index]);
+                    },
+                    itemCount: data.length,
+                  ),
+                );
+              },
+              error: (error, stackTrace) => Text(error.toString()),
+              loading: () => const Center(
+                child: CircularProgressIndicator.adaptive(),
+              ),
+            );
+      },
     );
   }
 
@@ -94,7 +99,7 @@ class HistoryView extends ConsumerWidget {
   BodyOneDefaultText _buildAmount(String type, double amount) {
     return BodyOneDefaultText(
       bold: true,
-      text: "${type == debited ? "- " : "+"}${Utility.doubleFormate(amount)}",
+      text: "${type == debited ? "- " : "+ "}${Utility.doubleFormate(amount)}",
     );
   }
 
