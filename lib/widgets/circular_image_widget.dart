@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/util.dart';
@@ -16,10 +17,13 @@ class CircularImageWidget extends StatelessWidget {
             onTap: () {
               Routes.navigateToImageView(context: context, imageData: imageData, titile: titile);
             },
-            child: Utility.imageFromBase64String(
-              imageData,
-              height: 44.sp,
-              width: 44.sp,
+            child: Hero(
+              tag: PhotoViewHeroAttributes(tag: titile),
+              child: Utility.imageFromBase64String(
+                imageData,
+                height: 44.sp,
+                width: 44.sp,
+              ),
             ),
           )
         : DefaultUserImage(

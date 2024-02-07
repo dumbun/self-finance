@@ -1,9 +1,7 @@
 import "dart:convert";
-
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:self_finance/fonts/body_text.dart';
-import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/fonts/body_two_default_text.dart';
 
 class ImageView extends StatelessWidget {
   const ImageView({super.key, required this.imageString, required this.titile});
@@ -14,9 +12,15 @@ class ImageView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: false,
-        backgroundColor: AppColors.getTransparentColor,
-        title: BodyOneDefaultText(text: titile),
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.close),
+        ),
+        forceMaterialTransparency: true,
+        title: BodyTwoDefaultText(
+          text: titile,
+          bold: true,
+        ),
       ),
       body: PhotoView(
         heroAttributes: PhotoViewHeroAttributes(tag: titile),

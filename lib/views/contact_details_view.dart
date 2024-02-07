@@ -227,7 +227,7 @@ class ContactDetailsView extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             SizedBox(height: 20.sp),
-                            _buildImage(customer.photo),
+                            _buildImage(customer.photo, customer.name),
                             SizedBox(height: 16.sp),
                             _buildCustomerName(customer.name),
                             SizedBox(height: 16.sp),
@@ -393,7 +393,7 @@ class ContactDetailsView extends ConsumerWidget {
   }
 
   /// [ _buildImage()] method to build the image of the customer
-  Center _buildImage(String imageData) {
-    return Center(child: CircularImageWidget(imageData: imageData, titile: "customer photo"));
+  Center _buildImage(String imageData, String customerName) {
+    return Center(child: CircularImageWidget(imageData: imageData, titile: "$customerName photo"));
   }
 }
