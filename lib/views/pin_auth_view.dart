@@ -50,7 +50,9 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         data.first.profilePicture != ""
-                            ? Hero(tag: "User-image", child: Utility.imageFromBase64String(data.first.profilePicture))
+                            ? Hero(
+                                tag: "user-profile-pic",
+                                child: Utility.imageFromBase64String(data.first.profilePicture))
                             : const AppIcon(),
                         SizedBox(height: 20.sp),
                         const StrongHeadingOne(
@@ -62,11 +64,16 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
                           pinController: pinController,
                           obscureText: true,
                           validator: (String? p0) {
-                            if (p0 != data.first.userPin) {
-                              pinController.clear();
-                              return "Please enter the correct pin";
+                            if (p0 == null || p0.isEmpty) {
+                              return "Please enter your pin";
                             } else {
-                              return null;
+                              if (p0 == data.first.userPin) {
+                                Routes.navigateToDashboard(context: context);
+                                return null;
+                              } else {
+                                pinController.clear();
+                                return "Please enter the correct pin";
+                              }
                             }
                           },
                         ),

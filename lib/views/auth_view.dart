@@ -28,19 +28,19 @@ class _AuthViewState extends State<AuthView> {
 
   Future<void> _authenticateWithBiometrics() async {
     try {
-      final canCheckBiometrics = await auth.canCheckBiometrics;
+      final bool canCheckBiometrics = await auth.canCheckBiometrics;
       if (!canCheckBiometrics) {
         setState(() => _isAuthenticated = false);
         return;
       }
 
-      final availableBiometrics = await auth.getAvailableBiometrics();
+      final List<BiometricType> availableBiometrics = await auth.getAvailableBiometrics();
       if (availableBiometrics.isEmpty) {
         setState(() => _isAuthenticated = false);
         return;
       }
 
-      final authenticated = await _performBiometricAuthentication();
+      final bool authenticated = await _performBiometricAuthentication();
 
       if (authenticated) {
         setState(() => _isAuthenticated = true);
@@ -70,7 +70,7 @@ class _AuthViewState extends State<AuthView> {
   Widget build(BuildContext context) {
     return FutureBuilder<List<User>>(
       future: UserBackEnd.fetchIDOneUser(),
-      builder: (context, snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<List<User>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator.adaptive());
         } else if (snapshot.hasError) {
