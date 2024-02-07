@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_text.dart';
@@ -10,14 +11,18 @@ import 'package:self_finance/models/user_history.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
-import 'package:self_finance/widgets/refresh_widget.dart';
 
 class HistoryView extends ConsumerWidget {
   const HistoryView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return RefreshWidget(
+    return LiquidPullToRefresh(
+      color: AppColors.getLigthGreyColor,
+      showChildOpacityTransition: false,
+      springAnimationDurationInMilliseconds: 1000,
+      height: 40.sp,
+      animSpeedFactor: 8.0,
       onRefresh: () => ref.refresh(asyncHistoryProvider.future),
       child: Padding(
         padding: EdgeInsets.all(12.sp),

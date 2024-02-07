@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
@@ -8,7 +9,6 @@ import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/widgets/refresh_widget.dart';
 
 class ContactsView extends ConsumerWidget {
   const ContactsView({super.key});
@@ -22,7 +22,12 @@ class ContactsView extends ConsumerWidget {
           bold: true,
         ),
       ),
-      body: RefreshWidget(
+      body: LiquidPullToRefresh(
+        color: AppColors.getLigthGreyColor,
+        showChildOpacityTransition: false,
+        springAnimationDurationInMilliseconds: 1000,
+        height: 40.sp,
+        animSpeedFactor: 8.0,
         onRefresh: () => ref.refresh(asyncCustomersContactsProvider.future),
         child: SafeArea(
           child: Padding(
