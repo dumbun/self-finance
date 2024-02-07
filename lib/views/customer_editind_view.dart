@@ -8,7 +8,6 @@ import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/util.dart';
 import 'package:self_finance/views/contact_details_view.dart';
-import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
@@ -66,10 +65,12 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _buildCustomerPhoto(),
+                  SizedBox(height: 20.sp),
                   _buildTextFields(),
                   SizedBox(height: 20.sp),
                   _buildImagePickers(),
-                  SizedBox(height: 32.sp),
+                  SizedBox(height: 20.sp),
                   Hero(
                     tag: "save-button",
                     child: RoundedCornerButton(text: "update", onPressed: _save),
@@ -80,6 +81,27 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
           ),
         ),
       ),
+    );
+  }
+
+  Center _buildCustomerPhoto() {
+    return _buildCard(
+      title: "Customer Photo",
+      updatePhoto: ref.watch(updatedCustomerPhotoStringProvider),
+      onTap: () async {
+        try {
+          await pickImageFromCamera().then((value) {
+            if (value != "" && value.isNotEmpty) {
+              ref.read(updatedCustomerPhotoStringProvider.notifier).update((state) => value);
+            }
+          });
+        } catch (e) {
+          //
+        }
+      },
+      defaultImagePath: defaultProfileImagePath,
+      defaultImageHeight: 40.sp,
+      defaultImageWidth: 40.sp,
     );
   }
 
@@ -165,96 +187,68 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
     );
   }
 
-  Row _buildImagePickers() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          child: Card(
-            elevation: 0,
-            child: Padding(
-              padding: EdgeInsets.all(18.sp),
-              child: Consumer(
-                builder: (context, ref, child) {
-                  final updateCustomerPhoto = ref.watch(updatedCustomerPhotoStringProvider);
-                  return GestureDetector(
-                    onTap: () async {
-                      try {
-                        await pickImageFromCamera().then((value) {
-                          if (value != "" && value.isNotEmpty) {
-                            ref.read(updatedCustomerPhotoStringProvider.notifier).update((state) => value);
-                          }
-                        });
-                      } catch (e) {
-                        //
-                      }
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        updateCustomerPhoto.isNotEmpty
-                            ? Utility.imageFromBase64String(updateCustomerPhoto)
-                            : const DefaultUserImage(),
-                        SizedBox(height: 12.sp),
-                        const BodyTwoDefaultText(
-                          text: "Customer Photo",
-                          bold: true,
-                        ),
-                      ],
+  Center _buildImagePickers() {
+    return _buildCard(
+      title: "Customer Proof",
+      updatePhoto: ref.watch(updatedCustomerProofStringProvider),
+      onTap: () async {
+        try {
+          await pickImageFromCamera().then((value) {
+            if (value != "" && value.isNotEmpty) {
+              ref.read(updatedCustomerProofStringProvider.notifier).update((state) => value);
+            }
+          });
+        } catch (e) {
+          //
+        }
+      },
+      defaultImagePath: defaultProofImagePath,
+      defaultImageWidth: 32.sp,
+      defaultImageHeight: 32.sp,
+    );
+  }
+
+  _buildCard({
+    required String title,
+    required String updatePhoto,
+    required void Function()? onTap,
+    required String defaultImagePath,
+    required double defaultImageHeight,
+    required double defaultImageWidth,
+  }) {
+    return Center(
+      child: Card(
+        elevation: 0,
+        child: Padding(
+          padding: EdgeInsets.all(18.sp),
+          child: Consumer(
+            builder: (context, ref, child) {
+              final photoString = updatePhoto;
+              return GestureDetector(
+                onTap: onTap,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    photoString.isNotEmpty
+                        ? Utility.imageFromBase64String(photoString)
+                        : SvgPicture.asset(
+                            height: defaultImageHeight,
+                            width: defaultImageWidth,
+                            defaultImagePath,
+                          ),
+                    SizedBox(height: 16.sp),
+                    BodyTwoDefaultText(
+                      text: title,
+                      bold: true,
                     ),
-                  );
-                },
-              ),
-            ),
+                  ],
+                ),
+              );
+            },
           ),
         ),
-        Expanded(
-          child: Card(
-            elevation: 0,
-            child: Padding(
-              padding: EdgeInsets.all(18.sp),
-              child: Consumer(
-                builder: (context, ref, child) {
-                  final updateProofPhoto = ref.watch(updatedCustomerProofStringProvider);
-                  return GestureDetector(
-                    onTap: () async {
-                      try {
-                        await pickImageFromCamera().then((value) {
-                          if (value != "" && value.isNotEmpty) {
-                            ref.read(updatedCustomerProofStringProvider.notifier).update((state) => value);
-                          }
-                        });
-                      } catch (e) {
-                        //
-                      }
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        updateProofPhoto.isNotEmpty
-                            ? Utility.imageFromBase64String(updateProofPhoto)
-                            : SvgPicture.asset(
-                                height: 28.sp,
-                                width: 28.sp,
-                                defaultProofImagePath,
-                              ),
-                        SizedBox(height: 12.sp),
-                        const BodyTwoDefaultText(
-                          text: "Customer Proof",
-                          bold: true,
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

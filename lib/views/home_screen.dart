@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/backend/backend.dart';
+import 'package:self_finance/models/customer_model.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});

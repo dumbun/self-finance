@@ -8,6 +8,7 @@ import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/widgets/refresh_widget.dart';
 
 class ContactsView extends ConsumerWidget {
   const ContactsView({super.key});
@@ -21,11 +22,11 @@ class ContactsView extends ConsumerWidget {
           bold: true,
         ),
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 20.sp, horizontal: 16.sp),
-          child: RefreshIndicator.adaptive(
-            onRefresh: () => ref.refresh(asyncCustomersContactsProvider.future),
+      body: RefreshWidget(
+        onRefresh: () => ref.refresh(asyncCustomersContactsProvider.future),
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 20.sp, horizontal: 16.sp),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,14 +49,14 @@ class ContactsView extends ConsumerWidget {
     );
   }
 
-  Consumer _buildCustomerList() {
-    return Consumer(
-      builder: (context, ref, child) {
-        return ref.watch(asyncCustomersContactsProvider).when(
-              data: (data) {
-                return data.isNotEmpty
-                    ? Expanded(
-                        child: ListView.builder(
+  Expanded _buildCustomerList() {
+    return Expanded(
+      child: Consumer(
+        builder: (context, ref, child) {
+          return ref.watch(asyncCustomersContactsProvider).when(
+                data: (data) {
+                  return data.isNotEmpty
+                      ? ListView.builder(
                           itemCount: data.length,
                           itemBuilder: (BuildContext context, int index) {
                             return GestureDetector(
@@ -93,25 +94,25 @@ class ContactsView extends ConsumerWidget {
                               ),
                             );
                           },
-                        ),
-                      )
-                    : const Center(
-                        child: BodyOneDefaultText(
-                          text: "0 Contacts Found 🫠",
-                          bold: true,
-                        ),
-                      );
-              },
-              error: (error, stackTrace) {
-                return const Center(
-                  child: BodyOneDefaultText(text: "Error fetching customers contacts please try again 😶‍🌫️"),
-                );
-              },
-              loading: () => const Center(
-                child: CircularProgressIndicator.adaptive(),
-              ),
-            );
-      },
+                        )
+                      : const Center(
+                          child: BodyOneDefaultText(
+                            text: "0 Contacts Found 🫠",
+                            bold: true,
+                          ),
+                        );
+                },
+                error: (error, stackTrace) {
+                  return const Center(
+                    child: BodyOneDefaultText(text: "Error fetching customers contacts please try again 😶‍🌫️"),
+                  );
+                },
+                loading: () => const Center(
+                  child: CircularProgressIndicator.adaptive(),
+                ),
+              );
+        },
+      ),
     );
   }
 

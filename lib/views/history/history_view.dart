@@ -10,13 +10,14 @@ import 'package:self_finance/models/user_history.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/util.dart';
+import 'package:self_finance/widgets/refresh_widget.dart';
 
 class HistoryView extends ConsumerWidget {
   const HistoryView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return RefreshIndicator.adaptive(
+    return RefreshWidget(
       onRefresh: () => ref.refresh(asyncHistoryProvider.future),
       child: Padding(
         padding: EdgeInsets.all(12.sp),
