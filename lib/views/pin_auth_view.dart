@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/strong_heading_one_text.dart';
@@ -51,13 +52,14 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
                       children: [
                         data.first.profilePicture != ""
                             ? Hero(
-                                tag: "user-profile-pic",
-                                child: Utility.imageFromBase64String(data.first.profilePicture))
+                                tag: Constant.userProfileTag,
+                                child: Utility.imageFromBase64String(data.first.profilePicture),
+                              )
                             : const AppIcon(),
                         SizedBox(height: 20.sp),
                         const StrongHeadingOne(
                           bold: true,
-                          text: "Enter your app PIN",
+                          text: Constant.enterYourAppPin,
                         ),
                         SizedBox(height: 20.sp),
                         PinInputWidget(
@@ -65,20 +67,23 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
                           obscureText: true,
                           validator: (String? p0) {
                             if (p0 == null || p0.isEmpty) {
-                              return "Please enter your pin";
+                              return Constant.enterYourAppPin;
                             } else {
                               if (p0 == data.first.userPin) {
                                 Routes.navigateToDashboard(context: context);
                                 return null;
                               } else {
                                 pinController.clear();
-                                return "Please enter the correct pin";
+                                return Constant.enterCorrectPin;
                               }
                             }
                           },
                         ),
                         SizedBox(height: 20.sp),
-                        RoundedCornerButton(text: "Login", onPressed: () => getLogin(data.first)),
+                        RoundedCornerButton(
+                          text: Constant.login,
+                          onPressed: () => getLogin(data.first),
+                        ),
                       ],
                     ),
                   ),
@@ -87,7 +92,7 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
             );
           },
           error: (error, stackTrace) => const Center(
-            child: BodyOneDefaultText(text: 'Error fetching user data please restart the app'),
+            child: BodyOneDefaultText(text: Constant.userFetchingError),
           ),
           loading: () => const Center(
             child: CircularProgressIndicator.adaptive(),

@@ -178,7 +178,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                   itemID: itemId,
                   transactionID: transacrtionId,
                   eventDate: presentDate,
-                  eventType: debited,
+                  eventType: Constant.debited,
                   amount: _doubleCheck(_amount.text),
                 ),
               );
@@ -227,7 +227,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                       : SvgPicture.asset(
                           height: 28.sp,
                           width: 28.sp,
-                          defaultItemImagePath,
+                          Constant.defaultItemImagePath,
                         ),
                   SizedBox(height: 12.sp),
                   const BodyOneDefaultText(text: "Add Item Image"),

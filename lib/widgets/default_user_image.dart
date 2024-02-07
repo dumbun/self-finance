@@ -19,7 +19,7 @@ class DefaultUserImage extends StatelessWidget {
     return SvgPicture.asset(
       height: height ?? 28.sp,
       width: width ?? 28.sp,
-      defaultProfileImagePath,
+      Constant.defaultProfileImagePath,
     );
   }
 }

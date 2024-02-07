@@ -74,7 +74,7 @@ class EMICalculatorView extends ConsumerWidget {
           children: <Widget>[
             // Taken Date
             _datePicker(
-              takenDate,
+              Constant.takenDate,
               _takenDataInput,
               context,
               ref,
@@ -82,7 +82,7 @@ class EMICalculatorView extends ConsumerWidget {
             SizedBox(height: 20.sp),
             // Tenture Date
             _datePicker(
-              tenureDate,
+              Constant.tenureDate,
               _tenureDataInput,
               context,
               ref,

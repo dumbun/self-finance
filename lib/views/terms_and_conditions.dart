@@ -52,7 +52,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     return SizedBox(
       width: double.infinity,
       child: RoundedCornerButton(
-          text: next,
+          text: Constant.next,
           onPressed: () {
             if (t == true) {
               Routes.navigateToPinCreationView(context);
@@ -64,7 +64,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
   Expanded _getTerms() {
     List<Widget> result = [];
 
-    for (var element in termsAndConditionsMap.entries) {
+    for (var element in TermsAndConditions.termsAndConditionsMap.entries) {
       result.add(BodyTwoDefaultText(
         text: element.key,
         bold: true,
@@ -108,7 +108,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
               height: 30.sp,
               child: const BodySmallText(
                 color: AppColors.getLigthGreyColor,
-                text: termAcknowledge,
+                text: Constant.termAcknowledge,
               ),
             )
           ],
@@ -127,7 +127,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     return Container(
       alignment: Alignment.topLeft,
       child: const StrongHeadingOne(
-        text: tAndMString,
+        text: Constant.tAndcString,
         bold: true,
         textAlign: TextAlign.justify,
       ),

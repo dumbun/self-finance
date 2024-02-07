@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/views/add_new_transaction_view.dart';
@@ -11,11 +12,11 @@ import 'package:self_finance/views/user_creating_view.dart';
 
 class Routes {
   static void navigateToChangePinView({required BuildContext context}) {
-    Navigator.of(context).pushNamed("/changePinView/");
+    Navigator.of(context).pushNamed(Constant.changePinView);
   }
 
   static void navigateToAccountSettingsView({required BuildContext context}) {
-    Navigator.of(context).pushNamed('/AccountSettingsView/');
+    Navigator.of(context).pushNamed(Constant.accountSettingsView);
   }
 
   static void navigateToAddNewTransactionToCustomerView({required BuildContext context, required int customerID}) {
@@ -42,7 +43,7 @@ class Routes {
   }
 
   static void navigateToContactsView(BuildContext context) {
-    Navigator.of(context).pushNamed('/contactsView/');
+    Navigator.of(context).pushNamed(Constant.contactView);
   }
 
   static void navigateToUserCreationView(BuildContext context, String pin) {
@@ -65,7 +66,7 @@ class Routes {
 
   static void navigateToDashboard({required BuildContext context}) {
     Navigator.of(context).pushNamedAndRemoveUntil(
-      '/dashboardview/',
+      Constant.dashboardView,
       (route) => false,
     );
   }
@@ -87,6 +88,6 @@ class Routes {
   }
 
   static void navigateToAddNewEntry({required BuildContext context}) async {
-    Navigator.of(context).pushNamed('/addNewEntry/');
+    Navigator.of(context).pushNamed(Constant.addNewEntryView);
   }
 }

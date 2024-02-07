@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/user_model.dart';
@@ -30,18 +31,22 @@ class AccountSettingsView extends StatelessWidget {
     }
 
     void logout(User user) async {
-      int response = await AlertDilogs.alertDialogWithTwoAction(context, "Exit", "Press yes to signout");
+      int response = await AlertDilogs.alertDialogWithTwoAction(
+        context,
+        Constant.exit,
+        Constant.signOutMessage,
+      );
       if (response == 1) {
         navigateToPinAuthView(user);
       }
     }
 
-    final Uri toLaunch = Uri.parse('https://dumbun.github.io/self-finance/terms_template');
+    final Uri toLaunch = Uri.parse(Constant.tAndcUrl);
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
         title: const BodyOneDefaultText(
-          text: "Account Setting",
+          text: Constant.accountSettings,
         ),
       ),
       body: SafeArea(
@@ -57,7 +62,7 @@ class AccountSettingsView extends StatelessWidget {
                     children: [
                       SizedBox(height: 20.sp),
                       const Hero(
-                        tag: "user-profile-pic",
+                        tag: Constant.userProfileTag,
                         child: UserImageUpdateWidget(),
                       ),
                       SizedBox(height: 20.sp),
@@ -73,7 +78,7 @@ class AccountSettingsView extends StatelessWidget {
                         onPressed: () {
                           Utility.launchInBrowserView(toLaunch);
                         },
-                        title: "Terms and Conditions",
+                        title: Constant.tAndcString,
                       ),
                       SizedBox(height: 12.sp),
                       Consumer(
@@ -87,11 +92,11 @@ class AccountSettingsView extends StatelessWidget {
                                   onPressed: () async {
                                     logout(data.first);
                                   },
-                                  title: "Logout",
+                                  title: Constant.logout,
                                 );
                               },
                               error: (error, stackTrace) => const Center(
-                                child: BodyOneDefaultText(text: "error fetching user data"),
+                                child: BodyOneDefaultText(text: Constant.errorUserFetch),
                               ),
                               loading: () => const Center(
                                 child: CircularProgressIndicator.adaptive(),
@@ -106,7 +111,8 @@ class AccountSettingsView extends StatelessWidget {
             const Align(
               alignment: Alignment.bottomCenter,
               child: BodyTwoDefaultText(
-                text: "self-finance ❤️ India",
+                text: Constant.loveBharath,
+                bold: true,
                 color: AppColors.getLigthGreyColor,
               ),
             ),

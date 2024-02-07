@@ -105,7 +105,7 @@ class HistoryView extends ConsumerWidget {
   BodyOneDefaultText _buildAmount(String type, double amount) {
     return BodyOneDefaultText(
       bold: true,
-      text: "${type == debited ? "- " : "+ "}${Utility.doubleFormate(amount)}",
+      text: "${type == Constant.debited ? "- " : "+ "}${Utility.doubleFormate(amount)}",
     );
   }
 
@@ -129,7 +129,7 @@ class HistoryView extends ConsumerWidget {
   }
 
   SizedBox _buildIcon({required String type}) {
-    return type == debited
+    return type == Constant.debited
         ? SizedBox(
             height: 26.sp,
             width: 26.sp,

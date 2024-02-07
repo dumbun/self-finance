@@ -76,7 +76,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                   SizedBox(height: 20.sp),
                   InputTextField(
                     keyboardType: TextInputType.name,
-                    hintText: " Customer Full Name ",
+                    hintText: Constant.customerName,
                     controller: _customerName,
                   ),
 
@@ -85,7 +85,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                   InputTextField(
                     keyboardType: TextInputType.name,
                     controller: _gaurdianName,
-                    hintText: " Gaurdian Full Name ",
+                    hintText: Constant.guardianName,
                   ),
 
                   // customer address
@@ -93,7 +93,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                   InputTextField(
                     keyboardType: TextInputType.streetAddress,
                     controller: _address,
-                    hintText: " Customer Address ",
+                    hintText: Constant.customerAddress,
                   ),
 
                   // customer mobile number
@@ -101,12 +101,12 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                   InputTextField(
                     keyboardType: TextInputType.phone,
                     controller: _mobileNumber,
-                    hintText: " Customer Mobile Number ",
+                    hintText: Constant.mobileNumber,
                     validator: (value) {
                       if (Utility.isValidPhoneNumber(value)) {
                         return null;
                       } else {
-                        return "please enter correct mobile number ";
+                        return "please enter correct mobile number";
                       }
                     },
                   ),
@@ -115,7 +115,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                   SizedBox(height: 20.sp),
                   InputTextField(
                     keyboardType: TextInputType.number,
-                    hintText: " Taken amount ",
+                    hintText: Constant.takenAmount,
                     validator: (value) => Utility.amountValidation(value: value),
                     controller: _takenAmount,
                   ),
@@ -124,7 +124,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                   SizedBox(height: 20.sp),
                   InputTextField(
                     validator: (value) => Utility.amountValidation(value: value),
-                    hintText: " Rate of Intrest % ",
+                    hintText: Constant.rateOfIntrest,
                     controller: _rateOfIntrest,
                     keyboardType: const TextInputType.numberWithOptions(signed: false, decimal: true),
                   ),
@@ -133,7 +133,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                   SizedBox(height: 20.sp),
                   InputDatePicker(
                     controller: _takenDate,
-                    labelText: " Taken Date dd-MM-yyyy ",
+                    labelText: Constant.takenDate,
                     firstDate: DateTime(1000),
                     lastDate: DateTime.now(),
                     initialDate: DateTime.now(),
@@ -143,7 +143,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                   SizedBox(height: 20.sp),
                   InputTextField(
                     controller: _itemDescription,
-                    hintText: " Item Description ",
+                    hintText: Constant.itemDescription,
                   ),
 
                   // image pickers
@@ -155,7 +155,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                   Visibility(
                     visible: _isloading,
                     replacement: RoundedCornerButton(
-                      text: " Save + ",
+                      text: Constant.save,
                       onPressed: _save,
                     ),
                     child: const Center(child: CircularProgressIndicator.adaptive()),
@@ -203,7 +203,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                 pawnedDate: _takenDate.text,
                 expiryDate: presentDateTime,
                 pawnAmount: takenAmount,
-                status: "Active",
+                status: Constant.active,
                 photo: ref.read(pickedCustomerItemImageStringProvider),
                 createdDate: presentDateTime,
               ));
@@ -214,7 +214,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                   customerId: customerCreatedResponse,
                   itemId: itemCreatedResponse,
                   transacrtionDate: _takenDate.text,
-                  transacrtionType: "Active",
+                  transacrtionType: Constant.active,
                   amount: takenAmount,
                   intrestRate: _doubleCheck(_rateOfIntrest.text),
                   intrestAmount: _doubleCheck(_takenAmount.text) * (_doubleCheck(_rateOfIntrest.text) / 100),
@@ -232,7 +232,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                       customerNumber: _mobileNumber.text,
                       transactionID: transactionCreatedResponse,
                       eventDate: presentDateTime,
-                      eventType: debited,
+                      eventType: Constant.debited,
                       amount: takenAmount,
                     ),
                   );
@@ -259,8 +259,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
     _mobileNumber.clear();
     _alertDilog(
       title: "",
-      content:
-          "Contact number is already present in your database please change the number or if you want to add the transacrtion to existing constact please select the add transaction to existing contact in Home Screen",
+      content: Constant.contactAlreadyExistMessage,
     );
   }
 
@@ -281,11 +280,11 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
   }
 
   void _afterFail() {
-    _alertDilog(title: "error", content: "Please Try again");
+    _alertDilog(title: Constant.error, content: "Please Try again");
     Navigator.pop(context);
   }
 
-  double _doubleCheck(String text, {String errorString = "error"}) {
+  double _doubleCheck(String text, {String errorString = Constant.error}) {
     try {
       return double.parse(text);
     } catch (e) {
@@ -296,7 +295,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
     }
   }
 
-  int _intCheck(String text, {String errorString = "error"}) {
+  int _intCheck(String text, {String errorString = Constant.error}) {
     try {
       return int.parse(text);
     } catch (e) {
@@ -327,15 +326,15 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
           children: [
             Expanded(
               child: ImagePickerWidget(
-                text: "Customer Photo",
-                defaultImage: defaultProfileImagePath,
+                text: Constant.customerPhoto,
+                defaultImage: Constant.defaultProfileImagePath,
                 imageProvider: pickedCustomerProfileImageStringProvider,
               ),
             ),
             Expanded(
               child: ImagePickerWidget(
-                text: "Customer Proof",
-                defaultImage: defaultProofImagePath,
+                text: Constant.customerProof,
+                defaultImage: Constant.defaultProofImagePath,
                 imageProvider: pickedCustomerProofImageStringProvider,
               ),
             ),
@@ -344,7 +343,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
         SizedBox(height: 10.sp),
         ImagePickerWidget(
           text: "Customer Item",
-          defaultImage: defaultItemImagePath,
+          defaultImage: Constant.defaultItemImagePath,
           imageProvider: pickedCustomerItemImageStringProvider,
         ),
       ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/models/user_model.dart';
@@ -34,7 +35,11 @@ class DashboardView extends StatelessWidget {
     }
 
     void logout(User user) async {
-      int response = await AlertDilogs.alertDialogWithTwoAction(context, "Exit", "Press yes to signout");
+      int response = await AlertDilogs.alertDialogWithTwoAction(
+        context,
+        Constant.exit,
+        Constant.signOutMessage,
+      );
       if (response == 1) {
         navigateToPinAuthView(user);
       }
@@ -49,10 +54,10 @@ class DashboardView extends StatelessWidget {
             final int pageIndex = ref.watch(selectedPageIndexProvider);
             return TitleWidget(
               text: pageIndex == 0
-                  ? "Home Screen"
+                  ? Constant.homeScreen
                   : pageIndex == 1
-                      ? "EMI Calculator"
-                      : "History",
+                      ? Constant.emiCalculatorTitle
+                      : Constant.history,
             );
           },
         ),
@@ -67,7 +72,7 @@ class DashboardView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Hero(
-                  tag: "user-profile-pic",
+                  tag: Constant.userProfileTag,
                   child: Consumer(
                     builder: (BuildContext context, WidgetRef ref, Widget? child) {
                       return ref.watch(asyncUserProvider).when(
@@ -84,7 +89,7 @@ class DashboardView extends StatelessWidget {
                                     );
                             },
                             error: (Object _, StackTrace __) => const Center(
-                              child: Text("error"),
+                              child: Text(Constant.error),
                             ),
                             loading: () => const Center(
                               child: CircularProgressIndicator.adaptive(),
@@ -95,7 +100,7 @@ class DashboardView extends StatelessWidget {
                 ),
                 SizedBox(height: 24.sp),
                 _buildDrawerButtons(
-                  text: "Account",
+                  text: Constant.account,
                   icon: Icons.vpn_key_rounded,
                   onTap: () {
                     Routes.navigateToAccountSettingsView(context: context);
@@ -107,7 +112,7 @@ class DashboardView extends StatelessWidget {
                     return ref.watch(asyncUserProvider).when(
                           data: (List<User> data) {
                             return _buildDrawerButtons(
-                              text: "Logout",
+                              text: Constant.logout,
                               icon: Icons.login_rounded,
                               color: AppColors.getErrorColor,
                               onTap: () => logout(data.first),
@@ -150,14 +155,14 @@ class DashboardView extends StatelessWidget {
                   distance: 32.sp,
                   children: [
                     ActionButton(
-                      toolTip: "Add New Transaction to a existing customer",
+                      toolTip: Constant.addNewTransactionToolTip,
                       onPressed: () => {
                         Routes.navigateToContactsView(context),
                       },
                       icon: const Icon(Icons.format_align_left),
                     ),
                     ActionButton(
-                      toolTip: "Add New Customer",
+                      toolTip: Constant.addNewCustomerToolTip,
                       onPressed: () => Routes.navigateToAddNewEntry(context: context),
                       icon: const Icon(Icons.person_add_alt_1),
                     ),
@@ -172,21 +177,21 @@ class DashboardView extends StatelessWidget {
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 icon: Icon(Icons.home_outlined),
-                label: 'Home',
-                tooltip: "Home Screen",
+                label: Constant.home,
+                tooltip: Constant.homeScreen,
                 activeIcon: Icon(Icons.home_rounded),
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.calculate_outlined),
-                label: 'EMI calculator',
+                label: Constant.emiCalculatorTitle,
                 activeIcon: Icon(Icons.calculate_rounded),
-                tooltip: "EMI calculator page where you can callculate intrests",
+                tooltip: Constant.emiCalculatorToolTip,
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.history_toggle_off),
-                label: 'History',
+                label: Constant.history,
                 activeIcon: Icon(Icons.history_rounded),
-                tooltip: "History Page : Views all your transactions history",
+                tooltip: Constant.historyToolTip,
               ),
             ],
             selectedItemColor: AppColors.getPrimaryColor,

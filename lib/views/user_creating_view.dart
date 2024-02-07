@@ -56,15 +56,15 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
                   validator: (String? value) {
                     if (value != null) {
                       if (value == "" && value.isEmpty) {
-                        return "Please enter your name";
+                        return Constant.pleaseEnterTheName;
                       }
                     } else if (value == null) {
-                      return "Please enter your name";
+                      return Constant.pleaseEnterTheName;
                     }
                     return null;
                   },
                   controller: nameInput,
-                  hintText: pleaseEnterTheName,
+                  hintText: Constant.pleaseEnterTheName,
                   keyboardType: TextInputType.name,
                 ),
               ],

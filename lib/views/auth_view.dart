@@ -53,7 +53,7 @@ class _AuthViewState extends State<AuthView> {
 
   Future<bool> _performBiometricAuthentication() async {
     return await auth.authenticate(
-      localizedReason: 'Scan your fingerprint (or face or whatever) to authenticate',
+      localizedReason: Constant.localizedReason,
       options: const AuthenticationOptions(
         stickyAuth: true,
         useErrorDialogs: true,
@@ -63,7 +63,7 @@ class _AuthViewState extends State<AuthView> {
   }
 
   void _showAlert(PlatformException e) {
-    AlertDilogs.alertDialogWithOneAction(context, error, e.code);
+    AlertDilogs.alertDialogWithOneAction(context, Constant.error, e.code);
   }
 
   @override
@@ -74,9 +74,9 @@ class _AuthViewState extends State<AuthView> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator.adaptive());
         } else if (snapshot.hasError) {
-          return Scaffold(
+          return const Scaffold(
             body: Center(
-              child: Text('Error fetching user data: ${snapshot.error}'),
+              child: Text(Constant.userFetchingError),
             ),
           );
         } else {

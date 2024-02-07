@@ -99,7 +99,7 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
           //
         }
       },
-      defaultImagePath: defaultProfileImagePath,
+      defaultImagePath: Constant.defaultProfileImagePath,
       defaultImageHeight: 40.sp,
       defaultImageWidth: 40.sp,
     );
@@ -202,7 +202,7 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
           //
         }
       },
-      defaultImagePath: defaultProofImagePath,
+      defaultImagePath: Constant.defaultProofImagePath,
       defaultImageWidth: 32.sp,
       defaultImageHeight: 32.sp,
     );
