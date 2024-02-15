@@ -39,10 +39,14 @@ class ContactsView extends ConsumerWidget {
                 CupertinoSearchTextField(
                   autocorrect: false,
                   enableIMEPersonalizedLearning: true,
-                  style: const TextStyle(color: AppColors.getPrimaryColor, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: AppColors.getPrimaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
                   keyboardType: TextInputType.name,
-                  onChanged: (value) =>
-                      ref.read(asyncCustomersContactsProvider.notifier).searchCustomer(givenInput: value),
+                  onChanged: (value) => ref
+                      .read(asyncCustomersContactsProvider.notifier)
+                      .searchCustomer(givenInput: value),
                 ),
                 SizedBox(height: 8.sp),
                 _buildCustomerList(),
@@ -65,19 +69,25 @@ class ContactsView extends ConsumerWidget {
                           itemCount: data.length,
                           itemBuilder: (BuildContext context, int index) {
                             return GestureDetector(
-                              onTap: () => contactSelected(data, index, context),
+                              onTap: () =>
+                                  contactSelected(data, index, context),
                               child: Card(
                                 margin: EdgeInsets.only(top: 16.sp),
                                 elevation: 0,
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 16.sp, vertical: 12.sp),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           BodyTwoDefaultText(
                                             text: data[index].name,
@@ -109,7 +119,10 @@ class ContactsView extends ConsumerWidget {
                 },
                 error: (error, stackTrace) {
                   return const Center(
-                    child: BodyOneDefaultText(text: "Error fetching customers contacts please try again 😶‍🌫️"),
+                    child: BodyOneDefaultText(
+                      text:
+                          "Error fetching customers contacts please try again 😶‍🌫️",
+                    ),
                   );
                 },
                 loading: () => const Center(

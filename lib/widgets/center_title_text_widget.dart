@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/models/user_model.dart';
-import 'package:self_finance/util.dart';
+import 'package:self_finance/utility/util.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 

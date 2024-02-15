@@ -4,7 +4,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/util.dart';
+import 'package:self_finance/utility/util.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 
 class UserImageUpdateWidget extends ConsumerWidget {
@@ -29,7 +29,7 @@ class UserImageUpdateWidget extends ConsumerWidget {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        pickImageFromCamera().then((value) {
+                        Utility.pickImageFromCamera().then((value) {
                           if (value != "" && value.isNotEmpty) {
                             ref
                                 .read(asyncUserProvider.notifier)
@@ -52,7 +52,7 @@ class UserImageUpdateWidget extends ConsumerWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        pickImageFromGallery().then((value) {
+                        Utility.pickImageFromGallery().then((value) {
                           if (value != "" && value.isNotEmpty) {
                             ref
                                 .read(asyncUserProvider.notifier)

@@ -11,7 +11,7 @@ import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/items_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
-import 'package:self_finance/util.dart';
+import 'package:self_finance/utility/util.dart';
 import 'package:self_finance/views/Add%20New%20Entry/providers.dart';
 import 'package:self_finance/widgets/date_picker_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
@@ -342,7 +342,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
         ),
         SizedBox(height: 10.sp),
         ImagePickerWidget(
-          text: "Customer Item",
+          text: Constant.customerItem,
           defaultImage: Constant.defaultItemImagePath,
           imageProvider: pickedCustomerItemImageStringProvider,
         ),

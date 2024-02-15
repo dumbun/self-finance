@@ -37,7 +37,8 @@ class MyApp extends StatelessWidget {
           Constant.dashboardView: (context) => const DashboardView(),
           Constant.addNewEntryView: (context) => const AddNewEntery(),
           Constant.contactView: (context) => const ContactsView(),
-          Constant.accountSettingsView: (context) => const AccountSettingsView(),
+          Constant.accountSettingsView: (context) =>
+              const AccountSettingsView(),
         },
         color: AppColors.getPrimaryColor,
         title: Constant.appTitle,

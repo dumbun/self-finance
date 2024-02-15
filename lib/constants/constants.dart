@@ -2,11 +2,15 @@ class Constant {
   static const String contactAlreadyExistMessage =
       "Contact number is already present in your database please change the number or if you want to add the transacrtion to existing constact please select the add transaction to existing contact in Home Screen";
   static const String login = "Login";
-  static const String loveBharath = "self-finance ❤️ Bharath";
+  static const String loveBharath = "self-finance ❤️  Bharath";
   static const String userFetchingError = 'Error fetching user data. Please restart the application';
   static const String localizedReason = 'Scan your fingerprint (or face or whatever) to authenticate';
   static const String appTitle = 'Self-Finance';
   static const String exit = 'Exit';
+  static const String customerImageTag = "customer-image-hero-tag";
+  static const String update = 'Update';
+  static const String saveButtonTag = "save-button";
+  static const String editContact = "Edit Contact";
   static const String signOutMessage = "Press yes to Sign-Out";
   static const String changePinView = '/changePinView/';
   static const String dashboardView = '/dashboardview/';
@@ -23,6 +27,7 @@ class Constant {
   static const String addNewCustomerToolTip = "Add New Customer";
   static const String addNewTransactionToolTip = "Add New Transaction to a existing customer";
   static const String history = "History";
+  static const String customerItem = "Customer Item";
   static const String customerAddress = " Customer Address ";
   static const String historyToolTip = "History Page : Views all your transactions history";
   static const String next = "next";

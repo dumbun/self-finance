@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/backend/backend.dart';
+import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
@@ -11,7 +12,7 @@ import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/util.dart';
+import 'package:self_finance/utility/util.dart';
 import 'package:self_finance/widgets/call_button_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
@@ -74,7 +75,7 @@ class ContactDetailsView extends ConsumerWidget {
       length: 2,
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
-          heroTag: "save-button",
+          heroTag: Constant.saveButtonTag,
           enableFeedback: true,
           isExtended: true,
           tooltip: "Add new trancation to this customer",
@@ -393,7 +394,15 @@ class ContactDetailsView extends ConsumerWidget {
   }
 
   /// [ _buildImage()] method to build the image of the customer
-  Center _buildImage(String imageData, String customerName) {
-    return Center(child: CircularImageWidget(imageData: imageData, titile: "$customerName photo"));
+  Hero _buildImage(String imageData, String customerName) {
+    return Hero(
+      tag: Constant.customerImageTag,
+      child: Center(
+        child: CircularImageWidget(
+          imageData: imageData,
+          titile: "$customerName photo",
+        ),
+      ),
+    );
   }
 }

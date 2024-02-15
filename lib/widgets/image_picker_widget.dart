@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
-import 'package:self_finance/util.dart';
+import 'package:self_finance/utility/util.dart';
 
 class ImagePickerWidget extends ConsumerStatefulWidget {
   const ImagePickerWidget({
@@ -56,7 +56,7 @@ class _ImagePickerWidgetState extends ConsumerState<ImagePickerWidget> {
   }
 
   void _doWork() {
-    pickImageFromCamera().then(
+    Utility.pickImageFromCamera().then(
       (value) {
         if (value != "" && value.isNotEmpty) {
           setState(() {

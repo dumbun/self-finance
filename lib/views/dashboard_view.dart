@@ -7,7 +7,7 @@ import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/util.dart';
+import 'package:self_finance/utility/util.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_view.dart';
 import 'package:self_finance/views/history/history_view.dart';
 import 'package:self_finance/views/home_screen.dart';

@@ -13,7 +13,7 @@ import 'package:self_finance/models/user_history.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/items_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
-import 'package:self_finance/util.dart';
+import 'package:self_finance/utility/util.dart';
 import 'package:self_finance/widgets/date_picker_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
@@ -209,7 +209,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
             return GestureDetector(
               onTap: () async {
                 try {
-                  await pickImageFromCamera().then((value) {
+                  await Utility.pickImageFromCamera().then((value) {
                     if (value != "" && value.isNotEmpty) {
                       ref.read(newItemImageProvider.notifier).update((state) => value);
                     }

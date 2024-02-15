@@ -6,8 +6,10 @@ import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
-import 'package:self_finance/util.dart';
+import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/utility/util.dart';
 import 'package:self_finance/views/contact_details_view.dart';
+import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
@@ -51,7 +53,7 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
     return Scaffold(
       appBar: AppBar(
         title: const BodyTwoDefaultText(
-          text: "Edit Contact",
+          text: Constant.editContact,
           bold: true,
         ),
       ),
@@ -72,8 +74,11 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
                   _buildImagePickers(),
                   SizedBox(height: 20.sp),
                   Hero(
-                    tag: "save-button",
-                    child: RoundedCornerButton(text: "update", onPressed: _save),
+                    tag: Constant.saveButtonTag,
+                    child: RoundedCornerButton(
+                      text: Constant.update,
+                      onPressed: _save,
+                    ),
                   ),
                 ],
               ),
@@ -84,24 +89,56 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
     );
   }
 
-  Center _buildCustomerPhoto() {
-    return _buildCard(
-      title: "Customer Photo",
-      updatePhoto: ref.watch(updatedCustomerPhotoStringProvider),
-      onTap: () async {
-        try {
-          await pickImageFromCamera().then((value) {
-            if (value != "" && value.isNotEmpty) {
-              ref.read(updatedCustomerPhotoStringProvider.notifier).update((state) => value);
-            }
-          });
-        } catch (e) {
-          //
-        }
-      },
-      defaultImagePath: Constant.defaultProfileImagePath,
-      defaultImageHeight: 40.sp,
-      defaultImageWidth: 40.sp,
+  _buildCustomerPhoto() {
+    return Center(
+      child: SizedBox(
+        width: 48.sp,
+        height: 48.sp,
+        child: Consumer(
+          builder: (context, ref, child) {
+            final userImageString = ref.watch(updatedCustomerPhotoStringProvider);
+            return GestureDetector(
+              onTap: () async {
+                await Utility.pickImageFromCamera().then(
+                  (value) => ref
+                      .read(
+                        updatedCustomerPhotoStringProvider.notifier,
+                      )
+                      .update(
+                        (state) => value,
+                      ),
+                );
+              },
+              child: Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  Hero(
+                    transitionOnUserGestures: true,
+                    tag: Constant.customerImageTag,
+                    child: userImageString.isEmpty
+                        ? DefaultUserImage(
+                            height: 46.sp,
+                            width: 46.sp,
+                          )
+                        : SizedBox(
+                            height: 46.sp,
+                            width: 46.sp,
+                            child: Utility.imageFromBase64String(
+                              userImageString,
+                            ),
+                          ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(12.sp),
+                    decoration: const BoxDecoration(color: AppColors.getPrimaryColor, shape: BoxShape.circle),
+                    child: const Icon(Icons.edit_rounded),
+                  )
+                ],
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -135,7 +172,7 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
   void _showError() {
     AlertDilogs.alertDialogWithOneAction(
       context,
-      "Error",
+      Constant.error,
       "Error while updating the contact please try again some other time",
     );
   }
@@ -156,13 +193,13 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
         InputTextField(
           keyboardType: TextInputType.name,
           controller: _customerName,
-          hintText: "Customer Name",
+          hintText: Constant.customerName,
         ),
         SizedBox(height: 20.sp),
         InputTextField(
           keyboardType: TextInputType.phone,
           controller: _mobileNumber,
-          hintText: "Contact Number",
+          hintText: Constant.mobileNumber,
           validator: (value) {
             if (Utility.isValidPhoneNumber(value)) {
               return null;
@@ -175,13 +212,13 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
         InputTextField(
           keyboardType: TextInputType.name,
           controller: _gaurdianName,
-          hintText: "Guardian Name",
+          hintText: Constant.guardianName,
         ),
         SizedBox(height: 20.sp),
         InputTextField(
           keyboardType: TextInputType.streetAddress,
           controller: _address,
-          hintText: "Address",
+          hintText: Constant.customerAddress,
         ),
       ],
     );
@@ -189,11 +226,11 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
 
   Center _buildImagePickers() {
     return _buildCard(
-      title: "Customer Proof",
+      title: Constant.customerProof,
       updatePhoto: ref.watch(updatedCustomerProofStringProvider),
       onTap: () async {
         try {
-          await pickImageFromCamera().then((value) {
+          await Utility.pickImageFromCamera().then((value) {
             if (value != "" && value.isNotEmpty) {
               ref.read(updatedCustomerProofStringProvider.notifier).update((state) => value);
             }
@@ -208,7 +245,7 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
     );
   }
 
-  _buildCard({
+  Center _buildCard({
     required String title,
     required String updatePhoto,
     required void Function()? onTap,
