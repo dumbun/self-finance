@@ -13,7 +13,7 @@ import 'package:self_finance/models/user_history.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/items_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
-import 'package:self_finance/utility/util.dart';
+import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/date_picker_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';

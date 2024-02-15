@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
-import 'package:self_finance/utility/util.dart';
+import 'package:self_finance/utility/user_utility.dart';
 
 class ImagePickerWidget extends ConsumerStatefulWidget {
   const ImagePickerWidget({

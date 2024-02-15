@@ -7,7 +7,7 @@ import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/utility/util.dart';
+import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/user_image_update_widget.dart';

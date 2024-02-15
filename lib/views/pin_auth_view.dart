@@ -7,7 +7,7 @@ import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/strong_heading_one_text.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
-import 'package:self_finance/utility/util.dart';
+import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/app_icon.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';

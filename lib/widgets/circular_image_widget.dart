@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/routes.dart';
-import 'package:self_finance/utility/util.dart';
+import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 
 class CircularImageWidget extends StatelessWidget {

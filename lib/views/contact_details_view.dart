@@ -12,7 +12,7 @@ import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/utility/util.dart';
+import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/call_button_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';

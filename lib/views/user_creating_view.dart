@@ -7,7 +7,7 @@ import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/utility/util.dart';
+import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';

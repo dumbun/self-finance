@@ -6,7 +6,8 @@ import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/logic/logic.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/utility/util.dart';
+import 'package:self_finance/utility/user_utility.dart';
+
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_providers.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/two_slice_pie_chart_widget.dart';
