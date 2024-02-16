@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
@@ -60,7 +60,10 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
       appBar: AppBar(
         forceMaterialTransparency: true,
         elevation: 0,
-        title: const BodyTwoDefaultText(text: "Add new Entry with new Customer"),
+        title: const BodyOneDefaultText(
+          text: Constant.addNewCustomerToolTip,
+          bold: true,
+        ),
       ),
       body: SafeArea(
         child: Padding(
@@ -106,7 +109,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                       if (Utility.isValidPhoneNumber(value)) {
                         return null;
                       } else {
-                        return "please enter correct mobile number";
+                        return Constant.enterCorrectNumber;
                       }
                     },
                   ),
@@ -275,12 +278,12 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
       _isloading = false;
     });
 
-    snackBarWidget(context: context, message: "Saved Successfully 👍");
+    snackBarWidget(context: context, message: Constant.savedSuccessfullyText);
     Navigator.pop(context);
   }
 
   void _afterFail() {
-    _alertDilog(title: Constant.error, content: "Please Try again");
+    _alertDilog(title: Constant.error, content: Constant.pleaseTryAgain);
     Navigator.pop(context);
   }
 

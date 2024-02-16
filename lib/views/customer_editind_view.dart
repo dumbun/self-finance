@@ -144,7 +144,11 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
 
   void _save() async {
     if (_validateAndSave()) {
-      final int response = await ref.read(asyncCustomersContactsProvider.notifier).updateCustomer(
+      final int response = await ref
+          .read(
+            asyncCustomersContactsProvider.notifier,
+          )
+          .updateCustomer(
             customerId: widget.contact.id!,
             newCustomerName: _customerName.text,
             newGuardianName: _gaurdianName.text,
@@ -166,14 +170,17 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
   void _navigateToContactsView() {
     Navigator.of(context).pop();
     // Navigator.of(context).popUntil(ModalRoute.withName('/contactsView/'));
-    snackBarWidget(context: context, message: "Contact Updated Successfully ");
+    snackBarWidget(
+      context: context,
+      message: Constant.contactUpdatedSuccessfully,
+    );
   }
 
   void _showError() {
     AlertDilogs.alertDialogWithOneAction(
       context,
       Constant.error,
-      "Error while updating the contact please try again some other time",
+      Constant.errorUpdatingContactMessage,
     );
   }
 
@@ -204,7 +211,7 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
             if (Utility.isValidPhoneNumber(value)) {
               return null;
             } else {
-              return "please enter correct mobile number ";
+              return Constant.enterCorrectNumber;
             }
           },
         ),

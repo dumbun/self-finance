@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
@@ -18,7 +19,7 @@ class ContactsView extends ConsumerWidget {
       appBar: AppBar(
         forceMaterialTransparency: true,
         title: const BodyTwoDefaultText(
-          text: "Contacts",
+          text: Constant.contact,
           bold: true,
         ),
       ),
@@ -44,9 +45,8 @@ class ContactsView extends ConsumerWidget {
                     fontWeight: FontWeight.bold,
                   ),
                   keyboardType: TextInputType.name,
-                  onChanged: (value) => ref
-                      .read(asyncCustomersContactsProvider.notifier)
-                      .searchCustomer(givenInput: value),
+                  onChanged: (value) =>
+                      ref.read(asyncCustomersContactsProvider.notifier).searchCustomer(givenInput: value),
                 ),
                 SizedBox(height: 8.sp),
                 _buildCustomerList(),
@@ -69,25 +69,19 @@ class ContactsView extends ConsumerWidget {
                           itemCount: data.length,
                           itemBuilder: (BuildContext context, int index) {
                             return GestureDetector(
-                              onTap: () =>
-                                  contactSelected(data, index, context),
+                              onTap: () => contactSelected(data, index, context),
                               child: Card(
                                 margin: EdgeInsets.only(top: 16.sp),
                                 elevation: 0,
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 16.sp, vertical: 12.sp),
+                                  padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           BodyTwoDefaultText(
                                             text: data[index].name,
@@ -112,7 +106,7 @@ class ContactsView extends ConsumerWidget {
                         )
                       : const Center(
                           child: BodyOneDefaultText(
-                            text: "0 Contacts Found 🫠",
+                            text: Constant.zeroContacts,
                             bold: true,
                           ),
                         );
@@ -120,8 +114,7 @@ class ContactsView extends ConsumerWidget {
                 error: (error, stackTrace) {
                   return const Center(
                     child: BodyOneDefaultText(
-                      text:
-                          "Error fetching customers contacts please try again 😶‍🌫️",
+                      text: Constant.errorFetchingContactMessage,
                     ),
                   );
                 },

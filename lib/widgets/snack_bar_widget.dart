@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/theme/colors.dart';
 
 snackBarWidget({required BuildContext context, required String message}) {
   return ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      animation: ProxyAnimation(),
+      showCloseIcon: true,
       backgroundColor: AppColors.getPrimaryColor,
       content: Row(
         children: [
-          Text(
-            message,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          )
+          BodyOneDefaultText(
+            text: message,
+            bold: true,
+          ),
         ],
       ),
     ),

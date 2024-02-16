@@ -22,10 +22,10 @@ class EMICalculatorView extends ConsumerWidget {
   final TextEditingController _tenureDataInput = TextEditingController();
 
   void _doCalculations(WidgetRef ref) {
-    if (_amountGivenInput.text != "" &&
-        _rateOfIntrestInput.text != "" &&
-        _takenDataInput.text != "" &&
-        _tenureDataInput.text != "") {
+    if (_amountGivenInput.text.isNotEmpty &&
+        _rateOfIntrestInput.text.isNotEmpty &&
+        _takenDataInput.text.isNotEmpty &&
+        _tenureDataInput.text.isNotEmpty) {
       double rateOfInterest = Utility.textToDouble(_rateOfIntrestInput.text);
       int loneAmount = Utility.textToInt(_amountGivenInput.text);
       String takenDate = _takenDataInput.text;
@@ -57,14 +57,6 @@ class EMICalculatorView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final totalAmount = ref.watch(totalAmountProvider);
-    final totalInterest = ref.watch(totalIntrestProvider);
-    final emiPerMonth = ref.watch(emiPerMonthProvider);
-    final principalAmount = ref.watch(principalAmountProvider);
-    final monthsAndDays = ref.watch(monthsAndDaysProvider);
-    final double firstIndicatorValue = ref.watch(firstIndicatorPercentageProvider);
-    final double secoundIndicatorValue = ref.watch(secoundIndicatorPercentageProvider);
-
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(16.sp),
@@ -106,27 +98,48 @@ class EMICalculatorView extends ConsumerWidget {
                 _doCalculations(ref);
               },
             ),
-            if (firstIndicatorValue != 0 && secoundIndicatorValue != 0)
-              TwoSlicePieChartWidget(
-                firstIndicatorText: "Principal amount",
-                secoundIndicatorText: "Intrest amount",
-                firstIndicatorValue: firstIndicatorValue,
-                secoundIndicatorValue: secoundIndicatorValue,
-              ),
-            _buildDetails(totalAmount, totalInterest, emiPerMonth, principalAmount, monthsAndDays)
+            Consumer(
+              builder: (context, ref, child) {
+                final totalAmount = ref.watch(totalAmountProvider);
+                final totalInterest = ref.watch(totalIntrestProvider);
+                final emiPerMonth = ref.watch(emiPerMonthProvider);
+                final principalAmount = ref.watch(principalAmountProvider);
+                final monthsAndDays = ref.watch(monthsAndDaysProvider);
+                final double firstIndicatorValue = ref.watch(firstIndicatorPercentageProvider);
+                final double secoundIndicatorValue = ref.watch(secoundIndicatorPercentageProvider);
+                return Column(
+                  children: [
+                    if (firstIndicatorValue != 0 && secoundIndicatorValue != 0)
+                      TwoSlicePieChartWidget(
+                        firstIndicatorText: "Principal amount",
+                        secoundIndicatorText: "Intrest amount",
+                        firstIndicatorValue: firstIndicatorValue,
+                        secoundIndicatorValue: secoundIndicatorValue,
+                      ),
+                    _buildDetails(
+                      totalAmount: totalAmount,
+                      totalInterest: totalInterest,
+                      emiPerMonth: emiPerMonth,
+                      principalAmount: principalAmount,
+                      monthsAndDays: monthsAndDays,
+                    )
+                  ],
+                );
+              },
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDetails(
-    totalAmount,
-    totalInterest,
-    emiPerMonth,
-    principalAmount,
-    monthsAndDays,
-  ) {
+  Widget _buildDetails({
+    required double totalAmount,
+    required double totalInterest,
+    required double emiPerMonth,
+    required int principalAmount,
+    required String monthsAndDays,
+  }) {
     if (totalAmount != 0 && totalInterest != 0 && emiPerMonth != 0 && principalAmount != 0 && monthsAndDays != "") {
       return Container(
         margin: EdgeInsets.only(top: 20.sp),

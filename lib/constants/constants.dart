@@ -1,4 +1,7 @@
 class Constant {
+  static const String contact = "Contacts";
+  static const String zeroContacts = "0 Contacts Found 🫠";
+  static const String errorFetchingContactMessage = "Error fetching customers contacts please try again 😶‍🌫️";
   static const String contactAlreadyExistMessage =
       "Contact number is already present in your database please change the number or if you want to add the transacrtion to existing constact please select the add transaction to existing contact in Home Screen";
   static const String login = "Login";
@@ -26,8 +29,11 @@ class Constant {
   static const String addNewEntry = "Add New Entry";
   static const String addNewCustomerToolTip = "Add New Customer";
   static const String addNewTransactionToolTip = "Add New Transaction to a existing customer";
+  static const String addNewTransaction = "Add New Transaction";
   static const String history = "History";
   static const String customerItem = "Customer Item";
+  static const String errorUpdatingContactMessage = "Error while updating the contact please try again some other time";
+  static const String contactUpdatedSuccessfully = "Contact Updated Successfully";
   static const String customerAddress = " Customer Address ";
   static const String historyToolTip = "History Page : Views all your transactions history";
   static const String next = "next";
@@ -69,4 +75,8 @@ class Constant {
   static const String save = " Save + ";
   static const String enterYourAppPin = "Enter your app PIN";
   static const String enterCorrectPin = "Please enter the correct pin";
+  static const String enterCorrectNumber = "please enter correct mobile number";
+  static const String pleaseTryAgain = "please try again";
+  static const String errorAddingTransaction = "Error adding transaction please try agine after some time";
+  static const String transacrtionAddedSuccessfully = "Transaction added Successfully";
 }

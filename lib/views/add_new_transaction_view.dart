@@ -57,7 +57,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
     return Scaffold(
       appBar: AppBar(
         title: const BodyTwoDefaultText(
-          text: "Add New Transaction",
+          text: Constant.addNewTransaction,
           bold: true,
         ),
       ),
@@ -73,14 +73,14 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                   InputTextField(
                     validator: (value) => Utility.amountValidation(value: value),
                     keyboardType: TextInputType.number,
-                    hintText: "Amount",
+                    hintText: Constant.takenAmount,
                     controller: _amount,
                   ),
                   SizedBox(height: 20.sp),
                   InputTextField(
                     validator: (value) => Utility.amountValidation(value: value),
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    hintText: "Rate of Intrest",
+                    hintText: Constant.rateOfIntrest,
                     controller: _rateOfIntrest,
                   ),
                   SizedBox(height: 20.sp),
@@ -89,22 +89,25 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                     firstDate: DateTime(1000),
                     initialDate: DateTime.now(),
                     lastDate: DateTime.now(),
-                    labelText: "Transaction Date",
+                    labelText: Constant.takenDate,
                   ),
                   SizedBox(height: 20.sp),
                   InputTextField(
                     keyboardType: TextInputType.multiline,
-                    hintText: "Item Description",
+                    hintText: Constant.itemDescription,
                     controller: _description,
                   ),
                   SizedBox(height: 20.sp),
                   _buldItemImagePicker(),
                   SizedBox(height: 40.sp),
                   Hero(
-                    tag: "save-button",
+                    tag: Constant.saveButtonTag,
                     child: Visibility(
                       visible: _isloading,
-                      replacement: RoundedCornerButton(text: "Save", onPressed: _save),
+                      replacement: RoundedCornerButton(
+                        text: Constant.save,
+                        onPressed: _save,
+                      ),
                       child: const CircularProgressIndicator.adaptive(),
                     ),
                   ),
@@ -126,7 +129,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
     }
   }
 
-  double _doubleCheck(String text, {String errorString = "error"}) {
+  double _doubleCheck(String text, {String errorString = Constant.error}) {
     try {
       return double.parse(text);
     } catch (e) {
@@ -148,7 +151,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
               pawnedDate: _transacrtionDate.text,
               expiryDate: presentDate,
               pawnAmount: _doubleCheck(_amount.text),
-              status: "Active",
+              status: Constant.active,
               photo: ref.read(newItemImageProvider),
               createdDate: DateTime.now().toString(),
             ),
@@ -159,7 +162,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                 customerId: widget.customerID,
                 itemId: itemId,
                 transacrtionDate: _transacrtionDate.text,
-                transacrtionType: "Active",
+                transacrtionType: Constant.active,
                 amount: _doubleCheck(_amount.text),
                 intrestRate: _doubleCheck(_rateOfIntrest.text),
                 intrestAmount: _doubleCheck(_amount.text) * (_doubleCheck(_rateOfIntrest.text) / 100),
@@ -190,13 +193,17 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
 
   void _safeSuccuse() {
     _isloading = false;
-    snackBarWidget(context: context, message: "Transaction added Successfully");
+    snackBarWidget(context: context, message: Constant.transacrtionAddedSuccessfully);
     Navigator.of(context).pop();
   }
 
   void _saveUnSuccessfull() {
     _isloading = false;
-    AlertDilogs.alertDialogWithOneAction(context, "Error", "Error adding transaction please try agine after some time");
+    AlertDilogs.alertDialogWithOneAction(
+      context,
+      Constant.error,
+      Constant.errorAddingTransaction,
+    );
   }
 
   Widget _buldItemImagePicker() {
@@ -230,7 +237,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                           Constant.defaultItemImagePath,
                         ),
                   SizedBox(height: 12.sp),
-                  const BodyOneDefaultText(text: "Add Item Image"),
+                  const BodyOneDefaultText(text: Constant.customerItem),
                 ],
               ),
             );
