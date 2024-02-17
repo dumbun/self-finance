@@ -102,7 +102,7 @@ class AccountSettingsView extends StatelessWidget {
 
   Consumer _buildLogoutButton() {
     return Consumer(
-      builder: (context, ref, child) => ref.watch(asyncUserProvider).when(
+      builder: (BuildContext context, WidgetRef ref, Widget? child) => ref.watch(asyncUserProvider).when(
             data: (List<User> data) {
               return _buidCard(
                 color: AppColors.getErrorColor,
@@ -115,13 +115,13 @@ class AccountSettingsView extends StatelessWidget {
                     Constant.exit,
                     Constant.signOutMessage,
                   ).then(
-                    (value) => _logout(data.first, value, context),
+                    (int value) => _logout(data.first, value, context),
                   );
                 },
                 title: Constant.logout,
               );
             },
-            error: (error, stackTrace) => const Center(
+            error: (Object error, StackTrace stackTrace) => const Center(
               child: BodyOneDefaultText(text: Constant.errorUserFetch),
             ),
             loading: () => const Center(
