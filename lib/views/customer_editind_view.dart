@@ -100,13 +100,17 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
             return GestureDetector(
               onTap: () async {
                 await Utility.pickImageFromCamera().then(
-                  (value) => ref
-                      .read(
-                        updatedCustomerPhotoStringProvider.notifier,
-                      )
-                      .update(
-                        (state) => value,
-                      ),
+                  (value) {
+                    if (value.isNotEmpty) {
+                      ref
+                          .read(
+                            updatedCustomerPhotoStringProvider.notifier,
+                          )
+                          .update(
+                            (state) => value,
+                          );
+                    }
+                  },
                 );
               },
               child: Stack(
@@ -236,15 +240,11 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
       title: Constant.customerProof,
       updatePhoto: ref.watch(updatedCustomerProofStringProvider),
       onTap: () async {
-        try {
-          await Utility.pickImageFromCamera().then((value) {
-            if (value != "" && value.isNotEmpty) {
-              ref.read(updatedCustomerProofStringProvider.notifier).update((state) => value);
-            }
-          });
-        } catch (e) {
-          //
-        }
+        await Utility.pickImageFromCamera().then((value) {
+          if (value != "" && value.isNotEmpty) {
+            ref.read(updatedCustomerProofStringProvider.notifier).update((state) => value);
+          }
+        });
       },
       defaultImagePath: Constant.defaultProofImagePath,
       defaultImageWidth: 32.sp,
