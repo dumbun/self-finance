@@ -3,17 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
-import 'package:self_finance/fonts/body_text.dart';
-import 'package:self_finance/models/user_model.dart';
-import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_view.dart';
 import 'package:self_finance/views/history/history_view.dart';
 import 'package:self_finance/views/home_screen.dart';
-import 'package:self_finance/views/pin_auth_view.dart';
-import 'package:self_finance/widgets/default_user_image.dart';
-import 'package:self_finance/widgets/dilogbox_widget.dart';
+import 'package:self_finance/widgets/drawer_widget.dart';
 import 'package:self_finance/widgets/expandable_fab.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 
@@ -26,108 +21,26 @@ class DashboardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    navigateToPinAuthView(User user) {
-      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-        builder: (context) {
-          return const PinAuthView();
-        },
-      ), (route) => false);
-    }
-
-    void logout(User user) async {
-      int response = await AlertDilogs.alertDialogWithTwoAction(
-        context,
-        Constant.exit,
-        Constant.signOutMessage,
-      );
-      if (response == 1) {
-        navigateToPinAuthView(user);
-      }
-    }
-
     final PageController pageController = PageController();
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
         title: Consumer(
-          builder: (context, ref, child) {
+          builder: (BuildContext context, WidgetRef ref, Widget? child) {
             final int pageIndex = ref.watch(selectedPageIndexProvider);
             return TitleWidget(
-              text: pageIndex == 0
-                  ? Constant.homeScreen
-                  : pageIndex == 1
-                      ? Constant.emiCalculatorTitle
-                      : Constant.history,
+              text: switch (pageIndex) {
+                0 => Constant.homeScreen,
+                1 => Constant.emiCalculatorTitle,
+                2 => Constant.history,
+                int() => throw UnimplementedError(),
+              },
             );
           },
         ),
       ),
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
-      drawer: Drawer(
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.all(16.sp),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Hero(
-                  tag: Constant.userProfileTag,
-                  child: Consumer(
-                    builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                      return ref.watch(asyncUserProvider).when(
-                            data: (List<User> data) {
-                              return data.first.profilePicture.isNotEmpty
-                                  ? Utility.imageFromBase64String(
-                                      data.first.profilePicture,
-                                      height: 45.sp,
-                                      width: 45.sp,
-                                    )
-                                  : DefaultUserImage(
-                                      height: 45.sp,
-                                      width: 45.sp,
-                                    );
-                            },
-                            error: (Object _, StackTrace __) => const Center(
-                              child: Text(Constant.error),
-                            ),
-                            loading: () => const Center(
-                              child: CircularProgressIndicator.adaptive(),
-                            ),
-                          );
-                    },
-                  ),
-                ),
-                SizedBox(height: 24.sp),
-                _buildDrawerButtons(
-                  text: Constant.account,
-                  icon: Icons.vpn_key_rounded,
-                  onTap: () {
-                    Routes.navigateToAccountSettingsView(context: context);
-                  },
-                ),
-                SizedBox(height: 12.sp),
-                Consumer(
-                  builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                    return ref.watch(asyncUserProvider).when(
-                          data: (List<User> data) {
-                            return _buildDrawerButtons(
-                              text: Constant.logout,
-                              icon: Icons.login_rounded,
-                              color: AppColors.getErrorColor,
-                              onTap: () => logout(data.first),
-                            );
-                          },
-                          error: (error, stackTrace) => Text(error.toString()),
-                          loading: () => const CircularProgressIndicator.adaptive(),
-                        );
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      drawer: const DrawerWidget(),
       body: SafeArea(
         child: GestureDetector(
           onTap: Utility.unfocus,
@@ -138,38 +51,32 @@ class DashboardView extends StatelessWidget {
                 onPageChanged: (index) {
                   ref.read(selectedPageIndexProvider.notifier).update((state) => index);
                 },
-                children: <Widget>[
-                  const HomeScreen(),
+                children: const <Widget>[
+                  HomeScreen(),
                   EMICalculatorView(),
-                  const HistoryView(),
+                  HistoryView(),
                 ],
               );
             },
           ),
         ),
       ),
-      floatingActionButton: Consumer(
-        builder: (BuildContext context, WidgetRef ref, Widget? child) {
-          return ref.watch(selectedPageIndexProvider) == 0
-              ? ExpandableFab(
-                  distance: 32.sp,
-                  children: [
-                    ActionButton(
-                      toolTip: Constant.addNewTransactionToolTip,
-                      onPressed: () => {
-                        Routes.navigateToContactsView(context),
-                      },
-                      icon: const Icon(Icons.format_align_left),
-                    ),
-                    ActionButton(
-                      toolTip: Constant.addNewCustomerToolTip,
-                      onPressed: () => Routes.navigateToAddNewEntry(context: context),
-                      icon: const Icon(Icons.person_add_alt_1),
-                    ),
-                  ],
-                )
-              : const SizedBox.shrink();
-        },
+      floatingActionButton: ExpandableFab(
+        distance: 32.sp,
+        children: [
+          ActionButton(
+            toolTip: Constant.addNewTransactionToolTip,
+            onPressed: () => {
+              Routes.navigateToContactsView(context),
+            },
+            icon: const Icon(Icons.format_align_left),
+          ),
+          ActionButton(
+            toolTip: Constant.addNewCustomerToolTip,
+            onPressed: () => Routes.navigateToAddNewEntry(context: context),
+            icon: const Icon(Icons.person_add_alt_1),
+          ),
+        ],
       ),
       bottomNavigationBar: Consumer(
         builder: (BuildContext context, WidgetRef ref, Widget? child) {
@@ -205,33 +112,6 @@ class DashboardView extends StatelessWidget {
             },
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildDrawerButtons(
-      {required String text, required IconData icon, required void Function()? onTap, Color? color}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        elevation: 0,
-        child: Padding(
-          padding: EdgeInsets.all(16.sp),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              BodyOneDefaultText(
-                text: text,
-                bold: true,
-              ),
-              Icon(
-                icon,
-                color: color,
-              )
-            ],
-          ),
-        ),
       ),
     );
   }

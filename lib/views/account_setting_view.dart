@@ -19,29 +19,6 @@ class AccountSettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void navigateToPinAuthView(User user) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) {
-            return const PinAuthView();
-          },
-        ),
-        (route) => false,
-      );
-    }
-
-    void logout(User user) async {
-      int response = await AlertDilogs.alertDialogWithTwoAction(
-        context,
-        Constant.exit,
-        Constant.signOutMessage,
-      );
-      if (response == 1) {
-        navigateToPinAuthView(user);
-      }
-    }
-
-    final Uri toLaunch = Uri.parse(Constant.tAndcUrl);
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
@@ -70,39 +47,9 @@ class AccountSettingsView extends StatelessWidget {
                       SizedBox(height: 12.sp),
                       const UserPinUpdateWidget(),
                       SizedBox(height: 12.sp),
-                      _buidCard(
-                        color: AppColors.getPrimaryColor,
-                        icon: const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                        ),
-                        onPressed: () {
-                          Utility.launchInBrowserView(toLaunch);
-                        },
-                        title: Constant.tAndcString,
-                      ),
+                      _buildTermsAndConditionButton(),
                       SizedBox(height: 12.sp),
-                      Consumer(
-                        builder: (context, ref, child) => ref.watch(asyncUserProvider).when(
-                              data: (List<User> data) {
-                                return _buidCard(
-                                  color: AppColors.getErrorColor,
-                                  icon: const Icon(
-                                    Icons.logout,
-                                  ),
-                                  onPressed: () async {
-                                    logout(data.first);
-                                  },
-                                  title: Constant.logout,
-                                );
-                              },
-                              error: (error, stackTrace) => const Center(
-                                child: BodyOneDefaultText(text: Constant.errorUserFetch),
-                              ),
-                              loading: () => const Center(
-                                child: CircularProgressIndicator.adaptive(),
-                              ),
-                            ),
-                      ),
+                      _buildLogoutButton(),
                     ],
                   ),
                 ),
@@ -119,6 +66,67 @@ class AccountSettingsView extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Card _buildTermsAndConditionButton() {
+    final Uri toLaunch = Uri.parse(Constant.tAndcUrl);
+    return _buidCard(
+      color: AppColors.getPrimaryColor,
+      icon: const Icon(
+        Icons.arrow_forward_ios_rounded,
+      ),
+      onPressed: () {
+        Utility.launchInBrowserView(toLaunch);
+      },
+      title: Constant.tAndcString,
+    );
+  }
+
+  void navigateToPinAuthView(User user, BuildContext context) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) {
+          return const PinAuthView();
+        },
+      ),
+      (route) => false,
+    );
+  }
+
+  void _logout(User user, int response, BuildContext context) {
+    if (response == 1) {
+      navigateToPinAuthView(user, context);
+    }
+  }
+
+  Consumer _buildLogoutButton() {
+    return Consumer(
+      builder: (context, ref, child) => ref.watch(asyncUserProvider).when(
+            data: (List<User> data) {
+              return _buidCard(
+                color: AppColors.getErrorColor,
+                icon: const Icon(
+                  Icons.logout,
+                ),
+                onPressed: () async {
+                  int response = await AlertDilogs.alertDialogWithTwoAction(
+                    context,
+                    Constant.exit,
+                    Constant.signOutMessage,
+                  );
+                  _logout(data.first, response, context);
+                },
+                title: Constant.logout,
+              );
+            },
+            error: (error, stackTrace) => const Center(
+              child: BodyOneDefaultText(text: Constant.errorUserFetch),
+            ),
+            loading: () => const Center(
+              child: CircularProgressIndicator.adaptive(),
+            ),
+          ),
     );
   }
 

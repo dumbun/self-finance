@@ -3,7 +3,7 @@ import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/items_model.dart';
 part 'items_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 class AsyncItems extends _$AsyncItems {
   Future<List<Items>> _fetchAllItemsData() async {
     final data = await BackEnd.fetchAllItems();

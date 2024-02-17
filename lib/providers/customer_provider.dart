@@ -4,7 +4,7 @@ import 'package:self_finance/models/customer_model.dart';
 
 part 'customer_provider.g.dart';
 
-@Riverpod(keepAlive: false)
+@riverpod
 class AsyncCustomers extends _$AsyncCustomers {
   Future<List<Customer>> _fetchAllCustomersData() async {
     return BackEnd.fetchAllCustomerData();

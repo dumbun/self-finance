@@ -1,5 +1,6 @@
 class Constant {
   static const String contact = "Contacts";
+  static const String intrestAmount = "Intrest Amount";
   static const String zeroContacts = "0 Contacts Found 🫠";
   static const String errorFetchingContactMessage = "Error fetching customers contacts please try again 😶‍🌫️";
   static const String contactAlreadyExistMessage =
@@ -41,7 +42,7 @@ class Constant {
       "By using the Self-Finance App, you acknowledge that you have read, understood, and agreed to these Terms and Conditions. ";
   static const String tAndcString = "Term & Conditions";
   static const String accountSettings = "Account Setting";
-  static const String tAndcUrl = 'https://dumbun.github.io/self-finance/terms_template';
+  static const String tAndcUrl = 'https://dumbun.github.io/self-finance/terms_and_conditions';
   static const String savedSuccessfullyText = "Saved successfully ✅";
   static const String emiCalculatorTitle = "EMI Calculator";
   static const String emiCalculatorToolTip = "EMI calculator page where you can callculate intrests";

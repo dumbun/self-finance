@@ -11,6 +11,7 @@ class InputDatePicker extends StatefulWidget {
     required this.firstDate,
     required this.lastDate,
     required this.initialDate,
+    this.onTap,
   });
   final TextEditingController controller;
   final DateTime firstDate;
@@ -18,6 +19,7 @@ class InputDatePicker extends StatefulWidget {
   final DateTime initialDate;
   final String labelText;
   final Function? onChanged;
+  final Function? onTap;
   @override
   State<InputDatePicker> createState() => _InputDatePickerState();
 }

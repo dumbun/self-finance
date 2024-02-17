@@ -3,7 +3,7 @@ import 'package:self_finance/backend/user_db.dart';
 import 'package:self_finance/models/user_model.dart';
 part 'user_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 class AsyncUser extends _$AsyncUser {
   Future<List<User>> _fetchAllUsers() async {
     return UserBackEnd.fetchIDOneUser();
