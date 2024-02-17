@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/widgets/indicators_widget.dart';
 
 class TwoSlicePieChartWidget extends StatefulWidget {

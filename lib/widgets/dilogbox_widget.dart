@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
-import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/theme/app_colors.dart';
 
 class AlertDilogs {
   static Future<int> alertDialogWithTwoAction(BuildContext context, String title, String content) async {

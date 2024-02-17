@@ -5,7 +5,7 @@ import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
-import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 
 class UserNameUpdateWidget extends ConsumerWidget {

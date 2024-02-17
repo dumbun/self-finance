@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/theme/app_colors.dart';
 
 class AppThemeData {
   static final ThemeData lightTheme = ThemeData(

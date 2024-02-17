@@ -4,7 +4,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/backend/user_db.dart';
 import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/theme/app_theme_data.dart';
 import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
 import 'package:self_finance/views/auth_view.dart';

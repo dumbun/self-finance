@@ -6,7 +6,7 @@ import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
-import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/views/contact_details_view.dart';
 import 'package:self_finance/widgets/default_user_image.dart';

@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
-import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/theme/app_colors.dart';
 
 class InputTextField extends StatelessWidget {
   /// [InputTextField] input text field helps to add the text field to user to enter the data

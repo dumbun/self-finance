@@ -9,7 +9,7 @@ import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/user_history.dart';
 import 'package:self_finance/providers/history_provider.dart';
-import 'package:self_finance/theme/colors.dart';
+import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 
 class HistoryView extends ConsumerWidget {
