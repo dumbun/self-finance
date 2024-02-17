@@ -5,7 +5,7 @@ import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/backend/user_db.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/theme/colors.dart';
-import 'package:self_finance/theme/theme_data.dart';
+import 'package:self_finance/theme/app_theme_data.dart';
 import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
 import 'package:self_finance/views/auth_view.dart';
 import 'package:self_finance/views/change_pin_view.dart';
@@ -37,8 +37,7 @@ class MyApp extends StatelessWidget {
           Constant.dashboardView: (context) => const DashboardView(),
           Constant.addNewEntryView: (context) => const AddNewEntery(),
           Constant.contactView: (context) => const ContactsView(),
-          Constant.accountSettingsView: (context) =>
-              const AccountSettingsView(),
+          Constant.accountSettingsView: (context) => const AccountSettingsView(),
         },
         color: AppColors.getPrimaryColor,
         title: Constant.appTitle,
