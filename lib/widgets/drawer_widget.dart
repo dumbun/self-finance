@@ -18,55 +18,53 @@ class DrawerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(16.sp),
-          child: Consumer(
-            builder: (BuildContext context, WidgetRef ref, Widget? child) {
-              return ref.watch(asyncUserProvider).when(
-                    data: (List<User> data) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Hero(
-                            tag: Constant.userProfileTag,
-                            child: data.first.profilePicture.isNotEmpty
-                                ? Utility.imageFromBase64String(
-                                    data.first.profilePicture,
-                                    height: 45.sp,
-                                    width: 45.sp,
-                                  )
-                                : DefaultUserImage(
-                                    height: 45.sp,
-                                    width: 45.sp,
-                                  ),
-                          ),
-                          SizedBox(height: 24.sp),
-                          _buildDrawerButtons(
-                            text: Constant.account,
-                            icon: Icons.vpn_key_rounded,
-                            onTap: () => Routes.navigateToAccountSettingsView(context: context),
-                          ),
-                          SizedBox(height: 12.sp),
-                          _buildDrawerButtons(
-                            text: Constant.logout,
-                            icon: Icons.login_rounded,
-                            color: AppColors.getErrorColor,
-                            onTap: () => _logout(data.first, context),
-                          ),
-                        ],
-                      );
-                    },
-                    error: (Object _, StackTrace __) => const Center(
-                      child: Text(Constant.error),
-                    ),
-                    loading: () => const Center(
-                      child: CircularProgressIndicator.adaptive(),
-                    ),
-                  );
-            },
-          ),
+      child: Padding(
+        padding: EdgeInsets.all(16.sp),
+        child: Consumer(
+          builder: (BuildContext context, WidgetRef ref, Widget? child) {
+            return ref.watch(asyncUserProvider).when(
+                  data: (List<User> data) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Hero(
+                          tag: Constant.userProfileTag,
+                          child: data.first.profilePicture.isNotEmpty
+                              ? Utility.imageFromBase64String(
+                                  data.first.profilePicture,
+                                  height: 45.sp,
+                                  width: 45.sp,
+                                )
+                              : DefaultUserImage(
+                                  height: 45.sp,
+                                  width: 45.sp,
+                                ),
+                        ),
+                        SizedBox(height: 24.sp),
+                        _buildDrawerButtons(
+                          text: Constant.account,
+                          icon: Icons.vpn_key_rounded,
+                          onTap: () => Routes.navigateToAccountSettingsView(context: context),
+                        ),
+                        SizedBox(height: 12.sp),
+                        _buildDrawerButtons(
+                          text: Constant.logout,
+                          icon: Icons.login_rounded,
+                          color: AppColors.getErrorColor,
+                          onTap: () => _logout(data.first, context),
+                        ),
+                      ],
+                    );
+                  },
+                  error: (Object _, StackTrace __) => const Center(
+                    child: Text(Constant.error),
+                  ),
+                  loading: () => const Center(
+                    child: CircularProgressIndicator.adaptive(),
+                  ),
+                );
+          },
         ),
       ),
     );
