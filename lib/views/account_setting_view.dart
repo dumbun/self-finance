@@ -109,13 +109,14 @@ class AccountSettingsView extends StatelessWidget {
                 icon: const Icon(
                   Icons.logout,
                 ),
-                onPressed: () async {
-                  int response = await AlertDilogs.alertDialogWithTwoAction(
+                onPressed: () {
+                  AlertDilogs.alertDialogWithTwoAction(
                     context,
                     Constant.exit,
                     Constant.signOutMessage,
+                  ).then(
+                    (value) => _logout(data.first, value, context),
                   );
-                  _logout(data.first, response, context);
                 },
                 title: Constant.logout,
               );

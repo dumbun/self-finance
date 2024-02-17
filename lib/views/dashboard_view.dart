@@ -61,22 +61,30 @@ class DashboardView extends StatelessWidget {
           ),
         ),
       ),
-      floatingActionButton: ExpandableFab(
-        distance: 32.sp,
-        children: [
-          ActionButton(
-            toolTip: Constant.addNewTransactionToolTip,
-            onPressed: () => {
-              Routes.navigateToContactsView(context),
-            },
-            icon: const Icon(Icons.format_align_left),
-          ),
-          ActionButton(
-            toolTip: Constant.addNewCustomerToolTip,
-            onPressed: () => Routes.navigateToAddNewEntry(context: context),
-            icon: const Icon(Icons.person_add_alt_1),
-          ),
-        ],
+      floatingActionButton: Consumer(
+        builder: (context, ref, child) {
+          final int pageIndex = ref.watch(selectedPageIndexProvider);
+          return switch (pageIndex) {
+            0 => ExpandableFab(
+                distance: 32.sp,
+                children: [
+                  ActionButton(
+                    toolTip: Constant.addNewTransactionToolTip,
+                    onPressed: () => {
+                      Routes.navigateToContactsView(context),
+                    },
+                    icon: const Icon(Icons.format_align_left),
+                  ),
+                  ActionButton(
+                    toolTip: Constant.addNewCustomerToolTip,
+                    onPressed: () => Routes.navigateToAddNewEntry(context: context),
+                    icon: const Icon(Icons.person_add_alt_1),
+                  ),
+                ],
+              ),
+            _ => const SizedBox.shrink()
+          };
+        },
       ),
       bottomNavigationBar: Consumer(
         builder: (BuildContext context, WidgetRef ref, Widget? child) {
