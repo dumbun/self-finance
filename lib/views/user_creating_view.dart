@@ -8,6 +8,7 @@ import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/widgets/currency_type_input_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
@@ -26,12 +27,13 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
   final double height = 55.sp;
   final double width = 55.sp;
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController nameInput = TextEditingController();
+  final TextEditingController _nameInput = TextEditingController();
+  final TextEditingController _currencyInput = TextEditingController();
   Widget? pickedItemImage;
 
   @override
   void dispose() {
-    nameInput.dispose();
+    _nameInput.dispose();
     super.dispose();
   }
 
@@ -40,34 +42,30 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: Container(
-            alignment: Alignment.center,
-            width: double.infinity,
-            padding: EdgeInsets.all(18.sp),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                _buildImagePickWidget(),
-                SizedBox(height: 24.sp),
-                InputTextField(
-                  validator: (String? value) {
-                    if (value != null) {
-                      if (value == "" && value.isEmpty) {
-                        return Constant.pleaseEnterTheName;
-                      }
-                    } else if (value == null) {
-                      return Constant.pleaseEnterTheName;
-                    }
-                    return null;
-                  },
-                  controller: nameInput,
-                  hintText: Constant.pleaseEnterTheName,
-                  keyboardType: TextInputType.name,
+        child: Center(
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Padding(
+                padding: EdgeInsets.all(18.sp),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    _buildImagePickWidget(),
+                    SizedBox(height: 24.sp),
+                    InputTextField(
+                      controller: _nameInput,
+                      hintText: Constant.pleaseEnterTheName,
+                      keyboardType: TextInputType.name,
+                    ),
+                    SizedBox(height: 24.sp),
+                    CurrencyTypeInputWidget(
+                      controller: _currencyInput,
+                    )
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -76,8 +74,9 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
         onPressed: () => createUser(
           User(
             id: 1,
-            userName: nameInput.text,
+            userName: _nameInput.text,
             userPin: widget.pin,
+            userCurrency: _currencyInput.text,
             profilePicture: userProfilePicString,
           ),
         ),

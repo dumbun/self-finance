@@ -8,7 +8,9 @@ import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 
 class UserImageUpdateWidget extends ConsumerWidget {
-  const UserImageUpdateWidget({super.key});
+  const UserImageUpdateWidget({super.key, required this.userImageString});
+
+  final String userImageString;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -87,30 +89,16 @@ class UserImageUpdateWidget extends ConsumerWidget {
             children: [
               Align(
                 alignment: Alignment.topCenter,
-                child: ref.watch(asyncUserProvider).when(
-                      data: (data) {
-                        return data.first.profilePicture.isEmpty
-                            ? DefaultUserImage(
-                                width: 46.sp,
-                                height: 46.sp,
-                              )
-                            : SizedBox(
-                                height: 46.sp,
-                                width: 46.sp,
-                                child: Utility.imageFromBase64String(
-                                  data.first.profilePicture,
-                                ),
-                              );
-                      },
-                      error: (error, stackTrace) => const Center(
-                        child: BodyOneDefaultText(
-                          text: "error fetching user data",
-                        ),
+                child: userImageString.isEmpty
+                    ? DefaultUserImage(
+                        width: 46.sp,
+                        height: 46.sp,
+                      )
+                    : SizedBox(
+                        height: 46.sp,
+                        width: 46.sp,
+                        child: Utility.imageFromBase64String(userImageString),
                       ),
-                      loading: () => const Center(
-                        child: CircularProgressIndicator.adaptive(),
-                      ),
-                    ),
               ),
               Align(
                 alignment: Alignment.bottomRight,

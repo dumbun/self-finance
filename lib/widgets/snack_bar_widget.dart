@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:self_finance/fonts/body_text.dart';
+import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/theme/app_colors.dart';
 
 snackBarWidget({required BuildContext context, required String message}) {
@@ -9,7 +9,7 @@ snackBarWidget({required BuildContext context, required String message}) {
       backgroundColor: AppColors.getPrimaryColor,
       content: Row(
         children: [
-          BodyOneDefaultText(
+          BodyTwoDefaultText(
             text: message,
             bold: true,
           ),

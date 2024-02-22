@@ -8,7 +8,7 @@ class Constant {
   static const String login = "Login";
   static const String loveBharath = "self-finance ❤️  Bharath";
   static const String userFetchingError = 'Error fetching user data. Please restart the application';
-  static const String localizedReason = 'Scan your fingerprint (or face or whatever) to authenticate';
+  static const String localizedReason = 'Authenticate to access the app';
   static const String appTitle = 'Self-Finance';
   static const String exit = 'Exit';
   static const String customerImageTag = "customer-image-hero-tag";
@@ -21,6 +21,7 @@ class Constant {
   static const String addNewEntryView = '/addNewEntry/';
   static const String contactView = '/contactsView/';
   static const String accountSettingsView = '/AccountSettingsView/';
+  static const String currencyType = "Please select currency type";
   static const String pleaseEnterTheName = "Please Enter Your Name";
   static const String errorUserFetch = "Error of fetching User data";
   static const String testText =

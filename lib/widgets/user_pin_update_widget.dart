@@ -7,120 +7,129 @@ import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
 
-class UserPinUpdateWidget extends ConsumerWidget {
-  const UserPinUpdateWidget({super.key});
+class UserPinUpdateWidget extends ConsumerStatefulWidget {
+  const UserPinUpdateWidget({super.key, required this.id});
+
+  final int id;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    TextEditingController pin = TextEditingController();
-    TextEditingController conformPin = TextEditingController();
-    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-    bool validateAndSave() {
-      final FormState? form = formKey.currentState;
-      if (form!.validate()) {
-        return true;
-      } else {
-        return false;
-      }
-    }
+  ConsumerState<UserPinUpdateWidget> createState() => _UserPinUpdateWidgetState();
+}
 
-    return ref.watch(asyncUserProvider).when(
-          data: (data) {
-            return Card(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 14.sp),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const BodyOneDefaultText(
-                      text: "Change App Pin",
-                      bold: true,
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        showBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return Container(
-                              padding: EdgeInsets.all(16.sp),
-                              width: double.infinity,
-                              height: 80.sp,
-                              child: Form(
-                                key: formKey,
-                                child: Column(
-                                  children: [
-                                    SizedBox(height: 18.sp),
-                                    const BodyOneDefaultText(text: "Please provide new pin "),
-                                    PinInputWidget(
-                                      pinController: pin,
-                                      obscureText: false,
-                                    ),
-                                    SizedBox(height: 18.sp),
-                                    const BodyOneDefaultText(text: "Please conform new pin "),
-                                    PinInputWidget(
-                                      validator: (p0) => pin.text != conformPin.text ? "Please provide same pin" : null,
-                                      pinController: conformPin,
-                                      obscureText: false,
-                                    ),
-                                    SizedBox(height: 18.sp),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Expanded(
-                                          child: ElevatedButton.icon(
-                                            style: const ButtonStyle(elevation: MaterialStatePropertyAll(0)),
-                                            onPressed: () {
-                                              if (validateAndSave()) {
-                                                ref.read(asyncUserProvider.notifier).updateUserPin(
-                                                    userId: data.first.id!, updateUserPin: conformPin.text);
-                                                Navigator.pop(context);
-                                              }
-                                            },
-                                            label: const BodyTwoDefaultText(
-                                              text: "Confirm",
-                                            ),
-                                            icon: const Icon(Icons.done_rounded),
-                                          ),
-                                        ),
-                                        SizedBox(width: 12.sp),
-                                        Expanded(
-                                          child: ElevatedButton.icon(
-                                            style: const ButtonStyle(elevation: MaterialStatePropertyAll(0)),
-                                            onPressed: () => Navigator.pop(context),
-                                            icon: const Icon(
-                                              Icons.cancel_rounded,
-                                              color: AppColors.getErrorColor,
-                                            ),
-                                            label: const BodyTwoDefaultText(text: "Cancel"),
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                      icon: const Icon(
-                        Icons.password,
-                        color: AppColors.getPrimaryColor,
+class _UserPinUpdateWidgetState extends ConsumerState<UserPinUpdateWidget> {
+  final TextEditingController _pin = TextEditingController();
+  final TextEditingController _conformPin = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool validateAndSave() {
+    final FormState? form = _formKey.currentState;
+    if (form!.validate()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  void dispose() {
+    _pin.dispose();
+    _conformPin.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => showBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            padding: EdgeInsets.all(16.sp),
+            width: double.infinity,
+            height: 80.sp,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  SizedBox(height: 18.sp),
+                  const BodyOneDefaultText(text: "Please provide new pin "),
+                  PinInputWidget(
+                    pinController: _pin,
+                    obscureText: false,
+                  ),
+                  SizedBox(height: 18.sp),
+                  const BodyOneDefaultText(text: "Please conform new pin "),
+                  PinInputWidget(
+                    validator: (p0) => _pin.text != _conformPin.text ? "Please provide same pin" : null,
+                    pinController: _conformPin,
+                    obscureText: false,
+                  ),
+                  SizedBox(height: 18.sp),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _buildActionButton(
+                        onPressed: () {
+                          if (validateAndSave()) {
+                            ref.read(asyncUserProvider.notifier).updateUserPin(
+                                  userId: widget.id,
+                                  updateUserPin: _conformPin.text,
+                                );
+                            Navigator.pop(context);
+                          }
+                        },
+                        icon: const Icon(Icons.done_rounded),
+                        text: "Confirm",
                       ),
-                    ),
-                  ],
-                ),
+                      SizedBox(width: 12.sp),
+                      _buildActionButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(
+                          Icons.cancel_rounded,
+                          color: AppColors.getErrorColor,
+                        ),
+                        text: "Cancel",
+                      ),
+                    ],
+                  )
+                ],
               ),
-            );
-          },
-          loading: () => const Center(
-            child: CircularProgressIndicator.adaptive(),
+            ),
+          );
+        },
+      ),
+      child: Card(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.sp, horizontal: 16.sp),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              BodyOneDefaultText(
+                text: "Change App Pin",
+                bold: true,
+              ),
+              Icon(
+                Icons.password,
+                color: AppColors.getPrimaryColor,
+              ),
+            ],
           ),
-          error: (error, stackTrace) => const Center(
-            child: BodyTwoDefaultText(text: "Con't change pin please try again"),
-          ),
-        );
+        ),
+      ),
+    );
+  }
+
+  Expanded _buildActionButton({required void Function()? onPressed, required Widget icon, required String text}) {
+    return Expanded(
+      child: ElevatedButton.icon(
+        style: const ButtonStyle(elevation: MaterialStatePropertyAll(0)),
+        onPressed: onPressed,
+        icon: icon,
+        label: BodyTwoDefaultText(
+          text: text,
+        ),
+      ),
+    );
   }
 }

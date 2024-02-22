@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:local_auth/local_auth.dart';
-import 'package:self_finance/backend/user_db.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:self_finance/auth/auth.dart';
 import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/models/user_model.dart';
+import 'package:self_finance/fonts/body_text.dart';
+import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/views/terms_and_conditions.dart';
-import 'package:self_finance/widgets/dilogbox_widget.dart';
 
-class AuthView extends StatefulWidget {
+class AuthView extends ConsumerStatefulWidget {
   const AuthView({super.key});
 
   @override
-  State<AuthView> createState() => _AuthViewState();
+  ConsumerState<AuthView> createState() => _AuthViewState();
 }
 
-class _AuthViewState extends State<AuthView> {
-  final LocalAuthentication auth = LocalAuthentication();
+class _AuthViewState extends ConsumerState<AuthView> {
   bool _isAuthenticated = false;
 
   @override
@@ -26,70 +24,32 @@ class _AuthViewState extends State<AuthView> {
     _authenticateWithBiometrics();
   }
 
-  Future<void> _authenticateWithBiometrics() async {
-    try {
-      final bool canCheckBiometrics = await auth.canCheckBiometrics;
-      if (!canCheckBiometrics) {
-        setState(() => _isAuthenticated = false);
-        return;
-      }
-
-      final List<BiometricType> availableBiometrics = await auth.getAvailableBiometrics();
-      if (availableBiometrics.isEmpty) {
-        setState(() => _isAuthenticated = false);
-        return;
-      }
-
-      final bool authenticated = await _performBiometricAuthentication();
-
-      if (authenticated) {
-        setState(() => _isAuthenticated = true);
-      }
-    } on PlatformException catch (e) {
-      setState(() => _isAuthenticated = false);
-      _showAlert(e);
-    }
-  }
-
-  Future<bool> _performBiometricAuthentication() async {
-    return await auth.authenticate(
-      localizedReason: Constant.localizedReason,
-      options: const AuthenticationOptions(
-        stickyAuth: true,
-        useErrorDialogs: true,
-        sensitiveTransaction: true,
-      ),
-    );
-  }
-
-  void _showAlert(PlatformException e) {
-    AlertDilogs.alertDialogWithOneAction(context, Constant.error, e.code);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<User>>(
-      future: UserBackEnd.fetchIDOneUser(),
-      builder: (BuildContext context, AsyncSnapshot<List<User>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator.adaptive());
-        } else if (snapshot.hasError) {
-          return const Scaffold(
-            body: Center(
-              child: Text(Constant.userFetchingError),
+    return ref.watch(asyncUserProvider).when(
+          data: (users) {
+            if (users.isNotEmpty) {
+              return _isAuthenticated ? const DashboardView() : const PinAuthView();
+            } else {
+              return const TermsAndConditons();
+            }
+          },
+          loading: () => const Center(
+            child: CircularProgressIndicator.adaptive(),
+          ),
+          error: (error, stackTrace) => const Center(
+            child: BodyOneDefaultText(
+              text: Constant.errorUserFetch,
             ),
-          );
-        } else {
-          // fetched data from the user database
-          List<User> users = snapshot.data ?? [];
-          // checking for user present or not
-          if (users.isNotEmpty) {
-            return _isAuthenticated ? const DashboardView() : const PinAuthView();
-          } else {
-            return const TermsAndConditons();
-          }
-        }
-      },
-    );
+          ),
+        );
+  }
+
+  void _authenticateWithBiometrics() {
+    LocalAuthenticator.authenticate().then((value) {
+      setState(() {
+        _isAuthenticated = value;
+      });
+    });
   }
 }

@@ -8,6 +8,7 @@ class UserBackEnd {
       ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       USER_NAME TEXT NOT NULL,
       USER_PIN TEXT NOT NULL,
+      USER_CURRENCY TEXT NOT NULL,
       USER_PROFILE_PICTURE TEXT NOT NULL
     )""");
   }
@@ -31,6 +32,7 @@ class UserBackEnd {
         "ID": user.id,
         "USER_NAME": user.userName,
         "USER_PIN": user.userPin,
+        "USER_CURRENCY": user.userCurrency,
         "USER_PROFILE_PICTURE": user.profilePicture,
       };
       final id = await db.insert('USER', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
@@ -109,6 +111,7 @@ class UserBackEnd {
       'ID': user.id!,
       'USER_NAME': user.userName,
       'USER_PIN': user.userPin,
+      'USER_CURRENCY': user.userCurrency,
       'USER_PROFILE_PICTURE': user.profilePicture,
     };
     final result = await db.update('USER', data, where: "id = ?", whereArgs: [user.id]);

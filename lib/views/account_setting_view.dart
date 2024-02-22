@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_text.dart';
@@ -22,7 +23,8 @@ class AccountSettingsView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
-        title: const BodyOneDefaultText(
+        title: const BodyTwoDefaultText(
+          bold: true,
           text: Constant.accountSettings,
         ),
       ),
@@ -33,25 +35,51 @@ class AccountSettingsView extends StatelessWidget {
               padding: EdgeInsets.all(12.sp),
               child: Align(
                 alignment: Alignment.topCenter,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 20.sp),
-                      const Hero(
-                        tag: Constant.userProfileTag,
-                        child: UserImageUpdateWidget(),
-                      ),
-                      SizedBox(height: 20.sp),
-                      const UserNameUpdateWidget(),
-                      SizedBox(height: 12.sp),
-                      const UserPinUpdateWidget(),
-                      SizedBox(height: 12.sp),
-                      _buildTermsAndConditionButton(),
-                      SizedBox(height: 12.sp),
-                      _buildLogoutButton(),
-                    ],
-                  ),
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    return ref.watch(asyncUserProvider).when(
+                        data: (List<User> data) {
+                          final User user = data.first;
+                          return LiquidPullToRefresh(
+                            color: AppColors.getLigthGreyColor,
+                            showChildOpacityTransition: false,
+                            springAnimationDurationInMilliseconds: 1000,
+                            height: 40.sp,
+                            animSpeedFactor: 8.0,
+                            onRefresh: () => ref.refresh(asyncUserProvider.future),
+                            child: ListView(
+                              children: [
+                                SizedBox(height: 20.sp),
+                                Hero(
+                                  tag: Constant.userProfileTag,
+                                  child: UserImageUpdateWidget(
+                                    userImageString: user.profilePicture,
+                                  ),
+                                ),
+                                SizedBox(height: 20.sp),
+                                UserNameUpdateWidget(
+                                  userId: user.id!,
+                                  userName: user.userName,
+                                ),
+                                SizedBox(height: 12.sp),
+                                UserPinUpdateWidget(
+                                  id: user.id!,
+                                ),
+                                SizedBox(height: 12.sp),
+                                _buildTermsAndConditionButton(),
+                                SizedBox(height: 12.sp),
+                                _buildLogoutButton(),
+                              ],
+                            ),
+                          );
+                        },
+                        error: (error, stackTrace) => const Center(
+                              child: BodyOneDefaultText(text: Constant.errorUserFetch),
+                            ),
+                        loading: () => const Center(
+                              child: CircularProgressIndicator.adaptive(),
+                            ));
+                  },
                 ),
               ),
             ),
@@ -69,12 +97,12 @@ class AccountSettingsView extends StatelessWidget {
     );
   }
 
-  Card _buildTermsAndConditionButton() {
+  GestureDetector _buildTermsAndConditionButton() {
     final Uri toLaunch = Uri.parse(Constant.tAndcUrl);
     return _buidCard(
-      color: AppColors.getPrimaryColor,
       icon: const Icon(
         Icons.arrow_forward_ios_rounded,
+        color: AppColors.getPrimaryColor,
       ),
       onPressed: () {
         Utility.launchInBrowserView(toLaunch);
@@ -105,9 +133,9 @@ class AccountSettingsView extends StatelessWidget {
       builder: (BuildContext context, WidgetRef ref, Widget? child) => ref.watch(asyncUserProvider).when(
             data: (List<User> data) {
               return _buidCard(
-                color: AppColors.getErrorColor,
                 icon: const Icon(
                   Icons.logout,
+                  color: AppColors.getErrorColor,
                 ),
                 onPressed: () {
                   AlertDilogs.alertDialogWithTwoAction(
@@ -131,29 +159,27 @@ class AccountSettingsView extends StatelessWidget {
     );
   }
 
-  Card _buidCard({
+  GestureDetector _buidCard({
     required String title,
     required void Function()? onPressed,
     required Widget icon,
-    required Color? color,
   }) {
-    return Card(
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 14.sp),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            BodyOneDefaultText(
-              text: title,
-              bold: true,
-            ),
-            IconButton(
-              onPressed: onPressed,
-              icon: icon,
-              color: color,
-            ),
-          ],
+    return GestureDetector(
+      onTap: onPressed,
+      child: Card(
+        child: Padding(
+          padding: EdgeInsets.all(16.sp),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              BodyOneDefaultText(
+                text: title,
+                bold: true,
+              ),
+              icon,
+            ],
+          ),
         ),
       ),
     );
