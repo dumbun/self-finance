@@ -6,7 +6,7 @@ class Constant {
   static const String contactAlreadyExistMessage =
       "Contact number is already present in your database please change the number or if you want to add the transacrtion to existing constact please select the add transaction to existing contact in Home Screen";
   static const String login = "Login";
-  static const String loveBharath = "self-finance ❤️  Bharath";
+  static const String loveBharath = "self-finance ❤️ Bharath";
   static const String userFetchingError = 'Error fetching user data. Please restart the application';
   static const String localizedReason = 'Authenticate to access the app';
   static const String appTitle = 'Self-Finance';

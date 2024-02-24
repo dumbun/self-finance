@@ -38,47 +38,48 @@ class AccountSettingsView extends StatelessWidget {
                 child: Consumer(
                   builder: (context, ref, child) {
                     return ref.watch(asyncUserProvider).when(
-                        data: (List<User> data) {
-                          final User user = data.first;
-                          return LiquidPullToRefresh(
-                            color: AppColors.getLigthGreyColor,
-                            showChildOpacityTransition: false,
-                            springAnimationDurationInMilliseconds: 1000,
-                            height: 40.sp,
-                            animSpeedFactor: 8.0,
-                            onRefresh: () => ref.refresh(asyncUserProvider.future),
-                            child: ListView(
-                              children: [
-                                SizedBox(height: 20.sp),
-                                Hero(
-                                  tag: Constant.userProfileTag,
-                                  child: UserImageUpdateWidget(
-                                    userImageString: user.profilePicture,
+                          data: (List<User> data) {
+                            final User user = data.first;
+                            return LiquidPullToRefresh(
+                              color: AppColors.getLigthGreyColor,
+                              showChildOpacityTransition: false,
+                              springAnimationDurationInMilliseconds: 1000,
+                              height: 40.sp,
+                              animSpeedFactor: 8.0,
+                              onRefresh: () => ref.refresh(asyncUserProvider.future),
+                              child: ListView(
+                                children: [
+                                  SizedBox(height: 20.sp),
+                                  Hero(
+                                    tag: Constant.userProfileTag,
+                                    child: UserImageUpdateWidget(
+                                      userImageString: user.profilePicture,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(height: 20.sp),
-                                UserNameUpdateWidget(
-                                  userId: user.id!,
-                                  userName: user.userName,
-                                ),
-                                SizedBox(height: 12.sp),
-                                UserPinUpdateWidget(
-                                  id: user.id!,
-                                ),
-                                SizedBox(height: 12.sp),
-                                _buildTermsAndConditionButton(),
-                                SizedBox(height: 12.sp),
-                                _buildLogoutButton(),
-                              ],
-                            ),
-                          );
-                        },
-                        error: (error, stackTrace) => const Center(
-                              child: BodyOneDefaultText(text: Constant.errorUserFetch),
-                            ),
-                        loading: () => const Center(
-                              child: CircularProgressIndicator.adaptive(),
-                            ));
+                                  SizedBox(height: 20.sp),
+                                  UserNameUpdateWidget(
+                                    userId: user.id!,
+                                    userName: user.userName,
+                                  ),
+                                  SizedBox(height: 12.sp),
+                                  UserPinUpdateWidget(
+                                    id: user.id!,
+                                  ),
+                                  SizedBox(height: 12.sp),
+                                  _buildTermsAndConditionButton(),
+                                  SizedBox(height: 12.sp),
+                                  _buildLogoutButton(),
+                                ],
+                              ),
+                            );
+                          },
+                          error: (error, stackTrace) => const Center(
+                            child: BodyOneDefaultText(text: Constant.errorUserFetch),
+                          ),
+                          loading: () => const Center(
+                            child: CircularProgressIndicator.adaptive(),
+                          ),
+                        );
                   },
                 ),
               ),
