@@ -20,8 +20,9 @@ class Utility {
     }
   }
 
-  static Future<void> launchInBrowserView(Uri url) async {
-    if (!await launchUrl(url, mode: LaunchMode.inAppBrowserView)) {
+  static Future<void> launchInBrowserView(String url) async {
+    final Uri toLaunch = Uri.parse(url);
+    if (!await launchUrl(toLaunch, mode: LaunchMode.inAppBrowserView)) {
       throw Exception('Could not launch $url');
     }
   }

@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
@@ -7,6 +9,7 @@ import 'package:self_finance/fonts/body_small_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/fonts/strong_heading_one_text.dart';
+import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/app_icon.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
@@ -18,10 +21,12 @@ class TermsAndConditons extends StatefulWidget {
 }
 
 class _TermsAndConditonsState extends State<TermsAndConditons> {
-  bool ticked = false;
+  bool _ticked = false;
+  bool _pAndP = false;
   @override
   void initState() {
-    ticked = false;
+    _ticked = false;
+    _pAndP = false;
     super.initState();
   }
 
@@ -40,7 +45,8 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
               SizedBox(height: 16.sp),
               _getTerms(),
               _getCheckBoxWithDescription(),
-              _getNextButton(ticked),
+              _getPrivacyAndPolicyButton(),
+              _getNextButton(),
             ],
           ),
         ),
@@ -48,13 +54,45 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     );
   }
 
-  SizedBox _getNextButton(bool t) {
+  _getPrivacyAndPolicyButton() {
+    return Container(
+      margin: EdgeInsets.only(bottom: 16.sp),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Checkbox(
+            value: _pAndP,
+            onChanged: (bool? value) => setState(() {
+              _pAndP = value!;
+            }),
+            activeColor: AppColors.getPrimaryColor,
+          ),
+          SizedBox(width: 10.sp),
+          GestureDetector(
+            onTap: () => Utility.launchInBrowserView(Constant.pAndPUrl),
+            child: SizedBox(
+              width: 60.sp,
+              height: 28.sp,
+              child: const BodySmallText(
+                bold: true,
+                color: AppColors.getPrimaryColor,
+                text: Constant.pAndPDistription,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  SizedBox _getNextButton() {
     return SizedBox(
       width: double.infinity,
       child: RoundedCornerButton(
           text: Constant.next,
           onPressed: () {
-            if (t == true) {
+            if (_pAndP == true && _ticked == true) {
               Routes.navigateToPinCreationView(context);
             }
           }),
@@ -90,7 +128,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
 
   InkWell _getCheckBoxWithDescription() {
     return InkWell(
-      onTap: () => setState(() => ticked = !ticked),
+      onTap: () => setState(() => _ticked = !_ticked),
       child: Container(
         margin: EdgeInsets.only(top: 20.sp, bottom: 20.sp),
         child: Row(
@@ -98,8 +136,12 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Checkbox(
-              value: ticked,
-              onChanged: (bool? value) => _getClicked(),
+              value: _ticked,
+              onChanged: (bool? value) {
+                setState(() {
+                  _ticked = value!;
+                });
+              },
               activeColor: AppColors.getPrimaryColor,
             ),
             SizedBox(width: 10.sp),
@@ -115,12 +157,6 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
         ),
       ),
     );
-  }
-
-  void _getClicked() {
-    setState(() {
-      ticked = !ticked;
-    });
   }
 
   Container _getHeading() {

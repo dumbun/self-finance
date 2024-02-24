@@ -1,4 +1,5 @@
 class Constant {
+  static const String pAndPDistription = 'Accepting Privacy and Policy (Tap here to Open)';
   static const String contact = "Contacts";
   static const String intrestAmount = "Intrest Amount";
   static const String zeroContacts = "0 Contacts Found 🫠";
@@ -44,6 +45,7 @@ class Constant {
   static const String tAndcString = "Term & Conditions";
   static const String accountSettings = "Account Setting";
   static const String tAndcUrl = 'https://dumbun.github.io/self-finance/terms_and_conditions';
+  static const String pAndPUrl = "https://dumbun.github.io/self-finance/privacy_and_policy";
   static const String savedSuccessfullyText = "Saved successfully ✅";
   static const String emiCalculatorTitle = "EMI Calculator";
   static const String emiCalculatorToolTip = "EMI calculator page where you can callculate intrests";

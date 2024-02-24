@@ -99,14 +99,13 @@ class AccountSettingsView extends StatelessWidget {
   }
 
   GestureDetector _buildTermsAndConditionButton() {
-    final Uri toLaunch = Uri.parse(Constant.tAndcUrl);
     return _buidCard(
       icon: const Icon(
         Icons.arrow_forward_ios_rounded,
         color: AppColors.getPrimaryColor,
       ),
       onPressed: () {
-        Utility.launchInBrowserView(toLaunch);
+        Utility.launchInBrowserView(Constant.tAndcUrl);
       },
       title: Constant.tAndcString,
     );
