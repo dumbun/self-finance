@@ -165,7 +165,11 @@ class BackEnd {
         "Proof_Photo": customer.proof,
         "Created_Date": customer.createdDate,
       };
-      final int id = await db.insert('Customers', data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
+      final int id = await db.insert(
+        'Customers',
+        data,
+        conflictAlgorithm: sql.ConflictAlgorithm.abort,
+      );
       return id;
     } catch (e) {
       return 0;
