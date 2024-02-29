@@ -193,7 +193,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
 
   void _safeSuccuse() {
     _isloading = false;
-    snackBarWidget(context: context, message: Constant.transacrtionAddedSuccessfully);
+    SnackBarWidget.snackBarWidget(context: context, message: Constant.transacrtionAddedSuccessfully);
     Navigator.of(context).pop();
   }
 

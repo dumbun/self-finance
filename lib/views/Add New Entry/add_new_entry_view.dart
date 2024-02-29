@@ -278,7 +278,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
       _isloading = false;
     });
 
-    snackBarWidget(context: context, message: Constant.savedSuccessfullyText);
+    SnackBarWidget.snackBarWidget(context: context, message: Constant.savedSuccessfullyText);
     Navigator.pop(context);
   }
 
@@ -298,16 +298,16 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
     }
   }
 
-  int _intCheck(String text, {String errorString = Constant.error}) {
-    try {
-      return int.parse(text);
-    } catch (e) {
-      setState(() {
-        _isloading = false;
-      });
-      return AlertDilogs.alertDialogWithOneAction(context, errorString, e.toString());
-    }
-  }
+  // int _intCheck(String text, {String errorString = Constant.error}) {
+  //   try {
+  //     return int.parse(text);
+  //   } catch (e) {
+  //     setState(() {
+  //       _isloading = false;
+  //     });
+  //     return AlertDilogs.alertDialogWithOneAction(context, errorString, e.toString());
+  //   }
+  // }
 
   bool _validateAndSave() {
     final FormState? form = _formKey.currentState;

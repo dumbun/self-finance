@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_text.dart';
@@ -11,6 +10,7 @@ import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
+import 'package:self_finance/widgets/refresh_widget.dart';
 import 'package:self_finance/widgets/user_image_update_widget.dart';
 import 'package:self_finance/widgets/user_name_update_widget.dart';
 import 'package:self_finance/widgets/user_pin_update_widget.dart';
@@ -40,12 +40,7 @@ class AccountSettingsView extends StatelessWidget {
                     return ref.watch(asyncUserProvider).when(
                           data: (List<User> data) {
                             final User user = data.first;
-                            return LiquidPullToRefresh(
-                              color: AppColors.getLigthGreyColor,
-                              showChildOpacityTransition: false,
-                              springAnimationDurationInMilliseconds: 1000,
-                              height: 40.sp,
-                              animSpeedFactor: 8.0,
+                            return RefreshWidget(
                               onRefresh: () => ref.refresh(asyncUserProvider.future),
                               child: ListView(
                                 children: [
@@ -67,6 +62,8 @@ class AccountSettingsView extends StatelessWidget {
                                   ),
                                   SizedBox(height: 12.sp),
                                   _buildTermsAndConditionButton(),
+                                  SizedBox(height: 12.sp),
+                                  _buildPrivacyPolicyButton(),
                                   SizedBox(height: 12.sp),
                                   _buildLogoutButton(),
                                 ],
@@ -98,8 +95,19 @@ class AccountSettingsView extends StatelessWidget {
     );
   }
 
+  GestureDetector _buildPrivacyPolicyButton() {
+    return _buildCard(
+      icon: const Icon(
+        Icons.key,
+        color: AppColors.getPrimaryColor,
+      ),
+      onPressed: () => Utility.launchInBrowserView(Constant.pAndPUrl),
+      title: Constant.pandp,
+    );
+  }
+
   GestureDetector _buildTermsAndConditionButton() {
-    return _buidCard(
+    return _buildCard(
       icon: const Icon(
         Icons.arrow_forward_ios_rounded,
         color: AppColors.getPrimaryColor,
@@ -132,7 +140,7 @@ class AccountSettingsView extends StatelessWidget {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) => ref.watch(asyncUserProvider).when(
             data: (List<User> data) {
-              return _buidCard(
+              return _buildCard(
                 icon: const Icon(
                   Icons.logout,
                   color: AppColors.getErrorColor,
@@ -159,7 +167,7 @@ class AccountSettingsView extends StatelessWidget {
     );
   }
 
-  GestureDetector _buidCard({
+  GestureDetector _buildCard({
     required String title,
     required void Function()? onPressed,
     required Widget icon,

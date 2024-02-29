@@ -1,5 +1,6 @@
 class Constant {
   static const String pAndPDistription = 'Accepting Privacy and Policy (Tap here to Open)';
+  static const String pandp = 'Privacy and Policy';
   static const String contact = "Contacts";
   static const String intrestAmount = "Intrest Amount";
   static const String zeroContacts = "0 Contacts Found 🫠";

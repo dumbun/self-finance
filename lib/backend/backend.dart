@@ -352,7 +352,6 @@ class BackEnd {
       final response = await db.insert("Transactions", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
       return response;
     } catch (e) {
-      print(e);
       return 0;
     }
   }
@@ -405,7 +404,6 @@ class BackEnd {
         final int id = await db.insert("History", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
         return id;
       } catch (e) {
-        print(e);
         return 0;
       }
     } catch (e) {

@@ -174,7 +174,7 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
   void _navigateToContactsView() {
     Navigator.of(context).pop();
     // Navigator.of(context).popUntil(ModalRoute.withName('/contactsView/'));
-    snackBarWidget(
+    SnackBarWidget.snackBarWidget(
       context: context,
       message: Constant.contactUpdatedSuccessfully,
     );

@@ -100,7 +100,7 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
   /// navigates to the main Dashboard view
   void navigateToDashboard() {
     Routes.navigateToDashboard(context: context);
-    snackBarWidget(context: context, message: "success : user created successfully ");
+    SnackBarWidget.snackBarWidget(context: context, message: "success : user created successfully ");
   }
 
   /// to show errors if avilable
