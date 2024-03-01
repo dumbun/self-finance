@@ -95,8 +95,8 @@ class AccountSettingsView extends StatelessWidget {
     );
   }
 
-  GestureDetector _buildPrivacyPolicyButton() {
-    return _buildCard(
+  Card _buildPrivacyPolicyButton() {
+    return _buildListTile(
       icon: const Icon(
         Icons.key,
         color: AppColors.getPrimaryColor,
@@ -106,8 +106,8 @@ class AccountSettingsView extends StatelessWidget {
     );
   }
 
-  GestureDetector _buildTermsAndConditionButton() {
-    return _buildCard(
+  Card _buildTermsAndConditionButton() {
+    return _buildListTile(
       icon: const Icon(
         Icons.arrow_forward_ios_rounded,
         color: AppColors.getPrimaryColor,
@@ -140,7 +140,7 @@ class AccountSettingsView extends StatelessWidget {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) => ref.watch(asyncUserProvider).when(
             data: (List<User> data) {
-              return _buildCard(
+              return _buildListTile(
                 icon: const Icon(
                   Icons.logout,
                   color: AppColors.getErrorColor,
@@ -167,27 +167,18 @@ class AccountSettingsView extends StatelessWidget {
     );
   }
 
-  GestureDetector _buildCard({
+  Card _buildListTile({
     required String title,
     required void Function()? onPressed,
     required Widget icon,
   }) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Card(
-        child: Padding(
-          padding: EdgeInsets.all(16.sp),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              BodyOneDefaultText(
-                text: title,
-                bold: true,
-              ),
-              icon,
-            ],
-          ),
+    return Card(
+      child: ListTile(
+        onTap: onPressed,
+        trailing: icon,
+        title: BodyOneDefaultText(
+          text: title,
+          bold: true,
         ),
       ),
     );

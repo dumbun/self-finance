@@ -43,80 +43,72 @@ class _UserNameUpdateWidgetState extends ConsumerState<UserNameUpdateWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => showBottomSheet(
-        enableDrag: true,
-        context: context,
-        builder: (context) {
-          return Container(
-            height: 60.sp,
-            padding: EdgeInsets.all(16.sp),
-            child: Form(
-              key: _formKey,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    SizedBox(height: 18.sp),
-                    InputTextField(
-                      keyboardType: TextInputType.name,
-                      hintText: "New User Name",
-                      controller: _newUserName,
-                    ),
-                    SizedBox(height: 18.sp),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _buildActionButton(
-                          onPressed: () {
-                            if (_newUserName.text == widget.userName) {
-                              Navigator.pop(context);
-                            } else if (validateAndSave()) {
-                              ref
-                                  .read(asyncUserProvider.notifier)
-                                  .updateUserName(userId: widget.userId, updateUserName: _newUserName.text);
-                              Navigator.pop(context);
-                            }
-                          },
-                          icon: const Icon(Icons.done_rounded),
-                          text: "Done",
-                        ),
-                        SizedBox(width: 12.sp),
-                        _buildActionButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(
-                            Icons.cancel_rounded,
-                            color: AppColors.getErrorColor,
+    return Card(
+      child: ListTile(
+        onTap: () => showBottomSheet(
+          enableDrag: true,
+          context: context,
+          builder: (context) {
+            return Container(
+              height: 60.sp,
+              padding: EdgeInsets.all(16.sp),
+              child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      SizedBox(height: 18.sp),
+                      InputTextField(
+                        keyboardType: TextInputType.name,
+                        hintText: "New User Name",
+                        controller: _newUserName,
+                      ),
+                      SizedBox(height: 18.sp),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          _buildActionButton(
+                            onPressed: () {
+                              if (_newUserName.text == widget.userName) {
+                                Navigator.pop(context);
+                              } else if (validateAndSave()) {
+                                ref
+                                    .read(asyncUserProvider.notifier)
+                                    .updateUserName(userId: widget.userId, updateUserName: _newUserName.text);
+                                Navigator.pop(context);
+                              }
+                            },
+                            icon: const Icon(Icons.done_rounded),
+                            text: "Done",
                           ),
-                          text: "Cancel",
-                        )
-                      ],
-                    )
-                  ],
+                          SizedBox(width: 12.sp),
+                          _buildActionButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(
+                              Icons.cancel_rounded,
+                              color: AppColors.getErrorColor,
+                            ),
+                            text: "Cancel",
+                          )
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
-      ),
-      child: Card(
-        child: Padding(
-          padding: EdgeInsets.all(16.sp),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              BodyOneDefaultText(
-                text: widget.userName,
-                bold: true,
-              ),
-              const Icon(
-                Icons.edit,
-                color: AppColors.getPrimaryColor,
-              ),
-            ],
-          ),
+            );
+          },
+        ),
+        trailing: const Icon(
+          Icons.edit,
+          color: AppColors.getPrimaryColor,
+        ),
+        title: BodyOneDefaultText(
+          text: widget.userName,
+          bold: true,
         ),
       ),
     );
