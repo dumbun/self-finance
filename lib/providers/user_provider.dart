@@ -51,4 +51,8 @@ class AsyncUser extends _$AsyncUser {
       return _fetchAllUsers();
     });
   }
+
+  Future<String> userCurrency() async {
+    return await UserBackEnd.fetchUserCurrency();
+  }
 }

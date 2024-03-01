@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/widgets/home_screen_graph_widget.dart';
+import 'package:self_finance/providers/home_screen_graph_value_provider.dart';
 
 part 'transactions_provider.g.dart';
 

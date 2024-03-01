@@ -2,7 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/providers/customer_provider.dart';
-import 'package:self_finance/widgets/home_screen_graph_widget.dart';
+import 'package:self_finance/providers/home_screen_graph_value_provider.dart';
 part 'customer_contacts_provider.g.dart';
 
 @Riverpod(keepAlive: false)

@@ -2,7 +2,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
-class UserBackEnd {
+abstract class UserBackEnd {
   static Future<void> createTable(sql.Database database) async {
     await database.execute("""CREATE TABLE USER(
       ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -77,6 +77,16 @@ class UserBackEnd {
   SELECT USER_PIN FROM USER WHERE ID = 1
 """);
     return result[0]["USER_PIN"].toString();
+  }
+
+  // fetch user currency
+
+  static Future<String> fetchUserCurrency() async {
+    final db = await UserBackEnd.db();
+    List<Map<String, Object?>> result = await db.rawQuery("""
+  SELECT USER_CURRENCY FROM USER WHERE ID = 1 
+    """);
+    return result[0]["USER_CURRENCY"].toString();
   }
 
   // Update the USER_NAME

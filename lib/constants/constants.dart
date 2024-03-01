@@ -1,4 +1,4 @@
-class Constant {
+abstract class Constant {
   static const String pAndPDistription = 'Accepting Privacy and Policy (Tap here to Open)';
   static const String loading = "Please wait";
   static const String totalAmountInvested = "Total Amount Invested";
@@ -70,13 +70,14 @@ class Constant {
   static const String error = "Error";
   static const String customerPhoto = "Customer Photo";
   static const String customerProof = "Customer Proof";
-  static const String takenAmount = " Taken amount ";
-  static const String itemDescription = " Item Description ";
-  static const String takenDate = " Taken Date dd-MM-yyyy ";
+  static const String takenAmount = "Taken amount";
+  static const String itemDescription = "Item Description";
+  static const String takenDate = "Taken Date dd-MM-yyyy";
+  static const String takenDateSmall = "Taken Date";
   static const String tenureDate = "Tenure Date ( dd - MM - yyyy )";
   static const String debited = "Debited";
   static const String credit = "Credit";
-  static const String rateOfIntrest = " Rate of Intrest % ";
+  static const String rateOfIntrest = "Rate of Intrest %";
   static const String homeScreen = "Home Screen";
   static const String userProfileTag = "User-Profile-Tag";
   static const String logout = "Logout";

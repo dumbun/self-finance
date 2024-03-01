@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/contacts_model.dart';
@@ -61,7 +60,7 @@ The PRAGMA foreign_keys = ON statement at the end is used to enable foreign key 
 
 */
 
-class BackEnd extends ChangeNotifier {
+abstract class BackEnd {
   static Future<void> createTable(sql.Database database) async {
     //// create [new tables]
     await database.execute("""

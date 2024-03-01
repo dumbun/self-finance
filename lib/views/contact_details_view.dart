@@ -8,6 +8,7 @@ import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/providers/app_currency_provider.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
@@ -161,6 +162,7 @@ class ContactDetailsView extends ConsumerWidget {
   Consumer _buildTransactionsHistory() {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
+        final String currencyType = ref.watch(currencyProvider);
         return ref.watch(asyncTransactionsProvider).when(
               data: (List<Trx> data) {
                 final List<Trx> transactions = data.where((Trx element) => element.customerId == customerID).toList();
@@ -183,10 +185,18 @@ class ContactDetailsView extends ConsumerWidget {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       BodyOneDefaultText(
-                                          text: "Taken Amount : ${Utility.doubleFormate(transactions[index].amount)}"),
-                                      BodyOneDefaultText(text: "Taken Date : ${transactions[index].transacrtionDate}"),
-                                      BodyOneDefaultText(text: "Rate of Intrest : ${transactions[index].intrestRate}"),
-                                      BodyTwoDefaultText(text: transactions[index].transacrtionType),
+                                        text:
+                                            "${Constant.takenAmount}: ${Utility.doubleFormate(transactions[index].amount)} $currencyType",
+                                      ),
+                                      BodyOneDefaultText(
+                                        text: "${Constant.takenDateSmall}: ${transactions[index].transacrtionDate}",
+                                      ),
+                                      BodyOneDefaultText(
+                                        text: "${Constant.rateOfIntrest}: ${transactions[index].intrestRate}",
+                                      ),
+                                      BodyTwoDefaultText(
+                                        text: transactions[index].transacrtionType,
+                                      ),
                                     ],
                                   )
                                 ],

@@ -49,11 +49,7 @@ class HistoryView extends ConsumerWidget {
       builder: (context, ref, child) {
         return ref.watch(asyncHistoryProvider).when(
               data: (List<UserHistory> data) {
-                final String currencyType = ref.watch(currencyProvider).when(
-                      data: (data) => data,
-                      error: (error, stackTrace) => "",
-                      loading: () => "",
-                    );
+                final String currencyType = ref.watch(currencyProvider);
                 return Expanded(
                   child: ListView.builder(
                     itemBuilder: (context, index) {
