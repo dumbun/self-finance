@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 
 class LoanCalculator {
-  final int takenAmount;
+  final double takenAmount;
   final double rateOfInterest;
   final String takenDate;
   DateTime? tenureDate;

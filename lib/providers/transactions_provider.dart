@@ -1,9 +1,11 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/widgets/home_screen_graph_widget.dart';
+
 part 'transactions_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class AsyncTransactions extends _$AsyncTransactions {
   Future<List<Trx>> _fetchAllTransactionsData() async {
     final data = await BackEnd.fetchAllTransactions();
@@ -25,6 +27,7 @@ class AsyncTransactions extends _$AsyncTransactions {
       result = await BackEnd.createNewTransaction(transaction);
       return _fetchAllTransactionsData();
     });
+    ref.refresh(homeScreenGraphValuesProvider.future).ignore();
     return result;
   }
 
@@ -37,5 +40,9 @@ class AsyncTransactions extends _$AsyncTransactions {
     });
 
     return await BackEnd.fetchRequriedCustomerTransactions(customerId: customerID);
+  }
+
+  Future<double> fetchSumOfTakenAmount() async {
+    return await BackEnd.fetchSumOfTakenAmount();
   }
 }

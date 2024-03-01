@@ -1,6 +1,12 @@
 class Constant {
   static const String pAndPDistription = 'Accepting Privacy and Policy (Tap here to Open)';
+  static const String loading = "Please wait";
+  static const String totalAmountInvested = "Total Amount Invested";
+  static const String emptyTransactionsString =
+      "Please add a transaction by pressing the + symbol to create a new contact with new customer or add a new trancation to a existing customer";
   static const String pandp = 'Privacy and Policy';
+  static const String firstIndicatorPercentage = 'First Indicator Percentage';
+  static const String secoundIndicatorPercentage = 'Secound Indicator Percentage';
   static const String contact = "Contacts";
   static const String intrestAmount = "Intrest Amount";
   static const String zeroContacts = "0 Contacts Found 🫠";

@@ -1,10 +1,11 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
+import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
 
 part 'customer_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class AsyncCustomers extends _$AsyncCustomers {
   Future<List<Customer>> _fetchAllCustomersData() async {
     return BackEnd.fetchAllCustomerData();
@@ -67,6 +68,10 @@ class AsyncCustomers extends _$AsyncCustomers {
       return _fetchAllCustomersData();
     });
     return data;
+  }
+
+  Future<List<Contact>> fetchAllCustomersNameAndNumber() async {
+    return await BackEnd.fetchAllCustomerNumbersWithNames();
   }
 
   Future<List<Customer>> fetchRequriedCustomerDetails({required int customerID}) async {

@@ -97,9 +97,9 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                     hintText: Constant.itemDescription,
                     controller: _description,
                   ),
-                  SizedBox(height: 20.sp),
+                  SizedBox(height: 30.sp),
                   _buldItemImagePicker(),
-                  SizedBox(height: 40.sp),
+                  SizedBox(height: 30.sp),
                   Hero(
                     tag: Constant.saveButtonTag,
                     child: Visibility(

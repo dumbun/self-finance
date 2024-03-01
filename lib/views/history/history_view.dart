@@ -7,6 +7,7 @@ import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/user_history.dart';
+import 'package:self_finance/providers/app_currency_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
@@ -28,7 +29,10 @@ class HistoryView extends ConsumerWidget {
             CupertinoSearchTextField(
               autocorrect: false,
               enableIMEPersonalizedLearning: true,
-              style: const TextStyle(color: AppColors.getPrimaryColor, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: AppColors.getPrimaryColor,
+                fontWeight: FontWeight.bold,
+              ),
               keyboardType: TextInputType.name,
               onChanged: (value) => ref.read(asyncHistoryProvider.notifier).doSearch(givenInput: value),
             ),
@@ -45,10 +49,15 @@ class HistoryView extends ConsumerWidget {
       builder: (context, ref, child) {
         return ref.watch(asyncHistoryProvider).when(
               data: (List<UserHistory> data) {
+                final String currencyType = ref.watch(currencyProvider).when(
+                      data: (data) => data,
+                      error: (error, stackTrace) => "",
+                      loading: () => "",
+                    );
                 return Expanded(
                   child: ListView.builder(
                     itemBuilder: (context, index) {
-                      return _buildHistoryCard(data[index]);
+                      return _buildListTile(data[index], currencyType);
                     },
                     itemCount: data.length,
                   ),
@@ -63,44 +72,23 @@ class HistoryView extends ConsumerWidget {
     );
   }
 
-  Card _buildHistoryCard(UserHistory data) {
-    return Card(
-      elevation: 0,
-      margin: EdgeInsets.only(top: 12.sp),
-      child: Padding(
-        padding: EdgeInsets.all(16.sp),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _buildIcon(type: data.eventType),
-            SizedBox(width: 16.sp),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildAmount(data.eventType, data.amount),
-                  SizedBox(height: 4.sp),
-                  BodyTwoDefaultText(
-                    text: data.customerName,
-                    color: AppColors.getLigthGreyColor,
-                    bold: true,
-                  )
-                ],
-              ),
-            ),
-            _buildDate(data.eventDate),
-          ],
-        ),
+  ListTile _buildListTile(UserHistory data, String currencyType) {
+    return ListTile(
+      leading: _buildIcon(type: data.eventType),
+      title: _buildAmount(data.eventType, data.amount, currencyType),
+      subtitle: BodyTwoDefaultText(
+        text: data.customerName,
+        color: AppColors.getLigthGreyColor,
+        bold: true,
       ),
+      trailing: _buildDate(data.eventDate),
     );
   }
 
-  BodyOneDefaultText _buildAmount(String type, double amount) {
+  BodyOneDefaultText _buildAmount(String type, double amount, String currencyType) {
     return BodyOneDefaultText(
       bold: true,
-      text: "${type == Constant.debited ? "- " : "+ "}${Utility.doubleFormate(amount)}",
+      text: "${type == Constant.debited ? "- " : "+ "}${Utility.doubleFormate(amount)} $currencyType",
     );
   }
 

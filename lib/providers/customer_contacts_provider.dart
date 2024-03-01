@@ -2,12 +2,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/providers/customer_provider.dart';
+import 'package:self_finance/widgets/home_screen_graph_widget.dart';
 part 'customer_contacts_provider.g.dart';
 
 @Riverpod(keepAlive: false)
 class AsyncCustomersContacts extends _$AsyncCustomersContacts {
   Future<List<Contact>> _fetchAllCustomersContactsData() async {
-    return await BackEnd.fetchAllCustomerNumbersWithNames();
+    return await ref.watch(asyncCustomersProvider.notifier).fetchAllCustomersNameAndNumber();
   }
 
   @override
@@ -43,6 +44,7 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
       await BackEnd.deleteTheCustomer(customerID: customerID);
       return _fetchAllCustomersContactsData();
     });
+    ref.refresh(homeScreenGraphValuesProvider.future).ignore();
   }
 
   Future<int> updateCustomer({

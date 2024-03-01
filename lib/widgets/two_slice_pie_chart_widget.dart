@@ -11,12 +11,14 @@ class TwoSlicePieChartWidget extends StatefulWidget {
     required this.secoundIndicatorText,
     required this.firstIndicatorValue,
     required this.secoundIndicatorValue,
+    this.showPercentage = true,
   });
 
   final String firstIndicatorText;
   final String secoundIndicatorText;
   final double firstIndicatorValue;
   final double secoundIndicatorValue;
+  final bool? showPercentage;
 
   @override
   State<TwoSlicePieChartWidget> createState() => _TwoSlicePieChartWidgetState();
@@ -92,7 +94,7 @@ class _TwoSlicePieChartWidgetState extends State<TwoSlicePieChartWidget> {
           return PieChartSectionData(
             color: AppColors.getPrimaryColor,
             value: widget.firstIndicatorValue,
-            title: '${widget.firstIndicatorValue}%',
+            title: widget.showPercentage! ? '${widget.firstIndicatorValue}%' : "",
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -105,7 +107,7 @@ class _TwoSlicePieChartWidgetState extends State<TwoSlicePieChartWidget> {
           return PieChartSectionData(
             color: AppColors.getLigthGreyColor,
             value: widget.secoundIndicatorValue,
-            title: '${widget.secoundIndicatorValue}%',
+            title: widget.showPercentage! ? '${widget.secoundIndicatorValue}%' : "",
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,

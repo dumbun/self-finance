@@ -141,8 +141,8 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
         _rateOfIntrestInput.text.isNotEmpty &&
         _takenDataInput.text.isNotEmpty &&
         _tenureDataInput.text.isNotEmpty) {
-      double rateOfInterest = Utility.textToDouble(_rateOfIntrestInput.text);
-      int loneAmount = Utility.textToInt(_amountGivenInput.text);
+      final double rateOfInterest = Utility.textToDouble(_rateOfIntrestInput.text);
+      final double loneAmount = Utility.textToDouble(_amountGivenInput.text);
       String tenureDate = _tenureDataInput.text;
       final DateFormat format = DateFormat("dd-MM-yyyy");
       LoanCalculator l1 = LoanCalculator(
@@ -170,7 +170,7 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
     required double totalAmount,
     required double totalInterest,
     required double emiPerMonth,
-    required int principalAmount,
+    required double principalAmount,
     required String monthsAndDays,
   }) {
     if (totalAmount != 0 && totalInterest != 0 && emiPerMonth != 0 && principalAmount != 0 && monthsAndDays != "") {
@@ -186,7 +186,7 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
             _buildDetailCard(
               icon: Icons.account_balance_wallet,
               label: Constant.takenAmount,
-              result: Utility.numberFormate(principalAmount),
+              result: Utility.doubleFormate(principalAmount),
             ),
             SizedBox(height: 10.sp),
             _buildDetailCard(
