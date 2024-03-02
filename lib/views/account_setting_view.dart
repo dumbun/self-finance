@@ -12,8 +12,8 @@ import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
 import 'package:self_finance/widgets/user_image_update_widget.dart';
-import 'package:self_finance/widgets/user_name_update_widget.dart';
-import 'package:self_finance/widgets/user_pin_update_widget.dart';
+import 'package:self_finance/widgets/user_name_update_buttom_sheet_widget.dart';
+import 'package:self_finance/widgets/pin_update_buttom_sheet_widget.dart';
 
 class AccountSettingsView extends StatelessWidget {
   const AccountSettingsView({super.key});
@@ -44,6 +44,7 @@ class AccountSettingsView extends StatelessWidget {
                               onRefresh: () => ref.refresh(asyncUserProvider.future),
                               child: ListView(
                                 children: [
+                                  // user profile pic
                                   SizedBox(height: 20.sp),
                                   Hero(
                                     tag: Constant.userProfileTag,
@@ -51,21 +52,34 @@ class AccountSettingsView extends StatelessWidget {
                                       userImageString: user.profilePicture,
                                     ),
                                   ),
+
+                                  // user name
                                   SizedBox(height: 20.sp),
-                                  UserNameUpdateWidget(
+                                  _buildNameUpdateButton(
+                                    context: context,
                                     userId: user.id!,
                                     userName: user.userName,
                                   ),
+
+                                  // user pin update button
                                   SizedBox(height: 12.sp),
-                                  UserPinUpdateWidget(
+                                  _buildPinUpdateButton(
+                                    context: context,
                                     id: user.id!,
+                                    userPin: user.userPin,
                                   ),
+
+                                  // user terms and condition button
                                   SizedBox(height: 12.sp),
                                   _buildTermsAndConditionButton(),
+
+                                  // user privacy Policy button
                                   SizedBox(height: 12.sp),
                                   _buildPrivacyPolicyButton(),
+
+                                  // logout button
                                   SizedBox(height: 12.sp),
-                                  _buildLogoutButton(),
+                                  _buildLogoutButton(context: context),
                                 ],
                               ),
                             );
@@ -95,10 +109,45 @@ class AccountSettingsView extends StatelessWidget {
     );
   }
 
+  Card _buildNameUpdateButton({required BuildContext context, required String userName, required int userId}) {
+    return _buildListTile(
+      title: userName,
+      onPressed: () => showBottomSheet(
+          enableDrag: true,
+          context: context,
+          builder: (context) {
+            return UserNameUpdateButtomSheetWidget(userId: userId, userName: userName);
+          }),
+      icon: const Icon(
+        Icons.edit,
+        color: AppColors.getPrimaryColor,
+      ),
+    );
+  }
+
+  Card _buildPinUpdateButton({required BuildContext context, required int id, required String userPin}) {
+    return _buildListTile(
+      title: 'Change App Pin',
+      onPressed: () => showBottomSheet(
+        context: context,
+        builder: (context) {
+          return PinUpdatebuttomSheetWidget(
+            id: id,
+            userPin: userPin,
+          );
+        },
+      ),
+      icon: const Icon(
+        Icons.lock,
+        color: AppColors.getPrimaryColor,
+      ),
+    );
+  }
+
   Card _buildPrivacyPolicyButton() {
     return _buildListTile(
       icon: const Icon(
-        Icons.key,
+        Icons.privacy_tip_rounded,
         color: AppColors.getPrimaryColor,
       ),
       onPressed: () => Utility.launchInBrowserView(Constant.pAndPUrl),
@@ -109,7 +158,7 @@ class AccountSettingsView extends StatelessWidget {
   Card _buildTermsAndConditionButton() {
     return _buildListTile(
       icon: const Icon(
-        Icons.arrow_forward_ios_rounded,
+        Icons.work_rounded,
         color: AppColors.getPrimaryColor,
       ),
       onPressed: () {
@@ -119,51 +168,35 @@ class AccountSettingsView extends StatelessWidget {
     );
   }
 
-  void navigateToPinAuthView(User user, BuildContext context) {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) {
-          return const PinAuthView();
-        },
-      ),
-      (route) => false,
-    );
-  }
-
-  void _logout(User user, int response, BuildContext context) {
+  void _logout(int response, BuildContext context) {
     if (response == 1) {
-      navigateToPinAuthView(user, context);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) {
+            return const PinAuthView();
+          },
+        ),
+        (route) => false,
+      );
     }
   }
 
-  Consumer _buildLogoutButton() {
-    return Consumer(
-      builder: (BuildContext context, WidgetRef ref, Widget? child) => ref.watch(asyncUserProvider).when(
-            data: (List<User> data) {
-              return _buildListTile(
-                icon: const Icon(
-                  Icons.logout,
-                  color: AppColors.getErrorColor,
-                ),
-                onPressed: () {
-                  AlertDilogs.alertDialogWithTwoAction(
-                    context,
-                    Constant.exit,
-                    Constant.signOutMessage,
-                  ).then(
-                    (int value) => _logout(data.first, value, context),
-                  );
-                },
-                title: Constant.logout,
-              );
-            },
-            error: (Object error, StackTrace stackTrace) => const Center(
-              child: BodyOneDefaultText(text: Constant.errorUserFetch),
-            ),
-            loading: () => const Center(
-              child: CircularProgressIndicator.adaptive(),
-            ),
-          ),
+  Card _buildLogoutButton({required BuildContext context}) {
+    return _buildListTile(
+      icon: const Icon(
+        Icons.logout,
+        color: AppColors.getErrorColor,
+      ),
+      onPressed: () {
+        AlertDilogs.alertDialogWithTwoAction(
+          context,
+          Constant.exit,
+          Constant.signOutMessage,
+        ).then(
+          (int value) => _logout(value, context),
+        );
+      },
+      title: Constant.logout,
     );
   }
 
