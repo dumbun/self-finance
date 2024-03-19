@@ -28,7 +28,7 @@ abstract class UserBackEnd {
   static Future<bool> createNewUser(User user) async {
     final db = await UserBackEnd.db();
     try {
-      final data = {
+      final Map<String, Object?> data = {
         "ID": user.id,
         "USER_NAME": user.userName,
         "USER_PIN": user.userPin,

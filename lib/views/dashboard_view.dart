@@ -12,7 +12,11 @@ import 'package:self_finance/widgets/drawer_widget.dart';
 import 'package:self_finance/widgets/expandable_fab.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 
-final StateProvider<int> selectedPageIndexProvider = StateProvider<int>((ref) {
+//? providers
+///[selectedPageIndexProvider] is a provider which is auto dispose
+///this provider helps to maintain
+///the state of the buttom navigation bar in the dashboard
+final AutoDisposeStateProvider<int> selectedPageIndexProvider = StateProvider.autoDispose<int>((ref) {
   return 0;
 });
 

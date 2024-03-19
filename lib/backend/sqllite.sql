@@ -43,6 +43,21 @@ CREATE TABLE Payments (
     Payment_Type     TEXT,
     Created_Date     DATETIME
 );
+
+-- Hisroy Table 
+CREATE TABLE History (
+    Histoy_ID        INTEGER PRIMARY KEY AUTOINCREMENT,
+    User_ID          INTEGER NOT NULL,
+    Customer_ID      INTEGER NOT NULL,
+    Customer_Name    TEXT NOT NULL,
+    Contact_Number   TEXT NOT NULL,
+    Item_ID          INTEGER NOT NULL,
+    Transacrtion_ID  INTEGER NOT NULL,
+    Amount           REAL NOT NULL,
+    Event_Date       TEXT NOT NULL,
+    Event_Type       TEXT NOT NULL
+);
+
 CREATE UNIQUE INDEX ui_cust_index ON "CUSTOMERS"("Contact_Number");
 PRAGMA foreign_keys = ON
 -- INSERT INTO Customers (Customer_Name, Gaurdian_Name, Customer_Address, Contact_Number, Customer_Photo, Created_Date)

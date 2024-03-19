@@ -52,7 +52,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     );
   }
 
-  _getPrivacyAndPolicyButton() {
+  Container _getPrivacyAndPolicyButton() {
     return Container(
       margin: EdgeInsets.only(bottom: 16.sp),
       child: Row(

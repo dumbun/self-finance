@@ -112,7 +112,7 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
   void createUser(User user) async {
     if (validateAndSave()) {
       try {
-        final result = await ref.read(asyncUserProvider.notifier).addUser(user: user);
+        final bool result = await ref.read(asyncUserProvider.notifier).addUser(user: user);
         result ? navigateToDashboard() : showAlerts();
       } catch (e) {
         showAlerts();
