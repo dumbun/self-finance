@@ -105,6 +105,16 @@ abstract class UserBackEnd {
     final result = await db.update('USER', data, where: "id = ?", whereArgs: [id]);
     return result;
   }
+
+  // Update the USER_PIN
+
+  static Future<int> updateUserCurrency(int id, String currency) async {
+    print("object");
+    final db = await UserBackEnd.db();
+    final data = {'USER_CURRENCY': currency};
+    final result = await db.update('USER', data, where: "id = ?", whereArgs: [id]);
+    return result;
+  }
   // Update the USER_PROFILE_PIC
 
   static Future<int> updateProfilePic(int id, String imageString) async {

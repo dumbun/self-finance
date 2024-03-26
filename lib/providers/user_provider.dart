@@ -52,6 +52,14 @@ class AsyncUser extends _$AsyncUser {
     });
   }
 
+  Future<void> updateUserCurrency({required int userId, required String updateUserPin}) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await UserBackEnd.updateUserCurrency(userId, updateUserPin);
+      return _fetchAllUsers();
+    });
+  }
+
   Future<String> userCurrency() async {
     return await UserBackEnd.fetchUserCurrency();
   }

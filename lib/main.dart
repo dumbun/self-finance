@@ -8,7 +8,6 @@ import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/theme/app_theme_data.dart';
 import 'package:self_finance/views/Add%20New%20Entry/add_new_entry_view.dart';
 import 'package:self_finance/views/auth_view.dart';
-import 'package:self_finance/views/change_pin_view.dart';
 import 'package:self_finance/views/contacts_view.dart';
 import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/account_setting_view.dart';
@@ -33,7 +32,6 @@ class MyApp extends StatelessWidget {
     return ResponsiveSizer(
       builder: (context, orientation, screenType) => MaterialApp(
         routes: {
-          Constant.changePinView: (context) => const ChangePinView(),
           Constant.dashboardView: (context) => const DashboardView(),
           Constant.addNewEntryView: (context) => const AddNewEntery(),
           Constant.contactView: (context) => const ContactsView(),

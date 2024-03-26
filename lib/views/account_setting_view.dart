@@ -1,3 +1,4 @@
+import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -11,6 +12,7 @@ import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
+import 'package:self_finance/widgets/title_widget.dart';
 import 'package:self_finance/widgets/user_image_update_widget.dart';
 import 'package:self_finance/widgets/user_name_update_buttom_sheet_widget.dart';
 import 'package:self_finance/widgets/pin_update_buttom_sheet_widget.dart';
@@ -69,6 +71,15 @@ class AccountSettingsView extends StatelessWidget {
                                     userPin: user.userPin,
                                   ),
 
+                                  // user Currency update button
+                                  SizedBox(height: 12.sp),
+                                  _buildCurrencyUpdateButton(
+                                    context: context,
+                                    id: user.id!,
+                                    currency: user.userCurrency,
+                                    ref: ref,
+                                  ),
+
                                   // user terms and condition button
                                   SizedBox(height: 12.sp),
                                   _buildTermsAndConditionButton(),
@@ -109,7 +120,11 @@ class AccountSettingsView extends StatelessWidget {
     );
   }
 
-  Card _buildNameUpdateButton({required BuildContext context, required String userName, required int userId}) {
+  Card _buildNameUpdateButton({
+    required BuildContext context,
+    required String userName,
+    required int userId,
+  }) {
     return _buildListTile(
       title: userName,
       onPressed: () => showBottomSheet(
@@ -125,7 +140,11 @@ class AccountSettingsView extends StatelessWidget {
     );
   }
 
-  Card _buildPinUpdateButton({required BuildContext context, required int id, required String userPin}) {
+  Card _buildPinUpdateButton({
+    required BuildContext context,
+    required int id,
+    required String userPin,
+  }) {
     return _buildListTile(
       title: 'Change App Pin',
       onPressed: () => showBottomSheet(
@@ -140,6 +159,41 @@ class AccountSettingsView extends StatelessWidget {
       icon: const Icon(
         Icons.lock,
         color: AppColors.getPrimaryColor,
+      ),
+    );
+  }
+
+  Card _buildCurrencyUpdateButton({
+    required BuildContext context,
+    required int id,
+    required String currency,
+    required WidgetRef ref,
+  }) {
+    return _buildListTile(
+      title: 'Change App Currency',
+      onPressed: () async {
+        if (await AlertDilogs.alertDialogWithTwoAction(context, Constant.alert, Constant.currencyChangeAlert) == 1) {
+          showCurrencyPicker(
+            theme: CurrencyPickerThemeData(bottomSheetHeight: 90.sp),
+            useRootNavigator: true,
+            context: context,
+            showFlag: true,
+            showSearchField: true,
+            showCurrencyName: true,
+            showCurrencyCode: true,
+            onSelect: (Currency selectedCurrency) {
+              ref.read(asyncUserProvider.notifier).updateUserCurrency(
+                    userId: id,
+                    updateUserPin: selectedCurrency.symbol,
+                  );
+            },
+          );
+        }
+      },
+      icon: TitleWidget(
+        bold: true,
+        color: AppColors.getPrimaryColor,
+        text: currency,
       ),
     );
   }

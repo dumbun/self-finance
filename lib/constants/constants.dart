@@ -1,4 +1,7 @@
 abstract class Constant {
+  static const String alert = "Alert";
+  static const String currencyChangeAlert =
+      "The application as a whole is affected by this modification. Would you really like to alter the application's currency?";
   static const String pAndPDistription = 'Accepting Privacy and Policy (Tap here to Open)';
   static const String loading = "Please wait";
   static const String totalAmountInvested = "Total Amount Invested";

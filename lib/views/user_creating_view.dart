@@ -62,7 +62,7 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
                     SizedBox(height: 24.sp),
                     CurrencyTypeInputWidget(
                       controller: _currencyInput,
-                    )
+                    ),
                   ],
                 ),
               ),
