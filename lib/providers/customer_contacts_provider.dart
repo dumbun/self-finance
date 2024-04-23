@@ -1,8 +1,10 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/contacts_model.dart';
+import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/home_screen_graph_value_provider.dart';
+
 part 'customer_contacts_provider.g.dart';
 
 @Riverpod(keepAlive: false)
@@ -15,6 +17,19 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
   Future<List<Contact>> build() {
     // Load initial todo list from the remote repository
     return _fetchAllCustomersContactsData();
+  }
+
+  Future<int> addCustomer({required Customer customer}) async {
+    int result = 0;
+    // Set the state to loading
+    state = const AsyncValue.loading();
+    // Add the new todo and reload the todo list from the remote repository
+    state = await AsyncValue.guard(() async {
+      result = await ref.read(asyncCustomersProvider.notifier).addCustomer(customer: customer);
+      // creating new item becacuse every new transaction will have a proof item
+      return await _fetchAllCustomersContactsData();
+    });
+    return result;
   }
 
   Future<void> searchCustomer({required String givenInput}) async {

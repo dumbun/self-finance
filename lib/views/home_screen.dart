@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/widgets/home_screen_graph_widget.dart';
+import 'package:self_finance/widgets/latest_transactions_widget.dart';
+import 'package:self_finance/widgets/user_stats_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -9,10 +11,15 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(left: 20.0.sp, right: 20.sp),
-      child: const Column(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [HomeScreenGraphWidget()],
+        children: [
+          const HomeScreenGraphWidget(),
+          SizedBox(height: 18.sp),
+          const UserStatsWidget(),
+          const LatestTransactionsWidget(),
+        ],
       ),
     );
   }

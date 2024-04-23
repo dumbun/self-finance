@@ -5,7 +5,7 @@ import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/utility/user_utility.dart';
 
-final homeScreenGraphValuesProvider = FutureProvider<Map<String, double>>(
+final homeScreenGraphValuesProvider = FutureProvider.autoDispose<Map<String, double>>(
   (ref) async {
     final double totalActiveTakenAmount = await ref.watch(asyncTransactionsProvider.notifier).fetchSumOfTakenAmount();
     final double totalIntrestAmount = await ref.watch(asyncTransactionsProvider).when(

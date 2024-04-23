@@ -1,12 +1,16 @@
 import 'dart:convert';
 import 'dart:core';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:self_finance/utility/image_catch_manager.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 
 class Utility {
   // make call
@@ -129,5 +133,21 @@ class Utility {
     }
 
     return result;
+  }
+
+  static screenShotShare(ScreenshotController screenshotController, BuildContext context) async {
+    double pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    await screenshotController
+        .capture(pixelRatio: pixelRatio, delay: const Duration(milliseconds: 10))
+        .then((Uint8List? image) async {
+      if (image != null) {
+        final directory = await getApplicationDocumentsDirectory();
+        final imagePath = XFile('${directory.path}/image.png');
+
+        /// Share Plugin
+        await Share.shareXFiles([imagePath]);
+      }
+    });
   }
 }

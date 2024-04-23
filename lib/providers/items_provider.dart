@@ -36,4 +36,8 @@ class AsyncItems extends _$AsyncItems {
     });
     return await BackEnd.fetchitemOfRequriedCustomer(customerID: customerID);
   }
+
+  Future<List<Items>> fetchRequriedItem({required int itemId}) async {
+    return await BackEnd.fetchRequriedItem(itemId: itemId);
+  }
 }

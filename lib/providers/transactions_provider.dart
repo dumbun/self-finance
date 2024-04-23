@@ -25,24 +25,40 @@ class AsyncTransactions extends _$AsyncTransactions {
     // Add the new todo and reload the todo list from the remote repository
     state = await AsyncValue.guard(() async {
       result = await BackEnd.createNewTransaction(transaction);
-      return _fetchAllTransactionsData();
+      return await _fetchAllTransactionsData();
     });
     ref.refresh(homeScreenGraphValuesProvider.future).ignore();
     return result;
   }
 
-  Future<List<Trx>> fetchRequriedCustomerTransactions({required int customerID}) async {
+  Future<void> fetchRequriedCustomerTransactions({required int customerID}) async {
     // Set the state to loading
     state = const AsyncValue.loading();
     // Add the new todo and reload the todo list from the remote repository
     state = await AsyncValue.guard(() async {
       return await BackEnd.fetchRequriedCustomerTransactions(customerId: customerID);
     });
+  }
 
-    return await BackEnd.fetchRequriedCustomerTransactions(customerId: customerID);
+  Future<List<Trx>> fetchRequriedTransaction({required int transactionId}) async {
+    final List<Trx> responce = await BackEnd.fetchRequriedTransaction(transacrtionId: transactionId);
+    return responce;
   }
 
   Future<double> fetchSumOfTakenAmount() async {
     return await BackEnd.fetchSumOfTakenAmount();
+  }
+
+  Future<int> markAsPaidTransaction({required int trancationId}) async {
+    int responce = 0;
+    // Set the state to loading
+    state = const AsyncValue.loading();
+    // Add the new todo and reload the todo list from the remote repository
+    state = await AsyncValue.guard(() async {
+      responce = await BackEnd.updateTransactionAsPaid(id: trancationId);
+      return await _fetchAllTransactionsData();
+    });
+
+    return responce;
   }
 }

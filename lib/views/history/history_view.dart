@@ -16,56 +16,14 @@ import 'package:self_finance/widgets/refresh_widget.dart';
 class HistoryView extends ConsumerWidget {
   const HistoryView({super.key});
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return RefreshWidget(
-      onRefresh: () => ref.refresh(asyncHistoryProvider.future),
-      child: Padding(
-        padding: EdgeInsets.all(12.sp),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CupertinoSearchTextField(
-              autocorrect: false,
-              enableIMEPersonalizedLearning: true,
-              style: const TextStyle(
-                color: AppColors.getPrimaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-              keyboardType: TextInputType.name,
-              onChanged: (value) => ref.read(asyncHistoryProvider.notifier).doSearch(givenInput: value),
-            ),
-            SizedBox(height: 16.sp),
-            _buildhistoryList(),
-          ],
-        ),
+  Expanded _buildhistoryList(List<UserHistory> data, currencyType) {
+    return Expanded(
+      child: ListView.builder(
+        itemBuilder: (context, index) {
+          return _buildListTile(data[index], currencyType);
+        },
+        itemCount: data.length,
       ),
-    );
-  }
-
-  Consumer _buildhistoryList() {
-    return Consumer(
-      builder: (context, ref, child) {
-        return ref.watch(asyncHistoryProvider).when(
-              data: (List<UserHistory> data) {
-                final String currencyType = ref.watch(currencyProvider);
-
-                return Expanded(
-                  child: ListView.builder(
-                    itemBuilder: (context, index) {
-                      return _buildListTile(data[index], currencyType);
-                    },
-                    itemCount: data.length,
-                  ),
-                );
-              },
-              error: (error, stackTrace) => Text(error.toString()),
-              loading: () => const Center(
-                child: CircularProgressIndicator.adaptive(),
-              ),
-            );
-      },
     );
   }
 
@@ -128,5 +86,39 @@ class HistoryView extends ConsumerWidget {
               size: 22.sp,
             ),
           );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return RefreshWidget(
+      onRefresh: () => ref.refresh(asyncHistoryProvider.future),
+      child: Padding(
+        padding: EdgeInsets.all(12.sp),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CupertinoSearchTextField(
+              autocorrect: false,
+              enableIMEPersonalizedLearning: true,
+              style: const TextStyle(
+                color: AppColors.getPrimaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+              keyboardType: TextInputType.name,
+              onChanged: (value) => ref.read(asyncHistoryProvider.notifier).doSearch(givenInput: value),
+            ),
+            SizedBox(height: 16.sp),
+            ref.watch(asyncHistoryProvider).when(
+                  data: (data) => _buildhistoryList(data, ref.watch(currencyProvider)),
+                  error: (error, stackTrace) => Text(error.toString()),
+                  loading: () => const Center(
+                    child: CircularProgressIndicator.adaptive(),
+                  ),
+                ),
+          ],
+        ),
+      ),
+    );
   }
 }

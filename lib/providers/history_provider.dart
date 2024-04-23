@@ -1,10 +1,13 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/user_history.dart';
+import 'package:self_finance/providers/customer_contacts_provider.dart';
+import 'package:self_finance/providers/customer_provider.dart';
+import 'package:self_finance/providers/transactions_provider.dart';
 
 part 'history_provider.g.dart';
 
-@Riverpod(keepAlive: false)
+@riverpod
 class AsyncHistory extends _$AsyncHistory {
   Future<List<UserHistory>> _fetchAllItemsData() async {
     final data = await BackEnd.fetchAllUserHistory();
@@ -13,6 +16,9 @@ class AsyncHistory extends _$AsyncHistory {
 
   @override
   FutureOr<List<UserHistory>> build() {
+    ref.watch(asyncCustomersContactsProvider);
+    ref.watch(asyncCustomersProvider);
+    ref.watch(asyncTransactionsProvider);
     // Load initial todo list from the remote repository
     return _fetchAllItemsData();
   }

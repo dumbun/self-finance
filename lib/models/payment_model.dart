@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 class Payment {
@@ -6,7 +7,7 @@ class Payment {
   final String paymentDate;
   final double amountpaid;
   final String type;
-  final DateTime createdDate;
+  final String createdDate;
   Payment({
     this.id,
     required this.transactionId,
@@ -39,7 +40,7 @@ class Payment {
     String? paymentDate,
     double? amountpaid,
     String? type,
-    DateTime? createdDate,
+    String? createdDate,
   }) {
     return Payment(
       id: id ?? this.id,
@@ -58,7 +59,7 @@ class Payment {
       'paymentDate': paymentDate,
       'amountpaid': amountpaid,
       'type': type,
-      'createdDate': createdDate.millisecondsSinceEpoch,
+      'createdDate': createdDate,
     };
   }
 
@@ -69,7 +70,7 @@ class Payment {
       paymentDate: map['paymentDate'] as String,
       amountpaid: map['amountpaid'] as double,
       type: map['type'] as String,
-      createdDate: DateTime.fromMillisecondsSinceEpoch(map['createdDate'] as int),
+      createdDate: map['createdDate'] as String,
     );
   }
 

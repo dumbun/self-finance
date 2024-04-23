@@ -7,6 +7,7 @@ import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history.dart';
+import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/items_provider.dart';
@@ -184,7 +185,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
         final takenAmount = _doubleCheck(_takenAmount.text);
 
         // creating the new customer
-        final int customerCreatedResponse = await ref.read(asyncCustomersProvider.notifier).addCustomer(
+        final int customerCreatedResponse = await ref.read(asyncCustomersContactsProvider.notifier).addCustomer(
               customer: Customer(
                 userID: 1, //? later updates if there are more users
                 name: _customerName.text,

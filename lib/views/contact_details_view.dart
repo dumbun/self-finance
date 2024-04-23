@@ -36,129 +36,6 @@ class ContactDetailsView extends ConsumerWidget {
   const ContactDetailsView({super.key, required this.customerID});
   final int customerID;
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    void delateTheContact() {
-      ref.read(asyncCustomersContactsProvider.notifier).deleteCustomer(customerID: customerID);
-      Navigator.of(context).pop();
-    }
-
-    void navigateToEditingPage(Customer c) {
-      Routes.navigateToContactEditingView(context: context, contact: c);
-    }
-
-    void preEditingSettings() async {
-      final List<Customer> response = await BackEnd.fetchSingleContactDetails(id: customerID);
-      ref.read(updatedCustomerPhotoStringProvider.notifier).state = response.first.photo;
-      ref.read(updatedCustomerProofStringProvider.notifier).state = response.first.proof;
-      navigateToEditingPage(response.first);
-    }
-
-    void popUpMenuSelected(String value) async {
-      switch (value) {
-        case '1':
-          preEditingSettings();
-          break;
-        case '2':
-          if (await AlertDilogs.alertDialogWithTwoAction(context, "Alert",
-                  "By Pressing 'YES' you will remove all the details of this customer from your Date Base") ==
-              1) {
-            delateTheContact();
-          }
-          break;
-        default:
-          () {};
-      }
-    }
-
-    return DefaultTabController(
-      initialIndex: 0,
-      length: 2,
-      child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          heroTag: Constant.saveButtonTag,
-          enableFeedback: true,
-          isExtended: true,
-          tooltip: "Add new trancation to this customer",
-          splashColor: AppColors.getPrimaryColor,
-          backgroundColor: AppColors.getPrimaryColor,
-          shape: const CircleBorder(),
-          child: const Icon(
-            Icons.add,
-            color: AppColors.getBackgroundColor,
-          ),
-          onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(context: context, customerID: customerID),
-        ),
-        appBar: AppBar(
-          forceMaterialTransparency: true,
-          actions: [
-            PopupMenuButton<String>(
-              onSelected: (String value) => popUpMenuSelected(value),
-              itemBuilder: (BuildContext context) => [
-                _buildPopUpMenuItems(
-                  value: '1',
-                  icon: Icons.edit_rounded,
-                  iconColor: AppColors.getPrimaryColor,
-                  title: 'Edit',
-                ),
-                _buildPopUpMenuItems(
-                  value: '2',
-                  icon: Icons.delete_rounded,
-                  iconColor: AppColors.getErrorColor,
-                  title: "Delete",
-                ),
-              ],
-            ),
-          ],
-          toolbarHeight: 32.sp,
-          title: const BodyTwoDefaultText(text: "Contact Info", bold: true),
-          bottom: const TabBar(
-            dividerColor: Colors.transparent,
-            tabs: [
-              Tab(icon: Icon(Icons.person)),
-              Tab(icon: Icon(Icons.history)),
-            ],
-          ),
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 16.sp),
-            child: TabBarView(
-              children: <Widget>[
-                _buildCustomerDetails(),
-                _buildTransactionsHistory(),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  PopupMenuItem<String> _buildPopUpMenuItems({
-    required String value,
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-  }) {
-    return PopupMenuItem<String>(
-      value: value,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: iconColor,
-          ),
-          SizedBox(width: 18.sp),
-          BodyTwoDefaultText(text: title),
-          SizedBox(width: 18.sp),
-        ],
-      ),
-    );
-  }
-
   Consumer _buildTransactionsHistory() {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
@@ -171,35 +48,45 @@ class ContactDetailsView extends ConsumerWidget {
                         itemCount: transactions.length,
                         separatorBuilder: (BuildContext context, int index) => SizedBox(height: 12.sp),
                         itemBuilder: (BuildContext context, int index) {
-                          return Card(
-                            child: Padding(
-                              padding: EdgeInsets.all(16.sp),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Icon(Icons.auto_stories, size: 24.sp),
-                                  SizedBox(width: 18.sp),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      BodyOneDefaultText(
-                                        text:
-                                            "${Constant.takenAmount}: ${Utility.doubleFormate(transactions[index].amount)} $currencyType",
-                                      ),
-                                      BodyOneDefaultText(
-                                        text: "${Constant.takenDateSmall}: ${transactions[index].transacrtionDate}",
-                                      ),
-                                      BodyOneDefaultText(
-                                        text: "${Constant.rateOfIntrest}: ${transactions[index].intrestRate}",
-                                      ),
-                                      BodyTwoDefaultText(
-                                        text: transactions[index].transacrtionType,
-                                      ),
-                                    ],
-                                  )
-                                ],
+                          return GestureDetector(
+                            onTap: () => Routes.navigateToTransactionDetailsView(
+                                transacrtion: transactions[index], context: context),
+                            child: Card(
+                              child: Padding(
+                                padding: EdgeInsets.all(16.sp),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      Icons.circle,
+                                      size: 24.sp,
+                                      color: transactions[index].transacrtionType == Constant.active
+                                          ? AppColors.getGreenColor
+                                          : AppColors.getErrorColor,
+                                    ),
+                                    SizedBox(width: 18.sp),
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        BodyOneDefaultText(
+                                          text:
+                                              "${Constant.takenAmount}: ${Utility.doubleFormate(transactions[index].amount)} $currencyType",
+                                        ),
+                                        BodyOneDefaultText(
+                                          text: "${Constant.takenDateSmall}: ${transactions[index].transacrtionDate}",
+                                        ),
+                                        BodyOneDefaultText(
+                                          text: "${Constant.rateOfIntrest}: ${transactions[index].intrestRate}",
+                                        ),
+                                        BodyTwoDefaultText(
+                                          text: transactions[index].transacrtionType,
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           );
@@ -412,6 +299,129 @@ class ContactDetailsView extends ConsumerWidget {
           imageData: imageData,
           titile: "$customerName photo",
         ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    void delateTheContact() {
+      ref.read(asyncCustomersContactsProvider.notifier).deleteCustomer(customerID: customerID);
+      Navigator.of(context).pop();
+    }
+
+    void navigateToEditingPage(Customer c) {
+      Routes.navigateToContactEditingView(context: context, contact: c);
+    }
+
+    void preEditingSettings() async {
+      final List<Customer> response = await BackEnd.fetchSingleContactDetails(id: customerID);
+      ref.read(updatedCustomerPhotoStringProvider.notifier).state = response.first.photo;
+      ref.read(updatedCustomerProofStringProvider.notifier).state = response.first.proof;
+      navigateToEditingPage(response.first);
+    }
+
+    void popUpMenuSelected(String value) async {
+      switch (value) {
+        case '1':
+          preEditingSettings();
+          break;
+        case '2':
+          if (await AlertDilogs.alertDialogWithTwoAction(context, "Alert",
+                  "By Pressing 'YES' you will remove all the details of this customer from your Date Base") ==
+              1) {
+            delateTheContact();
+          }
+          break;
+        default:
+          () {};
+      }
+    }
+
+    return DefaultTabController(
+      initialIndex: 0,
+      length: 2,
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          heroTag: Constant.saveButtonTag,
+          enableFeedback: true,
+          isExtended: true,
+          tooltip: "Add new trancation to this customer",
+          splashColor: AppColors.getPrimaryColor,
+          backgroundColor: AppColors.getPrimaryColor,
+          shape: const CircleBorder(),
+          child: const Icon(
+            Icons.add,
+            color: AppColors.getBackgroundColor,
+          ),
+          onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(context: context, customerID: customerID),
+        ),
+        appBar: AppBar(
+          forceMaterialTransparency: true,
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: (String value) => popUpMenuSelected(value),
+              itemBuilder: (BuildContext context) => [
+                _buildPopUpMenuItems(
+                  value: '1',
+                  icon: Icons.edit_rounded,
+                  iconColor: AppColors.getPrimaryColor,
+                  title: 'Edit',
+                ),
+                _buildPopUpMenuItems(
+                  value: '2',
+                  icon: Icons.delete_rounded,
+                  iconColor: AppColors.getErrorColor,
+                  title: "Delete",
+                ),
+              ],
+            ),
+          ],
+          toolbarHeight: 32.sp,
+          title: const BodyTwoDefaultText(text: "Contact Info", bold: true),
+          bottom: const TabBar(
+            dividerColor: Colors.transparent,
+            tabs: [
+              Tab(icon: Icon(Icons.person)),
+              Tab(icon: Icon(Icons.history)),
+            ],
+          ),
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 16.sp),
+            child: TabBarView(
+              children: <Widget>[
+                _buildCustomerDetails(),
+                _buildTransactionsHistory(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  PopupMenuItem<String> _buildPopUpMenuItems({
+    required String value,
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+  }) {
+    return PopupMenuItem<String>(
+      value: value,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: iconColor,
+          ),
+          SizedBox(width: 18.sp),
+          BodyTwoDefaultText(text: title),
+          SizedBox(width: 18.sp),
+        ],
       ),
     );
   }

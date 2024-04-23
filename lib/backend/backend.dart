@@ -3,6 +3,7 @@ import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
+import 'package:self_finance/models/payment_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history.dart';
 import 'package:sqflite/sqflite.dart' as sql;
@@ -60,7 +61,7 @@ The PRAGMA foreign_keys = ON statement at the end is used to enable foreign key 
 
 */
 
-abstract class BackEnd {
+class BackEnd {
   static Future<void> createTable(sql.Database database) async {
     //// create [new tables]
     await database.execute("""
@@ -171,6 +172,7 @@ abstract class BackEnd {
         data,
         conflictAlgorithm: sql.ConflictAlgorithm.abort,
       );
+
       return id;
     } catch (e) {
       return 0;
@@ -302,6 +304,7 @@ abstract class BackEnd {
       where: 'Customer_ID = ?',
       whereArgs: [customerId],
     );
+
     return count;
   }
 
@@ -322,6 +325,7 @@ abstract class BackEnd {
         "Created_Date": item.createdDate
       };
       final int id = await db.insert("Items", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
+
       return id;
     } catch (e) {
       return 0;
@@ -329,7 +333,7 @@ abstract class BackEnd {
   }
 
   /// fetch all items
-  static fetchAllItems() async {
+  static Future<List<Items>> fetchAllItems() async {
     final Database db = await BackEnd.db();
     final List<Map<String, Object?>> response = await db.rawQuery("""SELECT * FROM Items""");
     return Items.toList(response);
@@ -342,6 +346,17 @@ abstract class BackEnd {
       "Items",
       where: 'Customer_ID = ?',
       whereArgs: [customerID],
+    );
+    return Items.toList(response);
+  }
+
+  // fetch requried Item
+  static Future<List<Items>> fetchRequriedItem({required int itemId}) async {
+    final Database db = await BackEnd.db();
+    final List<Map<String, Object?>> response = await db.query(
+      "Items",
+      where: 'Item_ID = ?',
+      whereArgs: [itemId],
     );
     return Items.toList(response);
   }
@@ -365,6 +380,7 @@ abstract class BackEnd {
         "Created_Date": transasction.createdDate,
       };
       final response = await db.insert("Transactions", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
+
       return response;
     } catch (e) {
       return 0;
@@ -383,12 +399,34 @@ abstract class BackEnd {
     }
   }
 
+  static Future<List<Trx>> fetchActiveTransactions() async {
+    try {
+      final db = await BackEnd.db();
+      final response = await db.rawQuery("""
+          SELECT * FROM Transactions WHERE Transaction_Type = '${Constant.active}'
+      """);
+      return Trx.toList(response);
+    } catch (e) {
+      return [];
+    }
+  }
+
   static Future<List<Trx>> fetchRequriedCustomerTransactions({required int customerId}) async {
     final Database db = await BackEnd.db();
     final List<Map<String, Object?>> response = await db.query(
       "Transactions",
       where: 'Customer_ID = ?',
       whereArgs: [customerId],
+    );
+    return Trx.toList(response);
+  }
+
+  static Future<List<Trx>> fetchRequriedTransaction({required int transacrtionId}) async {
+    final Database db = await BackEnd.db();
+    final List<Map<String, Object?>> response = await db.query(
+      "Transactions",
+      where: 'Transaction_ID = ?',
+      whereArgs: [transacrtionId],
     );
     return Trx.toList(response);
   }
@@ -405,9 +443,49 @@ abstract class BackEnd {
     }
   }
 
+  static Future<int> updateTransactionAsPaid({required int id}) async {
+    final db = await BackEnd.db();
+    final data = {'Transaction_Type': Constant.inactive};
+    final result = await db.update('Transactions', data, where: "Transaction_ID = ?", whereArgs: [id]);
+
+    return result;
+  }
+
+  //// P A Y M E N T S
+
+  ///Fetch All payments based on requrited transaction
+  static Future<List<Payment>> fetchRequriedPaymentsOfTransaction({required int transactionId}) async {
+    final Database db = await BackEnd.db();
+    final List<Map<String, Object?>> response =
+        await db.query('Payments', where: 'Transaction_ID = ?', whereArgs: [transactionId]);
+
+    return Payment.toList(response);
+  }
+
+  static Future<int> addPayment({required Payment payment}) async {
+    try {
+      final db = await BackEnd.db();
+      final Map<String, Object> data = {
+        "Transaction_ID": payment.transactionId,
+        "Payment_Date": payment.paymentDate,
+        "Amount_Paid": payment.amountpaid,
+        "Payment_Type": payment.type,
+        "Created_Date": payment.createdDate,
+      };
+      try {
+        final int id = await db.insert("Payments", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
+        return id;
+      } catch (e) {
+        return 0;
+      }
+    } catch (e) {
+      return 0;
+    }
+  }
+
   //// H I S T O R Y
   /// fetch all history
-  static fetchAllUserHistory() async {
+  static Future<List<UserHistory>> fetchAllUserHistory() async {
     final Database db = await BackEnd.db();
     final List<Map<String, Object?>> response = await db.rawQuery("""SELECT * FROM History ORDER BY Event_Date DESC""");
     return UserHistory.toList(response);
@@ -428,7 +506,11 @@ abstract class BackEnd {
         "Event_Type": history.eventType,
       };
       try {
-        final int id = await db.insert("History", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
+        final int id = await db.insert(
+          "History",
+          data,
+          conflictAlgorithm: sql.ConflictAlgorithm.abort,
+        );
         return id;
       } catch (e) {
         return 0;
