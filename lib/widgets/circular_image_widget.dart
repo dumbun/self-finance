@@ -16,10 +16,13 @@ class CircularImageWidget extends StatelessWidget {
             onTap: () {
               Routes.navigateToImageView(context: context, imageData: imageData, titile: titile);
             },
-            child: Utility.imageFromBase64String(
-              imageData,
-              height: 44.sp,
-              width: 44.sp,
+            child: Hero(
+              tag: titile,
+              child: Utility.imageFromBase64String(
+                imageData,
+                height: 44.sp,
+                width: 44.sp,
+              ),
             ),
           )
         : DefaultUserImage(

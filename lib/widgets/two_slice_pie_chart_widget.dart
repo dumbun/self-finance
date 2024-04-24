@@ -29,7 +29,7 @@ class _TwoSlicePieChartWidgetState extends State<TwoSlicePieChartWidget> {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1.5,
+      aspectRatio: 2.0,
       child: Row(
         children: [
           Expanded(
@@ -53,8 +53,8 @@ class _TwoSlicePieChartWidgetState extends State<TwoSlicePieChartWidget> {
                   borderData: FlBorderData(
                     show: true,
                   ),
-                  sectionsSpace: 5.sp,
-                  centerSpaceRadius: 25.sp,
+                  sectionsSpace: 8.sp,
+                  centerSpaceRadius: 20.sp,
                   sections: showingSections(),
                 ),
               ),

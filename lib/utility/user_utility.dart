@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -138,16 +139,22 @@ class Utility {
   static screenShotShare(ScreenshotController screenshotController, BuildContext context) async {
     double pixelRatio = MediaQuery.of(context).devicePixelRatio;
 
-    await screenshotController
-        .capture(pixelRatio: pixelRatio, delay: const Duration(milliseconds: 10))
-        .then((Uint8List? image) async {
-      if (image != null) {
-        final directory = await getApplicationDocumentsDirectory();
-        final imagePath = XFile('${directory.path}/image.png');
+    try {
+      await screenshotController
+          .capture(delay: const Duration(milliseconds: 15), pixelRatio: pixelRatio)
+          .then((Uint8List? image) async {
+        if (image != null) {
+          final directory = await getApplicationDocumentsDirectory();
+          final imagePath = await File('${directory.path}/image.png').create();
+          await imagePath.writeAsBytes(image);
+          final XFile responce = XFile(imagePath.path);
 
-        /// Share Plugin
-        await Share.shareXFiles([imagePath]);
-      }
-    });
+          /// Share Plugin
+          await Share.shareXFiles([responce]);
+        }
+      });
+    } catch (e) {
+      //
+    }
   }
 }

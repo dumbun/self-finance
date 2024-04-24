@@ -16,16 +16,31 @@ import 'package:self_finance/widgets/title_widget.dart';
 ///[selectedPageIndexProvider] is a provider which is auto dispose
 ///this provider helps to maintain
 ///the state of the buttom navigation bar in the dashboard
-final AutoDisposeStateProvider<int> selectedPageIndexProvider = StateProvider.autoDispose<int>((ref) {
+final StateProvider<int> selectedPageIndexProvider = StateProvider<int>((ref) {
   return 0;
 });
 
-class DashboardView extends StatelessWidget {
+final StateProvider<PageController> dashboardPageController = StateProvider<PageController>((ref) {
+  final PageController pageController = PageController();
+  return pageController;
+});
+
+class DashboardView extends ConsumerWidget {
   const DashboardView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final PageController pageController = PageController();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final PageController pageController = ref.watch(dashboardPageController);
+
+    void _changePage(int index) {
+      final PageController dashboardController = ref.read(dashboardPageController);
+      dashboardController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeInOut,
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
@@ -115,13 +130,7 @@ class DashboardView extends StatelessWidget {
             ],
             selectedItemColor: AppColors.getPrimaryColor,
             currentIndex: ref.watch(selectedPageIndexProvider),
-            onTap: (index) {
-              pageController.animateToPage(
-                index,
-                duration: const Duration(milliseconds: 450),
-                curve: Curves.easeInOut,
-              );
-            },
+            onTap: (index) => _changePage(index),
           );
         },
       ),

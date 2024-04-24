@@ -125,7 +125,7 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
                       emiPerMonth: emiPerMonth,
                       principalAmount: principalAmount,
                       monthsAndDays: monthsAndDays,
-                    )
+                    ),
                   ],
                 );
               },
@@ -227,29 +227,15 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
     required String result,
   }) {
     return Card(
-      child: Padding(
-        padding: EdgeInsets.all(16.sp),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(icon),
-                SizedBox(width: 12.sp),
-                BodyTwoDefaultText(
-                  text: label,
-                  bold: true,
-                ),
-              ],
-            ),
-            BodyTwoDefaultText(
-              text: result,
-              bold: true,
-            ),
-          ],
+      child: ListTile(
+        leading: Icon(icon),
+        title: BodyTwoDefaultText(
+          text: label,
+          bold: true,
+        ),
+        trailing: BodyTwoDefaultText(
+          text: result,
+          bold: true,
         ),
       ),
     );

@@ -36,6 +36,16 @@ class ContactDetailsView extends ConsumerWidget {
   const ContactDetailsView({super.key, required this.customerID});
   final int customerID;
 
+  void _navigateToTransactionDetailsView(WidgetRef ref, BuildContext context, Trx trancation) {
+    ref.read(asyncCustomersProvider.notifier).fetchRequriedCustomerDetails(customerID: customerID).then(
+          (List<Customer> customerDetails) => Routes.navigateToTransactionDetailsView(
+            transacrtion: trancation,
+            context: context,
+            customerDetails: customerDetails.first,
+          ),
+        );
+  }
+
   Consumer _buildTransactionsHistory() {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
@@ -49,8 +59,7 @@ class ContactDetailsView extends ConsumerWidget {
                         separatorBuilder: (BuildContext context, int index) => SizedBox(height: 12.sp),
                         itemBuilder: (BuildContext context, int index) {
                           return GestureDetector(
-                            onTap: () => Routes.navigateToTransactionDetailsView(
-                                transacrtion: transactions[index], context: context),
+                            onTap: () => _navigateToTransactionDetailsView(ref, context, transactions[index]),
                             child: Card(
                               child: Padding(
                                 padding: EdgeInsets.all(16.sp),
@@ -291,14 +300,11 @@ class ContactDetailsView extends ConsumerWidget {
   }
 
   /// [ _buildImage()] method to build the image of the customer
-  Hero _buildImage(String imageData, String customerName) {
-    return Hero(
-      tag: Constant.customerImageTag,
-      child: Center(
-        child: CircularImageWidget(
-          imageData: imageData,
-          titile: "$customerName photo",
-        ),
+  Center _buildImage(String imageData, String customerName) {
+    return Center(
+      child: CircularImageWidget(
+        imageData: imageData,
+        titile: "$customerName photo",
       ),
     );
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
@@ -12,13 +11,12 @@ import 'package:self_finance/views/transaction_detail_view.dart';
 import 'package:self_finance/views/user_creating_view.dart';
 
 class Routes {
-  static void navigateToTransactionDetailsView({
-    required Trx transacrtion,
-    required BuildContext context,
-  }) {
+  static void navigateToTransactionDetailsView(
+      {required Trx transacrtion, required BuildContext context, required Customer customerDetails}) {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => TransactionDetailView(
         transacrtion: transacrtion,
+        customerDetails: customerDetails,
       ),
     ));
   }

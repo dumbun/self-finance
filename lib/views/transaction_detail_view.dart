@@ -5,17 +5,24 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
+import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/logic/logic.dart';
+import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/payment_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/models/user_history.dart';
 import 'package:self_finance/providers/app_currency_provider.dart';
+import 'package:self_finance/providers/customer_provider.dart';
+import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/items_provider.dart';
 import 'package:self_finance/providers/requried_payments_provider.dart';
 import 'package:self_finance/providers/requried_transaction_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/widgets/circular_image_widget.dart';
+import 'package:self_finance/widgets/round_corner_button.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
 
 // providers
@@ -44,10 +51,11 @@ final AutoDisposeProviderFamily<List<Payment>, int> paymentsProvider =
       );
 });
 
-final class TransactionDetailView extends StatelessWidget {
-  TransactionDetailView({super.key, required this.transacrtion});
+class TransactionDetailView extends StatelessWidget {
+  TransactionDetailView({super.key, required this.transacrtion, required this.customerDetails});
 
   final Trx transacrtion;
+  final Customer customerDetails;
 
   Column _buildDate(String eventDate) {
     return Column(
@@ -65,7 +73,7 @@ final class TransactionDetailView extends StatelessWidget {
     );
   }
 
-  _buildDateCards(List<Payment> payments) {
+  Card _buildDateCards(List<Payment> payments) {
     if (payments.isNotEmpty) {
       return Card(
         child: ListTile(
@@ -99,7 +107,6 @@ final class TransactionDetailView extends StatelessWidget {
       builder: (context, ref, child) {
         final List<Payment> payments = ref.watch(paymentsProvider(transacrtion.id!));
         final String appCurrency = ref.watch(currencyProvider);
-        final DateTime presentDate = DateTime.now();
 
         return ref.watch(asyncRequriedTransactionsProvider(transacrtion.id!)).when(
               data: (List<Trx> data) {
@@ -110,8 +117,7 @@ final class TransactionDetailView extends StatelessWidget {
                   tenureDate: payments.isNotEmpty ? DateTime.tryParse(payments.first.paymentDate) : DateTime.now(),
                 );
 
-                return Screenshot(
-                  controller: screenShotController,
+                return Expanded(
                   child: ListView(
                     children: [
                       Card(
@@ -272,23 +278,11 @@ final class TransactionDetailView extends StatelessWidget {
                               child: CircularProgressIndicator.adaptive(),
                             ),
                           ),
+                      SizedBox(height: 12.sp),
                       if (data.first.transacrtionType == Constant.active)
                         _buildActionButton(
-                          onPressed: () async {
-                            await ref.read(AsyncRequriedPaymentProvider(data.first.id!).notifier).addPayment(
-                                  payment: Payment(
-                                    transactionId: data.first.id!,
-                                    paymentDate: presentDate.toIso8601String(),
-                                    amountpaid: data.first.amount,
-                                    type: 'cash',
-                                    createdDate: DateTime.now().toIso8601String(),
-                                  ),
-                                );
-                            await ref
-                                .read(asyncRequriedTransactionsProvider(data.first.id!).notifier)
-                                .markAsPaidTransaction(trancationId: data.first.id!);
-                          },
-                          icon: const Icon(Icons.done),
+                          onPressed: () => _markAsPaid(ref, data.first),
+                          icon: Icons.done,
                           text: "Mark As Paid",
                         )
                     ],
@@ -304,17 +298,85 @@ final class TransactionDetailView extends StatelessWidget {
     );
   }
 
+  void _markAsPaid(
+    WidgetRef ref,
+    Trx transaction,
+  ) async {
+    final DateTime presentDate = DateTime.now();
+    await ref.read(AsyncRequriedPaymentProvider(transaction.id!).notifier).addPayment(
+          payment: Payment(
+            transactionId: transaction.id!,
+            paymentDate: presentDate.toIso8601String(),
+            amountpaid: transaction.amount,
+            type: 'cash',
+            createdDate: DateTime.now().toIso8601String(),
+          ),
+        );
+    await ref
+        .read(asyncRequriedTransactionsProvider(transaction.id!).notifier)
+        .markAsPaidTransaction(trancationId: transaction.id!);
+    final List<Customer> c = await ref
+        .watch(asyncCustomersProvider.notifier)
+        .fetchRequriedCustomerDetails(customerID: transaction.customerId);
+    await ref.read(asyncHistoryProvider.notifier).addHistory(
+          history: UserHistory(
+            userID: 1, //default
+            customerID: transaction.customerId,
+            itemID: transaction.itemId,
+            customerNumber: c.first.number,
+            customerName: c.first.name,
+            transactionID: transaction.id!,
+            eventDate: Utility.presentDate().toString(),
+            eventType: Constant.credit,
+            amount: transaction.amount,
+          ),
+        );
+  }
+
   _buildActionButton({
-    required void Function()? onPressed,
-    required Widget icon,
+    required void Function() onPressed,
+    required IconData icon,
     required String text,
   }) {
-    return ElevatedButton.icon(
-      style: const ButtonStyle(elevation: MaterialStatePropertyAll(0)),
+    return RoundedCornerButton(
       onPressed: onPressed,
       icon: icon,
-      label: BodyTwoDefaultText(
-        text: text,
+      text: text,
+    );
+  }
+
+  Card _buildCustomerDetails() {
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 20.sp),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BodyTwoDefaultText(
+                  text: customerDetails.name,
+                  bold: true,
+                ),
+                BodyTwoDefaultText(
+                  text: customerDetails.number,
+                  color: AppColors.getLigthGreyColor,
+                ),
+                BodyTwoDefaultText(
+                  text: customerDetails.address,
+                  color: AppColors.getLigthGreyColor,
+                ),
+              ],
+            ),
+            CircularImageWidget(
+              imageData: customerDetails.photo,
+              titile: "${customerDetails.name} photo",
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -339,9 +401,24 @@ final class TransactionDetailView extends StatelessWidget {
           bold: true,
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(12.sp),
-        child: _buildTransactionDetails(screenShotController),
+      body: Screenshot(
+        controller: screenShotController,
+        child: Padding(
+          padding: EdgeInsets.all(12.sp),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildCustomerDetails(),
+              SizedBox(height: 12.sp),
+              const BodyOneDefaultText(
+                text: 'Transaction Details',
+                bold: true,
+              ),
+              _buildTransactionDetails(screenShotController),
+            ],
+          ),
+        ),
       ),
     );
   }
