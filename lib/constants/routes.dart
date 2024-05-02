@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/models/user_history.dart';
 import 'package:self_finance/views/add_new_transaction_view.dart';
 import 'package:self_finance/views/contact_details_view.dart';
 import 'package:self_finance/views/customer_editind_view.dart';
+import 'package:self_finance/views/history/history_detailed_view.dart';
 import 'package:self_finance/views/pin_creating_view.dart';
 import 'package:self_finance/views/image_view.dart';
 import 'package:self_finance/views/transaction_detail_view.dart';
@@ -85,6 +87,18 @@ class Routes {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) => ImageView(imageString: imageData, titile: titile),
+      ),
+    );
+  }
+
+  static void navigateToHistoryDetailedView(
+      {required BuildContext context, required Customer customer, required UserHistory history}) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) => HistoryDetailedView(
+          customer: customer,
+          history: history,
+        ),
       ),
     );
   }

@@ -58,5 +58,7 @@
 		<string>sms</string>
   		<string>tel</string>
 	</array>
+	<key>FLTEnableImpeller</key>
+  	<true />
 </dict>
 </plist>

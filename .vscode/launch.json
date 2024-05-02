@@ -9,7 +9,7 @@
       "request": "launch",
       "type": "dart",
       "noDebug": true,
-      "args": ["--no-enable-impeller"]
+      "args": ["--enable-impeller"]
     },
     {
       "name": "self_finance (profile mode)",

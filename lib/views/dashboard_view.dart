@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_view.dart';
@@ -31,8 +29,8 @@ class DashboardView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final PageController pageController = ref.watch(dashboardPageController);
-
-    void _changePage(int index) {
+    final int selectedPageIndex = ref.watch(selectedPageIndexProvider);
+    void changePage(int index) {
       final PageController dashboardController = ref.read(dashboardPageController);
       dashboardController.animateToPage(
         index,
@@ -44,17 +42,12 @@ class DashboardView extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
-        title: Consumer(
-          builder: (BuildContext context, WidgetRef ref, Widget? child) {
-            final int pageIndex = ref.watch(selectedPageIndexProvider);
-            return TitleWidget(
-              text: switch (pageIndex) {
-                0 => Constant.homeScreen,
-                1 => Constant.emiCalculatorTitle,
-                2 => Constant.history,
-                int() => throw UnimplementedError(),
-              },
-            );
+        title: TitleWidget(
+          text: switch (selectedPageIndex) {
+            0 => Constant.homeScreen,
+            1 => Constant.emiCalculatorTitle,
+            2 => Constant.history,
+            int() => throw UnimplementedError(),
           },
         ),
       ),
@@ -63,76 +56,44 @@ class DashboardView extends ConsumerWidget {
       body: SafeArea(
         child: GestureDetector(
           onTap: Utility.unfocus,
-          child: Consumer(
-            builder: (context, ref, child) {
-              return PageView(
-                controller: pageController,
-                onPageChanged: (index) {
-                  ref.read(selectedPageIndexProvider.notifier).update((state) => index);
-                },
-                children: const <Widget>[
-                  HomeScreen(),
-                  EMICalculatorView(),
-                  HistoryView(),
-                ],
-              );
+          child: PageView(
+            controller: pageController,
+            onPageChanged: (int index) {
+              ref.read(selectedPageIndexProvider.notifier).update((state) => index);
             },
+            children: const <Widget>[
+              HomeScreen(),
+              EMICalculatorView(),
+              HistoryView(),
+            ],
           ),
         ),
       ),
-      floatingActionButton: Consumer(
-        builder: (context, ref, child) {
-          final int pageIndex = ref.watch(selectedPageIndexProvider);
-          return switch (pageIndex) {
-            0 => ExpandableFab(
-                distance: 32.sp,
-                children: [
-                  ActionButton(
-                    toolTip: Constant.addNewTransactionToolTip,
-                    onPressed: () => {
-                      Routes.navigateToContactsView(context),
-                    },
-                    icon: const Icon(Icons.format_align_left),
-                  ),
-                  ActionButton(
-                    toolTip: Constant.addNewCustomerToolTip,
-                    onPressed: () => Routes.navigateToAddNewEntry(context: context),
-                    icon: const Icon(Icons.person_add_alt_1),
-                  ),
-                ],
-              ),
-            _ => const SizedBox.shrink()
-          };
-        },
-      ),
-      bottomNavigationBar: Consumer(
-        builder: (BuildContext context, WidgetRef ref, Widget? child) {
-          return BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                label: Constant.home,
-                tooltip: Constant.homeScreen,
-                activeIcon: Icon(Icons.home_rounded),
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.calculate_outlined),
-                label: Constant.emiCalculatorTitle,
-                activeIcon: Icon(Icons.calculate_rounded),
-                tooltip: Constant.emiCalculatorToolTip,
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.history_toggle_off),
-                label: Constant.history,
-                activeIcon: Icon(Icons.history_rounded),
-                tooltip: Constant.historyToolTip,
-              ),
-            ],
-            selectedItemColor: AppColors.getPrimaryColor,
-            currentIndex: ref.watch(selectedPageIndexProvider),
-            onTap: (index) => _changePage(index),
-          );
-        },
+      floatingActionButton: selectedPageIndex == 0 ? const ExpandableFab() : const SizedBox.shrink(),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: Constant.home,
+            tooltip: Constant.homeScreen,
+            activeIcon: Icon(Icons.home_rounded),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calculate_outlined),
+            label: Constant.emiCalculatorTitle,
+            activeIcon: Icon(Icons.calculate_rounded),
+            tooltip: Constant.emiCalculatorToolTip,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history_toggle_off),
+            label: Constant.history,
+            activeIcon: Icon(Icons.history_rounded),
+            tooltip: Constant.historyToolTip,
+          ),
+        ],
+        selectedItemColor: AppColors.getPrimaryColor,
+        currentIndex: selectedPageIndex,
+        onTap: (index) => changePage(index),
       ),
     );
   }

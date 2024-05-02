@@ -8,18 +8,18 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 20.0.sp,
-        right: 20.sp,
-      ),
-      child: SingleChildScrollView(
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 20.0.sp,
+          right: 20.sp,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const HomeScreenGraphWidget(),
-            SizedBox(height: 18.sp),
+            SizedBox(height: 22.sp),
             const LatestTransactionsWidget(),
           ],
         ),
