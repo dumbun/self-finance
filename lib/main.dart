@@ -13,6 +13,7 @@ import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/account_setting_view.dart';
 
 void main() async {
+  // ensuring all the plugins are connected to the system before running the code
   WidgetsFlutterBinding.ensureInitialized();
   await UserBackEnd.db();
   await BackEnd.db();

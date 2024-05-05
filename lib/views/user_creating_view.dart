@@ -26,7 +26,7 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
   String userProfilePicString = "";
   final double height = 55.sp;
   final double width = 55.sp;
-  final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nameInput = TextEditingController();
   final TextEditingController _currencyInput = TextEditingController();
   Widget? pickedItemImage;
@@ -37,91 +37,31 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Padding(
-                padding: EdgeInsets.all(18.sp),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    _buildImagePickWidget(),
-                    SizedBox(height: 24.sp),
-                    InputTextField(
-                      controller: _nameInput,
-                      hintText: Constant.pleaseEnterTheName,
-                      keyboardType: TextInputType.name,
-                    ),
-                    SizedBox(height: 24.sp),
-                    CurrencyTypeInputWidget(
-                      controller: _currencyInput,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => createUser(
-          User(
-            id: 1,
-            userName: _nameInput.text,
-            userPin: widget.pin,
-            userCurrency: _currencyInput.text,
-            profilePicture: userProfilePicString,
-          ),
-        ),
-        backgroundColor: AppColors.getPrimaryColor,
-        enableFeedback: true,
-        autofocus: true,
-        isExtended: true,
-        mini: false,
-        shape: const CircleBorder(),
-        tooltip: "Next",
-        splashColor: AppColors.getPrimaryColor,
-        focusElevation: 40.sp,
-        child: const Icon(
-          Icons.arrow_forward_ios_rounded,
-          color: AppColors.getBackgroundColor,
-        ),
-      ),
-    );
-  }
-
   /// navigates to the main Dashboard view
-  void navigateToDashboard() {
+  void _navigateToDashboard() {
     Routes.navigateToDashboard(context: context);
     SnackBarWidget.snackBarWidget(context: context, message: "success : user created successfully ");
   }
 
   /// to show errors if avilable
-  void showAlerts() {
+  void _showAlerts() {
     AlertDilogs.alertDialogWithOneAction(context, "error", 'Please try after some time');
   }
 
   /// to create user [createUser]
-  void createUser(User user) async {
-    if (validateAndSave()) {
+  void _createUser(User user) async {
+    if (_validateAndSave()) {
       try {
         final bool result = await ref.read(asyncUserProvider.notifier).addUser(user: user);
-        result ? navigateToDashboard() : showAlerts();
+        result ? _navigateToDashboard() : _showAlerts();
       } catch (e) {
-        showAlerts();
+        _showAlerts();
       }
     }
   }
 
   // form validation
-  bool validateAndSave() {
+  bool _validateAndSave() {
     final FormState? form = _formKey.currentState;
     if (form!.validate()) {
       return true;
@@ -175,6 +115,66 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Padding(
+                padding: EdgeInsets.all(18.sp),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    _buildImagePickWidget(),
+                    SizedBox(height: 24.sp),
+                    InputTextField(
+                      controller: _nameInput,
+                      hintText: Constant.pleaseEnterTheName,
+                      keyboardType: TextInputType.name,
+                    ),
+                    SizedBox(height: 24.sp),
+                    CurrencyTypeInputWidget(
+                      controller: _currencyInput,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _createUser(
+          User(
+            id: 1,
+            userName: _nameInput.text,
+            userPin: widget.pin,
+            userCurrency: _currencyInput.text,
+            profilePicture: userProfilePicString,
+          ),
+        ),
+        backgroundColor: AppColors.getPrimaryColor,
+        enableFeedback: true,
+        autofocus: true,
+        isExtended: true,
+        mini: false,
+        shape: const CircleBorder(),
+        tooltip: "Next",
+        splashColor: AppColors.getPrimaryColor,
+        focusElevation: 40.sp,
+        child: const Icon(
+          Icons.arrow_forward_ios_rounded,
+          color: AppColors.getBackgroundColor,
         ),
       ),
     );

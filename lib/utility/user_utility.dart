@@ -136,7 +136,7 @@ class Utility {
     return result;
   }
 
-  static screenShotShare(ScreenshotController screenshotController, BuildContext context) async {
+  static void screenShotShare(ScreenshotController screenshotController, BuildContext context) async {
     double pixelRatio = MediaQuery.of(context).devicePixelRatio;
 
     try {

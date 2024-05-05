@@ -4,11 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
+import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history.dart';
 import 'package:self_finance/providers/app_currency_provider.dart';
+import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
+import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
@@ -16,34 +21,10 @@ import 'package:self_finance/widgets/refresh_widget.dart';
 class HistoryView extends ConsumerWidget {
   const HistoryView({super.key});
 
-  Expanded _buildhistoryList(List<UserHistory> data, currencyType) {
-    return Expanded(
-      child: ListView.builder(
-        itemBuilder: (context, index) {
-          return _buildListTile(data[index], currencyType);
-        },
-        itemCount: data.length,
-      ),
-    );
-  }
-
-  ListTile _buildListTile(UserHistory data, String currencyType) {
-    return ListTile(
-      leading: _buildIcon(type: data.eventType),
-      title: _buildAmount(data.eventType, data.amount, currencyType),
-      subtitle: BodyTwoDefaultText(
-        text: data.customerName,
-        color: AppColors.getLigthGreyColor,
-        bold: true,
-      ),
-      trailing: _buildDate(data.eventDate),
-    );
-  }
-
   BodyOneDefaultText _buildAmount(String type, double amount, String currencyType) {
     return BodyOneDefaultText(
       bold: true,
-      text: "${type == Constant.debited ? "- " : "+ "}${Utility.doubleFormate(amount)} $currencyType",
+      text: "${Utility.doubleFormate(amount)} $currencyType",
     );
   }
 
@@ -90,6 +71,44 @@ class HistoryView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ListTile buildListTile(UserHistory data) {
+      return ListTile(
+        onTap: () =>
+            ref.read(asyncCustomersProvider.notifier).fetchRequriedCustomerDetails(customerID: data.customerID).then(
+                  (List<Customer> customer) => ref
+                      .read(asyncTransactionsProvider.notifier)
+                      .fetchRequriedTransaction(transactionId: data.transactionID)
+                      .then(
+                        (List<Trx> transaction) => Routes.navigateToHistoryDetailedView(
+                          context: context,
+                          customer: customer.first,
+                          history: data,
+                          transaction: transaction.first,
+                        ),
+                      ),
+                ),
+        leading: _buildIcon(type: data.eventType),
+        title: _buildAmount(data.eventType, data.amount, ref.watch(currencyProvider)),
+        subtitle: BodyTwoDefaultText(
+          text: data.customerName,
+          color: AppColors.getLigthGreyColor,
+          bold: true,
+        ),
+        trailing: _buildDate(data.eventDate),
+      );
+    }
+
+    Expanded buildhistoryList(List<UserHistory> data, currencyType) {
+      return Expanded(
+        child: ListView.builder(
+          itemBuilder: (context, index) {
+            return buildListTile(data[index]);
+          },
+          itemCount: data.length,
+        ),
+      );
+    }
+
     return RefreshWidget(
       onRefresh: () => ref.refresh(asyncHistoryProvider.future),
       child: Padding(
@@ -100,7 +119,6 @@ class HistoryView extends ConsumerWidget {
           children: [
             CupertinoSearchTextField(
               autocorrect: false,
-              enableIMEPersonalizedLearning: true,
               style: const TextStyle(
                 color: AppColors.getPrimaryColor,
                 fontWeight: FontWeight.bold,
@@ -109,13 +127,17 @@ class HistoryView extends ConsumerWidget {
               onChanged: (value) => ref.read(asyncHistoryProvider.notifier).doSearch(givenInput: value),
             ),
             SizedBox(height: 16.sp),
-            ref.watch(asyncHistoryProvider).when(
-                  data: (data) => _buildhistoryList(data, ref.watch(currencyProvider)),
-                  error: (error, stackTrace) => Text(error.toString()),
-                  loading: () => const Center(
-                    child: CircularProgressIndicator.adaptive(),
-                  ),
-                ),
+            Consumer(
+              builder: (context, ref, child) {
+                return ref.watch(asyncHistoryProvider).when(
+                      data: (data) => buildhistoryList(data, ref.watch(currencyProvider)),
+                      error: (error, stackTrace) => Text(error.toString()),
+                      loading: () => const Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      ),
+                    );
+              },
+            ),
           ],
         ),
       ),

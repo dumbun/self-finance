@@ -91,13 +91,18 @@ class Routes {
     );
   }
 
-  static void navigateToHistoryDetailedView(
-      {required BuildContext context, required Customer customer, required UserHistory history}) {
+  static void navigateToHistoryDetailedView({
+    required BuildContext context,
+    required Customer customer,
+    required UserHistory history,
+    required Trx transaction,
+  }) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context) => HistoryDetailedView(
           customer: customer,
           history: history,
+          transaction: transaction,
         ),
       ),
     );

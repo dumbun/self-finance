@@ -6,7 +6,7 @@ part of 'history_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$asyncHistoryHash() => r'86f26e8caa43f685cb0888c2a51afb17effbe346';
+String _$asyncHistoryHash() => r'b386cd6ac0513e29324a6b770d3bf9f4c0bfc550';
 
 /// See also [AsyncHistory].
 @ProviderFor(AsyncHistory)

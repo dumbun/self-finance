@@ -7,12 +7,19 @@ import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history.dart';
 import 'package:self_finance/providers/app_currency_provider.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
+import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/views/dashboard_view.dart';
+
+final AutoDisposeFutureProvider<List<UserHistory>> latestUserHistoryProvider =
+    FutureProvider.autoDispose((AutoDisposeFutureProviderRef<List<UserHistory>> ref) async {
+  return await ref.watch(asyncHistoryProvider.notifier).build();
+});
 
 class LatestTransactionsWidget extends ConsumerWidget {
   const LatestTransactionsWidget({super.key});
@@ -48,10 +55,25 @@ class LatestTransactionsWidget extends ConsumerWidget {
       );
     }
 
-    return ref.watch(asyncHistoryProvider).when(
+    void navigateToHistoryDetailedView(int customerID, UserHistory history) {
+      ref.read(asyncCustomersProvider.notifier).fetchRequriedCustomerDetails(customerID: customerID).then(
+          (List<Customer> customer) => ref
+              .read(asyncTransactionsProvider.notifier)
+              .fetchRequriedTransaction(transactionId: history.transactionID)
+              .then(
+                (List<Trx> transaction) => Routes.navigateToHistoryDetailedView(
+                  context: context,
+                  customer: customer.first,
+                  history: history,
+                  transaction: transaction.first,
+                ),
+              ));
+    }
+
+    return ref.watch(latestUserHistoryProvider).when(
           data: (List<UserHistory> data) {
             if (data.isEmpty) {
-              return const SizedBox();
+              return const SizedBox.shrink();
             }
             return SizedBox(
               height: 84.sp,
@@ -71,22 +93,13 @@ class LatestTransactionsWidget extends ConsumerWidget {
                       shrinkWrap: false,
                       addAutomaticKeepAlives: true,
                       itemCount: data.length > 4 ? 4 : data.length,
-                      itemBuilder: (context, index) {
+                      itemBuilder: (BuildContext context, int index) {
                         return Card(
                           elevation: 0,
                           child: Padding(
                             padding: EdgeInsets.all(4.sp),
                             child: ListTile(
-                              onTap: () async {
-                                final List<Customer> customer = await ref
-                                    .read(asyncCustomersProvider.notifier)
-                                    .fetchRequriedCustomerDetails(customerID: data[index].customerID);
-                                Routes.navigateToHistoryDetailedView(
-                                  context: context,
-                                  customer: customer.first,
-                                  history: data[index],
-                                );
-                              },
+                              onTap: () => navigateToHistoryDetailedView(data[index].customerID, data[index]),
                               leading: data[index].eventType == Constant.debited
                                   ? const Icon(
                                       Icons.arrow_upward_rounded,
@@ -123,7 +136,7 @@ class LatestTransactionsWidget extends ConsumerWidget {
               ),
             );
           },
-          error: (error, stackTrace) => const BodyTwoDefaultText(
+          error: (Object error, StackTrace stackTrace) => const BodyTwoDefaultText(
             text: Constant.error,
           ),
           loading: () => const Center(

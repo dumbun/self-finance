@@ -55,4 +55,8 @@ class AsyncHistory extends _$AsyncHistory {
       }
     });
   }
+
+  Future<List<UserHistory>> fetchAllUserHistory() async {
+    return await _fetchAllItemsData();
+  }
 }

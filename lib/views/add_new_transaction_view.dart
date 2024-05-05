@@ -52,74 +52,6 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const BodyTwoDefaultText(
-          text: Constant.addNewTransaction,
-          bold: true,
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Padding(
-              padding: EdgeInsets.all(18.sp),
-              child: Column(
-                children: [
-                  SizedBox(height: 12.sp),
-                  InputTextField(
-                    validator: (value) => Utility.amountValidation(value: value),
-                    keyboardType: TextInputType.number,
-                    hintText: Constant.takenAmount,
-                    controller: _amount,
-                  ),
-                  SizedBox(height: 20.sp),
-                  InputTextField(
-                    validator: (value) => Utility.amountValidation(value: value),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    hintText: Constant.rateOfIntrest,
-                    controller: _rateOfIntrest,
-                  ),
-                  SizedBox(height: 20.sp),
-                  InputDatePicker(
-                    controller: _transacrtionDate,
-                    firstDate: DateTime(1000),
-                    initialDate: DateTime.now(),
-                    lastDate: DateTime.now(),
-                    labelText: Constant.takenDate,
-                  ),
-                  SizedBox(height: 20.sp),
-                  InputTextField(
-                    keyboardType: TextInputType.multiline,
-                    hintText: Constant.itemDescription,
-                    controller: _description,
-                  ),
-                  SizedBox(height: 30.sp),
-                  _buldItemImagePicker(),
-                  SizedBox(height: 30.sp),
-                  Hero(
-                    tag: Constant.saveButtonTag,
-                    child: Visibility(
-                      visible: _isloading,
-                      replacement: RoundedCornerButton(
-                        text: Constant.save,
-                        onPressed: _save,
-                      ),
-                      child: const CircularProgressIndicator.adaptive(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   bool _validateAndSave() {
     final FormState? form = _formKey.currentState;
     if (form!.validate()) {
@@ -242,6 +174,74 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const BodyTwoDefaultText(
+          text: Constant.addNewTransaction,
+          bold: true,
+        ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Padding(
+              padding: EdgeInsets.all(18.sp),
+              child: Column(
+                children: [
+                  SizedBox(height: 12.sp),
+                  InputTextField(
+                    validator: (value) => Utility.amountValidation(value: value),
+                    keyboardType: TextInputType.number,
+                    hintText: Constant.takenAmount,
+                    controller: _amount,
+                  ),
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    validator: (value) => Utility.amountValidation(value: value),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    hintText: Constant.rateOfIntrest,
+                    controller: _rateOfIntrest,
+                  ),
+                  SizedBox(height: 20.sp),
+                  InputDatePicker(
+                    controller: _transacrtionDate,
+                    firstDate: DateTime(1000),
+                    initialDate: DateTime.now(),
+                    lastDate: DateTime.now(),
+                    labelText: Constant.takenDate,
+                  ),
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    keyboardType: TextInputType.multiline,
+                    hintText: Constant.itemDescription,
+                    controller: _description,
+                  ),
+                  SizedBox(height: 30.sp),
+                  _buldItemImagePicker(),
+                  SizedBox(height: 30.sp),
+                  Hero(
+                    tag: Constant.saveButtonTag,
+                    child: Visibility(
+                      visible: _isloading,
+                      replacement: RoundedCornerButton(
+                        text: Constant.save,
+                        onPressed: _save,
+                      ),
+                      child: const CircularProgressIndicator.adaptive(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

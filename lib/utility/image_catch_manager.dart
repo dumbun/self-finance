@@ -17,7 +17,6 @@ class ImageCacheManager {
       final totalRAM = await platform.invokeMethod('getTotalRAM');
       _maxCacheSize = _calculateMaxCacheSize(totalRAM);
     } on PlatformException catch (e) {
-      print("Failed to get RAM info: ${e.message}");
       // Set a default cache size in case of failure
       _maxCacheSize = 100;
     }

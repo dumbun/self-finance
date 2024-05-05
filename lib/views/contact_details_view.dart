@@ -309,6 +309,30 @@ class ContactDetailsView extends ConsumerWidget {
     );
   }
 
+  PopupMenuItem<String> _buildPopUpMenuItems({
+    required String value,
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+  }) {
+    return PopupMenuItem<String>(
+      value: value,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: iconColor,
+          ),
+          SizedBox(width: 18.sp),
+          BodyTwoDefaultText(text: title),
+          SizedBox(width: 18.sp),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     void delateTheContact() {
@@ -404,30 +428,6 @@ class ContactDetailsView extends ConsumerWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  PopupMenuItem<String> _buildPopUpMenuItems({
-    required String value,
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-  }) {
-    return PopupMenuItem<String>(
-      value: value,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: iconColor,
-          ),
-          SizedBox(width: 18.sp),
-          BodyTwoDefaultText(text: title),
-          SizedBox(width: 18.sp),
-        ],
       ),
     );
   }

@@ -60,7 +60,7 @@ class ExpandableFab extends StatelessWidget {
           context: context,
           builder: (BuildContext context) {
             return Container(
-              height: 56.sp,
+              height: 64.sp,
               padding: EdgeInsets.all(20.sp),
               margin: EdgeInsets.symmetric(vertical: 20.sp),
               width: double.infinity,
