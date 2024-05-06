@@ -14,6 +14,7 @@ import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/views/dashboard_view.dart';
 
 final AutoDisposeFutureProvider<List<UserHistory>> latestUserHistoryProvider =
@@ -110,7 +111,7 @@ class LatestTransactionsWidget extends ConsumerWidget {
                                       color: AppColors.getGreenColor,
                                     ),
                               title: BodyOneDefaultText(
-                                text: '${data[index].amount} $appCurrency',
+                                text: '${Utility.doubleFormate(data[index].amount)} $appCurrency',
                                 bold: true,
                               ),
                               subtitle: BodyTwoDefaultText(

@@ -86,7 +86,7 @@ class HistoryDetailedView extends ConsumerWidget {
                               fontSize: 24.sp,
                               fontWeight: FontWeight.bold,
                             ),
-                            '${history.eventType == Constant.debited ? '-' : '+'} ${history.amount.toString()} $appCurrency',
+                            '${history.eventType == Constant.debited ? '-' : '+'} ${Utility.doubleFormate(history.amount)} $appCurrency',
                           ),
                           GestureDetector(
                             onTap: () => Routes.navigateToContactDetailsView(
@@ -126,7 +126,7 @@ class HistoryDetailedView extends ConsumerWidget {
                 _buildDetailesCard(
                   icon: Icons.circle,
                   title: 'Tranasction Status',
-                  details: Constant.active,
+                  details: transaction.transacrtionType == Constant.active ? Constant.active : Constant.inactive,
                 ),
                 Center(
                   child: TextButton(

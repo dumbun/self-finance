@@ -281,7 +281,11 @@ class TransactionDetailView extends StatelessWidget {
                       SizedBox(height: 12.sp),
                       if (data.first.transacrtionType == Constant.active)
                         _buildActionButton(
-                          onPressed: () => _markAsPaid(ref, data.first),
+                          onPressed: () => _markAsPaid(
+                            ref,
+                            data.first,
+                            calculator.totalInterestAmount,
+                          ),
                           icon: Icons.done,
                           text: "Mark As Paid",
                         )
@@ -301,6 +305,7 @@ class TransactionDetailView extends StatelessWidget {
   void _markAsPaid(
     WidgetRef ref,
     Trx transaction,
+    double totalAmountPaid,
   ) async {
     final DateTime presentDate = DateTime.now();
     await ref.read(AsyncRequriedPaymentProvider(transaction.id!).notifier).addPayment(
@@ -328,7 +333,7 @@ class TransactionDetailView extends StatelessWidget {
             transactionID: transaction.id!,
             eventDate: Utility.presentDate().toString(),
             eventType: Constant.credit,
-            amount: transaction.amount,
+            amount: totalAmountPaid,
           ),
         );
   }
