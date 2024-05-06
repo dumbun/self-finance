@@ -1,7 +1,7 @@
-import "dart:convert";
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/utility/image_catch_manager.dart';
 
 class ImageView extends StatelessWidget {
   const ImageView({super.key, required this.imageString, required this.titile});
@@ -28,7 +28,11 @@ class ImageView extends StatelessWidget {
         gaplessPlayback: true,
         tightMode: false,
         wantKeepAlive: true,
-        imageProvider: MemoryImage(base64Decode(imageString)),
+        imageProvider: ImageCacheManager.getCachedImage(
+          imageString,
+          double.infinity,
+          double.infinity,
+        ).image,
       ),
     );
   }

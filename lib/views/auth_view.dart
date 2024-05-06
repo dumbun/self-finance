@@ -20,8 +20,8 @@ class _AuthViewState extends ConsumerState<AuthView> {
 
   @override
   void initState() {
-    super.initState();
     _authenticateWithBiometrics();
+    super.initState();
   }
 
   @override

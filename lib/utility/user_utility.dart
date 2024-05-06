@@ -145,7 +145,7 @@ class Utility {
           .then((Uint8List? image) async {
         if (image != null) {
           final directory = await getApplicationDocumentsDirectory();
-          final imagePath = await File('${directory.path}/image.png').create();
+          final imagePath = await File('${directory.path}/image.jpeg').create();
           await imagePath.writeAsBytes(image);
           final XFile responce = XFile(imagePath.path);
 

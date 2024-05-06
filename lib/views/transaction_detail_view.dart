@@ -384,26 +384,26 @@ class TransactionDetailView extends StatelessWidget {
   final ScreenshotController screenShotController = ScreenshotController();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.share_rounded,
-              color: AppColors.getPrimaryColor,
+    return Screenshot(
+      controller: screenShotController,
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.share_rounded,
+                color: AppColors.getPrimaryColor,
+              ),
+              onPressed: () => Utility.screenShotShare(screenShotController, context),
             ),
-            onPressed: () => Utility.screenShotShare(screenShotController, context),
+          ],
+          title: const BodyTwoDefaultText(
+            text: "Transaction Details",
+            bold: true,
           ),
-        ],
-        title: const BodyTwoDefaultText(
-          text: "Transaction Details",
-          bold: true,
         ),
-      ),
-      body: Screenshot(
-        controller: screenShotController,
-        child: Padding(
+        body: Container(
           padding: EdgeInsets.all(12.sp),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,

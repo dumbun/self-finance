@@ -49,42 +49,42 @@ class LoanCalculator {
     this.tenureDate,
   });
 
-  int get days => getDays();
-  String get monthsAndRemainingDays => daysToMonthsAndRemainingDays();
-  double get interestPerDay => getInterestPerDay();
-  double get totalInterestAmount => totalInterest();
-  double get totalAmount => getTotal();
+  int get days => _getDays();
+  String get monthsAndRemainingDays => _daysToMonthsAndRemainingDays();
+  double get interestPerDay => _getInterestPerDay();
+  double get totalInterestAmount => _totalInterest();
+  double get totalAmount => _getTotal();
 
-  int getDays() {
+  int _getDays() {
     tenureDate ??= DateTime.now();
-    return DateUtils.getDaysDifference(takenDate, tenureDate!);
+    return DateUtils._getDaysDifference(takenDate, tenureDate!);
   }
 
-  String daysToMonthsAndRemainingDays() {
-    int days = getDays();
+  String _daysToMonthsAndRemainingDays() {
+    int days = _getDays();
     return "${(days ~/ 30)} Months - ${days % 30} Days";
   }
 
-  double getInterestPerDay() {
+  double _getInterestPerDay() {
     final num perMonth = takenAmount * (rateOfInterest / 100);
     return perMonth / 30;
   }
 
-  double totalInterest() {
-    final double interestPerDay = getInterestPerDay();
-    final int totalDays = getDays();
+  double _totalInterest() {
+    final double interestPerDay = _getInterestPerDay();
+    final int totalDays = _getDays();
     return interestPerDay * totalDays;
   }
 
-  double getTotal() {
-    final double interestPerDay = getInterestPerDay();
-    final int totalDays = getDays();
+  double _getTotal() {
+    final double interestPerDay = _getInterestPerDay();
+    final int totalDays = _getDays();
     return takenAmount + interestPerDay * totalDays;
   }
 }
 
 class DateUtils {
-  static int getDaysDifference(String startDate, DateTime endDate) {
+  static int _getDaysDifference(String startDate, DateTime endDate) {
     final DateFormat format = DateFormat("dd-MM-yyyy");
     final DateTime convertedStartDate = format.parseStrict(startDate);
     return endDate.difference(convertedStartDate).inDays;
