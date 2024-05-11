@@ -2,18 +2,51 @@ import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
 
+import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:screenshot/screenshot.dart';
+import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/utility/image_catch_manager.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 
 class Utility {
+  // send feedback email
+
+  static sendFeedbackEmail(BuildContext context) {
+    BetterFeedback.of(context).show((feedback) async {
+      // draft an email and send to developer
+      final screenshotFilePath = await Utility.writeImageToStorage(
+        feedback.screenshot,
+      );
+
+      final Email email = Email(
+        body: feedback.text,
+        subject: Constant.feedbackSubject,
+        recipients: [Constant.applicationHandleEmail],
+        attachmentPaths: [screenshotFilePath],
+        isHTML: false,
+      );
+      await FlutterEmailSender.send(email);
+    });
+  }
+
+  // writefeedback image to the storage
+  static Future<String> writeImageToStorage(Uint8List feedbackScreenshot) async {
+    final Directory output = await getTemporaryDirectory();
+    final String screenshotFilePath = '${output.path}/feedback.png';
+    final File screenshotFile = File(screenshotFilePath);
+    await screenshotFile.writeAsBytes(feedbackScreenshot);
+    return screenshotFilePath;
+  }
+
   // make call
   static makeCall({required String phoneNumber}) async {
     final Uri launchUri = Uri(

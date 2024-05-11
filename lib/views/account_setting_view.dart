@@ -171,24 +171,26 @@ class AccountSettingsView extends StatelessWidget {
   }) {
     return _buildListTile(
       title: 'Change App Currency',
-      onPressed: () async {
-        if (await AlertDilogs.alertDialogWithTwoAction(context, Constant.alert, Constant.currencyChangeAlert) == 1) {
-          showCurrencyPicker(
-            theme: CurrencyPickerThemeData(bottomSheetHeight: 90.sp),
-            useRootNavigator: true,
-            context: context,
-            showFlag: true,
-            showSearchField: true,
-            showCurrencyName: true,
-            showCurrencyCode: true,
-            onSelect: (Currency selectedCurrency) {
-              ref.read(asyncUserProvider.notifier).updateUserCurrency(
-                    userId: id,
-                    updateUserPin: selectedCurrency.symbol,
-                  );
-            },
-          );
-        }
+      onPressed: () {
+        AlertDilogs.alertDialogWithTwoAction(context, Constant.alert, Constant.currencyChangeAlert).then((int value) {
+          if (value == 1) {
+            showCurrencyPicker(
+              theme: CurrencyPickerThemeData(bottomSheetHeight: 90.sp),
+              useRootNavigator: true,
+              context: context,
+              showFlag: true,
+              showSearchField: true,
+              showCurrencyName: true,
+              showCurrencyCode: true,
+              onSelect: (Currency selectedCurrency) {
+                ref.read(asyncUserProvider.notifier).updateUserCurrency(
+                      userId: id,
+                      updateUserPin: selectedCurrency.symbol,
+                    );
+              },
+            );
+          }
+        });
       },
       icon: TitleWidget(
         bold: true,

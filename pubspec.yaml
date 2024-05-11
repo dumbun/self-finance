@@ -32,7 +32,7 @@ dependencies:
   screenshot: ^2.3.0
   share_plus: ^9.0.0
   feedback: ^3.1.0
-
+  flutter_email_sender: ^6.0.3
 
 dev_dependencies:
   flutter_test:
