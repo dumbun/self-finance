@@ -1,3 +1,4 @@
+import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -20,7 +21,9 @@ void main() async {
 
   runApp(
     const ProviderScope(
-      child: MyApp(),
+      child: BetterFeedback(
+        child: MyApp(),
+      ),
     ),
   );
 }
@@ -31,12 +34,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ResponsiveSizer(
-      builder: (context, orientation, screenType) => MaterialApp(
+      builder: (BuildContext context, Orientation orientation, ScreenType screenType) => MaterialApp(
         routes: {
-          Constant.dashboardView: (context) => const DashboardView(),
-          Constant.addNewEntryView: (context) => const AddNewEntery(),
-          Constant.contactView: (context) => const ContactsView(),
-          Constant.accountSettingsView: (context) => const AccountSettingsView(),
+          Constant.dashboardView: (BuildContext context) => const DashboardView(),
+          Constant.addNewEntryView: (BuildContext context) => const AddNewEntery(),
+          Constant.contactView: (BuildContext context) => const ContactsView(),
+          Constant.accountSettingsView: (BuildContext context) => const AccountSettingsView(),
         },
         color: AppColors.getPrimaryColor,
         title: Constant.appTitle,

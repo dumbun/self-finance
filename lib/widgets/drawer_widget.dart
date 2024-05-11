@@ -66,11 +66,16 @@ class DrawerWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildDrawerButtons(
-      {required String text, required IconData icon, required void Function()? onTap, Color? color}) {
+  Widget _buildDrawerButtons({
+    required String text,
+    required IconData icon,
+    required void Function()? onTap,
+    Color? color,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Card(
+        margin: EdgeInsets.symmetric(vertical: 6.sp),
         elevation: 0,
         child: Padding(
           padding: EdgeInsets.all(16.sp),
