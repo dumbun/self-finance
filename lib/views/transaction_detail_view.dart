@@ -284,7 +284,7 @@ class TransactionDetailView extends StatelessWidget {
                           onPressed: () => _markAsPaid(
                             ref,
                             data.first,
-                            calculator.totalInterestAmount,
+                            calculator.totalAmount,
                           ),
                           icon: Icons.done,
                           text: "Mark As Paid",

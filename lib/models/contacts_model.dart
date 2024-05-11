@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 class Contact {
   final int id;
   final String name;
@@ -50,10 +48,6 @@ class Contact {
       number: map['number'] as String,
     );
   }
-
-  String toJson() => json.encode(toMap());
-
-  factory Contact.fromJson(String source) => Contact.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() => 'Contact(id: $id, name: $name, number: $number)';

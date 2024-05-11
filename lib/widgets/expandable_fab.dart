@@ -35,26 +35,20 @@ class ExpandableFab extends StatelessWidget {
     );
   }
 
+  void _navigateToContactsView(BuildContext context) {
+    Navigator.of(context).pop(context);
+    Routes.navigateToContactsView(context);
+  }
+
+  void _navigateToAddNewEntry(BuildContext context) {
+    Navigator.of(context).pop(context);
+    Routes.navigateToAddNewEntry(context: context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    void navigateToContactsView() {
-      Navigator.of(context).pop(context);
-      Routes.navigateToContactsView(context);
-    }
-
-    void navigateToAddNewEntry() {
-      Navigator.of(context).pop(context);
-      Routes.navigateToAddNewEntry(context: context);
-    }
-
     return FloatingActionButton(
-      shape: const CircleBorder(),
       tooltip: Constant.addNewTransactionToolTip,
-      elevation: 10.sp,
-      backgroundColor: AppColors.getPrimaryColor,
-      clipBehavior: Clip.antiAliasWithSaveLayer,
-      highlightElevation: 20.sp,
-      hoverElevation: 20.sp,
       onPressed: () {
         showModalBottomSheet(
           context: context,
@@ -69,7 +63,7 @@ class ExpandableFab extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildFlotingActionButtons(
-                    navigateToAddNewEntry,
+                    () => _navigateToAddNewEntry(context),
                     Icons.add,
                     "Create new Contact",
                   ),
@@ -77,7 +71,7 @@ class ExpandableFab extends StatelessWidget {
                     height: 12.sp,
                   ),
                   _buildFlotingActionButtons(
-                    navigateToContactsView,
+                    () => _navigateToContactsView(context),
                     Icons.contact_page_rounded,
                     "Show Contacts",
                   ),

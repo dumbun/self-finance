@@ -14,11 +14,12 @@ import 'package:self_finance/widgets/title_widget.dart';
 ///[selectedPageIndexProvider] is a provider which is auto dispose
 ///this provider helps to maintain
 ///the state of the buttom navigation bar in the dashboard
-final StateProvider<int> selectedPageIndexProvider = StateProvider<int>((ref) {
+final AutoDisposeStateProvider<int> selectedPageIndexProvider = StateProvider.autoDispose<int>((ref) {
   return 0;
 });
 
-final StateProvider<PageController> dashboardPageController = StateProvider<PageController>((ref) {
+final AutoDisposeStateProvider<PageController> dashboardPageController =
+    StateProvider.autoDispose<PageController>((ref) {
   final PageController pageController = PageController();
   return pageController;
 });

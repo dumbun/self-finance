@@ -142,7 +142,7 @@ abstract class UserBackEnd {
   static Future<List<User>> fetchPin(String pin) async {
     final db = await UserBackEnd.db();
     List<User> data = User.toList(
-      db.query(
+      await db.query(
         "USER",
         where: "USER_PIN = ?",
         whereArgs: [pin],

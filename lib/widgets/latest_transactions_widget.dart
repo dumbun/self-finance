@@ -71,7 +71,7 @@ class LatestTransactionsWidget extends ConsumerWidget {
               ));
     }
 
-    return ref.watch(latestUserHistoryProvider).when(
+    return ref.watch(asyncHistoryProvider).when(
           data: (List<UserHistory> data) {
             if (data.isEmpty) {
               return const SizedBox.shrink();

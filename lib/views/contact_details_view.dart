@@ -374,15 +374,9 @@ class ContactDetailsView extends ConsumerWidget {
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
           heroTag: Constant.saveButtonTag,
-          enableFeedback: true,
-          isExtended: true,
           tooltip: "Add new trancation to this customer",
-          splashColor: AppColors.getPrimaryColor,
-          backgroundColor: AppColors.getPrimaryColor,
-          shape: const CircleBorder(),
           child: const Icon(
             Icons.add,
-            color: AppColors.getBackgroundColor,
           ),
           onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(context: context, customerID: customerID),
         ),

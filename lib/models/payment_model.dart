@@ -1,6 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-
 class Payment {
   int? id;
   final int transactionId;
@@ -73,10 +70,6 @@ class Payment {
       createdDate: map['createdDate'] as String,
     );
   }
-
-  String toJson() => json.encode(toMap());
-
-  factory Payment.fromJson(String source) => Payment.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {

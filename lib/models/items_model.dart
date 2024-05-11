@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 class Items {
   final int? id;
   final int customerid;
@@ -100,10 +98,6 @@ class Items {
       createdDate: map['createdDate'] as String,
     );
   }
-
-  String toJson() => json.encode(toMap());
-
-  factory Items.fromJson(String source) => Items.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {

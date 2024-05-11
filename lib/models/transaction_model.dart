@@ -1,29 +1,4 @@
-import 'dart:convert';
-
-/// [Trx] is a shortform of Transaction class
-/// using this class we can create a [Transaction] which contains the
-/// 1. [customerId] : which is used for the reference the [Customer] in the data base
-/// 2. [itemId] : which is used for the reference the [Item] in the DataBase
-/// 3. [transacrtionDate] : the time when transaction take place
-/// 4. [transacrtionType] : the type of trancation [Debit] or [Credit]
-/// 5. [amount] : Amount involved in the transaction
-/// 6. [intrestRate] : rate of intrest for the transaction
-/// 7. [remainingAmount] : remaning amount after the transaction
-/// 8. [proofPhoto] : proof of the customer who did the transaction
-/// 9. [createdDate] : when the transaction happened
-
 class Trx {
-  int? id;
-  final int customerId;
-  final int itemId;
-  final String transacrtionDate;
-  final String transacrtionType;
-  final double amount;
-  final double intrestRate;
-  final double intrestAmount;
-  final double remainingAmount;
-  final String createdDate;
-
   Trx({
     this.id,
     required this.customerId,
@@ -36,6 +11,29 @@ class Trx {
     required this.remainingAmount,
     required this.createdDate,
   });
+
+  int? id;
+  final int customerId;
+  final int itemId;
+  final String transacrtionDate;
+  final String transacrtionType;
+  final double amount;
+  final double intrestRate;
+  final double intrestAmount;
+  final double remainingAmount;
+  final String createdDate;
+
+  /// [Trx] is a shortform of Transaction class
+  /// using this class we can create a [Transaction] which contains the
+  /// 1. [customerId] : which is used for the reference the [Customer] in the data base
+  /// 2. [itemId] : which is used for the reference the [Item] in the DataBase
+  /// 3. [transacrtionDate] : the time when transaction take place
+  /// 4. [transacrtionType] : the type of trancation [Debit] or [Credit]
+  /// 5. [amount] : Amount involved in the transaction
+  /// 6. [intrestRate] : rate of intrest for the transaction
+  /// 7. [remainingAmount] : remaning amount after the transaction
+  /// 8. [proofPhoto] : proof of the customer who did the transaction
+  /// 9. [createdDate] : when the transaction happened
 
   static List<Trx> toList(List<Map<String, dynamic>> data) {
     if (data.isEmpty) {
@@ -114,10 +112,6 @@ class Trx {
       createdDate: map['createdDate'] as String,
     );
   }
-
-  String toJson() => json.encode(toMap());
-
-  factory Trx.fromJson(String source) => Trx.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {

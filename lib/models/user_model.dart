@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 class User {
   final int? id;
   final String userName;
@@ -15,19 +13,20 @@ class User {
     required this.userCurrency,
   });
 
-  static List<User> toList(data) {
-    List<User> userData = [];
-    if (data != []) {
-      data.forEach((Map<String, dynamic> e) {
-        userData.add(User(
-            id: e['ID'],
-            userName: e['USER_NAME'],
-            userPin: e['USER_PIN'],
-            profilePicture: e['USER_PROFILE_PICTURE'],
-            userCurrency: e['USER_CURRENCY']));
-      });
+  static List<User> toList(List<Map<String, Object?>> data) {
+    if (data.isNotEmpty) {
+      return data.map((e) {
+        return User(
+          id: e['ID'] as int,
+          userName: e['USER_NAME'] as String,
+          userPin: e['USER_PIN'] as String,
+          profilePicture: e['USER_PROFILE_PICTURE'] as String,
+          userCurrency: e['USER_CURRENCY'] as String,
+        );
+      }).toList();
+    } else {
+      return [];
     }
-    return userData;
   }
 
   User copyWith({
@@ -65,10 +64,6 @@ class User {
       userCurrency: map['userCurrency'] as String,
     );
   }
-
-  String toJson() => json.encode(toMap());
-
-  factory User.fromJson(String source) => User.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
