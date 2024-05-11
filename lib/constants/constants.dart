@@ -1,5 +1,7 @@
 abstract class Constant {
+  static const String applicationHandleEmail = "sf.help.vamshi@gmail.com";
   static const String alert = "Alert";
+  static const String feedbackSubject = "Self-Finance Appication Feedback";
   static const String inactive = "Inactive";
   static const String currencyChangeAlert =
       "The application as a whole is affected by this modification. Would you really like to alter the application's currency?";

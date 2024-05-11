@@ -31,7 +31,15 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-    </application>
+      </application>
+
+  <queries>
+    <intent>
+      <action android:name="android.intent.action.SENDTO" />
+      <data android:scheme="mailto" />
+    </intent>
+  </queries>
+
     <meta-data
         android:name="io.flutter.embedding.android.EnableImpeller"
         android:value="true" />

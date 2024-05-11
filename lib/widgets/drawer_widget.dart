@@ -9,68 +9,23 @@ import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
+import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 
 class DrawerWidget extends ConsumerWidget {
   const DrawerWidget({super.key});
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Drawer(
-      child: Padding(
-        padding: EdgeInsets.all(16.sp),
-        child: ref.watch(asyncUserProvider).when(
-              data: (List<User> data) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Hero(
-                      tag: Constant.userProfileTag,
-                      child: data.first.profilePicture.isNotEmpty
-                          ? Utility.imageFromBase64String(
-                              data.first.profilePicture,
-                              height: 45.sp,
-                              width: 45.sp,
-                            )
-                          : DefaultUserImage(
-                              height: 45.sp,
-                              width: 45.sp,
-                            ),
-                    ),
-                    SizedBox(height: 24.sp),
-                    _buildDrawerButtons(
-                      text: Constant.account,
-                      icon: Icons.vpn_key_rounded,
-                      onTap: () => Routes.navigateToAccountSettingsView(context: context),
-                    ),
-                    SizedBox(height: 12.sp),
-                    _buildDrawerButtons(
-                      text: Constant.logout,
-                      icon: Icons.login_rounded,
-                      color: AppColors.getErrorColor,
-                      onTap: () => _logout(data.first, context),
-                    ),
-                  ],
-                );
-              },
-              error: (Object _, StackTrace __) => const Center(
-                child: Text(Constant.error),
-              ),
-              loading: () => const Center(
-                child: CircularProgressIndicator.adaptive(),
-              ),
-            ),
-      ),
-    );
-  }
-
-  Widget _buildDrawerButtons(
-      {required String text, required IconData icon, required void Function()? onTap, Color? color}) {
+  Widget _buildDrawerButtons({
+    required String text,
+    required IconData icon,
+    required void Function()? onTap,
+    Color? color,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Card(
+        margin: EdgeInsets.symmetric(vertical: 12.sp),
         elevation: 0,
         child: Padding(
           padding: EdgeInsets.all(16.sp),
@@ -111,5 +66,56 @@ class DrawerWidget extends ConsumerWidget {
         return const PinAuthView();
       },
     ), (route) => false);
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Drawer(
+      child: Padding(
+        padding: EdgeInsets.all(16.sp),
+        child: ref.watch(asyncUserProvider).when(
+              data: (List<User> data) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    data.first.profilePicture.isNotEmpty
+                        ? CircularImageWidget(
+                            imageData: data.first.profilePicture,
+                            titile: 'Account Profile Image',
+                          )
+                        : DefaultUserImage(
+                            height: 45.sp,
+                            width: 45.sp,
+                          ),
+                    SizedBox(height: 16.sp),
+                    _buildDrawerButtons(
+                      text: Constant.account,
+                      icon: Icons.vpn_key_rounded,
+                      onTap: () => Routes.navigateToAccountSettingsView(context: context),
+                    ),
+                    _buildDrawerButtons(
+                      text: "Feedback",
+                      icon: Icons.feedback,
+                      onTap: () => Utility.sendFeedbackEmail(context),
+                    ),
+                    _buildDrawerButtons(
+                      text: Constant.logout,
+                      icon: Icons.login_rounded,
+                      color: AppColors.getErrorColor,
+                      onTap: () => _logout(data.first, context),
+                    ),
+                  ],
+                );
+              },
+              error: (Object _, StackTrace __) => const Center(
+                child: Text(Constant.error),
+              ),
+              loading: () => const Center(
+                child: CircularProgressIndicator.adaptive(),
+              ),
+            ),
+      ),
+    );
   }
 }
