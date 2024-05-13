@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:self_finance/ads/ad_helper.dart';
+import 'package:self_finance/constants/constants.dart';
 
 class AdsBannerWidget extends StatefulWidget {
   const AdsBannerWidget({super.key});
@@ -12,29 +13,26 @@ class AdsBannerWidget extends StatefulWidget {
 class _AdsBannerWidgetState extends State<AdsBannerWidget> {
   BannerAd? _bannerAd;
 
-  Future<InitializationStatus> _initGoogleMobileAds() {
-    return MobileAds.instance.initialize();
-  }
-
   @override
   void initState() {
-    _initGoogleMobileAds();
-    BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      request: const AdRequest(),
-      size: AdSize.banner,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            _bannerAd = ad as BannerAd;
-          });
-        },
-        onAdFailedToLoad: (ad, err) {
-          print('Failed to load a banner ad: ${err.message}');
-          ad.dispose();
-        },
-      ),
-    ).load();
+    if (Constant.ads) {
+      BannerAd(
+        adUnitId: AdHelper.bannerAdUnitId,
+        request: const AdRequest(),
+        size: AdSize.banner,
+        listener: BannerAdListener(
+          onAdLoaded: (ad) {
+            setState(() {
+              _bannerAd = ad as BannerAd;
+            });
+          },
+          onAdFailedToLoad: (ad, err) {
+            print('Failed to load a banner ad: ${err.message}');
+            ad.dispose();
+          },
+        ),
+      ).load();
+    }
     super.initState();
   }
 
@@ -46,7 +44,7 @@ class _AdsBannerWidgetState extends State<AdsBannerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return _bannerAd != null
+    return Constant.ads && _bannerAd != null
         ? Align(
             alignment: Alignment.topCenter,
             child: SizedBox(
