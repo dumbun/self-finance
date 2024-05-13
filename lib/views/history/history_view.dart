@@ -99,7 +99,7 @@ class HistoryView extends ConsumerWidget {
       );
     }
 
-    Expanded _buildhistoryList(List<UserHistory> data, currencyType) {
+    Expanded buildhistoryList(List<UserHistory> data, currencyType) {
       return Expanded(
         child: ListView.builder(
           itemBuilder: (context, index) {
@@ -133,7 +133,7 @@ class HistoryView extends ConsumerWidget {
             Consumer(
               builder: (context, ref, child) {
                 return ref.watch(asyncHistoryProvider).when(
-                      data: (data) => _buildhistoryList(data, ref.watch(currencyProvider)),
+                      data: (data) => buildhistoryList(data, ref.watch(currencyProvider)),
                       error: (error, stackTrace) => Text(error.toString()),
                       loading: () => const Center(
                         child: CircularProgressIndicator.adaptive(),

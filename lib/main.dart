@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:feedback/feedback.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +12,7 @@ import 'package:self_finance/my_app.dart';
 void main() async {
   // ensuring all the plugins are connected to the system before running the code
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

@@ -139,4 +139,6 @@ dependencies {
       // Add the dependencies for the Crashlytics and Analytics libraries
 
     implementation("com.google.firebase:firebase-analytics:22.0.0")
+
+    
 }

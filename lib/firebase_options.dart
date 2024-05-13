@@ -41,49 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDQFJ1jCrkDMRbvNH5lyvCIia8pSkc9s_s',
-    appId: '1:670447424946:web:d37a0901fd2322a19600ab',
-    messagingSenderId: '670447424946',
-    projectId: 'self-finance-2230a',
-    authDomain: 'self-finance-2230a.firebaseapp.com',
-    storageBucket: 'self-finance-2230a.appspot.com',
-    measurementId: 'G-MX9Q6DH4H0',
+    apiKey: 'AIzaSyDfxtMmN3HJRMxGdn9btHveXGVptPKlAM4',
+    appId: '1:61978761608:web:bd6396561312986e6a023d',
+    messagingSenderId: '61978761608',
+    projectId: 'self-finance-with-ads',
+    authDomain: 'self-finance-with-ads.firebaseapp.com',
+    storageBucket: 'self-finance-with-ads.appspot.com',
+    measurementId: 'G-1B98D0FCSX',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDATu1jSh88sS3PEje1yRoEeYpI6tXiNhQ',
-    appId: '1:670447424946:android:27dc3ab8b3ba9d639600ab',
-    messagingSenderId: '670447424946',
-    projectId: 'self-finance-2230a',
-    storageBucket: 'self-finance-2230a.appspot.com',
+    apiKey: 'AIzaSyARMxxK0qx5jk2KUbbaZaBgt-afSKLqB3Q',
+    appId: '1:61978761608:android:88e6d349aaa032b56a023d',
+    messagingSenderId: '61978761608',
+    projectId: 'self-finance-with-ads',
+    storageBucket: 'self-finance-with-ads.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBq9I4GzrU3txdza61ru6Vkwe2vyRW5aDw',
-    appId: '1:670447424946:ios:8e61b61d6c219bfc9600ab',
-    messagingSenderId: '670447424946',
-    projectId: 'self-finance-2230a',
-    storageBucket: 'self-finance-2230a.appspot.com',
+    apiKey: 'AIzaSyAGnWJ76et7ukAtZggjBQOkPekEv-AtimA',
+    appId: '1:61978761608:ios:619a9e2c2235d02b6a023d',
+    messagingSenderId: '61978761608',
+    projectId: 'self-finance-with-ads',
+    storageBucket: 'self-finance-with-ads.appspot.com',
     iosBundleId: 'com.vamshikrishna.selfFinance',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBq9I4GzrU3txdza61ru6Vkwe2vyRW5aDw',
-    appId: '1:670447424946:ios:8e61b61d6c219bfc9600ab',
-    messagingSenderId: '670447424946',
-    projectId: 'self-finance-2230a',
-    storageBucket: 'self-finance-2230a.appspot.com',
+    apiKey: 'AIzaSyAGnWJ76et7ukAtZggjBQOkPekEv-AtimA',
+    appId: '1:61978761608:ios:619a9e2c2235d02b6a023d',
+    messagingSenderId: '61978761608',
+    projectId: 'self-finance-with-ads',
+    storageBucket: 'self-finance-with-ads.appspot.com',
     iosBundleId: 'com.vamshikrishna.selfFinance',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDQFJ1jCrkDMRbvNH5lyvCIia8pSkc9s_s',
-    appId: '1:670447424946:web:70de0171e72066659600ab',
-    messagingSenderId: '670447424946',
-    projectId: 'self-finance-2230a',
-    authDomain: 'self-finance-2230a.firebaseapp.com',
-    storageBucket: 'self-finance-2230a.appspot.com',
-    measurementId: 'G-MLREEGSM9N',
+    apiKey: 'AIzaSyDfxtMmN3HJRMxGdn9btHveXGVptPKlAM4',
+    appId: '1:61978761608:web:9f7e8e2eb12fe9dc6a023d',
+    messagingSenderId: '61978761608',
+    projectId: 'self-finance-with-ads',
+    authDomain: 'self-finance-with-ads.firebaseapp.com',
+    storageBucket: 'self-finance-with-ads.appspot.com',
+    measurementId: 'G-7T5VK5YYY3',
   );
 
 }
