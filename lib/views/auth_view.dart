@@ -27,7 +27,7 @@ class _AuthViewState extends ConsumerState<AuthView> {
   @override
   Widget build(BuildContext context) {
     return ref.watch(asyncUserProvider).when(
-          data: (users) {
+          data: (List users) {
             if (users.isNotEmpty) {
               return _isAuthenticated ? const DashboardView() : const PinAuthView();
             } else {
