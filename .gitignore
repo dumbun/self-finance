@@ -1,14 +1,20 @@
 # Miscellaneous
+.firebaserc
+firebase.json
 *.class
+*.json
 *.env
 *.log
 *.pyc
 *.swp
 .DS_Store
 .atom/
+.firebase
 .buildlog/
 .history
 .svn/
+.firebase.json
+firebase.json
 migrate_working_dir/
 
 # IntelliJ related
@@ -33,6 +39,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+.firebase.json
 
 # Symbolication related
 app.*.symbols
