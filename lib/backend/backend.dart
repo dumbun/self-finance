@@ -147,9 +147,13 @@ class BackEnd {
   static Future<sql.Database> db() async {
     final directory = await getApplicationDocumentsDirectory();
     final path = '${directory.path}/itdata.db';
-    return sql.openDatabase(path, version: 1, onCreate: (sql.Database database, int version) async {
-      await createTable(database);
-    });
+    return sql.openDatabase(
+      path,
+      version: 1,
+      onCreate: (sql.Database database, int version) async {
+        await createTable(database);
+      },
+    );
   }
 
   //// C U S T O M E R S
