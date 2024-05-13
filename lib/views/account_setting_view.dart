@@ -10,6 +10,7 @@ import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
+import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
 import 'package:self_finance/widgets/title_widget.dart';
@@ -91,6 +92,10 @@ class AccountSettingsView extends StatelessWidget {
                                   // logout button
                                   SizedBox(height: 12.sp),
                                   _buildLogoutButton(context: context),
+
+                                  SizedBox(height: 12.sp),
+                                  const AdsBannerWidget(),
+                                  SizedBox(height: 12.sp),
                                 ],
                               ),
                             );

@@ -7,6 +7,7 @@ import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/logic/logic.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_providers.dart';
+import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/input_date_picker.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/two_slice_pie_chart_widget.dart';
@@ -45,6 +46,8 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            const AdsBannerWidget(),
+            SizedBox(height: 16.sp),
             //taken date
             InputDatePicker(
               controller: _takenDataInput,
@@ -212,6 +215,8 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
               label: 'Total Amount : ',
               result: Utility.reduceDecimals(totalAmount).toString(),
             ),
+            SizedBox(height: 12.sp),
+            const AdsBannerWidget(),
             SizedBox(height: 10.sp),
           ],
         ),

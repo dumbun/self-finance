@@ -13,6 +13,7 @@ import 'package:self_finance/models/user_history.dart';
 import 'package:self_finance/providers/app_currency_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 
 class HistoryDetailedView extends ConsumerWidget {
@@ -128,6 +129,9 @@ class HistoryDetailedView extends ConsumerWidget {
                   title: 'Tranasction Status',
                   details: transaction.transacrtionType == Constant.active ? Constant.active : Constant.inactive,
                 ),
+                SizedBox(height: 12.sp),
+                const AdsBannerWidget(),
+                SizedBox(height: 12.sp),
                 Center(
                   child: TextButton(
                     onPressed: () => Routes.navigateToTransactionDetailsView(

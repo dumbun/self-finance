@@ -11,4 +11,5 @@ class MainActivity: FlutterFragmentActivity() {
     window.addFlags(LayoutParams.FLAG_SECURE)
     super.configureFlutterEngine(flutterEngine)
   }
+
 }

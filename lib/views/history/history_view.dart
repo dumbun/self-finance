@@ -16,6 +16,7 @@ import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
 
 class HistoryView extends ConsumerWidget {
@@ -126,6 +127,8 @@ class HistoryView extends ConsumerWidget {
               keyboardType: TextInputType.name,
               onChanged: (value) => ref.read(asyncHistoryProvider.notifier).doSearch(givenInput: value),
             ),
+            SizedBox(height: 16.sp),
+            const AdsBannerWidget(),
             SizedBox(height: 16.sp),
             Consumer(
               builder: (context, ref, child) {

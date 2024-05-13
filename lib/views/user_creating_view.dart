@@ -146,6 +146,7 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
                     CurrencyTypeInputWidget(
                       controller: _currencyInput,
                     ),
+                    // const GoogleSignInButtonWidget(),
                   ],
                 ),
               ),
