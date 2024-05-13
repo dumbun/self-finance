@@ -16,6 +16,7 @@ import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
 
 class HistoryView extends ConsumerWidget {
@@ -98,7 +99,7 @@ class HistoryView extends ConsumerWidget {
       );
     }
 
-    Expanded buildhistoryList(List<UserHistory> data, currencyType) {
+    Expanded _buildhistoryList(List<UserHistory> data, currencyType) {
       return Expanded(
         child: ListView.builder(
           itemBuilder: (context, index) {
@@ -127,10 +128,12 @@ class HistoryView extends ConsumerWidget {
               onChanged: (value) => ref.read(asyncHistoryProvider.notifier).doSearch(givenInput: value),
             ),
             SizedBox(height: 16.sp),
+            const AdsBannerWidget(),
+            SizedBox(height: 16.sp),
             Consumer(
               builder: (context, ref, child) {
                 return ref.watch(asyncHistoryProvider).when(
-                      data: (data) => buildhistoryList(data, ref.watch(currencyProvider)),
+                      data: (data) => _buildhistoryList(data, ref.watch(currencyProvider)),
                       error: (error, stackTrace) => Text(error.toString()),
                       loading: () => const Center(
                         child: CircularProgressIndicator.adaptive(),

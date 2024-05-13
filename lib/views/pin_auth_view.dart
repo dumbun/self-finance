@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -8,6 +9,7 @@ import 'package:self_finance/fonts/strong_heading_one_text.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/app_icon.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
@@ -42,51 +44,61 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
           data: (data) {
             return Scaffold(
               body: SafeArea(
-                child: Container(
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.all(20.sp),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        data.first.profilePicture != ""
-                            ? Hero(
-                                tag: Constant.userProfileTag,
-                                child: Utility.imageFromBase64String(data.first.profilePicture),
-                              )
-                            : const AppIcon(),
-                        SizedBox(height: 20.sp),
-                        const StrongHeadingOne(
-                          bold: true,
-                          text: Constant.enterYourAppPin,
-                        ),
-                        SizedBox(height: 20.sp),
-                        PinInputWidget(
-                          pinController: pinController,
-                          obscureText: true,
-                          validator: (String? p0) {
-                            if (p0 == null || p0.isEmpty) {
-                              return Constant.enterYourAppPin;
-                            } else {
-                              if (p0 == data.first.userPin) {
-                                Routes.navigateToDashboard(context: context);
-                                return null;
-                              } else {
-                                pinController.clear();
-                                return Constant.enterCorrectPin;
-                              }
-                            }
-                          },
-                        ),
-                        SizedBox(height: 20.sp),
-                        RoundedCornerButton(
-                          text: Constant.login,
-                          onPressed: () => getLogin(data.first),
-                        ),
-                      ],
+                child: Stack(
+                  children: [
+                    const Align(
+                      alignment: Alignment.topCenter,
+                      child: AdsBannerWidget(),
                     ),
-                  ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: EdgeInsets.all(12.sp),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              data.first.profilePicture != ""
+                                  ? Hero(
+                                      tag: Constant.userProfileTag,
+                                      child: Utility.imageFromBase64String(data.first.profilePicture),
+                                    )
+                                  : const AppIcon(),
+                              SizedBox(height: 20.sp),
+                              const StrongHeadingOne(
+                                bold: true,
+                                text: Constant.enterYourAppPin,
+                              ),
+                              SizedBox(height: 20.sp),
+                              PinInputWidget(
+                                pinController: pinController,
+                                obscureText: true,
+                                validator: (String? p0) {
+                                  if (p0 == null || p0.isEmpty) {
+                                    return Constant.enterYourAppPin;
+                                  } else {
+                                    if (p0 == data.first.userPin) {
+                                      Routes.navigateToDashboard(context: context);
+                                      return null;
+                                    } else {
+                                      pinController.clear();
+                                      return Constant.enterCorrectPin;
+                                    }
+                                  }
+                                },
+                              ),
+                              SizedBox(height: 20.sp),
+                              RoundedCornerButton(
+                                text: Constant.login,
+                                onPressed: () => getLogin(data.first),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );

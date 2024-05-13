@@ -11,6 +11,7 @@ import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/currency_type_input_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
+import 'package:self_finance/widgets/google_sign_in_button_windget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
 
@@ -146,6 +147,7 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
                     CurrencyTypeInputWidget(
                       controller: _currencyInput,
                     ),
+                    // const GoogleSignInButtonWidget(),
                   ],
                 ),
               ),

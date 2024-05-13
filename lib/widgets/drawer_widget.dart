@@ -9,6 +9,7 @@ import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
+import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
@@ -105,6 +106,10 @@ class DrawerWidget extends ConsumerWidget {
                       color: AppColors.getErrorColor,
                       onTap: () => _logout(data.first, context),
                     ),
+                    SizedBox(
+                      height: 12.sp,
+                    ),
+                    const AdsBannerWidget(),
                   ],
                 );
               },

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "670447424946",
+    "project_id": "self-finance-2230a",
+    "storage_bucket": "self-finance-2230a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670447424946:android:27dc3ab8b3ba9d639600ab",
+        "android_client_info": {
+          "package_name": "com.vamshikrishna.self_finance"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDATu1jSh88sS3PEje1yRoEeYpI6tXiNhQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

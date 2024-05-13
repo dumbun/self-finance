@@ -10,6 +10,7 @@ import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
 
 class ContactsView extends ConsumerWidget {
@@ -44,7 +45,9 @@ class ContactsView extends ConsumerWidget {
                   onChanged: (value) =>
                       ref.read(asyncCustomersContactsProvider.notifier).searchCustomer(givenInput: value),
                 ),
-                SizedBox(height: 8.sp),
+                SizedBox(height: 12.sp),
+                const AdsBannerWidget(),
+                SizedBox(height: 12.sp),
                 _buildCustomerList(),
               ],
             ),

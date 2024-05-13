@@ -21,6 +21,7 @@ import 'package:self_finance/providers/requried_payments_provider.dart';
 import 'package:self_finance/providers/requried_transaction_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
@@ -408,12 +409,13 @@ class TransactionDetailView extends StatelessWidget {
             bold: true,
           ),
         ),
-        body: Container(
+        body: Padding(
           padding: EdgeInsets.all(12.sp),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const AdsBannerWidget(),
               _buildCustomerDetails(),
               SizedBox(height: 12.sp),
               const BodyOneDefaultText(
