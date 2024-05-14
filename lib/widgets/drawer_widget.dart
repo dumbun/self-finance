@@ -4,6 +4,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
+import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
@@ -110,6 +111,13 @@ class DrawerWidget extends ConsumerWidget {
                       height: 12.sp,
                     ),
                     const AdsBannerWidget(),
+                    SizedBox(
+                      height: 20.sp,
+                    ),
+                    const BodyTwoDefaultText(
+                      text: Constant.appVersion,
+                      color: AppColors.getLigthGreyColor,
+                    ),
                   ],
                 );
               },
