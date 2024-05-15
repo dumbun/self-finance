@@ -107,10 +107,7 @@ class DrawerWidget extends ConsumerWidget {
                     SizedBox(
                       height: 20.sp,
                     ),
-                    const BodyTwoDefaultText(
-                      text: Constant.appVersion,
-                      color: AppColors.getLigthGreyColor,
-                    ),
+                    _getAppVersion(),
                   ],
                 );
               },
@@ -122,6 +119,23 @@ class DrawerWidget extends ConsumerWidget {
               ),
             ),
       ),
+    );
+  }
+
+  FutureBuilder<String> _getAppVersion() {
+    return FutureBuilder<String>(
+      future: Utility.getAppVersion(), // async work
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        if (snapshot.connectionState case ConnectionState.waiting) {
+          return const BodyTwoDefaultText(text: 'Loading....');
+        } else {
+          if (snapshot.hasError) {
+            return BodyTwoDefaultText(text: 'Error: ${snapshot.error}');
+          } else {
+            return BodyTwoDefaultText(text: 'Version: ${snapshot.data}');
+          }
+        }
+      },
     );
   }
 }

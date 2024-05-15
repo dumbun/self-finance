@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:screenshot/screenshot.dart';
@@ -18,6 +19,18 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 
 class Utility {
+  /// [getAppVersion] this method provides application version
+  ///code taken from (https://www.geeksforgeeks.org/flutter-how-to-get-app-name-package-name-version-build-number/)
+  // app version provider
+  static Future<String> getAppVersion() async {
+    String? version;
+    await PackageInfo.fromPlatform().then((PackageInfo value) {
+      version = ("${value.version}+${value.buildNumber}").toString();
+      // Value will be our all details we get from package info package
+    });
+    return version ?? "";
+  }
+
   // send feedback email
 
   static sendFeedbackEmail(BuildContext context) {
