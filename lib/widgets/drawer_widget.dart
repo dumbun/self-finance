@@ -27,23 +27,16 @@ class DrawerWidget extends ConsumerWidget {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        margin: EdgeInsets.symmetric(vertical: 12.sp),
         elevation: 0,
-        child: Padding(
-          padding: EdgeInsets.all(16.sp),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              BodyOneDefaultText(
-                text: text,
-                bold: true,
-              ),
-              Icon(
-                icon,
-                color: color,
-              )
-            ],
+        margin: EdgeInsets.symmetric(vertical: 12.sp),
+        child: ListTile(
+          title: BodyOneDefaultText(
+            text: text,
+            bold: true,
+          ),
+          trailing: Icon(
+            icon,
+            color: color,
           ),
         ),
       ),
