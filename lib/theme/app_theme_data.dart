@@ -7,9 +7,11 @@ class AppThemeData {
     primaryColor: AppColors.getPrimaryColor,
     cardTheme: const CardTheme(color: AppColors.getBackgroundColor, elevation: 0),
     fontFamily: "hell",
+    appBarTheme: const AppBarTheme(
+      elevation: 0,
+    ),
     colorScheme: ColorScheme.fromSeed(
       seedColor: AppColors.getPrimaryColor,
-      background: AppColors.getVeryLightGreyColor,
       error: AppColors.getErrorColor,
       surface: AppColors.getVeryLightGreyColor,
       primary: AppColors.getPrimaryColor,
@@ -20,15 +22,19 @@ class AppThemeData {
   static final ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
     fontFamily: "hell",
+    useMaterial3: true,
+    primaryColor: AppColors.getPrimaryColor,
+    primaryColorDark: AppColors.getPrimaryTextColor,
+    primarySwatch: Colors.blue,
+    appBarTheme: const AppBarTheme(
+      elevation: 0,
+    ),
     colorScheme: ColorScheme.fromSeed(
-      background: AppColors.getPrimaryTextColor,
+      surface: AppColors.getPrimaryTextColor,
       error: AppColors.getErrorColor,
       seedColor: AppColors.getPrimaryColor,
       primary: AppColors.getPrimaryColor,
       brightness: Brightness.dark,
     ),
-    primarySwatch: Colors.blue,
-    useMaterial3: true,
-    primaryColor: AppColors.getPrimaryColor,
   );
 }
