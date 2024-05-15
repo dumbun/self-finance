@@ -2,12 +2,12 @@ abstract class Constant {
   static const String applicationHandleEmail = "sf.help.vamshi@gmail.com";
   static const String alert = "Alert";
   static const bool ads = false;
-  static const String appVersion = "version: 2.0.2+5";
+  static const String appVersion = "version: 2.0.2+6";
   static const String feedbackSubject = "Self-Finance Appication Feedback";
   static const String inactive = "Inactive";
   static const String currencyChangeAlert =
       "The application as a whole is affected by this modification. Would you really like to alter the application's currency?";
-  static const String pAndPDistription = 'Accepting Privacy and Policy (Tap here to Open)';
+  static const String pAndPDistription = 'Accepting Privacy and Policy';
   static const String loading = "Please wait";
   static const String totalAmountInvested = "Total Amount Invested";
   static const String emptyTransactionsString =
