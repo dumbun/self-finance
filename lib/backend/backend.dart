@@ -1,4 +1,3 @@
-import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
@@ -6,8 +5,8 @@ import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/payment_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history.dart';
-import 'package:sqflite/sqflite.dart' as sql;
-import 'package:sqflite/sqlite_api.dart';
+
+import 'package:sqflite/sqflite.dart';
 
 /*
 
@@ -62,7 +61,7 @@ The PRAGMA foreign_keys = ON statement at the end is used to enable foreign key 
 */
 
 class BackEnd {
-  static Future<void> createTable(sql.Database database) async {
+  static Future<void> createTable(Database database) async {
     //// create [new tables]
     await database.execute("""
           -- Customers Table
@@ -144,13 +143,13 @@ class BackEnd {
 
   // by providing the path the data will store in that path whene it reinstall app data will be safe
 
-  static Future<sql.Database> db() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final path = '${directory.path}/itdata.db';
-    return sql.openDatabase(
+  static Future<Database> db() async {
+    final String databasePath = await getDatabasesPath();
+    final String path = '$databasePath/itdata.db';
+    return openDatabase(
       path,
       version: 1,
-      onCreate: (sql.Database database, int version) async {
+      onCreate: (Database database, int version) async {
         await createTable(database);
       },
     );
@@ -174,7 +173,7 @@ class BackEnd {
       final int id = await db.insert(
         'Customers',
         data,
-        conflictAlgorithm: sql.ConflictAlgorithm.abort,
+        conflictAlgorithm: ConflictAlgorithm.abort,
       );
 
       return id;
@@ -328,7 +327,7 @@ class BackEnd {
         "Item_Photo": item.photo,
         "Created_Date": item.createdDate
       };
-      final int id = await db.insert("Items", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
+      final int id = await db.insert("Items", data, conflictAlgorithm: ConflictAlgorithm.abort);
 
       return id;
     } catch (e) {
@@ -383,7 +382,7 @@ class BackEnd {
         "Remaining_Amount": transasction.remainingAmount,
         "Created_Date": transasction.createdDate,
       };
-      final response = await db.insert("Transactions", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
+      final response = await db.insert("Transactions", data, conflictAlgorithm: ConflictAlgorithm.abort);
 
       return response;
     } catch (e) {
@@ -477,7 +476,7 @@ class BackEnd {
         "Created_Date": payment.createdDate,
       };
       try {
-        final int id = await db.insert("Payments", data, conflictAlgorithm: sql.ConflictAlgorithm.abort);
+        final int id = await db.insert("Payments", data, conflictAlgorithm: ConflictAlgorithm.abort);
         return id;
       } catch (e) {
         return 0;
@@ -513,7 +512,7 @@ class BackEnd {
         final int id = await db.insert(
           "History",
           data,
-          conflictAlgorithm: sql.ConflictAlgorithm.abort,
+          conflictAlgorithm: ConflictAlgorithm.abort,
         );
         return id;
       } catch (e) {

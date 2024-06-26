@@ -1,9 +1,8 @@
-import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/models/user_model.dart';
-import 'package:sqflite/sqflite.dart' as sql;
+import 'package:sqflite/sqflite.dart';
 
 abstract class UserBackEnd {
-  static Future<void> createTable(sql.Database database) async {
+  static Future<void> createTable(Database database) async {
     await database.execute("""CREATE TABLE USER(
       ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       USER_NAME TEXT NOT NULL,
@@ -15,10 +14,10 @@ abstract class UserBackEnd {
 
   // by providing the path the data will store in that path whene it reinstall app data will be safe
 
-  static Future<sql.Database> db() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final path = '${directory.path}/user.db';
-    return sql.openDatabase(path, version: 1, onCreate: (sql.Database database, int version) async {
+  static Future<Database> db() async {
+    final String databasePath = await getDatabasesPath();
+    final path = '$databasePath/user.db';
+    return openDatabase(path, version: 1, onCreate: (Database database, int version) async {
       await createTable(database);
     });
   }
@@ -35,7 +34,7 @@ abstract class UserBackEnd {
         "USER_CURRENCY": user.userCurrency,
         "USER_PROFILE_PICTURE": user.profilePicture,
       };
-      final id = await db.insert('USER', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
+      final id = await db.insert('USER', data, conflictAlgorithm: ConflictAlgorithm.replace);
       return id != 0 ? true : false;
     } catch (e) {
       return false;

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
-import 'package:self_finance/utility/image_catch_manager.dart';
 
 class ImageView extends StatelessWidget {
-  const ImageView({super.key, required this.imageString, required this.titile});
-  final String imageString;
+  const ImageView({
+    super.key,
+    required this.titile,
+    required this.imageWidget,
+  });
+
   final String titile;
+  final Image imageWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +32,7 @@ class ImageView extends StatelessWidget {
         gaplessPlayback: true,
         tightMode: false,
         wantKeepAlive: true,
-        imageProvider: ImageCacheManager.getCachedImage(
-          imageString,
-          double.infinity,
-          double.infinity,
-        ).image,
+        imageProvider: imageWidget.image,
       ),
     );
   }

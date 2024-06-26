@@ -83,10 +83,17 @@ class Routes {
     );
   }
 
-  static void navigateToImageView({required BuildContext context, required String imageData, required String titile}) {
+  static void navigateToImageView({
+    required BuildContext context,
+    required String titile,
+    required Image imageWidget,
+  }) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (BuildContext context) => ImageView(imageString: imageData, titile: titile),
+        builder: (BuildContext context) => ImageView(
+          titile: titile,
+          imageWidget: imageWidget,
+        ),
       ),
     );
   }

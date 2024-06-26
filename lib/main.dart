@@ -8,7 +8,7 @@ import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/backend/user_db.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/firebase_options.dart';
-import 'package:self_finance/my_app.dart';
+import 'package:self_finance/self_finance.dart';
 
 void main() async {
   // ensuring all the plugins are connected to the system before running the code
@@ -17,7 +17,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   if (Constant.ads) {
-    unawaited(MobileAds.instance.initialize());
+    unawaited(
+      MobileAds.instance.initialize(),
+    );
   }
   await UserBackEnd.db();
   await BackEnd.db();
@@ -25,7 +27,7 @@ void main() async {
   runApp(
     const ProviderScope(
       child: BetterFeedback(
-        child: MyApp(),
+        child: SelfFinance(),
       ),
     ),
   );

@@ -10,7 +10,7 @@ class ImageCacheManager {
 
   static Image getCachedImage(String base64String, double? height, double? width) {
     if (_imageCache.containsKey(base64String)) {
-      final cachedImage = _imageCache[base64String]!;
+      final Image cachedImage = _imageCache[base64String]!;
       _reorderCache(base64String, cachedImage);
       return cachedImage;
     } else {
@@ -22,7 +22,7 @@ class ImageCacheManager {
         width: height ?? 40.sp,
       );
 
-      if (_imageCache.length >= 60) {
+      if (_imageCache.length >= 20) {
         _removeLeastUsedImage();
       }
 

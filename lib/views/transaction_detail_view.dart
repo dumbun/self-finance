@@ -20,6 +20,7 @@ import 'package:self_finance/providers/items_provider.dart';
 import 'package:self_finance/providers/requried_payments_provider.dart';
 import 'package:self_finance/providers/requried_transaction_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/utility/image_catch_manager.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
@@ -247,7 +248,7 @@ class TransactionDetailView extends StatelessWidget {
                                     if (data.first.photo.isNotEmpty) {
                                       Routes.navigateToImageView(
                                         context: context,
-                                        imageData: data.first.photo,
+                                        imageWidget: ImageCacheManager.getCachedImage(data.first.photo, 44, 44),
                                         titile: data.first.description,
                                       );
                                     } else {

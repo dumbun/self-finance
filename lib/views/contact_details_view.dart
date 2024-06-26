@@ -13,6 +13,7 @@ import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/utility/image_catch_manager.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/call_button_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
@@ -162,7 +163,7 @@ class ContactDetailsView extends ConsumerWidget {
                               GestureDetector(
                                 onTap: () => Routes.navigateToImageView(
                                   context: context,
-                                  imageData: customer.proof,
+                                  imageWidget: ImageCacheManager.getCachedImage(customer.proof, 44.sp, 44.sp),
                                   titile: "${customer.name} proof",
                                 ),
                                 child: Card(
