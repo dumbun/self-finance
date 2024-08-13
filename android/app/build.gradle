@@ -36,9 +36,9 @@ android {
 
 
     namespace "com.vamshikrishna.self_finance"
-    compileSdkVersion flutter.compileSdkVersion
+    // compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 34
     ndkVersion flutter.ndkVersion
-    //compileSdkVersion 34
     // ndkVersion "25.1.8937393"
 
     compileOptions {
@@ -57,7 +57,8 @@ android {
     defaultConfig {
         applicationId "com.vamshikrishna.self_finance"
         minSdkVersion 23
-        targetSdkVersion flutter.targetSdkVersion
+        targetSdkVersion 34
+        // targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
