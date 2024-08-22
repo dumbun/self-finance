@@ -1,7 +1,11 @@
 import 'package:self_finance/models/user_model.dart';
 import 'package:sqflite/sqflite.dart';
 
+/// An abstract class to handle database operations related to the User model.
+/// Provides methods for creating the database table, performing CRUD operations,
+/// and fetching user data.
 abstract class UserBackEnd {
+  /// [database] - The database instance where the table will be created.
   static Future<void> createTable(Database database) async {
     await database.execute("""CREATE TABLE USER(
       ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -12,7 +16,11 @@ abstract class UserBackEnd {
     )""");
   }
 
-  // by providing the path the data will store in that path whene it reinstall app data will be safe
+  /// Opens or creates the database and returns a [Database] instance.
+  /// The database file will be stored at a path that ensures persistence
+  /// across app reinstalls.
+  ///
+  /// Returns a [Database] instance.
 
   static Future<Database> db() async {
     final String databasePath = await getDatabasesPath();
@@ -22,7 +30,11 @@ abstract class UserBackEnd {
     });
   }
 
-  //create new User
+  /// Inserts a new user into the USER table.
+  ///
+  /// [user] - The user object to be inserted.
+  ///
+  /// Returns `true` if the user was successfully created, otherwise `false`.
 
   static Future<bool> createNewUser(User user) async {
     final db = await UserBackEnd.db();
