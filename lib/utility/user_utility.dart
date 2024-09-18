@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
-
+import 'package:path/path.dart' as path;
 import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -202,5 +202,11 @@ class Utility {
     } catch (e) {
       //
     }
+  }
+
+  static saveImageInStoreage({required String imageName, required image}) async {
+    Directory applictionDocumentDirectory = await getApplicationDocumentsDirectory();
+    File file = File(path.join(applictionDocumentDirectory.path, imageName));
+    await file.writeAsBytes(image.bodyBytes);
   }
 }
