@@ -58,17 +58,18 @@ class LatestTransactionsWidget extends ConsumerWidget {
 
     void navigateToHistoryDetailedView(int customerID, UserHistory history) {
       ref.read(asyncCustomersProvider.notifier).fetchRequriedCustomerDetails(customerID: customerID).then(
-          (List<Customer> customer) => ref
-              .read(asyncTransactionsProvider.notifier)
-              .fetchRequriedTransaction(transactionId: history.transactionID)
-              .then(
-                (List<Trx> transaction) => Routes.navigateToHistoryDetailedView(
-                  context: context,
-                  customer: customer.first,
-                  history: history,
-                  transaction: transaction.first,
+            (List<Customer> customer) => ref
+                .read(asyncTransactionsProvider.notifier)
+                .fetchRequriedTransaction(transactionId: history.transactionID)
+                .then(
+                  (List<Trx> transaction) => Routes.navigateToHistoryDetailedView(
+                    context: context,
+                    customer: customer.first,
+                    history: history,
+                    transaction: transaction.first,
+                  ),
                 ),
-              ));
+          );
     }
 
     return ref.watch(asyncHistoryProvider).when(
