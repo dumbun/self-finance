@@ -106,7 +106,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                     keyboardType: TextInputType.phone,
                     controller: _mobileNumber,
                     hintText: Constant.mobileNumber,
-                    validator: (value) {
+                    validator: (String? value) {
                       if (Utility.isValidPhoneNumber(value)) {
                         return null;
                       } else {
@@ -120,14 +120,14 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                   InputTextField(
                     keyboardType: TextInputType.number,
                     hintText: Constant.takenAmount,
-                    validator: (value) => Utility.amountValidation(value: value),
+                    validator: (String? value) => Utility.amountValidation(value: value),
                     controller: _takenAmount,
                   ),
 
                   // rate of intrest
                   SizedBox(height: 20.sp),
                   InputTextField(
-                    validator: (value) => Utility.amountValidation(value: value),
+                    validator: (String? value) => Utility.amountValidation(value: value),
                     hintText: Constant.rateOfIntrest,
                     controller: _rateOfIntrest,
                     keyboardType: const TextInputType.numberWithOptions(signed: false, decimal: true),

@@ -159,7 +159,7 @@ class BackEnd {
   /// create new customer entry
   static Future<int> createNewCustomer(Customer customer) async {
     try {
-      final db = await BackEnd.db();
+      final Database db = await BackEnd.db();
       final Map<String, Object> data = {
         "User_ID": customer.userID,
         "Customer_Name": customer.name,
@@ -370,7 +370,7 @@ class BackEnd {
 
   static Future<int> createNewTransaction(Trx transasction) async {
     try {
-      final db = await BackEnd.db();
+      final Database db = await BackEnd.db();
       final Map<String, dynamic> data = {
         "Customer_ID": transasction.customerId,
         "Item_ID": transasction.itemId,
@@ -447,7 +447,7 @@ class BackEnd {
   }
 
   static Future<int> updateTransactionAsPaid({required int id}) async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final data = {'Transaction_Type': Constant.inactive};
     final result = await db.update('Transactions', data, where: "Transaction_ID = ?", whereArgs: [id]);
 
@@ -466,21 +466,17 @@ class BackEnd {
   }
 
   static Future<int> addPayment({required Payment payment}) async {
+    final Database db = await BackEnd.db();
+    final Map<String, Object> data = {
+      "Transaction_ID": payment.transactionId,
+      "Payment_Date": payment.paymentDate,
+      "Amount_Paid": payment.amountpaid,
+      "Payment_Type": payment.type,
+      "Created_Date": payment.createdDate,
+    };
     try {
-      final db = await BackEnd.db();
-      final Map<String, Object> data = {
-        "Transaction_ID": payment.transactionId,
-        "Payment_Date": payment.paymentDate,
-        "Amount_Paid": payment.amountpaid,
-        "Payment_Type": payment.type,
-        "Created_Date": payment.createdDate,
-      };
-      try {
-        final int id = await db.insert("Payments", data, conflictAlgorithm: ConflictAlgorithm.abort);
-        return id;
-      } catch (e) {
-        return 0;
-      }
+      final int id = await db.insert("Payments", data, conflictAlgorithm: ConflictAlgorithm.abort);
+      return id;
     } catch (e) {
       return 0;
     }
