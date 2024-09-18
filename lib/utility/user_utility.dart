@@ -150,7 +150,7 @@ class Utility {
 
     final XFile? imgFile = await picker.pickImage(
       source: ImageSource.camera,
-      imageQuality: 25,
+      imageQuality: 10,
     );
 
     if (imgFile != null) {
