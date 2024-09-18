@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
-import 'package:path/path.dart' as path;
+import 'dart:ui' as ui;
+
 import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +16,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/utility/image_catch_manager.dart';
+import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -204,9 +206,22 @@ class Utility {
     }
   }
 
-  static saveImageInStoreage({required String imageName, required image}) async {
-    Directory applictionDocumentDirectory = await getApplicationDocumentsDirectory();
-    File file = File(path.join(applictionDocumentDirectory.path, imageName));
-    await file.writeAsBytes(image.bodyBytes);
+  static void saveSignaturesInStorage({
+    required GlobalKey<SfSignaturePadState> signatureGlobalKey,
+    required String imageName,
+  }) async {
+    List<Path> paths = signatureGlobalKey.currentState!.toPathList();
+    // checks wether the signature pad is empty
+    if (paths.isNotEmpty) {
+      final ui.Image data = await signatureGlobalKey.currentState!.toImage(pixelRatio: 3.0);
+      final ByteData? bytes = await data.toByteData(format: ui.ImageByteFormat.png);
+      if (bytes != null && signatureGlobalKey.currentState != null) {
+        Directory applictionDocumentDirectory = await getApplicationDocumentsDirectory();
+        String path = applictionDocumentDirectory.path;
+        // create directory on external storage
+        await Directory('$path/signature').create(recursive: true);
+        File('$path/signature/$imageName.png').writeAsBytesSync(bytes.buffer.asInt8List());
+      }
+    }
   }
 }

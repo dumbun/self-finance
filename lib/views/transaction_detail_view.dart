@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:self_finance/constants/constants.dart';
@@ -146,6 +149,45 @@ class TransactionDetailView extends StatelessWidget {
                 color: trailingIconColor,
               ),
       ),
+    );
+  }
+
+  FutureBuilder<Directory> _buildShowSignatureButton() {
+    return FutureBuilder<Directory>(
+      future: getApplicationDocumentsDirectory(),
+      builder: (BuildContext context, AsyncSnapshot<Directory> snapshot) {
+        if (snapshot.hasError) {
+          return const Text("error");
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator.adaptive();
+        } else {
+          if (File('${snapshot.data!.path}/signature/${transacrtion.id!}.png').existsSync() == true) {
+            File? f = File('${snapshot.data!.path}/signature/${transacrtion.id!}.png');
+            return Card(
+              child: ListTile(
+                onTap: () => Routes.navigateToImageView(
+                  context: context,
+                  imageWidget: Image.file(f),
+                  titile: "Signature",
+                ),
+                leading: const Icon(
+                  Icons.topic_outlined,
+                ),
+                title: const BodyTwoDefaultText(
+                  text: 'Show Signature ',
+                  bold: true,
+                ),
+                trailing: const Icon(
+                  Icons.app_registration_sharp,
+                  color: AppColors.getPrimaryColor,
+                ),
+              ),
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
+        }
+      },
     );
   }
 
@@ -295,6 +337,9 @@ class TransactionDetailView extends StatelessWidget {
                           child: CircularProgressIndicator.adaptive(),
                         ),
                       ),
+
+                  // show signature image view
+                  _buildShowSignatureButton(),
                   SizedBox(height: 12.sp),
 
                   // Mark As Paid Button

@@ -65,8 +65,6 @@ class _InputDatePickerState extends State<InputDatePicker> {
           child: SafeArea(
             top: false,
             child: CupertinoDatePicker(
-              maximumDate: widget.lastDate,
-              minimumDate: widget.firstDate,
               initialDateTime: widget.initialDate,
               mode: CupertinoDatePickerMode.date,
               showDayOfWeek: true,

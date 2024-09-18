@@ -37,6 +37,7 @@ dependencies:
   package_info_plus: ^8.0.2
   permission_handler: ^11.3.1
   path: ^1.8.2
+  syncfusion_flutter_signaturepad: ^27.1.48
 
 dev_dependencies:
   flutter_test:

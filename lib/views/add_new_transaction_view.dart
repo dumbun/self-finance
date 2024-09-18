@@ -18,7 +18,9 @@ import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_date_picker.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
+import 'package:self_finance/widgets/signature_widget.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
+import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
 ///providers
 final newItemImageProvider = StateProvider.autoDispose<String>((ref) {
@@ -40,6 +42,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   final TextEditingController _transacrtionDate = TextEditingController();
   final TextEditingController _description = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<SfSignaturePadState> _signatureGlobalKey = GlobalKey();
 
   bool _isloading = false;
 
@@ -49,6 +52,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
     _rateOfIntrest.dispose();
     _transacrtionDate.dispose();
     _description.dispose();
+    _signatureGlobalKey.currentState?.dispose();
     super.dispose();
   }
 
@@ -104,6 +108,11 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
             );
 
         if (transacrtionId != 0) {
+          //saving signature to the storage
+          Utility.saveSignaturesInStorage(
+            signatureGlobalKey: _signatureGlobalKey,
+            imageName: transacrtionId.toString(),
+          );
           final int historyId = await ref.read(asyncHistoryProvider.notifier).addHistory(
                 history: UserHistory(
                   userID: 1,
@@ -138,7 +147,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
     );
   }
 
-  Widget _buldItemImagePicker() {
+  Widget _buildItemImagePicker() {
     return Card(
       child: Padding(
         padding: EdgeInsets.all(14.sp),
@@ -225,7 +234,16 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                     controller: _description,
                   ),
                   SizedBox(height: 30.sp),
-                  _buldItemImagePicker(),
+                  _buildItemImagePicker(),
+                  SizedBox(height: 30.sp),
+                  const BodyTwoDefaultText(
+                    text: "Customer Signature (optional) : ",
+                    bold: true,
+                  ),
+                  SizedBox(height: 20.sp),
+                  SignatureWidget(
+                    signatureGlobalKey: _signatureGlobalKey,
+                  ),
                   SizedBox(height: 30.sp),
                   Hero(
                     tag: Constant.saveButtonTag,
