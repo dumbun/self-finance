@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_text.dart';
@@ -18,9 +19,7 @@ import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_date_picker.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
-import 'package:self_finance/widgets/signature_widget.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
-import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
 ///providers
 final newItemImageProvider = StateProvider.autoDispose<String>((ref) {
@@ -63,6 +62,86 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
     } else {
       return false;
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const BodyTwoDefaultText(
+          text: Constant.addNewTransaction,
+          bold: true,
+        ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Padding(
+              padding: EdgeInsets.all(18.sp),
+              child: Column(
+                children: [
+                  SizedBox(height: 12.sp),
+                  InputTextField(
+                    validator: (value) => Utility.amountValidation(value: value),
+                    keyboardType: TextInputType.number,
+                    hintText: Constant.takenAmount,
+                    controller: _amount,
+                  ),
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    validator: (value) => Utility.amountValidation(value: value),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    hintText: Constant.rateOfIntrest,
+                    controller: _rateOfIntrest,
+                  ),
+                  SizedBox(height: 20.sp),
+                  InputDatePicker(
+                    controller: _transacrtionDate,
+                    firstDate: DateTime(1000),
+                    initialDate: DateTime.now(),
+                    lastDate: DateTime.now(),
+                    labelText: Constant.takenDate,
+                  ),
+                  SizedBox(height: 20.sp),
+                  InputTextField(
+                    keyboardType: TextInputType.multiline,
+                    hintText: Constant.itemDescription,
+                    controller: _description,
+                  ),
+                  SizedBox(height: 30.sp),
+                  _buildItemImagePicker(),
+
+                  //! Signature Widget that stores signatures on a app data (if requested provied it on update)
+                  // SizedBox(height: 30.sp),
+                  // const BodyTwoDefaultText(
+                  //   text: "Customer Signature (optional) : ",
+                  //   bold: true,
+                  // ),
+                  // SizedBox(height: 20.sp),
+                  // SignatureWidget(
+                  //   signatureGlobalKey: _signatureGlobalKey,
+                  // ),
+
+                  SizedBox(height: 30.sp),
+                  Hero(
+                    tag: Constant.saveButtonTag,
+                    child: Visibility(
+                      visible: _isloading,
+                      replacement: RoundedCornerButton(
+                        text: Constant.save,
+                        onPressed: _save,
+                      ),
+                      child: const CircularProgressIndicator.adaptive(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   double _doubleCheck(String text, {String errorString = Constant.error}) {
@@ -109,10 +188,10 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
 
         if (transacrtionId != 0) {
           //saving signature to the storage
-          Utility.saveSignaturesInStorage(
-            signatureGlobalKey: _signatureGlobalKey,
-            imageName: transacrtionId.toString(),
-          );
+          // Utility.saveSignaturesInStorage(
+          //   signatureGlobalKey: _signatureGlobalKey,
+          //   imageName: transacrtionId.toString(),
+          // );
           final int historyId = await ref.read(asyncHistoryProvider.notifier).addHistory(
                 history: UserHistory(
                   userID: 1,
@@ -183,83 +262,6 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
               ),
             );
           },
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const BodyTwoDefaultText(
-          text: Constant.addNewTransaction,
-          bold: true,
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Padding(
-              padding: EdgeInsets.all(18.sp),
-              child: Column(
-                children: [
-                  SizedBox(height: 12.sp),
-                  InputTextField(
-                    validator: (value) => Utility.amountValidation(value: value),
-                    keyboardType: TextInputType.number,
-                    hintText: Constant.takenAmount,
-                    controller: _amount,
-                  ),
-                  SizedBox(height: 20.sp),
-                  InputTextField(
-                    validator: (value) => Utility.amountValidation(value: value),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    hintText: Constant.rateOfIntrest,
-                    controller: _rateOfIntrest,
-                  ),
-                  SizedBox(height: 20.sp),
-                  InputDatePicker(
-                    controller: _transacrtionDate,
-                    firstDate: DateTime(1000),
-                    initialDate: DateTime.now(),
-                    lastDate: DateTime.now(),
-                    labelText: Constant.takenDate,
-                  ),
-                  SizedBox(height: 20.sp),
-                  InputTextField(
-                    keyboardType: TextInputType.multiline,
-                    hintText: Constant.itemDescription,
-                    controller: _description,
-                  ),
-                  SizedBox(height: 30.sp),
-                  _buildItemImagePicker(),
-                  SizedBox(height: 30.sp),
-                  const BodyTwoDefaultText(
-                    text: "Customer Signature (optional) : ",
-                    bold: true,
-                  ),
-                  SizedBox(height: 20.sp),
-                  SignatureWidget(
-                    signatureGlobalKey: _signatureGlobalKey,
-                  ),
-                  SizedBox(height: 30.sp),
-                  Hero(
-                    tag: Constant.saveButtonTag,
-                    child: Visibility(
-                      visible: _isloading,
-                      replacement: RoundedCornerButton(
-                        text: Constant.save,
-                        onPressed: _save,
-                      ),
-                      child: const CircularProgressIndicator.adaptive(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ),
       ),
     );

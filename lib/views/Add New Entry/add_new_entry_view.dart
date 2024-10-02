@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_text.dart';
-import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
@@ -20,9 +20,7 @@ import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:self_finance/widgets/input_date_picker.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
-import 'package:self_finance/widgets/signature_widget.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
-import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
 /// [AddNewEntery] is a view
 /// which helps the user to save a new customer details with a transcation
@@ -56,6 +54,7 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
     _address.dispose();
     _rateOfIntrest.dispose();
     _itemDescription.dispose();
+    _signatureGlobalKey.currentState?.dispose();
     super.dispose();
   }
 
@@ -158,16 +157,17 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                   SizedBox(height: 20.sp),
                   _buildImagePickers(),
 
+                  //! Signature Widget that stores signatures on a app data (if requested provied it on update)
                   // Signature
-                  SizedBox(height: 20.sp),
-                  const BodyTwoDefaultText(
-                    text: "Customer Signature (optional) : ",
-                    bold: true,
-                  ),
-                  SizedBox(height: 20.sp),
-                  SignatureWidget(
-                    signatureGlobalKey: _signatureGlobalKey,
-                  ),
+                  // SizedBox(height: 20.sp),
+                  // const BodyTwoDefaultText(
+                  //   text: "Customer Signature (optional) : ",
+                  //   bold: true,
+                  // ),
+                  // SizedBox(height: 20.sp),
+                  // SignatureWidget(
+                  //   signatureGlobalKey: _signatureGlobalKey,
+                  // ),
 
                   // save button
                   SizedBox(height: 20.sp),
@@ -241,12 +241,11 @@ class _AddNewEnteryState extends ConsumerState<AddNewEntery> {
                   createdDate: presentDateTime,
                 ));
             if (transactionCreatedResponse != 0) {
-              //saving signature to the storage
-
-              Utility.saveSignaturesInStorage(
-                signatureGlobalKey: _signatureGlobalKey,
-                imageName: transactionCreatedResponse.toString(),
-              );
+              //! saving signature to the storage
+              // Utility.saveSignaturesInStorage(
+              //   signatureGlobalKey: _signatureGlobalKey,
+              //   imageName: transactionCreatedResponse.toString(),
+              // );
 
               // creating history
               final int historyResponse = await ref.read(asyncHistoryProvider.notifier).addHistory(

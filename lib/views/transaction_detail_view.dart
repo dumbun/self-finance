@@ -136,9 +136,11 @@ class TransactionDetailView extends StatelessWidget {
     Color? color,
     IconData? trailingIcon,
     Color? trailingIconColor,
+    void Function()? onTap,
   }) {
     return Card(
       child: ListTile(
+        onTap: onTap,
         leading: Icon(icon, color: color),
         title: BodyTwoDefaultText(text: title, bold: true),
         trailing: trailingIcon != null
@@ -163,25 +165,16 @@ class TransactionDetailView extends StatelessWidget {
         } else {
           if (File('${snapshot.data!.path}/signature/${transacrtion.id!}.png').existsSync() == true) {
             File? f = File('${snapshot.data!.path}/signature/${transacrtion.id!}.png');
-            return Card(
-              child: ListTile(
-                onTap: () => Routes.navigateToImageView(
-                  context: context,
-                  imageWidget: Image.file(f),
-                  titile: "Signature",
-                ),
-                leading: const Icon(
-                  Icons.topic_outlined,
-                ),
-                title: const BodyTwoDefaultText(
-                  text: 'Show Signature ',
-                  bold: true,
-                ),
-                trailing: const Icon(
-                  Icons.app_registration_sharp,
-                  color: AppColors.getPrimaryColor,
-                ),
+            return _buildCard(
+              onTap: () => Routes.navigateToImageView(
+                context: context,
+                imageWidget: Image.file(f),
+                titile: "Signature",
               ),
+              title: "Signature",
+              data: "",
+              icon: Icons.topic_outlined,
+              trailingIcon: Icons.app_registration_sharp,
             );
           } else {
             return const SizedBox.shrink();
