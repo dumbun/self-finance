@@ -26,13 +26,12 @@ import 'package:self_finance/widgets/round_corner_button.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
 
 // providers
-final requriedTransactionItemProvider =
-    FutureProvider.family.autoDispose<List<Items>, int>((AutoDisposeFutureProviderRef<List<Items>> ref, int id) async {
+final requriedTransactionItemProvider = FutureProvider.family.autoDispose<List<Items>, int>((ref, int id) async {
   return await ref.read(asyncItemsProvider.notifier).fetchRequriedItem(itemId: id);
 });
 
 final AutoDisposeProviderFamily<List<Payment>, int> paymentsProvider =
-    Provider.family.autoDispose<List<Payment>, int>((AutoDisposeProviderRef<List<Payment>> ref, int transactionId) {
+    Provider.family.autoDispose<List<Payment>, int>((ref, int transactionId) {
   return ref.watch(asyncRequriedPaymentProvider(transactionId)).when(
         data: (List<Payment> data) => data,
         error: (Object error, StackTrace stackTrace) => [
@@ -67,6 +66,7 @@ class TransactionDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Screenshot(
       controller: _screenShotController,
+      key: Key("SCreemeslkcnfekl"),
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -87,19 +87,21 @@ class TransactionDetailView extends StatelessWidget {
         body: SafeArea(
           child: Padding(
             padding: EdgeInsets.all(12.sp),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const AdsBannerWidget(),
-                // _buildCustomerDetails(),
-                // SizedBox(height: 12.sp),
-                // const BodyOneDefaultText(
-                //   text: 'Transaction Details',
-                //   bold: true,
-                // ),
-                _buildTransactionDetails(),
-              ],
+            child: Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const AdsBannerWidget(),
+                  // _buildCustomerDetails(),
+                  // SizedBox(height: 12.sp),
+                  // const BodyOneDefaultText(
+                  //   text: 'Transaction Details',
+                  //   bold: true,
+                  // ),
+                  _buildTransactionDetails(),
+                ],
+              ),
             ),
           ),
         ),
@@ -363,6 +365,10 @@ class TransactionDetailView extends StatelessWidget {
     final List<Customer> c = await ref
         .read(asyncCustomersProvider.notifier)
         .fetchRequriedCustomerDetails(customerID: transaction.customerId);
+    await ref.read(AsyncRequriedPaymentProvider(transaction.id!).notifier).addPayment(amountpaid: transaction.amount);
+    await ref
+        .read(asyncRequriedTransactionsProvider(transaction.id!).notifier)
+        .markAsPaidTransaction(trancationId: transaction.id!);
     await ref.read(asyncHistoryProvider.notifier).addHistory(
           history: UserHistory(
             userID: 1, //default
@@ -376,11 +382,6 @@ class TransactionDetailView extends StatelessWidget {
             amount: totalAmountPaid,
           ),
         );
-
-    await ref.read(AsyncRequriedPaymentProvider(transaction.id!).notifier).addPayment(amountpaid: transaction.amount);
-    await ref
-        .read(asyncRequriedTransactionsProvider(transaction.id!).notifier)
-        .markAsPaidTransaction(trancationId: transaction.id!);
   }
 
   // Card _buildCustomerDetails() {
