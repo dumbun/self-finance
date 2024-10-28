@@ -98,4 +98,8 @@ abstract class Constant {
   static const String pleaseTryAgain = "please try again";
   static const String errorAddingTransaction = "Error adding transaction please try agine after some time";
   static const String transacrtionAddedSuccessfully = "Transaction added Successfully";
+  static const String showTransaction = 'Show trancation';
+  static const String transacrtionStatus = 'Tranasction Status';
+  static const String transactionDetails = "Transaction Details";
+  static const String transactionStatus = "Transaction Status";
 }

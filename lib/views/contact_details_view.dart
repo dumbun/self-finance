@@ -37,14 +37,97 @@ class ContactDetailsView extends ConsumerWidget {
   const ContactDetailsView({super.key, required this.customerID});
   final int customerID;
 
-  void _navigateToTransactionDetailsView(WidgetRef ref, BuildContext context, Trx trancation) {
-    ref.read(asyncCustomersProvider.notifier).fetchRequriedCustomerDetails(customerID: customerID).then(
-          (List<Customer> customerDetails) => Routes.navigateToTransactionDetailsView(
-            transacrtion: trancation,
-            context: context,
-            customerDetails: customerDetails.first,
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    void delateTheContact() {
+      ref.read(asyncCustomersContactsProvider.notifier).deleteCustomer(customerID: customerID);
+      Navigator.of(context).pop();
+    }
+
+    void navigateToEditingPage(Customer c) {
+      Routes.navigateToContactEditingView(context: context, contact: c);
+    }
+
+    void preEditingSettings() async {
+      final List<Customer> response = await BackEnd.fetchSingleContactDetails(id: customerID);
+      ref.read(updatedCustomerPhotoStringProvider.notifier).state = response.first.photo;
+      ref.read(updatedCustomerProofStringProvider.notifier).state = response.first.proof;
+      navigateToEditingPage(response.first);
+    }
+
+    void popUpMenuSelected(String value) async {
+      switch (value) {
+        case '1':
+          preEditingSettings();
+          break;
+        case '2':
+          if (await AlertDilogs.alertDialogWithTwoAction(context, "Alert",
+                  "By Pressing 'YES' you will remove all the details of this customer from your Date Base") ==
+              1) {
+            delateTheContact();
+          }
+          break;
+        default:
+          () {};
+      }
+    }
+
+    return DefaultTabController(
+      initialIndex: 0,
+      length: 2,
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          heroTag: Constant.saveButtonTag,
+          tooltip: "Add new trancation to this customer",
+          child: const Icon(
+            Icons.add,
           ),
-        );
+          onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(context: context, customerID: customerID),
+        ),
+        appBar: AppBar(
+          forceMaterialTransparency: true,
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: (String value) => popUpMenuSelected(value),
+              itemBuilder: (BuildContext context) => [
+                _buildPopUpMenuItems(
+                  value: '1',
+                  icon: Icons.edit_rounded,
+                  iconColor: AppColors.getPrimaryColor,
+                  title: 'Edit',
+                ),
+                _buildPopUpMenuItems(
+                  value: '2',
+                  icon: Icons.delete_rounded,
+                  iconColor: AppColors.getErrorColor,
+                  title: "Delete",
+                ),
+              ],
+            ),
+          ],
+          toolbarHeight: 32.sp,
+          title: const BodyTwoDefaultText(text: "Contact Info", bold: true),
+          bottom: const TabBar(
+            dividerColor: Colors.transparent,
+            tabs: [
+              Tab(icon: Icon(Icons.person)),
+              Tab(icon: Icon(Icons.history)),
+            ],
+          ),
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 16.sp),
+            child: TabBarView(
+              children: <Widget>[
+                _buildCustomerDetails(),
+                _buildTransactionsHistory(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Consumer _buildTransactionsHistory() {
@@ -60,7 +143,10 @@ class ContactDetailsView extends ConsumerWidget {
                         separatorBuilder: (BuildContext context, int index) => SizedBox(height: 12.sp),
                         itemBuilder: (BuildContext context, int index) {
                           return GestureDetector(
-                            onTap: () => _navigateToTransactionDetailsView(ref, context, transactions[index]),
+                            onTap: () => Routes.navigateToTransactionDetailsView(
+                              transacrtion: transactions[index],
+                              context: context,
+                            ),
                             child: Card(
                               child: Padding(
                                 padding: EdgeInsets.all(16.sp),
@@ -196,7 +282,7 @@ class ContactDetailsView extends ConsumerWidget {
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: BodyTwoDefaultText(
-                        text: "customer created on ${customer.createdDate}",
+                        text: "customer created on ${(customer.createdDate)}",
                         color: AppColors.getLigthGreyColor,
                       ),
                     )
@@ -330,99 +416,6 @@ class ContactDetailsView extends ConsumerWidget {
           BodyTwoDefaultText(text: title),
           SizedBox(width: 18.sp),
         ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    void delateTheContact() {
-      ref.read(asyncCustomersContactsProvider.notifier).deleteCustomer(customerID: customerID);
-      Navigator.of(context).pop();
-    }
-
-    void navigateToEditingPage(Customer c) {
-      Routes.navigateToContactEditingView(context: context, contact: c);
-    }
-
-    void preEditingSettings() async {
-      final List<Customer> response = await BackEnd.fetchSingleContactDetails(id: customerID);
-      ref.read(updatedCustomerPhotoStringProvider.notifier).state = response.first.photo;
-      ref.read(updatedCustomerProofStringProvider.notifier).state = response.first.proof;
-      navigateToEditingPage(response.first);
-    }
-
-    void popUpMenuSelected(String value) async {
-      switch (value) {
-        case '1':
-          preEditingSettings();
-          break;
-        case '2':
-          if (await AlertDilogs.alertDialogWithTwoAction(context, "Alert",
-                  "By Pressing 'YES' you will remove all the details of this customer from your Date Base") ==
-              1) {
-            delateTheContact();
-          }
-          break;
-        default:
-          () {};
-      }
-    }
-
-    return DefaultTabController(
-      initialIndex: 0,
-      length: 2,
-      child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          heroTag: Constant.saveButtonTag,
-          tooltip: "Add new trancation to this customer",
-          child: const Icon(
-            Icons.add,
-          ),
-          onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(context: context, customerID: customerID),
-        ),
-        appBar: AppBar(
-          forceMaterialTransparency: true,
-          actions: [
-            PopupMenuButton<String>(
-              onSelected: (String value) => popUpMenuSelected(value),
-              itemBuilder: (BuildContext context) => [
-                _buildPopUpMenuItems(
-                  value: '1',
-                  icon: Icons.edit_rounded,
-                  iconColor: AppColors.getPrimaryColor,
-                  title: 'Edit',
-                ),
-                _buildPopUpMenuItems(
-                  value: '2',
-                  icon: Icons.delete_rounded,
-                  iconColor: AppColors.getErrorColor,
-                  title: "Delete",
-                ),
-              ],
-            ),
-          ],
-          toolbarHeight: 32.sp,
-          title: const BodyTwoDefaultText(text: "Contact Info", bold: true),
-          bottom: const TabBar(
-            dividerColor: Colors.transparent,
-            tabs: [
-              Tab(icon: Icon(Icons.person)),
-              Tab(icon: Icon(Icons.history)),
-            ],
-          ),
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 16.sp),
-            child: TabBarView(
-              children: <Widget>[
-                _buildCustomerDetails(),
-                _buildTransactionsHistory(),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

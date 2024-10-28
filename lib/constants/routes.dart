@@ -13,12 +13,10 @@ import 'package:self_finance/views/transaction_detail_view.dart';
 import 'package:self_finance/views/user_creating_view.dart';
 
 class Routes {
-  static void navigateToTransactionDetailsView(
-      {required Trx transacrtion, required BuildContext context, required Customer customerDetails}) {
+  static void navigateToTransactionDetailsView({required Trx transacrtion, required BuildContext context}) {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => TransactionDetailView(
         transacrtion: transacrtion,
-        customerDetails: customerDetails,
       ),
     ));
   }

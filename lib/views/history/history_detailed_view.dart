@@ -126,7 +126,7 @@ class HistoryDetailedView extends ConsumerWidget {
                 ),
                 _buildDetailesCard(
                   icon: Icons.circle,
-                  title: 'Tranasction Status',
+                  title: Constant.transacrtionStatus,
                   details: transaction.transacrtionType == Constant.active ? Constant.active : Constant.inactive,
                 ),
                 SizedBox(height: 12.sp),
@@ -137,10 +137,9 @@ class HistoryDetailedView extends ConsumerWidget {
                     onPressed: () => Routes.navigateToTransactionDetailsView(
                       transacrtion: transaction,
                       context: context,
-                      customerDetails: customer,
                     ),
                     child: const BodyOneDefaultText(
-                      text: 'Show trancation',
+                      text: Constant.showTransaction,
                     ),
                   ),
                 )

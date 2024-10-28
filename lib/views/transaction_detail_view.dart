@@ -1,14 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
-import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/logic/logic.dart';
 import 'package:self_finance/models/customer_model.dart';
@@ -26,7 +22,6 @@ import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/image_catch_manager.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/ads_banner_widget.dart';
-import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
 
@@ -62,17 +57,16 @@ final AutoDisposeProviderFamily<List<Payment>, int> paymentsProvider =
 });
 
 class TransactionDetailView extends StatelessWidget {
-  TransactionDetailView({super.key, required this.transacrtion, required this.customerDetails});
+  TransactionDetailView({super.key, required this.transacrtion});
 
   final Trx transacrtion;
-  final Customer customerDetails;
 
-  final ScreenshotController screenShotController = ScreenshotController();
+  final ScreenshotController _screenShotController = ScreenshotController();
 
   @override
   Widget build(BuildContext context) {
     return Screenshot(
-      controller: screenShotController,
+      controller: _screenShotController,
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -82,11 +76,11 @@ class TransactionDetailView extends StatelessWidget {
                 Icons.share_rounded,
                 color: AppColors.getPrimaryColor,
               ),
-              onPressed: () => Utility.screenShotShare(screenShotController, context),
+              onPressed: () => Utility.screenShotShare(_screenShotController, context),
             ),
           ],
           title: const BodyTwoDefaultText(
-            text: "Transaction Details",
+            text: Constant.transactionDetails,
             bold: true,
           ),
         ),
@@ -98,12 +92,12 @@ class TransactionDetailView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const AdsBannerWidget(),
-                _buildCustomerDetails(),
-                SizedBox(height: 12.sp),
-                const BodyOneDefaultText(
-                  text: 'Transaction Details',
-                  bold: true,
-                ),
+                // _buildCustomerDetails(),
+                // SizedBox(height: 12.sp),
+                // const BodyOneDefaultText(
+                //   text: 'Transaction Details',
+                //   bold: true,
+                // ),
                 _buildTransactionDetails(),
               ],
             ),
@@ -129,7 +123,7 @@ class TransactionDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildCard({
+  Card _buildCard({
     required String title,
     required String data,
     required IconData icon,
@@ -154,35 +148,36 @@ class TransactionDetailView extends StatelessWidget {
     );
   }
 
-  FutureBuilder<Directory> _buildShowSignatureButton() {
-    return FutureBuilder<Directory>(
-      future: getApplicationDocumentsDirectory(),
-      builder: (BuildContext context, AsyncSnapshot<Directory> snapshot) {
-        if (snapshot.hasError) {
-          return const Text("error");
-        } else if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator.adaptive();
-        } else {
-          if (File('${snapshot.data!.path}/signature/${transacrtion.id!}.png').existsSync() == true) {
-            File? f = File('${snapshot.data!.path}/signature/${transacrtion.id!}.png');
-            return _buildCard(
-              onTap: () => Routes.navigateToImageView(
-                context: context,
-                imageWidget: Image.file(f),
-                titile: "Signature",
-              ),
-              title: "Signature",
-              data: "",
-              icon: Icons.topic_outlined,
-              trailingIcon: Icons.app_registration_sharp,
-            );
-          } else {
-            return const SizedBox.shrink();
-          }
-        }
-      },
-    );
-  }
+  //! Signature button if needed for update
+  // FutureBuilder<Directory> _buildShowSignatureButton() {
+  //   return FutureBuilder<Directory>(
+  //     future: getApplicationDocumentsDirectory(),
+  //     builder: (BuildContext context, AsyncSnapshot<Directory> snapshot) {
+  //       if (snapshot.hasError) {
+  //         return const Text("error");
+  //       } else if (snapshot.connectionState == ConnectionState.waiting) {
+  //         return const CircularProgressIndicator.adaptive();
+  //       } else {
+  //         if (File('${snapshot.data!.path}/signature/${transacrtion.id!}.png').existsSync() == true) {
+  //           File? f = File('${snapshot.data!.path}/signature/${transacrtion.id!}.png');
+  //           return _buildCard(
+  //             onTap: () => Routes.navigateToImageView(
+  //               context: context,
+  //               imageWidget: Image.file(f),
+  //               titile: "Signature",
+  //             ),
+  //             title: "Signature",
+  //             data: "",
+  //             icon: Icons.topic_outlined,
+  //             trailingIcon: Icons.app_registration_sharp,
+  //           );
+  //         } else {
+  //           return const SizedBox.shrink();
+  //         }
+  //       }
+  //     },
+  //   );
+  // }
 
   Consumer _buildTransactionDetails() {
     return Consumer(
@@ -209,7 +204,7 @@ class TransactionDetailView extends StatelessWidget {
                 children: [
                   // Transaction Status
                   _buildCard(
-                    title: "Transaction Status",
+                    title: Constant.transactionStatus,
                     data: transaction.transacrtionType == Constant.active ? 'Active' : 'Inactive',
                     icon: Icons.online_prediction,
                     trailingIcon: Icons.circle,
@@ -332,15 +327,18 @@ class TransactionDetailView extends StatelessWidget {
                       ),
 
                   // show signature image view
-                  _buildShowSignatureButton(),
+                  // _buildShowSignatureButton(),
                   SizedBox(height: 12.sp),
 
                   // Mark As Paid Button
                   if (transaction.transacrtionType == Constant.active)
-                    RoundedCornerButton(
-                      onPressed: () => _markAsPaid(ref, transaction, loanCalculator.totalAmount),
-                      icon: Icons.done,
-                      text: "Mark As Paid",
+                    Hero(
+                      tag: Constant.saveButtonTag,
+                      child: RoundedCornerButton(
+                        onPressed: () => _markAsPaid(ref, transaction, loanCalculator.totalAmount),
+                        icon: Icons.done,
+                        text: "Mark As Paid",
+                      ),
                     ),
 
                   SizedBox(height: 12.sp),
@@ -385,39 +383,39 @@ class TransactionDetailView extends StatelessWidget {
         .markAsPaidTransaction(trancationId: transaction.id!);
   }
 
-  Card _buildCustomerDetails() {
-    return Card(
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 20.sp),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                BodyTwoDefaultText(
-                  text: customerDetails.name,
-                  bold: true,
-                ),
-                BodyTwoDefaultText(
-                  text: customerDetails.number,
-                  color: AppColors.getLigthGreyColor,
-                ),
-                BodyTwoDefaultText(
-                  text: customerDetails.address,
-                  color: AppColors.getLigthGreyColor,
-                ),
-              ],
-            ),
-            CircularImageWidget(
-              imageData: customerDetails.photo,
-              titile: "${customerDetails.name} photo",
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Card _buildCustomerDetails() {
+  //   return Card(
+  //     child: Padding(
+  //       padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 20.sp),
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         crossAxisAlignment: CrossAxisAlignment.center,
+  //         children: <Widget>[
+  //           Column(
+  //             mainAxisAlignment: MainAxisAlignment.start,
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               BodyTwoDefaultText(
+  //                 text: customerDetails.name,
+  //                 bold: true,
+  //               ),
+  //               BodyTwoDefaultText(
+  //                 text: customerDetails.number,
+  //                 color: AppColors.getLigthGreyColor,
+  //               ),
+  //               BodyTwoDefaultText(
+  //                 text: customerDetails.address,
+  //                 color: AppColors.getLigthGreyColor,
+  //               ),
+  //             ],
+  //           ),
+  //           CircularImageWidget(
+  //             imageData: customerDetails.photo,
+  //             titile: "${customerDetails.name} photo",
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 }
