@@ -10,7 +10,7 @@ import local_auth_darwin
 import package_info_plus
 import path_provider_foundation
 import share_plus
-import sqflite
+import sqflite_darwin
 import url_launcher_macos
 import webview_flutter_wkwebview
 
