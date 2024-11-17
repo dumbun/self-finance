@@ -86,21 +86,19 @@ class TransactionDetailView extends StatelessWidget {
         body: SafeArea(
           child: Padding(
             padding: EdgeInsets.all(12.sp),
-            child: Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const AdsBannerWidget(),
-                  // _buildCustomerDetails(),
-                  // SizedBox(height: 12.sp),
-                  // const BodyOneDefaultText(
-                  //   text: 'Transaction Details',
-                  //   bold: true,
-                  // ),
-                  _buildTransactionDetails(),
-                ],
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const AdsBannerWidget(),
+                // _buildCustomerDetails(),
+                // SizedBox(height: 12.sp),
+                // const BodyOneDefaultText(
+                //   text: 'Transaction Details',
+                //   bold: true,
+                // ),
+                _buildTransactionDetails(),
+              ],
             ),
           ),
         ),

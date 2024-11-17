@@ -55,11 +55,11 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   file_selector_macos: cc3858c981fe6889f364731200d6232dac1d812d
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  local_auth_darwin: 66e40372f1c29f383a314c738c7446e2f7fdadc3
-  package_info_plus: f5790acc797bf17c3e959e9d6cf162cc68ff7523
-  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
-  share_plus: fd717ef89a2801d3491e737630112b80c310640e
-  sqflite_darwin: a553b1fd6fe66f53bbb0fe5b4f5bab93f08d7a13
+  local_auth_darwin: 908658cb17742d5d417f579ae7a024c09d95ad7e
+  package_info_plus: 12f1c5c2cfe8727ca46cbd0b26677728972d9a5b
+  path_provider_foundation: 4c194ee82ace19f3a7a9c7d620ba1e5b1fcfcc13
+  share_plus: 1fa619de8392a4398bfaf176d441853922614e89
+  sqflite_darwin: 5a7236e3b501866c1c9befc6771dfd73ffb8702d
   url_launcher_macos: c82c93949963e55b228a30115bd219499a6fe404
   webview_flutter_wkwebview: 0982481e3d9c78fd5c6f62a002fcd24fc791f1e4
 
