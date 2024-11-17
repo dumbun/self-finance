@@ -66,7 +66,6 @@ class TransactionDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Screenshot(
       controller: _screenShotController,
-      key: Key("SCreemeslkcnfekl"),
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
