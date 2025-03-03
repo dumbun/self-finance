@@ -31,7 +31,7 @@ class ImageView extends StatelessWidget {
         enablePanAlways: false,
         gaplessPlayback: true,
         tightMode: false,
-        wantKeepAlive: true,
+        wantKeepAlive: false,
         imageProvider: imageWidget.image,
       ),
     );

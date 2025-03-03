@@ -58,7 +58,7 @@ abstract class Constant {
   static const String customerItem = "Customer Item";
   static const String errorUpdatingContactMessage = "Error while updating the contact please try again some other time";
   static const String contactUpdatedSuccessfully = "Contact Updated Successfully";
-  static const String customerAddress = " Customer Address ";
+  static const String customerAddress = "Customer Address ";
   static const String historyToolTip = "History Page : Views all your transactions history";
   static const String next = "next";
   static const String termAcknowledge =
@@ -76,10 +76,10 @@ abstract class Constant {
   static const String searchMobile = "Search using Mobile Number";
   static const String searchName = "Search using Customer Name";
   static const String searchPlace = "Search using Customer Place";
-  static const String mobileNumber = " Customer Mobile Number ";
+  static const String mobileNumber = "Customer Mobile Number ";
   static const String noTransactionsFound = "sorry no transactions found. 🫠";
-  static const String customerName = " Customer Full Name ";
-  static const String guardianName = " Gaurdian Full Name ";
+  static const String customerName = "Customer Full Name ";
+  static const String guardianName = "Gaurdian Full Name ";
   static const String customerPlace = "Customer Place";
   static const String error = "Error";
   static const String customerPhoto = "Customer Photo";

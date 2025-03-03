@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/utility/user_utility.dart';
 
-class ImagePickerWidget extends ConsumerStatefulWidget {
+class ImagePickerWidget extends ConsumerWidget {
   const ImagePickerWidget({
     super.key,
     required this.text,
@@ -15,37 +16,93 @@ class ImagePickerWidget extends ConsumerStatefulWidget {
 
   final String text;
   final String defaultImage;
-  final StateProvider<String> imageProvider;
+  final AutoDisposeStateProvider<String> imageProvider;
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _ImagePickerWidgetState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    void doWork() {
+      showModalBottomSheet(
+        enableDrag: true,
+        useSafeArea: true,
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            alignment: Alignment.center,
+            height: 60.sp,
+            padding: EdgeInsets.all(20.sp),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildCard(
+                  () {
+                    Utility.pickImageFromCamera().then((String value) {
+                      if (value != "" && value.isNotEmpty) {
+                        ref.read(imageProvider.notifier).update(
+                              (String state) => value,
+                            );
+                      }
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  "camera",
+                  Icons.camera_alt,
+                ),
+                _buildCard(
+                  () {
+                    Utility.pickImageFromGallery().then(
+                      (String value) {
+                        if (value != "" && value.isNotEmpty) {
+                          ref.read(imageProvider.notifier).update(
+                                (String state) => value,
+                              );
+                        }
+                      },
+                    );
+                    Navigator.of(context).pop();
+                  },
+                  "Gallary",
+                  Icons.photo_library_sharp,
+                ),
+                _buildCard(
+                  () {
+                    ref.read(imageProvider.notifier).update(
+                          (String state) => "",
+                        );
+                    Navigator.of(context).pop();
+                  },
+                  "Remove",
+                  Icons.delete,
+                )
+              ],
+            ),
+          );
+        },
+      );
+    }
 
-class _ImagePickerWidgetState extends ConsumerState<ImagePickerWidget> {
-  Widget? pickedItemImage;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 0.sp,
-      child: Padding(
-        padding: EdgeInsets.all(18.sp),
-        child: GestureDetector(
-          onTap: _doWork,
+    String imageData = ref.watch(imageProvider);
+    return GestureDetector(
+      onTap: doWork,
+      child: Card(
+        elevation: 0.sp,
+        child: Padding(
+          padding: EdgeInsets.all(18.sp),
           child: Column(
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8.sp),
-                child: pickedItemImage ??
-                    SvgPicture.asset(
-                      widget.defaultImage,
-                      height: 28.sp,
-                      width: 28.sp,
-                    ),
+                child: imageData.isEmpty
+                    ? SvgPicture.asset(
+                        defaultImage,
+                        height: 28.sp,
+                        width: 28.sp,
+                      )
+                    : Utility.imageFromBase64String(imageData),
               ),
               SizedBox(height: 10.sp),
               BodyTwoDefaultText(
-                text: widget.text,
+                text: text,
                 bold: true,
               )
             ],
@@ -55,16 +112,20 @@ class _ImagePickerWidgetState extends ConsumerState<ImagePickerWidget> {
     );
   }
 
-  void _doWork() {
-    Utility.pickImageFromCamera().then(
-      (value) {
-        if (value != "" && value.isNotEmpty) {
-          setState(() {
-            pickedItemImage = Utility.imageFromBase64String(value);
-          });
-        }
-        ref.read(widget.imageProvider.notifier).update((state) => value);
-      },
+  GestureDetector _buildCard(void Function()? onTap, String title, IconData icon) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 30.sp,
+          ),
+          BodyOneDefaultText(text: title)
+        ],
+      ),
     );
   }
 }

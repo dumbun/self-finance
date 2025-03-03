@@ -3,6 +3,8 @@ import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history.dart';
+import 'package:self_finance/views/Add%20New%20Entry/customer_conformation_view.dart';
+import 'package:self_finance/views/Add%20New%20Entry/customer_lone_entry_view.dart';
 import 'package:self_finance/views/add_new_transaction_view.dart';
 import 'package:self_finance/views/contact_details_view.dart';
 import 'package:self_finance/views/customer_editind_view.dart';
@@ -19,6 +21,52 @@ class Routes {
         transacrtion: transacrtion,
       ),
     ));
+  }
+
+  static void navigateToCustomerLoneEntryView({
+    required BuildContext context,
+    required String customerName,
+    required String mobileNumber,
+    required String gaurdianName,
+    required String address,
+  }) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) => CustomerLoneEntryView(
+          customerName: customerName,
+          mobileNumber: mobileNumber,
+          gaurdianName: gaurdianName,
+          address: address,
+        ),
+      ),
+    );
+  }
+
+  static void navigateToCustomerConformationView({
+    required BuildContext context,
+    required String customerName,
+    required String mobileNumber,
+    required String gaurdianName,
+    required String address,
+    required String itemDescription,
+    required double rateOfIntrest,
+    required double takenAmount,
+    required String takenDate,
+  }) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) => CustomerConformationView(
+          customerName: customerName,
+          mobileNumber: mobileNumber,
+          gaurdianName: gaurdianName,
+          address: address,
+          itemDescription: itemDescription,
+          rateOfIntrest: rateOfIntrest,
+          takenAmount: takenAmount,
+          takenDate: takenDate,
+        ),
+      ),
+    );
   }
 
   static void navigateToChangePinView({required BuildContext context}) {
