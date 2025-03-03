@@ -5,7 +5,7 @@ import 'package:self_finance/theme/app_colors.dart';
 
 ///[RefreshWidget] drop down refresh indicator to refresh
 ///[child] for the child widget
-///[onRefresh] is a Future<void> Function() for doing future void function
+///[onRefresh] is a Future void Function() for doing future void function
 class RefreshWidget extends StatelessWidget {
   const RefreshWidget({super.key, required this.onRefresh, required this.child});
   final Future<void> Function() onRefresh;

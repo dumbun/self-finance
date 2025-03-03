@@ -37,10 +37,9 @@ android {
 
     namespace "com.vamshikrishna.self_finance"
     // compileSdkVersion flutter.compileSdkVersion
-    compileSdkVersion 34
+    compileSdkVersion 35
     // ndkVersion flutter.ndkVersion
-    // ndkVersion "25.1.8937393"
-    ndkVersion = "26.1.10909125"
+     ndkVersion "27.2.12479018"
     
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

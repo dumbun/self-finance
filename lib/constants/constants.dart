@@ -1,7 +1,14 @@
 abstract class Constant {
   static const String applicationHandleEmail = "sf.help.vamshi@gmail.com";
+  static const String errorFetchingTransactionMessage =
+      "Error fetching the transactions please restart the application";
+
+  static const bool ads = false;
+  static const String noImgageError = "No Image Found";
+  static const String noTransactionMessage = "No Transactions present. Add a transaction by pressing the + below ";
+  static const String contactDeleteMessage =
+      "By Pressing 'YES' you will remove all the details of this customer from your DateBase";
   static const String alert = "Alert";
-  static const bool ads = true;
   static const String feedbackSubject = "Self-Finance Appication Feedback";
   static const String inactive = "Inactive";
   static const String currencyChangeAlert =

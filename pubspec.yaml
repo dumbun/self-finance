@@ -22,7 +22,7 @@ dependencies:
   local_auth: ^2.3.0
   flutter_svg_provider: ^1.0.7
   intl: ^0.19.0
-  fl_chart: ^0.69.0
+  fl_chart: ^0.70.2
   image_picker: ^1.1.2
   photo_view: ^0.15.0
   flutter_riverpod: ^2.6.1
@@ -32,12 +32,12 @@ dependencies:
   screenshot: ^3.0.0
   share_plus: ^10.1.1
   feedback: ^3.1.0
-  flutter_email_sender: ^6.0.3
+  flutter_email_sender: ^7.0.0
   google_mobile_ads: ^5.2.0
   package_info_plus: ^8.0.2
   permission_handler: ^11.3.1
   path: ^1.8.2
-  syncfusion_flutter_signaturepad: ^27.1.48
+  syncfusion_flutter_signaturepad: ^28.2.7
 
 dev_dependencies:
   flutter_test:
@@ -47,7 +47,7 @@ dev_dependencies:
   build_runner: ^2.4.7
   custom_lint: ^0.7.0
   riverpod_lint: ^2.6.2
-  analyzer: ^6.7.0
+  analyzer: ^7.3.0
 
 analyzer:
   plugins:

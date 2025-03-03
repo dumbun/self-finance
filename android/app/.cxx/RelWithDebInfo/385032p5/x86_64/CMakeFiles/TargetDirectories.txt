@@ -1,0 +1,2 @@
+/Users/vamshikrishna/Developer/present-projects/self_finance/android/app/.cxx/RelWithDebInfo/385032p5/x86_64/CMakeFiles/edit_cache.dir
+/Users/vamshikrishna/Developer/present-projects/self_finance/android/app/.cxx/RelWithDebInfo/385032p5/x86_64/CMakeFiles/rebuild_cache.dir

@@ -15,6 +15,7 @@ import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
+import 'package:self_finance/widgets/title_widget.dart';
 
 class HistoryDetailedView extends ConsumerWidget {
   HistoryDetailedView({
@@ -82,22 +83,26 @@ class HistoryDetailedView extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            style: TextStyle(
-                              fontSize: 24.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            '${history.eventType == Constant.debited ? '-' : '+'} ${Utility.doubleFormate(history.amount)} $appCurrency',
+                          TitleWidget(
+                            color: history.eventType == Constant.debited
+                                ? AppColors.getErrorColor
+                                : AppColors.getGreenColor,
+                            text:
+                                '${history.eventType == Constant.debited ? '-' : '+'} ${Utility.doubleFormate(history.amount)} $appCurrency',
                           ),
                           GestureDetector(
                             onTap: () => Routes.navigateToContactDetailsView(
                               context,
                               customerID: history.customerID,
                             ),
-                            child: BodyOneDefaultText(
-                              bold: true,
-                              color: AppColors.getPrimaryColor,
-                              text: '${history.eventType == Constant.debited ? 'To' : 'From'} ${customer.name}',
+                            child: SizedBox(
+                              width: 60.sp,
+                              child: BodyOneDefaultText(
+                                overflow: TextOverflow.ellipsis,
+                                bold: true,
+                                color: AppColors.getPrimaryColor,
+                                text: '${history.eventType == Constant.debited ? 'To' : 'From'} ${customer.name}',
+                              ),
                             ),
                           ),
                           BodyTwoDefaultText(

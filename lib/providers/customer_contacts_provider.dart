@@ -34,23 +34,25 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
 
   Future<void> searchCustomer({required String givenInput}) async {
     final List<Contact> data = await BackEnd.fetchAllCustomerNumbersWithNames();
-    if (givenInput.isEmpty || givenInput == "" || givenInput == " ") {
+
+    if (givenInput.trim().isEmpty) {
       state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        return data;
-      });
-    } else {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        if (data.isNotEmpty) {
-          return data.where((element) {
-            return "${element.number} ${element.name.toLowerCase()}".contains(givenInput.toLowerCase());
-          }).toList();
-        } else {
-          return [];
-        }
-      });
+      state = await AsyncValue.guard(() async => data);
+      return;
     }
+
+    // Create a HashMap for quick lookup
+    final Map<String, Contact> customerMap = {
+      for (Contact contact in data) "${contact.number} ${contact.name.toLowerCase()}": contact
+    };
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      return customerMap.entries
+          .where((MapEntry<String, Contact> entry) => entry.key.contains(givenInput.toLowerCase()))
+          .map((MapEntry<String, Contact> entry) => entry.value)
+          .toList();
+    });
   }
 
   Future<void> deleteCustomer({required int customerID}) async {

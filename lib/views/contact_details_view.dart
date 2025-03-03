@@ -6,6 +6,7 @@ import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/fonts/selectable_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/providers/app_currency_provider.dart';
@@ -61,9 +62,7 @@ class ContactDetailsView extends ConsumerWidget {
           preEditingSettings();
           break;
         case '2':
-          if (await AlertDilogs.alertDialogWithTwoAction(context, "Alert",
-                  "By Pressing 'YES' you will remove all the details of this customer from your Date Base") ==
-              1) {
+          if (await AlertDilogs.alertDialogWithTwoAction(context, "Alert", Constant.contactDeleteMessage) == 1) {
             delateTheContact();
           }
           break;
@@ -78,7 +77,7 @@ class ContactDetailsView extends ConsumerWidget {
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
           heroTag: Constant.saveButtonTag,
-          tooltip: "Add new trancation to this customer",
+          tooltip: Constant.addNewTransaction,
           child: const Icon(
             Icons.add,
           ),
@@ -190,12 +189,12 @@ class ContactDetailsView extends ConsumerWidget {
                       )
                     : const Center(
                         child: BodyOneDefaultText(
-                          text: "No Transactions present. Add a transaction by pressing the + below ",
+                          text: Constant.noTransactionMessage,
                         ),
                       );
               },
               error: (Object error, StackTrace stackTrace) => const Center(
-                child: BodyOneDefaultText(text: "Error fetching the transactions please restart the application"),
+                child: BodyOneDefaultText(text: Constant.errorFetchingTransactionMessage),
               ),
               loading: () => const Center(
                 child: CircularProgressIndicator.adaptive(),
@@ -223,8 +222,22 @@ class ContactDetailsView extends ConsumerWidget {
                             SizedBox(height: 20.sp),
                             _buildImage(customer.photo, customer.name),
                             SizedBox(height: 16.sp),
-                            _buildCustomerName(customer.name),
+
+                            // Customer Name
+                            Padding(
+                              padding: EdgeInsets.only(
+                                left: 20.sp,
+                                right: 20.sp,
+                              ),
+                              child: Center(
+                                child: TitleWidget(
+                                  textAlign: TextAlign.center,
+                                  text: customer.name,
+                                ),
+                              ),
+                            ),
                             SizedBox(height: 16.sp),
+
                             _buildNumberDetails(customer.number),
                             SizedBox(height: 12.sp),
                             _buildDetails(
@@ -290,7 +303,7 @@ class ContactDetailsView extends ConsumerWidget {
                 );
               },
               error: (Object error, StackTrace stackTrace) => const Center(
-                child: BodyOneDefaultText(text: "Error Fetching Customer contact details. Please restart the app"),
+                child: BodyOneDefaultText(text: Constant.errorFetchingContactMessage),
               ),
               loading: () => const Center(child: CircularProgressIndicator.adaptive()),
             );
@@ -320,15 +333,7 @@ class ContactDetailsView extends ConsumerWidget {
                     color: AppColors.getLigthGreyColor,
                   ),
                 SizedBox(height: 8.sp),
-                SelectableText(
-                  data,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 18.sp,
-                    fontFamily: "hell",
-                    color: AppColors.getPrimaryColor,
-                  ),
-                )
+                SelectableTextWidget(data: data),
               ],
             ),
           ],
@@ -360,28 +365,12 @@ class ContactDetailsView extends ConsumerWidget {
                     color: AppColors.getLigthGreyColor,
                   ),
                   SizedBox(height: 8.sp),
-                  SelectableText(
-                    customerNumber,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 18.sp,
-                      fontFamily: "hell",
-                      color: AppColors.getPrimaryColor,
-                    ),
-                  )
+                  SelectableTextWidget(data: customerNumber),
                 ],
               )
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Center _buildCustomerName(String customerName) {
-    return Center(
-      child: TitleWidget(
-        text: customerName,
       ),
     );
   }

@@ -9,16 +9,17 @@ class Contact {
   });
 
   static List<Contact> toList(List<Map<String, Object?>> data) {
-    if (data.isEmpty) {
-      return []; // If data is empty, return an empty list directly
+    if (data.isNotEmpty) {
+      return List.generate(data.length, (index) {
+        final e = data[index];
+        return Contact(
+          id: e["Customer_ID"] as int,
+          name: e["Customer_Name"] as String,
+          number: e["Contact_Number"] as String,
+        );
+      }, growable: false);
     }
-    return data.map((e) {
-      return Contact(
-        id: e["Customer_ID"] as int,
-        name: e["Customer_Name"] as String,
-        number: e["Contact_Number"] as String,
-      );
-    }).toList();
+    return []; // Return empty list if no data
   }
 
   Contact copyWith({

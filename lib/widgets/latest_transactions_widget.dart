@@ -17,8 +17,7 @@ import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/views/dashboard_view.dart';
 
-final AutoDisposeFutureProvider<List<UserHistory>> latestUserHistoryProvider =
-    FutureProvider.autoDispose((AutoDisposeFutureProviderRef<List<UserHistory>> ref) async {
+final AutoDisposeFutureProvider<List<UserHistory>> latestUserHistoryProvider = FutureProvider.autoDispose((ref) async {
   return await ref.watch(asyncHistoryProvider.notifier).build();
 });
 

@@ -200,10 +200,16 @@ class BackEnd {
   }
 
   /// [fetchAllCustomerNumbersWithNames] fetch's the mobile numbers with there id and name from the all customers
+  /// Fetches customer details efficiently, sorted by name.
   static Future<List<Contact>> fetchAllCustomerNumbersWithNames() async {
     final Database db = await BackEnd.db();
-    final List<Map<String, Object?>> response = await db
-        .rawQuery("""SELECT Customer_ID, Customer_Name, Contact_Number FROM Customers ORDER BY Customer_Name ASC""");
+
+    // Ensure data is sorted by Customer_Name for binary search
+    final List<Map<String, Object?>> response = await db.rawQuery("""
+      SELECT Customer_ID, Customer_Name, Contact_Number 
+      FROM Customers 
+      ORDER BY Customer_Name ASC
+    """);
 
     return Contact.toList(response);
   }
@@ -211,7 +217,9 @@ class BackEnd {
   static Future<String> fetchRequriedCustomerName(int id) async {
     final Database db = await BackEnd.db();
     try {
-      final response = await db.rawQuery("""SELECT Customer_Name FROM Customers WHERE Customer_ID == $id""");
+      final List<Map<String, Object?>> response = await db.rawQuery(
+        """SELECT Customer_Name FROM Customers WHERE Customer_ID == $id""",
+      );
       return response.first["Customer_Name"].toString();
     } catch (e) {
       return "";
