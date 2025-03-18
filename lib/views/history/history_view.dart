@@ -125,16 +125,16 @@ class HistoryView extends ConsumerWidget {
                 fontWeight: FontWeight.bold,
               ),
               keyboardType: TextInputType.name,
-              onChanged: (value) => ref.read(asyncHistoryProvider.notifier).doSearch(givenInput: value),
+              onChanged: (String value) => ref.read(asyncHistoryProvider.notifier).doSearch(givenInput: value),
             ),
             SizedBox(height: 16.sp),
             const AdsBannerWidget(),
             SizedBox(height: 16.sp),
             Consumer(
-              builder: (context, ref, child) {
+              builder: (BuildContext context, WidgetRef ref, Widget? child) {
                 return ref.watch(asyncHistoryProvider).when(
-                      data: (data) => buildhistoryList(data, ref.watch(currencyProvider)),
-                      error: (error, stackTrace) => Text(error.toString()),
+                      data: (List<UserHistory> data) => buildhistoryList(data, ref.watch(currencyProvider)),
+                      error: (Object error, StackTrace stackTrace) => Text(error.toString()),
                       loading: () => const Center(
                         child: CircularProgressIndicator.adaptive(),
                       ),

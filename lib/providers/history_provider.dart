@@ -36,24 +36,25 @@ class AsyncHistory extends _$AsyncHistory {
   }
 
   Future<void> doSearch({required String givenInput}) async {
+    state = const AsyncValue.loading(); // Set loading state once
+
     final List<UserHistory> historyData = await BackEnd.fetchAllUserHistory();
-    if (givenInput.isEmpty) {
-      state = const AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        return historyData;
-      });
+    if (historyData.isEmpty) {
+      state = const AsyncValue.data([]);
       return;
     }
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      if (historyData.isNotEmpty) {
-        return historyData.where((element) {
-          return "${element.customerNumber} ${element.customerName.toLowerCase()}".contains(givenInput.toLowerCase());
-        }).toList();
-      } else {
-        return [];
-      }
-    });
+
+    if (givenInput.isEmpty) {
+      state = AsyncValue.data(historyData);
+      return;
+    }
+
+    final inputLower = givenInput.toLowerCase();
+    final filteredData = historyData.where((UserHistory element) {
+      return element.customerNumber.contains(inputLower) || element.customerName.toLowerCase().contains(inputLower);
+    }).toList();
+
+    state = AsyncValue.data(filteredData);
   }
 
   Future<List<UserHistory>> fetchAllUserHistory() async {

@@ -17,6 +17,84 @@ class ContactsView extends ConsumerWidget {
   const ContactsView({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    void contactSelected(List<Contact> data, int index, BuildContext context) {
+      ref.read(asyncTransactionsProvider.notifier).fetchRequriedCustomerTransactions(customerID: data[index].id);
+      Routes.navigateToContactDetailsView(context, customerID: data[index].id);
+    }
+
+    Expanded buildCustomerList() {
+      return Expanded(
+        child: Consumer(
+          builder: (
+            BuildContext context,
+            WidgetRef ref,
+            Widget? child,
+          ) {
+            return ref.watch(asyncCustomersContactsProvider).when(
+                  data: (List<Contact> data) {
+                    return data.isNotEmpty
+                        ? ListView.builder(
+                            itemCount: data.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return GestureDetector(
+                                onTap: () => contactSelected(data, index, context),
+                                child: Card(
+                                  margin: EdgeInsets.only(top: 16.sp),
+                                  elevation: 0,
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Column(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            BodyTwoDefaultText(
+                                              text: data[index].name,
+                                              bold: true,
+                                            ),
+                                            BodyTwoDefaultText(
+                                              text: data[index].number,
+                                              color: AppColors.getLigthGreyColor,
+                                            )
+                                          ],
+                                        ),
+                                        const Icon(
+                                          Icons.arrow_forward_ios_rounded,
+                                          color: AppColors.getLigthGreyColor,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        : const Center(
+                            child: BodyOneDefaultText(
+                              text: Constant.zeroContacts,
+                              bold: true,
+                            ),
+                          );
+                  },
+                  error: (Object error, StackTrace stackTrace) {
+                    return const Center(
+                      child: BodyOneDefaultText(
+                        text: Constant.errorFetchingContactMessage,
+                      ),
+                    );
+                  },
+                  loading: () => const Center(
+                    child: CircularProgressIndicator.adaptive(),
+                  ),
+                );
+          },
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
@@ -42,92 +120,18 @@ class ContactsView extends ConsumerWidget {
                     fontWeight: FontWeight.bold,
                   ),
                   keyboardType: TextInputType.name,
-                  onChanged: (value) =>
+                  onChanged: (String value) =>
                       ref.read(asyncCustomersContactsProvider.notifier).searchCustomer(givenInput: value),
                 ),
                 SizedBox(height: 12.sp),
                 const AdsBannerWidget(),
                 SizedBox(height: 12.sp),
-                _buildCustomerList(),
+                buildCustomerList(),
               ],
             ),
           ),
         ),
       ),
     );
-  }
-
-  Expanded _buildCustomerList() {
-    return Expanded(
-      child: Consumer(
-        builder: (context, ref, child) {
-          return ref.watch(asyncCustomersContactsProvider).when(
-                data: (data) {
-                  return data.isNotEmpty
-                      ? ListView.builder(
-                          itemCount: data.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return GestureDetector(
-                              onTap: () => contactSelected(data, index, context, ref),
-                              child: Card(
-                                margin: EdgeInsets.only(top: 16.sp),
-                                elevation: 0,
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          BodyTwoDefaultText(
-                                            text: data[index].name,
-                                            bold: true,
-                                          ),
-                                          BodyTwoDefaultText(
-                                            text: data[index].number,
-                                            color: AppColors.getLigthGreyColor,
-                                          )
-                                        ],
-                                      ),
-                                      const Icon(
-                                        Icons.arrow_forward_ios_rounded,
-                                        color: AppColors.getLigthGreyColor,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        )
-                      : const Center(
-                          child: BodyOneDefaultText(
-                            text: Constant.zeroContacts,
-                            bold: true,
-                          ),
-                        );
-                },
-                error: (error, stackTrace) {
-                  return const Center(
-                    child: BodyOneDefaultText(
-                      text: Constant.errorFetchingContactMessage,
-                    ),
-                  );
-                },
-                loading: () => const Center(
-                  child: CircularProgressIndicator.adaptive(),
-                ),
-              );
-        },
-      ),
-    );
-  }
-
-  void contactSelected(List<Contact> data, int index, BuildContext context, WidgetRef ref) {
-    ref.read(asyncTransactionsProvider.notifier).fetchRequriedCustomerTransactions(customerID: data[index].id);
-    Routes.navigateToContactDetailsView(context, customerID: data[index].id);
   }
 }
