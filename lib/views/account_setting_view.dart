@@ -39,7 +39,7 @@ class AccountSettingsView extends StatelessWidget {
               child: Align(
                 alignment: Alignment.topCenter,
                 child: Consumer(
-                  builder: (context, ref, child) {
+                  builder: (BuildContext context, WidgetRef ref, Widget? child) {
                     return ref.watch(asyncUserProvider).when(
                           data: (List<User> data) {
                             final User user = data.first;
@@ -100,7 +100,7 @@ class AccountSettingsView extends StatelessWidget {
                               ),
                             );
                           },
-                          error: (error, stackTrace) => const Center(
+                          error: (Object error, StackTrace stackTrace) => const Center(
                             child: BodyOneDefaultText(text: Constant.errorUserFetch),
                           ),
                           loading: () => const Center(
@@ -135,7 +135,7 @@ class AccountSettingsView extends StatelessWidget {
       onPressed: () => showBottomSheet(
           enableDrag: true,
           context: context,
-          builder: (context) {
+          builder: (BuildContext context) {
             return UserNameUpdateButtomSheetWidget(userId: userId, userName: userName);
           }),
       icon: const Icon(
@@ -154,7 +154,7 @@ class AccountSettingsView extends StatelessWidget {
       title: 'Change App Pin',
       onPressed: () => showBottomSheet(
         context: context,
-        builder: (context) {
+        builder: (BuildContext context) {
           return PinUpdatebuttomSheetWidget(
             id: id,
             userPin: userPin,
@@ -178,7 +178,7 @@ class AccountSettingsView extends StatelessWidget {
       title: 'Change App Currency',
       onPressed: () {
         AlertDilogs.alertDialogWithTwoAction(context, Constant.alert, Constant.currencyChangeAlert).then((int value) {
-          if (value == 1) {
+          if (value == 1 && context.mounted) {
             showCurrencyPicker(
               theme: CurrencyPickerThemeData(bottomSheetHeight: 90.sp),
               useRootNavigator: true,
@@ -229,17 +229,15 @@ class AccountSettingsView extends StatelessWidget {
     );
   }
 
-  void _logout(int response, BuildContext context) {
-    if (response == 1) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) {
-            return const PinAuthView();
-          },
-        ),
-        (route) => false,
-      );
-    }
+  void _logout(BuildContext context) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return const PinAuthView();
+        },
+      ),
+      (Route<dynamic> route) => false,
+    );
   }
 
   Card _buildLogoutButton({required BuildContext context}) {
@@ -253,9 +251,11 @@ class AccountSettingsView extends StatelessWidget {
           context,
           Constant.exit,
           Constant.signOutMessage,
-        ).then(
-          (int value) => _logout(value, context),
-        );
+        ).then((int value) {
+          if (context.mounted && value == 1) {
+            _logout(context);
+          }
+        });
       },
       title: Constant.logout,
     );

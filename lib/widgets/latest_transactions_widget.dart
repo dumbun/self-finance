@@ -60,14 +60,16 @@ class LatestTransactionsWidget extends ConsumerWidget {
             (List<Customer> customer) => ref
                 .read(asyncTransactionsProvider.notifier)
                 .fetchRequriedTransaction(transactionId: history.transactionID)
-                .then(
-                  (List<Trx> transaction) => Routes.navigateToHistoryDetailedView(
-                    context: context,
-                    customer: customer.first,
-                    history: history,
-                    transaction: transaction.first,
-                  ),
-                ),
+                .then((List<Trx> transaction) {
+              if (context.mounted) {
+                Routes.navigateToHistoryDetailedView(
+                  context: context,
+                  customer: customer.first,
+                  history: history,
+                  transaction: transaction.first,
+                );
+              }
+            }),
           );
     }
 

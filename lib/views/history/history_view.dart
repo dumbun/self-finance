@@ -79,14 +79,16 @@ class HistoryView extends ConsumerWidget {
                   (List<Customer> customer) => ref
                       .read(asyncTransactionsProvider.notifier)
                       .fetchRequriedTransaction(transactionId: data.transactionID)
-                      .then(
-                        (List<Trx> transaction) => Routes.navigateToHistoryDetailedView(
-                          context: context,
-                          customer: customer.first,
-                          history: data,
-                          transaction: transaction.first,
-                        ),
-                      ),
+                      .then((List<Trx> transaction) {
+                    if (context.mounted) {
+                      Routes.navigateToHistoryDetailedView(
+                        context: context,
+                        customer: customer.first,
+                        history: data,
+                        transaction: transaction.first,
+                      );
+                    }
+                  }),
                 ),
         leading: _buildIcon(type: data.eventType),
         title: _buildAmount(data.eventType, data.amount, ref.watch(currencyProvider)),

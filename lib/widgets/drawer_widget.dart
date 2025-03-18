@@ -49,7 +49,7 @@ class DrawerWidget extends ConsumerWidget {
       Constant.exit,
       Constant.signOutMessage,
     ).then((value) {
-      if (value == 1) {
+      if (value == 1 && context.mounted) {
         _navigateToPinAuthView(user, context);
       }
     });
@@ -57,7 +57,7 @@ class DrawerWidget extends ConsumerWidget {
 
   void _navigateToPinAuthView(User user, BuildContext context) {
     Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-      builder: (context) {
+      builder: (BuildContext context) {
         return const PinAuthView();
       },
     ), (route) => false);
