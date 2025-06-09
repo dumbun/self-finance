@@ -30,25 +30,15 @@ class DrawerWidget extends ConsumerWidget {
         elevation: 0,
         margin: EdgeInsets.symmetric(vertical: 12.sp),
         child: ListTile(
-          title: BodyOneDefaultText(
-            text: text,
-            bold: true,
-          ),
-          trailing: Icon(
-            icon,
-            color: color,
-          ),
+          title: BodyOneDefaultText(text: text, bold: true),
+          trailing: Icon(icon, color: color),
         ),
       ),
     );
   }
 
   void _logout(User user, BuildContext context) {
-    AlertDilogs.alertDialogWithTwoAction(
-      context,
-      Constant.exit,
-      Constant.signOutMessage,
-    ).then((value) {
+    AlertDilogs.alertDialogWithTwoAction(context, Constant.exit, Constant.signOutMessage).then((value) {
       if (value == 1 && context.mounted) {
         _navigateToPinAuthView(user, context);
       }
@@ -56,11 +46,14 @@ class DrawerWidget extends ConsumerWidget {
   }
 
   void _navigateToPinAuthView(User user, BuildContext context) {
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-      builder: (BuildContext context) {
-        return const PinAuthView();
-      },
-    ), (route) => false);
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return const PinAuthView();
+        },
+      ),
+      (route) => false,
+    );
   }
 
   @override
@@ -68,21 +61,17 @@ class DrawerWidget extends ConsumerWidget {
     return Drawer(
       child: Padding(
         padding: EdgeInsets.all(16.sp),
-        child: ref.watch(asyncUserProvider).when(
+        child: ref
+            .watch(asyncUserProvider)
+            .when(
               data: (List<User> data) {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     data.first.profilePicture.isNotEmpty
-                        ? CircularImageWidget(
-                            imageData: data.first.profilePicture,
-                            titile: 'Account Profile Image',
-                          )
-                        : DefaultUserImage(
-                            height: 45.sp,
-                            width: 45.sp,
-                          ),
+                        ? CircularImageWidget(imageData: data.first.profilePicture, titile: 'Account Profile Image')
+                        : DefaultUserImage(height: 45.sp, width: 45.sp),
                     SizedBox(height: 16.sp),
                     _buildDrawerButtons(
                       text: Constant.account,
@@ -100,23 +89,15 @@ class DrawerWidget extends ConsumerWidget {
                       color: AppColors.getErrorColor,
                       onTap: () => _logout(data.first, context),
                     ),
-                    SizedBox(
-                      height: 12.sp,
-                    ),
+                    SizedBox(height: 12.sp),
                     const AdsBannerWidget(),
-                    SizedBox(
-                      height: 20.sp,
-                    ),
+                    SizedBox(height: 20.sp),
                     _getAppVersion(),
                   ],
                 );
               },
-              error: (Object _, StackTrace __) => const Center(
-                child: Text(Constant.error),
-              ),
-              loading: () => const Center(
-                child: CircularProgressIndicator.adaptive(),
-              ),
+              error: (Object _, StackTrace _) => const Center(child: Text(Constant.error)),
+              loading: () => const Center(child: CircularProgressIndicator.adaptive()),
             ),
       ),
     );

@@ -93,7 +93,7 @@ class _PinUpdatebuttomSheetWidgetState extends ConsumerState<PinUpdatebuttomShee
     );
   }
 
-  update() {
+  void update() {
     ref.read(asyncUserProvider.notifier).updateUserPin(
           userId: widget.id,
           updateUserPin: _conformPin.text,

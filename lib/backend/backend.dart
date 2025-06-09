@@ -211,7 +211,7 @@ class BackEnd {
       ORDER BY Customer_Name ASC
     """);
 
-    return Contact.toList(response);
+    return Contact.fromList(response);
   }
 
   static Future<String> fetchRequriedCustomerName(int id) async {

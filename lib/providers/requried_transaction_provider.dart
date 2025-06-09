@@ -5,7 +5,7 @@ part 'requried_transaction_provider.g.dart';
 
 @riverpod
 class AsyncRequriedTransactions extends _$AsyncRequriedTransactions {
-  Future<List<Trx>> _fetchAllTransactionsData(id) async {
+  Future<List<Trx>> _fetchAllTransactionsData(int id) async {
     final data = await ref.watch(asyncTransactionsProvider.notifier).fetchRequriedTransaction(
           transactionId: id,
         );

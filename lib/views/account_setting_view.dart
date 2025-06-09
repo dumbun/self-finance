@@ -35,6 +35,7 @@ class AccountSettingsView extends StatelessWidget {
         child: Stack(
           children: [
             Padding(
+              
               padding: EdgeInsets.all(12.sp),
               child: Align(
                 alignment: Alignment.topCenter,

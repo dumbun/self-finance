@@ -3,7 +3,8 @@ import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/theme/app_colors.dart';
 
 class SnackBarWidget {
-  static snackBarWidget({required BuildContext context, required String message}) {
+  static ScaffoldFeatureController<SnackBar, SnackBarClosedReason> snackBarWidget(
+      {required BuildContext context, required String message}) {
     return ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         showCloseIcon: true,

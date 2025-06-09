@@ -57,7 +57,6 @@ class _CustomerConformationViewState extends ConsumerState<CustomerConformationV
       ),
       title: BodySmallText(
         text: title,
-        color: AppColors.borderColor,
       ),
     );
   }
@@ -228,6 +227,7 @@ class _CustomerConformationViewState extends ConsumerState<CustomerConformationV
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.getPrimaryColor,
         onPressed: _save,
         child: Visibility(
           visible: _isloading,

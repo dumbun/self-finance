@@ -4,6 +4,7 @@ import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_small_text.dart';
 import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/widgets/fab.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 
 class CustomerDetailsEntryView extends StatefulWidget {
@@ -49,20 +50,19 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
         ),
         forceMaterialTransparency: true,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (_validateAndSave()) {
-            Routes.navigateToCustomerLoneEntryView(
-              context: context,
-              customerName: _customerName.text,
-              mobileNumber: _mobileNumber.text,
-              gaurdianName: _gaurdianName.text,
-              address: _address.text,
-            );
-          }
-        },
-        child: Icon(Icons.navigate_next_rounded),
-      ),
+      floatingActionButton: Fab(
+          icon: Icons.navigate_next_rounded,
+          onPressed: () {
+            if (_validateAndSave()) {
+              Routes.navigateToCustomerLoneEntryView(
+                context: context,
+                customerName: _customerName.text,
+                mobileNumber: _mobileNumber.text,
+                gaurdianName: _gaurdianName.text,
+                address: _address.text,
+              );
+            }
+          }),
       body: SafeArea(
         child: SingleChildScrollView(
             child: Padding(

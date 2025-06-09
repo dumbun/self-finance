@@ -3,6 +3,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_small_text.dart';
+import 'package:self_finance/widgets/fab.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_date_picker.dart';
@@ -59,6 +60,7 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
     _itemDescription.dispose();
 
     super.dispose();
+    
   }
 
   @override
@@ -70,7 +72,7 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
           bold: true,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: Fab(
         onPressed: () {
           if (_validateAndSave()) {
             Routes.navigateToCustomerConformationView(
@@ -86,7 +88,7 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
             );
           }
         },
-        child: Icon(Icons.save),
+        icon:Icons.save,
       ),
       body: SafeArea(
           child: Padding(

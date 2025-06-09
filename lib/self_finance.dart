@@ -27,7 +27,7 @@ class SelfFinance extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
           primaryColor: AppColors.getPrimaryColor,
-          cardTheme: const CardTheme(color: AppColors.getBackgroundColor, elevation: 0),
+          cardTheme: CardThemeData(color: AppColors.getBackgroundColor, elevation: 0),
           fontFamily: "hell",
           appBarTheme: const AppBarTheme(
             elevation: 0,

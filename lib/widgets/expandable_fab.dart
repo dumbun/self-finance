@@ -48,6 +48,8 @@ class ExpandableFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
+      splashColor: AppColors.getPrimaryColor ,
+      backgroundColor: AppColors.getPrimaryColor,
       tooltip: Constant.addNewTransactionToolTip,
       onPressed: () {
         showModalBottomSheet(

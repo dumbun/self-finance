@@ -35,7 +35,7 @@ class Utility {
 
   // send feedback email
 
-  static sendFeedbackEmail(BuildContext context) {
+  static void sendFeedbackEmail(BuildContext context) {
     BetterFeedback.of(context).show((feedback) async {
       // draft an email and send to developer
       final screenshotFilePath = await Utility.writeImageToStorage(
@@ -63,7 +63,7 @@ class Utility {
   }
 
   // make call
-  static makeCall({required String phoneNumber}) async {
+  static void makeCall({required String phoneNumber}) async {
     final Uri launchUri = Uri(
       scheme: 'tel',
       path: phoneNumber,

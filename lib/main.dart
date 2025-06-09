@@ -11,7 +11,6 @@ import 'package:self_finance/self_finance.dart';
 void main() async {
   // ensuring all the plugins are connected to the system before running the code
   WidgetsFlutterBinding.ensureInitialized();
-
   if (Constant.ads) {
     unawaited(
       MobileAds.instance.initialize(),
@@ -19,11 +18,10 @@ void main() async {
   }
   await UserBackEnd.db();
   await BackEnd.db();
-
   runApp(
     const ProviderScope(
       child: BetterFeedback(
-        child: SelfFinance(),
+       child: SelfFinance(),
       ),
     ),
   );

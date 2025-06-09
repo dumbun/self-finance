@@ -19,6 +19,7 @@ import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/call_button_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
+import 'package:self_finance/widgets/fab.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 
 /// [updatedCustomerPhotoStringProvider] and [updatedCustomerProofStringProvider]
@@ -75,12 +76,9 @@ class ContactDetailsView extends ConsumerWidget {
       initialIndex: 0,
       length: 2,
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: Fab(
+          icon:   Icons.add,
           heroTag: Constant.saveButtonTag,
-          tooltip: Constant.addNewTransaction,
-          child: const Icon(
-            Icons.add,
-          ),
           onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(context: context, customerID: customerID),
         ),
         appBar: AppBar(

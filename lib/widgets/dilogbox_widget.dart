@@ -38,7 +38,7 @@ class AlertDilogs {
     return value;
   }
 
-  static alertDialogWithOneAction(BuildContext context, String title, String content) {
+  static dynamic alertDialogWithOneAction(BuildContext context, String title, String content) {
     return showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog.adaptive(
