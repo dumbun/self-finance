@@ -13,7 +13,6 @@ import 'package:self_finance/models/user_history.dart';
 import 'package:self_finance/providers/app_currency_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
-import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 
@@ -41,13 +40,8 @@ class HistoryDetailedView extends ConsumerWidget {
     return Card(
       child: ListTile(
         leading: Icon(icon),
-        title: BodyTwoDefaultText(
-          text: title,
-        ),
-        trailing: BodyTwoDefaultText(
-          bold: true,
-          text: details,
-        ),
+        title: BodyTwoDefaultText(text: title),
+        trailing: BodyTwoDefaultText(bold: true, text: details),
       ),
     );
   }
@@ -57,12 +51,11 @@ class HistoryDetailedView extends ConsumerWidget {
     final String appCurrency = ref.read(currencyProvider);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Utility.screenShotShare(_screenshotController, context),
+        onPressed: () =>
+            Utility.screenShotShare(_screenshotController, context),
         child: const Icon(Icons.share_rounded),
       ),
-      appBar: AppBar(
-        forceMaterialTransparency: true,
-      ),
+      appBar: AppBar(forceMaterialTransparency: true),
       body: SingleChildScrollView(
         child: Screenshot(
           controller: _screenshotController,
@@ -101,13 +94,12 @@ class HistoryDetailedView extends ConsumerWidget {
                                 overflow: TextOverflow.ellipsis,
                                 bold: true,
                                 color: AppColors.getPrimaryColor,
-                                text: '${history.eventType == Constant.debited ? 'To' : 'From'} ${customer.name}',
+                                text:
+                                    '${history.eventType == Constant.debited ? 'To' : 'From'} ${customer.name}',
                               ),
                             ),
                           ),
-                          BodyTwoDefaultText(
-                            text: _getDate(),
-                          )
+                          BodyTwoDefaultText(text: _getDate()),
                         ],
                       ),
                       SizedBox(
@@ -121,9 +113,7 @@ class HistoryDetailedView extends ConsumerWidget {
                     ],
                   ),
                 ),
-                SizedBox(
-                  height: 20.sp,
-                ),
+                SizedBox(height: 20.sp),
                 _buildDetailesCard(
                   icon: Icons.percent_rounded,
                   title: Constant.rateOfIntrest,
@@ -132,10 +122,11 @@ class HistoryDetailedView extends ConsumerWidget {
                 _buildDetailesCard(
                   icon: Icons.circle,
                   title: Constant.transacrtionStatus,
-                  details: transaction.transacrtionType == Constant.active ? Constant.active : Constant.inactive,
+                  details: transaction.transacrtionType == Constant.active
+                      ? Constant.active
+                      : Constant.inactive,
                 ),
                 SizedBox(height: 12.sp),
-                const AdsBannerWidget(),
                 SizedBox(height: 12.sp),
                 Center(
                   child: TextButton(
@@ -147,7 +138,7 @@ class HistoryDetailedView extends ConsumerWidget {
                       text: Constant.showTransaction,
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),

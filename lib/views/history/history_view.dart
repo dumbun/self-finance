@@ -16,13 +16,16 @@ import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
-import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
 
 class HistoryView extends ConsumerWidget {
   const HistoryView({super.key});
 
-  BodyOneDefaultText _buildAmount(String type, double amount, String currencyType) {
+  BodyOneDefaultText _buildAmount(
+    String type,
+    double amount,
+    String currencyType,
+  ) {
     return BodyOneDefaultText(
       bold: true,
       text: "${Utility.doubleFormate(amount)} $currencyType",
@@ -74,12 +77,14 @@ class HistoryView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ListTile buildListTile(UserHistory data) {
       return ListTile(
-        onTap: () =>
-            ref.read(asyncCustomersProvider.notifier).fetchRequriedCustomerDetails(customerID: data.customerID).then(
-                  (List<Customer> customer) => ref
-                      .read(asyncTransactionsProvider.notifier)
-                      .fetchRequriedTransaction(transactionId: data.transactionID)
-                      .then((List<Trx> transaction) {
+        onTap: () => ref
+            .read(asyncCustomersProvider.notifier)
+            .fetchRequriedCustomerDetails(customerID: data.customerID)
+            .then(
+              (List<Customer> customer) => ref
+                  .read(asyncTransactionsProvider.notifier)
+                  .fetchRequriedTransaction(transactionId: data.transactionID)
+                  .then((List<Trx> transaction) {
                     if (context.mounted) {
                       Routes.navigateToHistoryDetailedView(
                         context: context,
@@ -89,9 +94,13 @@ class HistoryView extends ConsumerWidget {
                       );
                     }
                   }),
-                ),
+            ),
         leading: _buildIcon(type: data.eventType),
-        title: _buildAmount(data.eventType, data.amount, ref.watch(currencyProvider)),
+        title: _buildAmount(
+          data.eventType,
+          data.amount,
+          ref.watch(currencyProvider),
+        ),
         subtitle: BodyTwoDefaultText(
           text: data.customerName,
           color: AppColors.getLigthGreyColor,
@@ -127,16 +136,21 @@ class HistoryView extends ConsumerWidget {
                 fontWeight: FontWeight.bold,
               ),
               keyboardType: TextInputType.name,
-              onChanged: (String value) => ref.read(asyncHistoryProvider.notifier).doSearch(givenInput: value),
+              onChanged: (String value) => ref
+                  .read(asyncHistoryProvider.notifier)
+                  .doSearch(givenInput: value),
             ),
             SizedBox(height: 16.sp),
-            const AdsBannerWidget(),
             SizedBox(height: 16.sp),
             Consumer(
               builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                return ref.watch(asyncHistoryProvider).when(
-                      data: (List<UserHistory> data) => buildhistoryList(data, ref.watch(currencyProvider)),
-                      error: (Object error, StackTrace stackTrace) => Text(error.toString()),
+                return ref
+                    .watch(asyncHistoryProvider)
+                    .when(
+                      data: (List<UserHistory> data) =>
+                          buildhistoryList(data, ref.watch(currencyProvider)),
+                      error: (Object error, StackTrace stackTrace) =>
+                          Text(error.toString()),
                       loading: () => const Center(
                         child: CircularProgressIndicator.adaptive(),
                       ),

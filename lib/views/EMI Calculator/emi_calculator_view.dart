@@ -7,7 +7,6 @@ import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/logic/logic.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_providers.dart';
-import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/input_date_picker.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/two_slice_pie_chart_widget.dart';
@@ -46,7 +45,6 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const AdsBannerWidget(),
             SizedBox(height: 16.sp),
             //taken date
             InputDatePicker(
@@ -68,7 +66,9 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
                 );
                 if (pickedDate != null) {
                   //pickedDate output format => 2021-03-10 00:00:00.000
-                  String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
+                  String formattedDate = DateFormat(
+                    'dd-MM-yyyy',
+                  ).format(pickedDate);
                   //formatted date output using intl package =>  2021-03-16
                   _takenDataInput.text = formattedDate;
                   _doCalculations(ref);
@@ -88,17 +88,20 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
             SizedBox(height: 20.sp),
             // taken amount
             InputTextField(
-                hintText: Constant.takenAmount,
-                keyboardType: TextInputType.number,
-                controller: _amountGivenInput,
-                onChanged: (value) {
-                  _doCalculations(ref);
-                }),
+              hintText: Constant.takenAmount,
+              keyboardType: TextInputType.number,
+              controller: _amountGivenInput,
+              onChanged: (value) {
+                _doCalculations(ref);
+              },
+            ),
             SizedBox(height: 20.sp),
             // rate of Intrest
             InputTextField(
               hintText: Constant.rateOfIntrest,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               controller: _rateOfIntrestInput,
               onChanged: (value) {
                 _doCalculations(ref);
@@ -111,8 +114,12 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
                 final emiPerMonth = ref.watch(emiPerMonthProvider);
                 final principalAmount = ref.watch(principalAmountProvider);
                 final monthsAndDays = ref.watch(monthsAndDaysProvider);
-                final double firstIndicatorValue = ref.watch(firstIndicatorPercentageProvider);
-                final double secoundIndicatorValue = ref.watch(secoundIndicatorPercentageProvider);
+                final double firstIndicatorValue = ref.watch(
+                  firstIndicatorPercentageProvider,
+                );
+                final double secoundIndicatorValue = ref.watch(
+                  secoundIndicatorPercentageProvider,
+                );
                 return Column(
                   children: [
                     if (firstIndicatorValue != 0 && secoundIndicatorValue != 0)
@@ -144,7 +151,9 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
         _rateOfIntrestInput.text.isNotEmpty &&
         _takenDataInput.text.isNotEmpty &&
         _tenureDataInput.text.isNotEmpty) {
-      final double rateOfInterest = Utility.textToDouble(_rateOfIntrestInput.text);
+      final double rateOfInterest = Utility.textToDouble(
+        _rateOfIntrestInput.text,
+      );
       final double loneAmount = Utility.textToDouble(_amountGivenInput.text);
       String tenureDate = _tenureDataInput.text;
       final DateFormat format = DateFormat("dd-MM-yyyy");
@@ -159,13 +168,16 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
       double totalAmount = l1.totalAmount;
       double firstIndicatorPercentage = (loneAmount / totalAmount) * 100;
       double secoundIndicatorPercentage = (totalInterest / totalAmount) * 100;
-      ref.read(monthsAndDaysProvider.notifier).state = l1.monthsAndRemainingDays;
+      ref.read(monthsAndDaysProvider.notifier).state =
+          l1.monthsAndRemainingDays;
       ref.read(emiPerMonthProvider.notifier).state = l1.interestPerDay * 30;
       ref.read(principalAmountProvider.notifier).state = loneAmount;
       ref.read(totalAmountProvider.notifier).state = totalAmount;
       ref.read(totalIntrestProvider.notifier).state = totalInterest;
-      ref.read(firstIndicatorPercentageProvider.notifier).state = Utility.reduceDecimals(firstIndicatorPercentage);
-      ref.read(secoundIndicatorPercentageProvider.notifier).state = Utility.reduceDecimals(secoundIndicatorPercentage);
+      ref.read(firstIndicatorPercentageProvider.notifier).state =
+          Utility.reduceDecimals(firstIndicatorPercentage);
+      ref.read(secoundIndicatorPercentageProvider.notifier).state =
+          Utility.reduceDecimals(secoundIndicatorPercentage);
     }
   }
 
@@ -176,7 +188,11 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
     required double principalAmount,
     required String monthsAndDays,
   }) {
-    if (totalAmount != 0 && totalInterest != 0 && emiPerMonth != 0 && principalAmount != 0 && monthsAndDays != "") {
+    if (totalAmount != 0 &&
+        totalInterest != 0 &&
+        emiPerMonth != 0 &&
+        principalAmount != 0 &&
+        monthsAndDays != "") {
       return Container(
         margin: EdgeInsets.only(top: 20.sp),
         width: double.infinity,
@@ -216,7 +232,6 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
               result: Utility.reduceDecimals(totalAmount).toString(),
             ),
             SizedBox(height: 12.sp),
-            const AdsBannerWidget(),
             SizedBox(height: 10.sp),
           ],
         ),
@@ -234,14 +249,8 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
     return Card(
       child: ListTile(
         leading: Icon(icon),
-        title: BodyTwoDefaultText(
-          text: label,
-          bold: true,
-        ),
-        trailing: BodyTwoDefaultText(
-          text: result,
-          bold: true,
-        ),
+        title: BodyTwoDefaultText(text: label, bold: true),
+        trailing: BodyTwoDefaultText(text: result, bold: true),
       ),
     );
   }

@@ -21,39 +21,44 @@ import 'package:self_finance/providers/requried_transaction_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/image_catch_manager.dart';
 import 'package:self_finance/utility/user_utility.dart';
-import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
 
 // providers
-final requriedTransactionItemProvider = FutureProvider.family.autoDispose<List<Items>, int>((ref, int id) async {
-  return await ref.read(asyncItemsProvider.notifier).fetchRequriedItem(itemId: id);
-});
+final requriedTransactionItemProvider = FutureProvider.family
+    .autoDispose<List<Items>, int>((ref, int id) async {
+      return await ref
+          .read(asyncItemsProvider.notifier)
+          .fetchRequriedItem(itemId: id);
+    });
 
-final AutoDisposeProviderFamily<List<Payment>, int> paymentsProvider =
-    Provider.family.autoDispose<List<Payment>, int>((ref, int transactionId) {
-  return ref.watch(asyncRequriedPaymentProvider(transactionId)).when(
-        data: (List<Payment> data) => data,
-        error: (Object error, StackTrace stackTrace) => [
-          Payment(
-            transactionId: transactionId,
-            paymentDate: 'error',
-            amountpaid: 0000,
-            type: 'error',
-            createdDate: 'error',
-          ),
-        ],
-        loading: () => [
-          Payment(
-            transactionId: transactionId,
-            paymentDate: 'loading',
-            amountpaid: 402,
-            type: 'loading',
-            createdDate: 'loading',
-          )
-        ],
-      );
-});
+final AutoDisposeProviderFamily<List<Payment>, int> paymentsProvider = Provider
+    .family
+    .autoDispose<List<Payment>, int>((ref, int transactionId) {
+      return ref
+          .watch(asyncRequriedPaymentProvider(transactionId))
+          .when(
+            data: (List<Payment> data) => data,
+            error: (Object error, StackTrace stackTrace) => [
+              Payment(
+                transactionId: transactionId,
+                paymentDate: 'error',
+                amountpaid: 0000,
+                type: 'error',
+                createdDate: 'error',
+              ),
+            ],
+            loading: () => [
+              Payment(
+                transactionId: transactionId,
+                paymentDate: 'loading',
+                amountpaid: 402,
+                type: 'loading',
+                createdDate: 'loading',
+              ),
+            ],
+          );
+    });
 
 class TransactionDetailView extends StatelessWidget {
   TransactionDetailView({super.key, required this.transacrtion});
@@ -73,7 +78,8 @@ class TransactionDetailView extends StatelessWidget {
               Icons.share_rounded,
               color: AppColors.getPrimaryColor,
             ),
-            onPressed: () => Utility.screenShotShare(_screenShotController, context),
+            onPressed: () =>
+                Utility.screenShotShare(_screenShotController, context),
           ),
         ],
         title: const BodyTwoDefaultText(
@@ -89,8 +95,7 @@ class TransactionDetailView extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const AdsBannerWidget(),
+              children: <Widget>[
                 // _buildCustomerDetails(),
                 // SizedBox(height: 12.sp),
                 // const BodyOneDefaultText(
@@ -137,7 +142,10 @@ class TransactionDetailView extends StatelessWidget {
         leading: Icon(icon, color: color),
         title: BodyTwoDefaultText(text: title, bold: true),
         trailing: trailingIcon != null
-            ? Icon(trailingIcon, color: trailingIconColor ?? AppColors.getPrimaryColor)
+            ? Icon(
+                trailingIcon,
+                color: trailingIconColor ?? AppColors.getPrimaryColor,
+              )
             : BodyTwoDefaultText(
                 text: data,
                 bold: true,
@@ -186,7 +194,9 @@ class TransactionDetailView extends StatelessWidget {
         final appCurrency = ref.read(currencyProvider);
 
         // Using async provider to fetch transactions
-        final asyncTransaction = ref.watch(asyncRequriedTransactionsProvider(transacrtion.id!));
+        final asyncTransaction = ref.watch(
+          asyncRequriedTransactionsProvider(transacrtion.id!),
+        );
 
         return asyncTransaction.when(
           data: (List<Trx> data) {
@@ -195,7 +205,9 @@ class TransactionDetailView extends StatelessWidget {
               rateOfInterest: transaction.intrestRate,
               takenAmount: transaction.amount,
               takenDate: transaction.transacrtionDate,
-              tenureDate: payments.isNotEmpty ? DateTime.tryParse(payments.first.paymentDate) : DateTime.now(),
+              tenureDate: payments.isNotEmpty
+                  ? DateTime.tryParse(payments.first.paymentDate)
+                  : DateTime.now(),
             );
 
             return Expanded(
@@ -204,10 +216,13 @@ class TransactionDetailView extends StatelessWidget {
                   // Transaction Status
                   _buildCard(
                     title: Constant.transactionStatus,
-                    data: transaction.transacrtionType == Constant.active ? 'Active' : 'Inactive',
+                    data: transaction.transacrtionType == Constant.active
+                        ? 'Active'
+                        : 'Inactive',
                     icon: Icons.online_prediction,
                     trailingIcon: Icons.circle,
-                    trailingIconColor: transaction.transacrtionType == Constant.active
+                    trailingIconColor:
+                        transaction.transacrtionType == Constant.active
                         ? AppColors.getGreenColor
                         : AppColors.getErrorColor,
                   ),
@@ -224,14 +239,18 @@ class TransactionDetailView extends StatelessWidget {
                     child: ListTile(
                       leading: const Icon(Icons.calendar_month_rounded),
                       title: BodyTwoDefaultText(
-                        text: payments.isNotEmpty ? 'Payment Date' : 'Present Date',
+                        text: payments.isNotEmpty
+                            ? 'Payment Date'
+                            : 'Present Date',
                         bold: true,
                       ),
                       trailing: payments.isNotEmpty
                           ? _buildDate(payments.first.paymentDate)
                           : BodyTwoDefaultText(
                               bold: true,
-                              text: DateFormat('dd-MM-yyyy').format(DateTime.now()),
+                              text: DateFormat(
+                                'dd-MM-yyyy',
+                              ).format(DateTime.now()),
                             ),
                     ),
                   ),
@@ -246,7 +265,8 @@ class TransactionDetailView extends StatelessWidget {
                   // Taken Amount Widget
                   _buildCard(
                     title: Constant.takenAmount,
-                    data: '${Utility.doubleFormate(transaction.amount)} $appCurrency',
+                    data:
+                        '${Utility.doubleFormate(transaction.amount)} $appCurrency',
                     icon: Icons.arrow_upward_rounded,
                     trailingIconColor: AppColors.getErrorColor,
                   ),
@@ -262,7 +282,8 @@ class TransactionDetailView extends StatelessWidget {
                   // Interest Per Month Widget
                   _buildCard(
                     title: 'Interest Per Month',
-                    data: '${Utility.doubleFormate(loanCalculator.interestPerDay * 30)} $appCurrency',
+                    data:
+                        '${Utility.doubleFormate(loanCalculator.interestPerDay * 30)} $appCurrency',
                     icon: Icons.timeline,
                     trailingIconColor: AppColors.getPrimaryColor,
                   ),
@@ -270,7 +291,8 @@ class TransactionDetailView extends StatelessWidget {
                   // Total Interest Amount Widget
                   _buildCard(
                     title: 'Total Interest Amount',
-                    data: '${Utility.doubleFormate(loanCalculator.totalInterestAmount)} $appCurrency',
+                    data:
+                        '${Utility.doubleFormate(loanCalculator.totalInterestAmount)} $appCurrency',
                     icon: Icons.assignment_turned_in_outlined,
                     trailingIconColor: AppColors.getPrimaryColor,
                   ),
@@ -278,13 +300,18 @@ class TransactionDetailView extends StatelessWidget {
                   // Total Amount Widget
                   _buildCard(
                     title: 'Total Amount',
-                    data: '${Utility.doubleFormate(loanCalculator.totalAmount)} $appCurrency',
+                    data:
+                        '${Utility.doubleFormate(loanCalculator.totalAmount)} $appCurrency',
                     icon: Icons.arrow_downward_rounded,
                     trailingIconColor: AppColors.contentColorGreen,
                   ),
 
                   // Show Pawned Item Image Widget
-                  ref.watch(requriedTransactionItemProvider(transaction.itemId)).when(
+                  ref
+                      .watch(
+                        requriedTransactionItemProvider(transaction.itemId),
+                      )
+                      .when(
                         data: (List<Items> itemData) {
                           return Card(
                             child: ListTile(
@@ -292,7 +319,12 @@ class TransactionDetailView extends StatelessWidget {
                                 if (itemData.first.photo.isNotEmpty) {
                                   Routes.navigateToImageView(
                                     context: context,
-                                    imageWidget: ImageCacheManager.getCachedImage(itemData.first.photo, 44, 44),
+                                    imageWidget:
+                                        ImageCacheManager.getCachedImage(
+                                          itemData.first.photo,
+                                          44,
+                                          44,
+                                        ),
                                     titile: itemData.first.description,
                                   );
                                 } else {
@@ -302,9 +334,7 @@ class TransactionDetailView extends StatelessWidget {
                                   );
                                 }
                               },
-                              leading: const Icon(
-                                Icons.topic_outlined,
-                              ),
+                              leading: const Icon(Icons.topic_outlined),
                               title: const BodyTwoDefaultText(
                                 text: 'Show Item',
                                 bold: true,
@@ -319,7 +349,8 @@ class TransactionDetailView extends StatelessWidget {
                             ),
                           );
                         },
-                        error: (Object error, StackTrace stackTrace) => const BodyTwoDefaultText(text: Constant.error),
+                        error: (Object error, StackTrace stackTrace) =>
+                            const BodyTwoDefaultText(text: Constant.error),
                         loading: () => const Center(
                           child: CircularProgressIndicator.adaptive(),
                         ),
@@ -334,7 +365,11 @@ class TransactionDetailView extends StatelessWidget {
                     Hero(
                       tag: Constant.saveButtonTag,
                       child: RoundedCornerButton(
-                        onPressed: () => _markAsPaid(ref, transaction, loanCalculator.totalAmount),
+                        onPressed: () => _markAsPaid(
+                          ref,
+                          transaction,
+                          loanCalculator.totalAmount,
+                        ),
                         icon: Icons.done,
                         text: "Mark As Paid",
                       ),
@@ -345,10 +380,10 @@ class TransactionDetailView extends StatelessWidget {
               ),
             );
           },
-          error: (Object error, StackTrace stackTrace) => BodyTwoDefaultText(text: error.toString()),
-          loading: () => const Center(
-            child: CircularProgressIndicator.adaptive(),
-          ),
+          error: (Object error, StackTrace stackTrace) =>
+              BodyTwoDefaultText(text: error.toString()),
+          loading: () =>
+              const Center(child: CircularProgressIndicator.adaptive()),
         );
       },
     );
@@ -362,11 +397,15 @@ class TransactionDetailView extends StatelessWidget {
     final List<Customer> c = await ref
         .read(asyncCustomersProvider.notifier)
         .fetchRequriedCustomerDetails(customerID: transaction.customerId);
-    await ref.read(AsyncRequriedPaymentProvider(transaction.id!).notifier).addPayment(amountpaid: transaction.amount);
+    await ref
+        .read(AsyncRequriedPaymentProvider(transaction.id!).notifier)
+        .addPayment(amountpaid: transaction.amount);
     await ref
         .read(asyncRequriedTransactionsProvider(transaction.id!).notifier)
         .markAsPaidTransaction(trancationId: transaction.id!);
-    await ref.read(asyncHistoryProvider.notifier).addHistory(
+    await ref
+        .read(asyncHistoryProvider.notifier)
+        .addHistory(
           history: UserHistory(
             userID: 1, //default
             customerID: transaction.customerId,

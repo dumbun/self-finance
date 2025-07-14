@@ -8,7 +8,6 @@ import 'package:self_finance/fonts/strong_heading_one_text.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/utility/user_utility.dart';
-import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/app_icon.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
@@ -39,16 +38,14 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
       }
     }
 
-    return ref.watch(asyncUserProvider).when(
+    return ref
+        .watch(asyncUserProvider)
+        .when(
           data: (data) {
             return Scaffold(
               body: SafeArea(
                 child: Stack(
-                  children: [
-                    const Align(
-                      alignment: Alignment.topCenter,
-                      child: AdsBannerWidget(),
-                    ),
+                  children: <Widget>[
                     Align(
                       alignment: Alignment.center,
                       child: SingleChildScrollView(
@@ -61,7 +58,9 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
                               data.first.profilePicture != ""
                                   ? Hero(
                                       tag: Constant.userProfileTag,
-                                      child: Utility.imageFromBase64String(data.first.profilePicture),
+                                      child: Utility.imageFromBase64String(
+                                        data.first.profilePicture,
+                                      ),
                                     )
                                   : const AppIcon(),
                               SizedBox(height: 20.sp),
@@ -78,7 +77,9 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
                                     return Constant.enterYourAppPin;
                                   } else {
                                     if (p0 == data.first.userPin) {
-                                      Routes.navigateToDashboard(context: context);
+                                      Routes.navigateToDashboard(
+                                        context: context,
+                                      );
                                       return null;
                                     } else {
                                       pinController.clear();
@@ -105,9 +106,8 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
           error: (error, stackTrace) => const Center(
             child: BodyOneDefaultText(text: Constant.userFetchingError),
           ),
-          loading: () => const Center(
-            child: CircularProgressIndicator.adaptive(),
-          ),
+          loading: () =>
+              const Center(child: CircularProgressIndicator.adaptive()),
         );
   }
 }

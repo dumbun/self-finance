@@ -10,7 +10,6 @@ import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
-import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
@@ -38,7 +37,11 @@ class DrawerWidget extends ConsumerWidget {
   }
 
   void _logout(User user, BuildContext context) {
-    AlertDilogs.alertDialogWithTwoAction(context, Constant.exit, Constant.signOutMessage).then((value) {
+    AlertDilogs.alertDialogWithTwoAction(
+      context,
+      Constant.exit,
+      Constant.signOutMessage,
+    ).then((value) {
       if (value == 1 && context.mounted) {
         _navigateToPinAuthView(user, context);
       }
@@ -70,13 +73,18 @@ class DrawerWidget extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     data.first.profilePicture.isNotEmpty
-                        ? CircularImageWidget(imageData: data.first.profilePicture, titile: 'Account Profile Image')
+                        ? CircularImageWidget(
+                            imageData: data.first.profilePicture,
+                            titile: 'Account Profile Image',
+                          )
                         : DefaultUserImage(height: 45.sp, width: 45.sp),
                     SizedBox(height: 16.sp),
                     _buildDrawerButtons(
                       text: Constant.account,
                       icon: Icons.vpn_key_rounded,
-                      onTap: () => Routes.navigateToAccountSettingsView(context: context),
+                      onTap: () => Routes.navigateToAccountSettingsView(
+                        context: context,
+                      ),
                     ),
                     _buildDrawerButtons(
                       text: "Feedback",
@@ -90,14 +98,15 @@ class DrawerWidget extends ConsumerWidget {
                       onTap: () => _logout(data.first, context),
                     ),
                     SizedBox(height: 12.sp),
-                    const AdsBannerWidget(),
                     SizedBox(height: 20.sp),
                     _getAppVersion(),
                   ],
                 );
               },
-              error: (Object _, StackTrace _) => const Center(child: Text(Constant.error)),
-              loading: () => const Center(child: CircularProgressIndicator.adaptive()),
+              error: (Object _, StackTrace _) =>
+                  const Center(child: Text(Constant.error)),
+              loading: () =>
+                  const Center(child: CircularProgressIndicator.adaptive()),
             ),
       ),
     );

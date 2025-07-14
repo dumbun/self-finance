@@ -10,7 +10,6 @@ import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
-import 'package:self_finance/widgets/ads_banner_widget.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
 
 class ContactsView extends ConsumerWidget {
@@ -18,38 +17,46 @@ class ContactsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     void contactSelected(List<Contact> data, int index, BuildContext context) {
-      ref.read(asyncTransactionsProvider.notifier).fetchRequriedCustomerTransactions(customerID: data[index].id);
+      ref
+          .read(asyncTransactionsProvider.notifier)
+          .fetchRequriedCustomerTransactions(customerID: data[index].id);
       Routes.navigateToContactDetailsView(context, customerID: data[index].id);
     }
 
     Expanded buildCustomerList() {
       return Expanded(
         child: Consumer(
-          builder: (
-            BuildContext context,
-            WidgetRef ref,
-            Widget? child,
-          ) {
-            return ref.watch(asyncCustomersContactsProvider).when(
+          builder: (BuildContext context, WidgetRef ref, Widget? child) {
+            return ref
+                .watch(asyncCustomersContactsProvider)
+                .when(
                   data: (List<Contact> data) {
                     return data.isNotEmpty
                         ? ListView.builder(
                             itemCount: data.length,
                             itemBuilder: (BuildContext context, int index) {
                               return GestureDetector(
-                                onTap: () => contactSelected(data, index, context),
+                                onTap: () =>
+                                    contactSelected(data, index, context),
                                 child: Card(
                                   margin: EdgeInsets.only(top: 16.sp),
                                   elevation: 0,
                                   child: Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 16.sp,
+                                      vertical: 12.sp,
+                                    ),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             BodyTwoDefaultText(
                                               text: data[index].name,
@@ -57,14 +64,15 @@ class ContactsView extends ConsumerWidget {
                                             ),
                                             BodyTwoDefaultText(
                                               text: data[index].number,
-                                              color: AppColors.getLigthGreyColor,
-                                            )
+                                              color:
+                                                  AppColors.getLigthGreyColor,
+                                            ),
                                           ],
                                         ),
                                         const Icon(
                                           Icons.arrow_forward_ios_rounded,
                                           color: AppColors.getLigthGreyColor,
-                                        )
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -86,9 +94,8 @@ class ContactsView extends ConsumerWidget {
                       ),
                     );
                   },
-                  loading: () => const Center(
-                    child: CircularProgressIndicator.adaptive(),
-                  ),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator.adaptive()),
                 );
           },
         ),
@@ -98,10 +105,7 @@ class ContactsView extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
-        title: const BodyTwoDefaultText(
-          text: Constant.contact,
-          bold: true,
-        ),
+        title: const BodyTwoDefaultText(text: Constant.contact, bold: true),
       ),
       body: RefreshWidget(
         onRefresh: () => ref.refresh(asyncCustomersContactsProvider.future),
@@ -120,11 +124,10 @@ class ContactsView extends ConsumerWidget {
                     fontWeight: FontWeight.bold,
                   ),
                   keyboardType: TextInputType.name,
-                  onChanged: (String value) =>
-                      ref.read(asyncCustomersContactsProvider.notifier).searchCustomer(givenInput: value),
+                  onChanged: (String value) => ref
+                      .read(asyncCustomersContactsProvider.notifier)
+                      .searchCustomer(givenInput: value),
                 ),
-                SizedBox(height: 12.sp),
-                const AdsBannerWidget(),
                 SizedBox(height: 12.sp),
                 buildCustomerList(),
               ],
