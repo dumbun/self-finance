@@ -12,13 +12,14 @@ String _$asyncHistoryHash() => r'3f6f94ef8a106bd080be80eb504f19189868c67a';
 @ProviderFor(AsyncHistory)
 final asyncHistoryProvider =
     AutoDisposeAsyncNotifierProvider<AsyncHistory, List<UserHistory>>.internal(
-  AsyncHistory.new,
-  name: r'asyncHistoryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$asyncHistoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+      AsyncHistory.new,
+      name: r'asyncHistoryProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$asyncHistoryHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 typedef _$AsyncHistory = AutoDisposeAsyncNotifier<List<UserHistory>>;
 // ignore_for_file: type=lint

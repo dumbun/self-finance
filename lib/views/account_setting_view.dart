@@ -2,6 +2,7 @@ import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
@@ -250,9 +251,11 @@ class AccountSettingsView extends StatelessWidget {
           Constant.exit,
           Constant.signOutMessage,
         ).then((int value) {
-          if (context.mounted && value == 1) {
-            _logout(context);
-          }
+          BackEnd.close().then((bool respond) {
+            if (context.mounted && value == 1 && respond) {
+              _logout(context);
+            }
+          });
         });
       },
       title: Constant.logout,

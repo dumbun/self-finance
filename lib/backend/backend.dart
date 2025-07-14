@@ -186,14 +186,18 @@ class BackEnd {
   /// fetch all customer data
   static Future<List<Customer>> fetchAllCustomerData() async {
     final Database db = await BackEnd.db();
-    final List<Map<String, Object?>> response = await db.rawQuery("""SELECT * FROM Customers""");
+    final List<Map<String, Object?>> response = await db.rawQuery(
+      """SELECT * FROM Customers""",
+    );
     return Customer.toList(response);
   }
 
   /// [fetchAllCustomerNumbers] fetch's the mobile numbers from the all customers
   static Future<List<String>> fetchAllCustomerNumbers() async {
     final Database db = await BackEnd.db();
-    final List<Map<String, Object?>> response = await db.rawQuery("""SELECT Contact_Number FROM Customers""");
+    final List<Map<String, Object?>> response = await db.rawQuery(
+      """SELECT Contact_Number FROM Customers""",
+    );
     return response.map((e) {
       return e["Contact_Number"] as String;
     }).toList();
@@ -211,7 +215,7 @@ class BackEnd {
       ORDER BY Customer_Name ASC
     """);
 
-    return Contact.fromList(response);
+    return Contact.toList(response);
   }
 
   static Future<String> fetchRequriedCustomerName(int id) async {
@@ -226,7 +230,9 @@ class BackEnd {
     }
   }
 
-  static Future<List<Customer>> fetchSingleContactDetails({required int id}) async {
+  static Future<List<Customer>> fetchSingleContactDetails({
+    required int id,
+  }) async {
     try {
       final db = await BackEnd.db();
       final response = await db.query(
@@ -309,10 +315,7 @@ class BackEnd {
     );
     count = await db.update(
       'History',
-      {
-        'Customer_Name': newCustomerName,
-        'Contact_Number ': newContactNumber,
-      },
+      {'Customer_Name': newCustomerName, 'Contact_Number ': newContactNumber},
       where: 'Customer_ID = ?',
       whereArgs: [customerId],
     );
@@ -334,9 +337,13 @@ class BackEnd {
         "Pawn_Amount": item.pawnAmount,
         "Item_Status": item.status,
         "Item_Photo": item.photo,
-        "Created_Date": item.createdDate
+        "Created_Date": item.createdDate,
       };
-      final int id = await db.insert("Items", data, conflictAlgorithm: ConflictAlgorithm.abort);
+      final int id = await db.insert(
+        "Items",
+        data,
+        conflictAlgorithm: ConflictAlgorithm.abort,
+      );
 
       return id;
     } catch (e) {
@@ -347,12 +354,16 @@ class BackEnd {
   /// fetch all items
   static Future<List<Items>> fetchAllItems() async {
     final Database db = await BackEnd.db();
-    final List<Map<String, Object?>> response = await db.rawQuery("""SELECT * FROM Items""");
+    final List<Map<String, Object?>> response = await db.rawQuery(
+      """SELECT * FROM Items""",
+    );
     return Items.toList(response);
   }
 
   // fetch all items of a requried customer
-  static Future<List<Items>> fetchitemOfRequriedCustomer({required int customerID}) async {
+  static Future<List<Items>> fetchitemOfRequriedCustomer({
+    required int customerID,
+  }) async {
     final Database db = await BackEnd.db();
     final List<Map<String, Object?>> response = await db.query(
       "Items",
@@ -391,7 +402,11 @@ class BackEnd {
         "Remaining_Amount": transasction.remainingAmount,
         "Created_Date": transasction.createdDate,
       };
-      final response = await db.insert("Transactions", data, conflictAlgorithm: ConflictAlgorithm.abort);
+      final response = await db.insert(
+        "Transactions",
+        data,
+        conflictAlgorithm: ConflictAlgorithm.abort,
+      );
 
       return response;
     } catch (e) {
@@ -423,7 +438,9 @@ class BackEnd {
     }
   }
 
-  static Future<List<Trx>> fetchRequriedCustomerTransactions({required int customerId}) async {
+  static Future<List<Trx>> fetchRequriedCustomerTransactions({
+    required int customerId,
+  }) async {
     final Database db = await BackEnd.db();
     final List<Map<String, Object?>> response = await db.query(
       "Transactions",
@@ -433,7 +450,9 @@ class BackEnd {
     return Trx.toList(response);
   }
 
-  static Future<List<Trx>> fetchRequriedTransaction({required int transacrtionId}) async {
+  static Future<List<Trx>> fetchRequriedTransaction({
+    required int transacrtionId,
+  }) async {
     final Database db = await BackEnd.db();
     final List<Map<String, Object?>> response = await db.query(
       "Transactions",
@@ -458,7 +477,12 @@ class BackEnd {
   static Future<int> updateTransactionAsPaid({required int id}) async {
     final Database db = await BackEnd.db();
     final data = {'Transaction_Type': Constant.inactive};
-    final result = await db.update('Transactions', data, where: "Transaction_ID = ?", whereArgs: [id]);
+    final result = await db.update(
+      'Transactions',
+      data,
+      where: "Transaction_ID = ?",
+      whereArgs: [id],
+    );
 
     return result;
   }
@@ -466,10 +490,15 @@ class BackEnd {
   //// P A Y M E N T S
 
   ///Fetch All payments based on requrited transaction
-  static Future<List<Payment>> fetchRequriedPaymentsOfTransaction({required int transactionId}) async {
+  static Future<List<Payment>> fetchRequriedPaymentsOfTransaction({
+    required int transactionId,
+  }) async {
     final Database db = await BackEnd.db();
-    final List<Map<String, Object?>> response =
-        await db.query('Payments', where: 'Transaction_ID = ?', whereArgs: [transactionId]);
+    final List<Map<String, Object?>> response = await db.query(
+      'Payments',
+      where: 'Transaction_ID = ?',
+      whereArgs: [transactionId],
+    );
 
     return Payment.toList(response);
   }
@@ -484,7 +513,11 @@ class BackEnd {
       "Created_Date": payment.createdDate,
     };
     try {
-      final int id = await db.insert("Payments", data, conflictAlgorithm: ConflictAlgorithm.abort);
+      final int id = await db.insert(
+        "Payments",
+        data,
+        conflictAlgorithm: ConflictAlgorithm.abort,
+      );
       return id;
     } catch (e) {
       return 0;
@@ -495,7 +528,9 @@ class BackEnd {
   /// fetch all history
   static Future<List<UserHistory>> fetchAllUserHistory() async {
     final Database db = await BackEnd.db();
-    final List<Map<String, Object?>> response = await db.rawQuery("""SELECT * FROM History ORDER BY Event_Date DESC""");
+    final List<Map<String, Object?>> response = await db.rawQuery(
+      """SELECT * FROM History ORDER BY Event_Date DESC""",
+    );
     return UserHistory.toList(response);
   }
 

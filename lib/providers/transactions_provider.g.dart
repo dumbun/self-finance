@@ -12,14 +12,14 @@ String _$asyncTransactionsHash() => r'09828eb6ca5b1f8e39b66223b57212bda0f917fb';
 @ProviderFor(AsyncTransactions)
 final asyncTransactionsProvider =
     AsyncNotifierProvider<AsyncTransactions, List<Trx>>.internal(
-  AsyncTransactions.new,
-  name: r'asyncTransactionsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$asyncTransactionsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+      AsyncTransactions.new,
+      name: r'asyncTransactionsProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$asyncTransactionsHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 typedef _$AsyncTransactions = AsyncNotifier<List<Trx>>;
 // ignore_for_file: type=lint

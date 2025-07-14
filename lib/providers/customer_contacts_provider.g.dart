@@ -11,16 +11,19 @@ String _$asyncCustomersContactsHash() =>
 
 /// See also [AsyncCustomersContacts].
 @ProviderFor(AsyncCustomersContacts)
-final asyncCustomersContactsProvider = AutoDisposeAsyncNotifierProvider<
-    AsyncCustomersContacts, List<Contact>>.internal(
-  AsyncCustomersContacts.new,
-  name: r'asyncCustomersContactsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$asyncCustomersContactsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final asyncCustomersContactsProvider =
+    AutoDisposeAsyncNotifierProvider<
+      AsyncCustomersContacts,
+      List<Contact>
+    >.internal(
+      AsyncCustomersContacts.new,
+      name: r'asyncCustomersContactsProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$asyncCustomersContactsHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 typedef _$AsyncCustomersContacts = AutoDisposeAsyncNotifier<List<Contact>>;
 // ignore_for_file: type=lint

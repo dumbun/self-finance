@@ -34,9 +34,7 @@ abstract class _$AsyncRequriedTransactions
     extends BuildlessAutoDisposeAsyncNotifier<List<Trx>> {
   late final dynamic id;
 
-  FutureOr<List<Trx>> build(
-    dynamic id,
-  );
+  FutureOr<List<Trx>> build(dynamic id);
 }
 
 /// See also [AsyncRequriedTransactions].
@@ -49,21 +47,15 @@ class AsyncRequriedTransactionsFamily extends Family<AsyncValue<List<Trx>>> {
   const AsyncRequriedTransactionsFamily();
 
   /// See also [AsyncRequriedTransactions].
-  AsyncRequriedTransactionsProvider call(
-    dynamic id,
-  ) {
-    return AsyncRequriedTransactionsProvider(
-      id,
-    );
+  AsyncRequriedTransactionsProvider call(dynamic id) {
+    return AsyncRequriedTransactionsProvider(id);
   }
 
   @override
   AsyncRequriedTransactionsProvider getProviderOverride(
     covariant AsyncRequriedTransactionsProvider provider,
   ) {
-    return call(
-      provider.id,
-    );
+    return call(provider.id);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -83,24 +75,25 @@ class AsyncRequriedTransactionsFamily extends Family<AsyncValue<List<Trx>>> {
 
 /// See also [AsyncRequriedTransactions].
 class AsyncRequriedTransactionsProvider
-    extends AutoDisposeAsyncNotifierProviderImpl<AsyncRequriedTransactions,
-        List<Trx>> {
+    extends
+        AutoDisposeAsyncNotifierProviderImpl<
+          AsyncRequriedTransactions,
+          List<Trx>
+        > {
   /// See also [AsyncRequriedTransactions].
-  AsyncRequriedTransactionsProvider(
-    dynamic id,
-  ) : this._internal(
-          () => AsyncRequriedTransactions()..id = id,
-          from: asyncRequriedTransactionsProvider,
-          name: r'asyncRequriedTransactionsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$asyncRequriedTransactionsHash,
-          dependencies: AsyncRequriedTransactionsFamily._dependencies,
-          allTransitiveDependencies:
-              AsyncRequriedTransactionsFamily._allTransitiveDependencies,
-          id: id,
-        );
+  AsyncRequriedTransactionsProvider(dynamic id)
+    : this._internal(
+        () => AsyncRequriedTransactions()..id = id,
+        from: asyncRequriedTransactionsProvider,
+        name: r'asyncRequriedTransactionsProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$asyncRequriedTransactionsHash,
+        dependencies: AsyncRequriedTransactionsFamily._dependencies,
+        allTransitiveDependencies:
+            AsyncRequriedTransactionsFamily._allTransitiveDependencies,
+        id: id,
+      );
 
   AsyncRequriedTransactionsProvider._internal(
     super._createNotifier, {
@@ -118,9 +111,7 @@ class AsyncRequriedTransactionsProvider
   FutureOr<List<Trx>> runNotifierBuild(
     covariant AsyncRequriedTransactions notifier,
   ) {
-    return notifier.build(
-      id,
-    );
+    return notifier.build(id);
   }
 
   @override
@@ -141,7 +132,7 @@ class AsyncRequriedTransactionsProvider
 
   @override
   AutoDisposeAsyncNotifierProviderElement<AsyncRequriedTransactions, List<Trx>>
-      createElement() {
+  createElement() {
     return _AsyncRequriedTransactionsProviderElement(this);
   }
 
@@ -168,12 +159,17 @@ mixin AsyncRequriedTransactionsRef
 }
 
 class _AsyncRequriedTransactionsProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<AsyncRequriedTransactions,
-        List<Trx>> with AsyncRequriedTransactionsRef {
+    extends
+        AutoDisposeAsyncNotifierProviderElement<
+          AsyncRequriedTransactions,
+          List<Trx>
+        >
+    with AsyncRequriedTransactionsRef {
   _AsyncRequriedTransactionsProviderElement(super.provider);
 
   @override
   dynamic get id => (origin as AsyncRequriedTransactionsProvider).id;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

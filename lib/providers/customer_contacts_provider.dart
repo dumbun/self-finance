@@ -10,7 +10,9 @@ part 'customer_contacts_provider.g.dart';
 @Riverpod(keepAlive: false)
 class AsyncCustomersContacts extends _$AsyncCustomersContacts {
   Future<List<Contact>> _fetchAllCustomersContactsData() async {
-    return await ref.watch(asyncCustomersProvider.notifier).fetchAllCustomersNameAndNumber();
+    return await ref
+        .watch(asyncCustomersProvider.notifier)
+        .fetchAllCustomersNameAndNumber();
   }
 
   @override
@@ -25,7 +27,9 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
     state = const AsyncValue.loading();
     // Add the new todo and reload the todo list from the remote repository
     state = await AsyncValue.guard(() async {
-      result = await ref.read(asyncCustomersProvider.notifier).addCustomer(customer: customer);
+      result = await ref
+          .read(asyncCustomersProvider.notifier)
+          .addCustomer(customer: customer);
       // creating new item becacuse every new transaction will have a proof item
       return await _fetchAllCustomersContactsData();
     });
@@ -43,13 +47,17 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
 
     // Create a HashMap for quick lookup
     final Map<String, Contact> customerMap = {
-      for (Contact contact in data) "${contact.number} ${contact.name.toLowerCase()}": contact
+      for (Contact contact in data)
+        "${contact.number} ${contact.name.toLowerCase()}": contact,
     };
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       return customerMap.entries
-          .where((MapEntry<String, Contact> entry) => entry.key.contains(givenInput.toLowerCase()))
+          .where(
+            (MapEntry<String, Contact> entry) =>
+                entry.key.contains(givenInput.toLowerCase()),
+          )
           .map((MapEntry<String, Contact> entry) => entry.value)
           .toList();
     });
@@ -76,7 +84,9 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
   }) async {
     int response;
     state = const AsyncValue.loading();
-    response = await ref.read(asyncCustomersProvider.notifier).updateCustomer(
+    response = await ref
+        .read(asyncCustomersProvider.notifier)
+        .updateCustomer(
           customerId: customerId,
           newCustomerName: newCustomerName,
           newGuardianName: newGuardianName,

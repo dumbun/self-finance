@@ -34,9 +34,7 @@ abstract class _$AsyncRequriedPayment
     extends BuildlessAutoDisposeAsyncNotifier<List<Payment>> {
   late final dynamic transactionId;
 
-  FutureOr<List<Payment>> build(
-    dynamic transactionId,
-  );
+  FutureOr<List<Payment>> build(dynamic transactionId);
 }
 
 /// See also [AsyncRequriedPayment].
@@ -49,21 +47,15 @@ class AsyncRequriedPaymentFamily extends Family<AsyncValue<List<Payment>>> {
   const AsyncRequriedPaymentFamily();
 
   /// See also [AsyncRequriedPayment].
-  AsyncRequriedPaymentProvider call(
-    dynamic transactionId,
-  ) {
-    return AsyncRequriedPaymentProvider(
-      transactionId,
-    );
+  AsyncRequriedPaymentProvider call(dynamic transactionId) {
+    return AsyncRequriedPaymentProvider(transactionId);
   }
 
   @override
   AsyncRequriedPaymentProvider getProviderOverride(
     covariant AsyncRequriedPaymentProvider provider,
   ) {
-    return call(
-      provider.transactionId,
-    );
+    return call(provider.transactionId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -82,24 +74,26 @@ class AsyncRequriedPaymentFamily extends Family<AsyncValue<List<Payment>>> {
 }
 
 /// See also [AsyncRequriedPayment].
-class AsyncRequriedPaymentProvider extends AutoDisposeAsyncNotifierProviderImpl<
-    AsyncRequriedPayment, List<Payment>> {
+class AsyncRequriedPaymentProvider
+    extends
+        AutoDisposeAsyncNotifierProviderImpl<
+          AsyncRequriedPayment,
+          List<Payment>
+        > {
   /// See also [AsyncRequriedPayment].
-  AsyncRequriedPaymentProvider(
-    dynamic transactionId,
-  ) : this._internal(
-          () => AsyncRequriedPayment()..transactionId = transactionId,
-          from: asyncRequriedPaymentProvider,
-          name: r'asyncRequriedPaymentProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$asyncRequriedPaymentHash,
-          dependencies: AsyncRequriedPaymentFamily._dependencies,
-          allTransitiveDependencies:
-              AsyncRequriedPaymentFamily._allTransitiveDependencies,
-          transactionId: transactionId,
-        );
+  AsyncRequriedPaymentProvider(dynamic transactionId)
+    : this._internal(
+        () => AsyncRequriedPayment()..transactionId = transactionId,
+        from: asyncRequriedPaymentProvider,
+        name: r'asyncRequriedPaymentProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$asyncRequriedPaymentHash,
+        dependencies: AsyncRequriedPaymentFamily._dependencies,
+        allTransitiveDependencies:
+            AsyncRequriedPaymentFamily._allTransitiveDependencies,
+        transactionId: transactionId,
+      );
 
   AsyncRequriedPaymentProvider._internal(
     super._createNotifier, {
@@ -117,9 +111,7 @@ class AsyncRequriedPaymentProvider extends AutoDisposeAsyncNotifierProviderImpl<
   FutureOr<List<Payment>> runNotifierBuild(
     covariant AsyncRequriedPayment notifier,
   ) {
-    return notifier.build(
-      transactionId,
-    );
+    return notifier.build(transactionId);
   }
 
   @override
@@ -140,7 +132,7 @@ class AsyncRequriedPaymentProvider extends AutoDisposeAsyncNotifierProviderImpl<
 
   @override
   AutoDisposeAsyncNotifierProviderElement<AsyncRequriedPayment, List<Payment>>
-      createElement() {
+  createElement() {
     return _AsyncRequriedPaymentProviderElement(this);
   }
 
@@ -168,13 +160,18 @@ mixin AsyncRequriedPaymentRef
 }
 
 class _AsyncRequriedPaymentProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<AsyncRequriedPayment,
-        List<Payment>> with AsyncRequriedPaymentRef {
+    extends
+        AutoDisposeAsyncNotifierProviderElement<
+          AsyncRequriedPayment,
+          List<Payment>
+        >
+    with AsyncRequriedPaymentRef {
   _AsyncRequriedPaymentProviderElement(super.provider);
 
   @override
   dynamic get transactionId =>
       (origin as AsyncRequriedPaymentProvider).transactionId;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

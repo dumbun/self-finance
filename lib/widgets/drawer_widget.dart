@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
@@ -41,10 +42,12 @@ class DrawerWidget extends ConsumerWidget {
       context,
       Constant.exit,
       Constant.signOutMessage,
-    ).then((value) {
-      if (value == 1 && context.mounted) {
-        _navigateToPinAuthView(user, context);
-      }
+    ).then((int value) {
+      BackEnd.close().then((bool respond) {
+        if (value == 1 && context.mounted && respond) {
+          _navigateToPinAuthView(user, context);
+        }
+      });
     });
   }
 

@@ -13,8 +13,9 @@ String _$asyncUserHash() => r'49cf5fc0cd84c6b76db3affc128d6527a423d25e';
 final asyncUserProvider = AsyncNotifierProvider<AsyncUser, List<User>>.internal(
   AsyncUser.new,
   name: r'asyncUserProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$asyncUserHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$asyncUserHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
