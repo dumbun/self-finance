@@ -85,7 +85,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -97,7 +97,9 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
       width: double.infinity,
       child: RoundedCornerButton(
         text: Constant.next,
-        onPressed: _pAndP == true && _ticked == true ? () => Routes.navigateToPinCreationView(context) : null,
+        onPressed: _pAndP == true && _ticked == true
+            ? () => Routes.navigateToPinCreationView(context)
+            : null,
       ),
     );
   }
