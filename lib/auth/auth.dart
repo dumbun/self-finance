@@ -12,7 +12,8 @@ class LocalAuthenticator {
         return false;
       }
 
-      List<BiometricType> availableBiometrics = await _newMethod.getAvailableBiometrics();
+      List<BiometricType> availableBiometrics = await _newMethod
+          .getAvailableBiometrics();
       if (availableBiometrics.isEmpty) {
         // No biometrics are available on this device
         return false;
@@ -20,11 +21,7 @@ class LocalAuthenticator {
 
       bool isAuthenticated = await _newMethod.authenticate(
         localizedReason: Constant.localizedReason, // Displayed to the user
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          useErrorDialogs: true,
-          sensitiveTransaction: true,
-        ),
+        sensitiveTransaction: true,
       );
 
       return isAuthenticated;
