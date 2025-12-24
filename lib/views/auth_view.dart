@@ -1,28 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:self_finance/auth/auth.dart';
-import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/fonts/body_text.dart';
-import 'package:self_finance/providers/user_provider.dart';
-import 'package:self_finance/views/dashboard_view.dart';
+import 'package:self_finance/backend/user_db.dart' show UserBackEnd;
+import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/views/terms_and_conditions.dart';
 
-class AuthView extends ConsumerStatefulWidget {
+class AuthView extends StatelessWidget {
   const AuthView({super.key});
 
   @override
-  ConsumerState<AuthView> createState() => _AuthViewState();
-}
-
-class _AuthViewState extends ConsumerState<AuthView> {
-  bool _isAuthenticated = false;
-
-  @override
-  void initState() {
-    _authenticateWithBiometrics();
-    super.initState();
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: UserBackEnd.fetchIDOneUser(),
+      builder: (BuildContext context, AsyncSnapshot<List<User>> snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return Center(child: CircularProgressIndicator());
+          default:
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              if (snapshot.data!.isNotEmpty) {
+                return PinAuthView(userDate: snapshot.requireData);
+              } else {
+                getPermissions();
+                return const TermsAndConditons();
+              }
+            }
+        }
+      },
+    );
   }
 
   void getPermissions() async {
@@ -39,35 +46,5 @@ class _AuthViewState extends ConsumerState<AuthView> {
     if (storageStatus.isDenied) {
       await Permission.storage.request();
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ref.watch(asyncUserProvider).when(
-          data: (List users) {
-            if (users.isNotEmpty) {
-              return _isAuthenticated ? const DashboardView() : const PinAuthView();
-            } else {
-              getPermissions();
-              return const TermsAndConditons();
-            }
-          },
-          loading: () => const Center(
-            child: CircularProgressIndicator.adaptive(),
-          ),
-          error: (error, stackTrace) => const Center(
-            child: BodyOneDefaultText(
-              text: Constant.errorUserFetch,
-            ),
-          ),
-        );
-  }
-
-  void _authenticateWithBiometrics() {
-    LocalAuthenticator.authenticate().then((value) {
-      setState(() {
-        _isAuthenticated = value;
-      });
-    });
   }
 }

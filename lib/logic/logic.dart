@@ -1,92 +1,145 @@
 import 'package:intl/intl.dart';
+import 'dart:math';
 
+/// LoanCalculator: calculates days, calendar months + remaining days,
+/// interest per day, total interest, and total payable amount.
+///
+/// - takenDate must be in "dd-MM-yyyy" format (e.g. "15-12-2024").
+/// - tenureDate is optional; if omitted, DateTime.now() is used.
+/// - inclusiveDays: if true, day counting includes both start and end days (common for loans).
+/// - yearDays: use 365 for calendar-year daily interest, or 360 for banking 30/360 convention.
 class LoanCalculator {
   final double takenAmount;
-  final double rateOfInterest;
-  final String takenDate;
-  DateTime? tenureDate;
+  final double rateOfInterest; // annual rate in percent (e.g. 12.0)
+  final String takenDate; // "dd-MM-yyyy"
+  final DateTime? tenureDate;
+  final bool inclusiveDays;
+  final int yearDays;
 
-  ///The [LoanCalculator] class is a Dart implementation for calculating loan-related metrics such as the number of days between the loan initiation date and a specified tenure date, the equivalent duration in months and remaining days, the daily interest rate, the total interest accrued, and the overall amount payable.
-
-  /// Class Structure:
-
-  /// Properties:
-  ///- `takenAmount`: The principal amount of the loan.
-  ///- `rateOfInterest`: The annual interest rate as a percentage.
-  ///- `takenDate`: The date when the loan was initiated in the format "dd-MM-yyyy".
-  ///- `tenureDate`: The optional date representing the tenure end date.
-
-  /// Methods:
-  ///1. `getDays()`: Calculates the number of days between the loan initiation date and the tenure date (current date if tenure date is not provided).
-
-  ///2. `daysToMonthsAndRemainingDays()`: Converts the total days into months and remaining days, providing a human-readable representation.
-
-  ///3. `getInterestPerDay()`: Calculates the daily interest rate based on the annual interest rate.
-
-  ///4. `totalInterest()`: Computes the total interest accrued by multiplying the daily interest rate with the total number of days.
-
-  ///5. `getTotal()`: Calculates the total amount payable, including the principal amount and the total interest.
-
-  /// Getter Properties:
-  ///- `days`: A getter property providing the total number of days.
-  ///- `monthsAndRemainingDays`: A getter property offering a formatted string of months and remaining days.
-  ///- `interestPerDay`: A getter property providing the daily interest rate.
-  ///- `totalInterestAmount`: A getter property offering the total interest accrued.
-  ///- `totalAmount`: A getter property providing the overall amount payable.
-
-  /// Supporting Class:
-
-  /// `DateUtils`:
-  ///A utility class with a static method (`getDaysDifference`) to calculate the difference in days between two given dates.
-
-  /// Usage:
-  ///To use the `LoanCalculator`, instantiate an object with the required parameters (principal amount, interest rate, and initiation date). Optionally, provide a tenure date. Access the desired metrics using the provided getter properties or methods. The class aims to enhance code modularity and readability while efficiently handling date-related calculations.
-
-  LoanCalculator({
+  const LoanCalculator({
     required this.takenAmount,
     required this.rateOfInterest,
     required this.takenDate,
     this.tenureDate,
+    this.inclusiveDays = true,
+    this.yearDays = 365,
   });
 
+  /// Total days between takenDate and tenureDate (or now), respecting inclusiveDays.
   int get days => _getDays();
-  String get monthsAndRemainingDays => _daysToMonthsAndRemainingDays();
+
+  /// Returns a string like "12 Months - 0 Days" using calendar-month logic.
+  String get monthsAndRemainingDays => _getMonthsAndRemainingDaysString();
+
+  /// Interest per day computed as (principal * rate/100) / yearDays
   double get interestPerDay => _getInterestPerDay();
+
+  /// Total interest = interestPerDay * days
   double get totalInterestAmount => _totalInterest();
-  double get totalAmount => _getTotal();
+
+  /// Total payable = principal + totalInterestAmount
+  double get totalAmount => takenAmount + totalInterestAmount;
+
+  // ---------- Internal helpers ----------
 
   int _getDays() {
-    tenureDate ??= DateTime.now();
-    return DateUtils._getDaysDifference(takenDate, tenureDate!);
+    final DateTime start = DateUtils.parseDateOnly(takenDate);
+    final DateTime end = tenureDate ?? DateTime.now();
+    return DateUtils.getDaysDifference(
+      startDate: start,
+      endDate: end,
+      inclusive: inclusiveDays,
+    );
   }
 
-  String _daysToMonthsAndRemainingDays() {
-    int days = _getDays();
-    return "${(days ~/ 30)} Months - ${days % 30} Days";
+  String _getMonthsAndRemainingDaysString() {
+    final DateTime start = DateUtils.parseDateOnly(takenDate);
+    final DateTime end = tenureDate ?? DateTime.now();
+    final List<int> md = DateUtils.getCalendarMonthsAndRemainingDays(
+      start: start,
+      end: end,
+    );
+    return "${md[0]} Months - ${md[1]} Days";
   }
 
   double _getInterestPerDay() {
-    final num perMonth = takenAmount * (rateOfInterest / 100);
-    return perMonth / 30;
+    final double annualInterest = takenAmount * (rateOfInterest / 100.0);
+    return annualInterest / yearDays;
   }
 
   double _totalInterest() {
-    final double interestPerDay = _getInterestPerDay();
-    final int totalDays = _getDays();
-    return interestPerDay * totalDays;
-  }
-
-  double _getTotal() {
-    final double interestPerDay = _getInterestPerDay();
-    final int totalDays = _getDays();
-    return takenAmount + interestPerDay * totalDays;
+    return _getInterestPerDay() * _getDays();
   }
 }
 
+/// Utility functions for date operations.
 class DateUtils {
-  static int _getDaysDifference(String startDate, DateTime endDate) {
+  /// Parse "dd-MM-yyyy" to a DateTime truncated to midnight.
+  static DateTime parseDateOnly(String ddMMyyyy) {
     final DateFormat format = DateFormat("dd-MM-yyyy");
-    final DateTime convertedStartDate = format.parseStrict(startDate);
-    return endDate.difference(convertedStartDate).inDays;
+    final DateTime parsed = format.parseStrict(ddMMyyyy);
+    return DateTime(parsed.year, parsed.month, parsed.day);
+  }
+
+  /// Return non-negative difference in days between startDate and endDate.
+  /// If inclusive is true, both start and end days are counted (add 1).
+  /// Returns 0 if endDate < startDate.
+  static int getDaysDifference({
+    required DateTime startDate,
+    required DateTime endDate,
+    bool inclusive = true,
+  }) {
+    final DateTime s = DateTime(startDate.year, startDate.month, startDate.day);
+    final DateTime e = DateTime(endDate.year, endDate.month, endDate.day);
+
+    int diff = e.difference(s).inDays;
+    if (inclusive) diff += 1;
+    if (diff < 0) return 0;
+    return diff;
+  }
+
+  /// Returns [months, days] as calendar months + remaining days between start and end.
+  /// Example: 15-12-2024 -> 15-12-2025 returns [12, 0].
+  /// It assumes end >= start; if end < start it returns [0, 0].
+  static List<int> getCalendarMonthsAndRemainingDays({
+    required DateTime start,
+    required DateTime end,
+  }) {
+    final DateTime s = DateTime(start.year, start.month, start.day);
+    final DateTime e = DateTime(end.year, end.month, end.day);
+
+    if (e.isBefore(s)) return [0, 0];
+
+    // total months ignoring days
+    int months = (e.year - s.year) * 12 + (e.month - s.month);
+
+    // candidate = start + months calendar months, with day clipped to month's last day if needed
+    DateTime candidate = _addCalendarMonthsClamped(start, months);
+
+    // If candidate is after end, step back one month
+    if (candidate.isAfter(e)) {
+      months -= 1;
+      candidate = _addCalendarMonthsClamped(start, months);
+    }
+
+    int remainingDays = e.difference(candidate).inDays;
+    if (remainingDays < 0) remainingDays = 0;
+    return [months, remainingDays];
+  }
+
+  /// Add calendar months to [date], but clamp day to the target month's max day.
+  static DateTime _addCalendarMonthsClamped(DateTime date, int monthsToAdd) {
+    final int totalMonths = date.month - 1 + monthsToAdd;
+    final int newYear = date.year + totalMonths ~/ 12;
+    final int newMonth = (totalMonths % 12) + 1;
+    final int maxDay = _daysInMonth(newYear, newMonth);
+    final int newDay = min(date.day, maxDay);
+    return DateTime(newYear, newMonth, newDay);
+  }
+
+  static int _daysInMonth(int year, int month) {
+    // Dart allows month overflow; day 0 of next month gives last day of current month
+    final DateTime lastDay = DateTime(year, month + 1, 0);
+    return lastDay.day;
   }
 }

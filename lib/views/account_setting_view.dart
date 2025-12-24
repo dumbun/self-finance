@@ -95,7 +95,10 @@ class AccountSettingsView extends StatelessWidget {
 
                                       // logout button
                                       SizedBox(height: 12.sp),
-                                      _buildLogoutButton(context: context),
+                                      _buildLogoutButton(
+                                        context: context,
+                                        userData: data,
+                                      ),
                                       SizedBox(height: 12.sp),
                                     ],
                                   ),
@@ -231,18 +234,21 @@ class AccountSettingsView extends StatelessWidget {
     );
   }
 
-  void _logout(BuildContext context) {
+  void _logout(BuildContext context, List<User> userData) {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return const PinAuthView();
+          return PinAuthView(userDate: userData);
         },
       ),
       (Route<dynamic> route) => false,
     );
   }
 
-  Card _buildLogoutButton({required BuildContext context}) {
+  Card _buildLogoutButton({
+    required BuildContext context,
+    required List<User> userData,
+  }) {
     return _buildListTile(
       icon: const Icon(Icons.logout, color: AppColors.getErrorColor),
       onPressed: () {
@@ -253,7 +259,7 @@ class AccountSettingsView extends StatelessWidget {
         ).then((int value) {
           BackEnd.close().then((bool respond) {
             if (context.mounted && value == 1 && respond) {
-              _logout(context);
+              _logout(context, userData);
             }
           });
         });

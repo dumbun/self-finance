@@ -37,7 +37,7 @@ class DrawerWidget extends ConsumerWidget {
     );
   }
 
-  void _logout(User user, BuildContext context) {
+  void _logout(List<User> userData, BuildContext context) {
     AlertDilogs.alertDialogWithTwoAction(
       context,
       Constant.exit,
@@ -45,17 +45,17 @@ class DrawerWidget extends ConsumerWidget {
     ).then((int value) {
       BackEnd.close().then((bool respond) {
         if (value == 1 && context.mounted && respond) {
-          _navigateToPinAuthView(user, context);
+          _navigateToPinAuthView(userData, context);
         }
       });
     });
   }
 
-  void _navigateToPinAuthView(User user, BuildContext context) {
+  void _navigateToPinAuthView(List<User> userData, BuildContext context) {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return const PinAuthView();
+          return PinAuthView(userDate: userData);
         },
       ),
       (route) => false,
@@ -98,7 +98,7 @@ class DrawerWidget extends ConsumerWidget {
                       text: Constant.logout,
                       icon: Icons.login_rounded,
                       color: AppColors.getErrorColor,
-                      onTap: () => _logout(data.first, context),
+                      onTap: () => _logout(data, context),
                     ),
                     SizedBox(height: 12.sp),
                     SizedBox(height: 20.sp),

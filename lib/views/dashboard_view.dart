@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
@@ -10,40 +9,23 @@ import 'package:self_finance/widgets/drawer_widget.dart';
 import 'package:self_finance/widgets/expandable_fab.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 
-//? providers
-///[selectedPageIndexProvider] is a provider which is auto dispose
-///this provider helps to maintain
-///the state of the buttom navigation bar in the dashboard
-final AutoDisposeStateProvider<int> selectedPageIndexProvider = StateProvider.autoDispose<int>((ref) {
-  return 0;
-});
-
-final AutoDisposeStateProvider<PageController> dashboardPageController =
-    StateProvider.autoDispose<PageController>((ref) {
-  final PageController pageController = PageController();
-  return pageController;
-});
-
-class DashboardView extends ConsumerWidget {
+class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final PageController pageController = ref.watch(dashboardPageController);
-    final int selectedPageIndex = ref.watch(selectedPageIndexProvider);
-    void changePage(int index) {
-      final PageController dashboardController = ref.read(dashboardPageController);
-      dashboardController.animateToPage(
-        index,
-        duration: const Duration(milliseconds: 450),
-        curve: Curves.easeInOut,
-      );
-    }
+  State<DashboardView> createState() => _DashboardViewState();
+}
 
+class _DashboardViewState extends State<DashboardView> {
+  int selectedPageIndex = 0;
+  final PageController pageController = PageController();
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
         title: TitleWidget(
+          key: GlobalKey(),
           text: switch (selectedPageIndex) {
             0 => Constant.homeScreen,
             1 => Constant.emiCalculatorTitle,
@@ -60,7 +42,9 @@ class DashboardView extends ConsumerWidget {
           child: PageView(
             controller: pageController,
             onPageChanged: (int index) {
-              ref.read(selectedPageIndexProvider.notifier).update((state) => index);
+              setState(() {
+                selectedPageIndex = index;
+              });
             },
             children: const <Widget>[
               HomeScreen(),
@@ -70,7 +54,9 @@ class DashboardView extends ConsumerWidget {
           ),
         ),
       ),
-      floatingActionButton: selectedPageIndex == 0 ? const ExpandableFab() : const SizedBox.shrink(),
+      floatingActionButton: selectedPageIndex == 0
+          ? const ExpandableFab()
+          : const SizedBox.shrink(),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -94,7 +80,11 @@ class DashboardView extends ConsumerWidget {
         ],
         selectedItemColor: AppColors.getPrimaryColor,
         currentIndex: selectedPageIndex,
-        onTap: (index) => changePage(index),
+        onTap: (int index) => pageController.animateToPage(
+          index,
+          duration: const Duration(milliseconds: 450),
+          curve: Curves.easeInOut,
+        ),
       ),
     );
   }

@@ -3,14 +3,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/widgets/home_screen_graph_widget.dart';
 import 'package:self_finance/widgets/latest_transactions_widget.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(

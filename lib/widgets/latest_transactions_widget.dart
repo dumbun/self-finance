@@ -15,11 +15,11 @@ import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
-import 'package:self_finance/views/dashboard_view.dart';
 
-final AutoDisposeFutureProvider<List<UserHistory>> latestUserHistoryProvider = FutureProvider.autoDispose((ref) async {
-  return await ref.watch(asyncHistoryProvider.notifier).build();
-});
+final AutoDisposeFutureProvider<List<UserHistory>> latestUserHistoryProvider =
+    FutureProvider.autoDispose((ref) async {
+      return await ref.watch(asyncHistoryProvider.notifier).build();
+    });
 
 class LatestTransactionsWidget extends ConsumerWidget {
   const LatestTransactionsWidget({super.key});
@@ -46,34 +46,30 @@ class LatestTransactionsWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final String appCurrency = ref.watch(currencyProvider);
 
-    void navigateToHistory() {
-      final dashboardViewpagecontroller = ref.read(dashboardPageController);
-      dashboardViewpagecontroller.animateToPage(
-        2,
-        duration: const Duration(milliseconds: 450),
-        curve: Curves.easeInOut,
-      );
-    }
-
     void navigateToHistoryDetailedView(int customerID, UserHistory history) {
-      ref.read(asyncCustomersProvider.notifier).fetchRequriedCustomerDetails(customerID: customerID).then(
+      ref
+          .read(asyncCustomersProvider.notifier)
+          .fetchRequriedCustomerDetails(customerID: customerID)
+          .then(
             (List<Customer> customer) => ref
                 .read(asyncTransactionsProvider.notifier)
                 .fetchRequriedTransaction(transactionId: history.transactionID)
                 .then((List<Trx> transaction) {
-              if (context.mounted) {
-                Routes.navigateToHistoryDetailedView(
-                  context: context,
-                  customer: customer.first,
-                  history: history,
-                  transaction: transaction.first,
-                );
-              }
-            }),
+                  if (context.mounted) {
+                    Routes.navigateToHistoryDetailedView(
+                      context: context,
+                      customer: customer.first,
+                      history: history,
+                      transaction: transaction.first,
+                    );
+                  }
+                }),
           );
     }
 
-    return ref.watch(asyncHistoryProvider).when(
+    return ref
+        .watch(asyncHistoryProvider)
+        .when(
           data: (List<UserHistory> data) {
             if (data.isEmpty) {
               return const SizedBox.shrink();
@@ -88,9 +84,7 @@ class LatestTransactionsWidget extends ConsumerWidget {
                     text: "Recent Activites",
                     bold: true,
                   ),
-                  SizedBox(
-                    height: 16.sp,
-                  ),
+                  SizedBox(height: 16.sp),
                   Expanded(
                     child: ListView.builder(
                       shrinkWrap: false,
@@ -102,7 +96,10 @@ class LatestTransactionsWidget extends ConsumerWidget {
                           child: Padding(
                             padding: EdgeInsets.all(4.sp),
                             child: ListTile(
-                              onTap: () => navigateToHistoryDetailedView(data[index].customerID, data[index]),
+                              onTap: () => navigateToHistoryDetailedView(
+                                data[index].customerID,
+                                data[index],
+                              ),
                               leading: data[index].eventType == Constant.debited
                                   ? const Icon(
                                       Icons.arrow_upward_rounded,
@@ -113,7 +110,8 @@ class LatestTransactionsWidget extends ConsumerWidget {
                                       color: AppColors.getGreenColor,
                                     ),
                               title: BodyOneDefaultText(
-                                text: '${Utility.doubleFormate(data[index].amount)} $appCurrency',
+                                text:
+                                    '${Utility.doubleFormate(data[index].amount)} $appCurrency',
                                 bold: true,
                               ),
                               subtitle: BodyTwoDefaultText(
@@ -128,23 +126,14 @@ class LatestTransactionsWidget extends ConsumerWidget {
                       },
                     ),
                   ),
-                  if (data.length > 4)
-                    TextButton(
-                      onPressed: navigateToHistory,
-                      child: const BodyTwoDefaultText(
-                        text: 'Show More',
-                      ),
-                    ),
                 ],
               ),
             );
           },
-          error: (Object error, StackTrace stackTrace) => const BodyTwoDefaultText(
-            text: Constant.error,
-          ),
-          loading: () => const Center(
-            child: CircularProgressIndicator.adaptive(),
-          ),
+          error: (Object error, StackTrace stackTrace) =>
+              const BodyTwoDefaultText(text: Constant.error),
+          loading: () =>
+              const Center(child: CircularProgressIndicator.adaptive()),
         );
   }
 }

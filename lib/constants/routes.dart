@@ -15,12 +15,15 @@ import 'package:self_finance/views/transaction_detail_view.dart';
 import 'package:self_finance/views/user_creating_view.dart';
 
 class Routes {
-  static void navigateToTransactionDetailsView({required Trx transacrtion, required BuildContext context}) {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => TransactionDetailView(
-        transacrtion: transacrtion,
+  static void navigateToTransactionDetailsView({
+    required Trx transacrtion,
+    required BuildContext context,
+  }) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => TransactionDetailView(transacrtion: transacrtion),
       ),
-    ));
+    );
   }
 
   static void navigateToCustomerLoneEntryView({
@@ -77,7 +80,10 @@ class Routes {
     Navigator.of(context).pushNamed(Constant.accountSettingsView);
   }
 
-  static void navigateToAddNewTransactionToCustomerView({required BuildContext context, required int customerID}) {
+  static void navigateToAddNewTransactionToCustomerView({
+    required BuildContext context,
+    required int customerID,
+  }) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => AddNewTransactionView(customerID: customerID),
@@ -85,14 +91,22 @@ class Routes {
     );
   }
 
-  static void navigateToContactEditingView({required BuildContext context, required Customer contact}) {
+  static void navigateToContactEditingView({
+    required BuildContext context,
+    required Customer contact,
+  }) {
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => ContactEditingView(contact: contact)),
+      MaterialPageRoute(
+        builder: (context) => ContactEditingView(contact: contact),
+      ),
       (route) => true,
     );
   }
 
-  static void navigateToContactDetailsView(BuildContext context, {required int customerID}) {
+  static void navigateToContactDetailsView(
+    BuildContext context, {
+    required int customerID,
+  }) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ContactDetailsView(customerID: customerID),
@@ -106,18 +120,17 @@ class Routes {
 
   static void navigateToUserCreationView(BuildContext context, String pin) {
     Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => UserCreationView(pin: pin),
-        ),
-        (route) => false);
+      context,
+      MaterialPageRoute(builder: (context) => UserCreationView(pin: pin)),
+      (route) => false,
+    );
   }
 
   static void navigateToPinCreationView(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const PinCreatingView(),
+        builder: (BuildContext context) => const PinCreatingView(),
       ),
     );
   }
@@ -125,7 +138,7 @@ class Routes {
   static void navigateToDashboard({required BuildContext context}) {
     Navigator.of(context).pushNamedAndRemoveUntil(
       Constant.dashboardView,
-      (route) => false,
+      (Route<dynamic> route) => false,
     );
   }
 
@@ -136,10 +149,8 @@ class Routes {
   }) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (BuildContext context) => ImageView(
-          titile: titile,
-          imageWidget: imageWidget,
-        ),
+        builder: (BuildContext context) =>
+            ImageView(titile: titile, imageWidget: imageWidget),
       ),
     );
   }
