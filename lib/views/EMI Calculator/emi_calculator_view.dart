@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/logic/logic.dart';
 import 'package:self_finance/utility/user_utility.dart';
-import 'package:self_finance/views/EMi%20Calculator/emi_calculator_providers.dart';
 import 'package:self_finance/widgets/input_date_picker.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
-import 'package:self_finance/widgets/two_slice_pie_chart_widget.dart';
+import 'package:self_finance/widgets/round_corner_button.dart';
 
-class EMICalculatorView extends ConsumerStatefulWidget {
+class EMICalculatorView extends StatefulWidget {
   const EMICalculatorView({super.key});
 
   @override
-  ConsumerState<EMICalculatorView> createState() => _EMICalculatorViewState();
+  State<EMICalculatorView> createState() => _EMICalculatorViewState();
 }
 
-class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
+class _EMICalculatorViewState extends State<EMICalculatorView> {
   final TextEditingController _amountGivenInput = TextEditingController();
   final TextEditingController _rateOfIntrestInput = TextEditingController();
   final TextEditingController _takenDataInput = TextEditingController();
@@ -26,6 +24,7 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
   final DateTime _firstDate = DateTime(1000);
   final DateTime _initalDate = DateTime.now();
   final DateTime _lastDate = DateTime(9999);
+  late LoanCalculator _loanCalculator;
 
   @override
   void dispose() {
@@ -38,9 +37,9 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsets.all(16.sp),
+    return Padding(
+      padding: EdgeInsetsGeometry.all(16.sp),
+      child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,29 +52,7 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
               firstDate: _firstDate,
               lastDate: _lastDate,
               initialDate: _initalDate,
-              onTap: () async {
-                DateTime? pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: _initalDate,
-                  currentDate: DateTime.now(),
-                  keyboardType: TextInputType.datetime,
-                  initialDatePickerMode: DatePickerMode.year,
-                  firstDate: _firstDate,
-                  //DateTime.now() - not to allow to choose before today.
-                  lastDate: _lastDate,
-                );
-                if (pickedDate != null) {
-                  //pickedDate output format => 2021-03-10 00:00:00.000
-                  String formattedDate = DateFormat(
-                    'dd-MM-yyyy',
-                  ).format(pickedDate);
-                  //formatted date output using intl package =>  2021-03-16
-                  _takenDataInput.text = formattedDate;
-                  _doCalculations(ref);
-                } else {}
-              },
             ),
-
             SizedBox(height: 20.sp),
             // Tenture Date
             InputDatePicker(
@@ -91,9 +68,6 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
               hintText: Constant.takenAmount,
               keyboardType: TextInputType.number,
               controller: _amountGivenInput,
-              onChanged: (value) {
-                _doCalculations(ref);
-              },
             ),
             SizedBox(height: 20.sp),
             // rate of Intrest
@@ -103,81 +77,51 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
                 decimal: true,
               ),
               controller: _rateOfIntrestInput,
-              onChanged: (value) {
-                _doCalculations(ref);
-              },
             ),
-            Consumer(
-              builder: (context, ref, child) {
-                final totalAmount = ref.watch(totalAmountProvider);
-                final totalInterest = ref.watch(totalIntrestProvider);
-                final emiPerMonth = ref.watch(emiPerMonthProvider);
-                final principalAmount = ref.watch(principalAmountProvider);
-                final monthsAndDays = ref.watch(monthsAndDaysProvider);
-                final double firstIndicatorValue = ref.watch(
-                  firstIndicatorPercentageProvider,
-                );
-                final double secoundIndicatorValue = ref.watch(
-                  secoundIndicatorPercentageProvider,
-                );
-                return Column(
-                  children: [
-                    if (firstIndicatorValue != 0 && secoundIndicatorValue != 0)
-                      TwoSlicePieChartWidget(
-                        firstIndicatorText: Constant.takenAmount,
-                        secoundIndicatorText: Constant.intrestAmount,
-                        firstIndicatorValue: firstIndicatorValue,
-                        secoundIndicatorValue: secoundIndicatorValue,
-                      ),
-                    _buildDetails(
-                      totalAmount: totalAmount,
-                      totalInterest: totalInterest,
-                      emiPerMonth: emiPerMonth,
-                      principalAmount: principalAmount,
-                      monthsAndDays: monthsAndDays,
+            SizedBox(height: 20.sp),
+            RoundedCornerButton(
+              onPressed: _doCalculation,
+              text: "DO CALCULATIONS",
+            ),
+            (_takenDataInput.text.isNotEmpty &&
+                    _amountGivenInput.text.isNotEmpty &&
+                    _tenureDataInput.text.isNotEmpty &&
+                    _rateOfIntrestInput.text.isNotEmpty)
+                ? _buildDetails(
+                    emiPerMonth: _loanCalculator.interestPerDay * 30,
+                    monthsAndDays: _loanCalculator.monthsAndRemainingDays,
+                    principalAmount: _loanCalculator.takenAmount,
+                    totalAmount: _loanCalculator.totalAmount,
+                    totalInterest: _loanCalculator.takenAmount,
+                  )
+                : Padding(
+                    padding: EdgeInsets.only(top: 20.sp),
+                    child: BodyTwoDefaultText(
+                      error: true,
+                      text: "PLEASE FILL ALL FIELDS",
                     ),
-                  ],
-                );
-              },
-            ),
+                  ),
           ],
         ),
       ),
     );
   }
 
-  void _doCalculations(WidgetRef ref) {
+  void _doCalculation() {
     if (_amountGivenInput.text.isNotEmpty &&
         _rateOfIntrestInput.text.isNotEmpty &&
         _takenDataInput.text.isNotEmpty &&
         _tenureDataInput.text.isNotEmpty) {
-      final double rateOfInterest = Utility.textToDouble(
-        _rateOfIntrestInput.text,
-      );
-      final double loneAmount = Utility.textToDouble(_amountGivenInput.text);
       String tenureDate = _tenureDataInput.text;
       final DateFormat format = DateFormat("dd-MM-yyyy");
-      LoanCalculator l1 = LoanCalculator(
-        takenAmount: loneAmount,
-        rateOfInterest: rateOfInterest,
-        takenDate: _takenDataInput.text,
-        tenureDate: format.parseStrict(tenureDate),
-      );
-
-      double totalInterest = l1.totalInterestAmount;
-      double totalAmount = l1.totalAmount;
-      double firstIndicatorPercentage = (loneAmount / totalAmount) * 100;
-      double secoundIndicatorPercentage = (totalInterest / totalAmount) * 100;
-      ref.read(monthsAndDaysProvider.notifier).state =
-          l1.monthsAndRemainingDays;
-      ref.read(emiPerMonthProvider.notifier).state = l1.interestPerDay * 30;
-      ref.read(principalAmountProvider.notifier).state = loneAmount;
-      ref.read(totalAmountProvider.notifier).state = totalAmount;
-      ref.read(totalIntrestProvider.notifier).state = totalInterest;
-      ref.read(firstIndicatorPercentageProvider.notifier).state =
-          Utility.reduceDecimals(firstIndicatorPercentage);
-      ref.read(secoundIndicatorPercentageProvider.notifier).state =
-          Utility.reduceDecimals(secoundIndicatorPercentage);
+      setState(() {
+        _loanCalculator = LoanCalculator(
+          takenAmount: Utility.textToDouble(_amountGivenInput.text),
+          rateOfInterest: Utility.textToDouble(_rateOfIntrestInput.text),
+          takenDate: _takenDataInput.text,
+          tenureDate: format.parseStrict(tenureDate),
+        );
+      });
     }
   }
 
