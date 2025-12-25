@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/logic/logic.dart';
 import 'package:self_finance/models/customer_model.dart';
@@ -19,10 +18,9 @@ import 'package:self_finance/providers/items_provider.dart';
 import 'package:self_finance/providers/requried_payments_provider.dart';
 import 'package:self_finance/providers/requried_transaction_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
-import 'package:self_finance/utility/image_catch_manager.dart';
 import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/widgets/pawned_item_image_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
-import 'package:self_finance/widgets/snack_bar_widget.dart';
 
 // providers
 final requriedTransactionItemProvider = FutureProvider.family
@@ -96,18 +94,53 @@ class TransactionDetailView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                // _buildCustomerDetails(),
-                // SizedBox(height: 12.sp),
-                // const BodyOneDefaultText(
-                //   text: 'Transaction Details',
-                //   bold: true,
-                // ),
                 _buildTransactionDetails(),
+                _buildPaymentButton(), // Mark As Paid Button
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Consumer _buildPaymentButton() {
+    return Consumer(
+      builder: (BuildContext context, WidgetRef ref, Widget? child) {
+        final payments = ref.watch(paymentsProvider(transacrtion.id!));
+        final transactionsProvider = ref.watch(
+          asyncRequriedTransactionsProvider(transacrtion.id!),
+        );
+        return transactionsProvider.when(
+          data: (List<Trx> data) {
+            final transaction = data.first;
+            if (transaction.transacrtionType == Constant.active) {
+              final loanCalculator = LoanCalculator(
+                rateOfInterest: transaction.intrestRate,
+                takenAmount: transaction.amount,
+                takenDate: transaction.transacrtionDate,
+                tenureDate: payments.isNotEmpty
+                    ? DateTime.tryParse(payments.first.paymentDate)
+                    : DateTime.now(),
+              );
+              return Hero(
+                tag: Constant.saveButtonTag,
+                child: RoundedCornerButton(
+                  onPressed: () =>
+                      _markAsPaid(ref, transaction, loanCalculator.totalAmount),
+                  icon: Icons.done,
+                  text: "Mark As Paid",
+                ),
+              );
+            } else {
+              return SizedBox.shrink();
+            }
+          },
+          error: (Object error, StackTrace stackTrace) =>
+              BodyTwoDefaultText(text: error.toString()),
+          loading: () => Center(child: CircularProgressIndicator()),
+        );
+      },
     );
   }
 
@@ -307,74 +340,10 @@ class TransactionDetailView extends StatelessWidget {
                   ),
 
                   // Show Pawned Item Image Widget
-                  ref
-                      .watch(
-                        requriedTransactionItemProvider(transaction.itemId),
-                      )
-                      .when(
-                        data: (List<Items> itemData) {
-                          return Card(
-                            child: ListTile(
-                              onTap: () {
-                                if (itemData.first.photo.isNotEmpty) {
-                                  Routes.navigateToImageView(
-                                    context: context,
-                                    imageWidget:
-                                        ImageCacheManager.getCachedImage(
-                                          itemData.first.photo,
-                                          44,
-                                          44,
-                                        ),
-                                    titile: itemData.first.description,
-                                  );
-                                } else {
-                                  SnackBarWidget.snackBarWidget(
-                                    context: context,
-                                    message: "No Image Found 😔",
-                                  );
-                                }
-                              },
-                              leading: const Icon(Icons.topic_outlined),
-                              title: const BodyTwoDefaultText(
-                                text: 'Show Item',
-                                bold: true,
-                              ),
-                              subtitle: BodyTwoDefaultText(
-                                text: itemData.first.description,
-                              ),
-                              trailing: const Icon(
-                                Icons.arrow_forward_rounded,
-                                color: AppColors.getPrimaryColor,
-                              ),
-                            ),
-                          );
-                        },
-                        error: (Object error, StackTrace stackTrace) =>
-                            const BodyTwoDefaultText(text: Constant.error),
-                        loading: () => const Center(
-                          child: CircularProgressIndicator.adaptive(),
-                        ),
-                      ),
+                  PawnedItemImageWidget(itemID: transaction.itemId),
 
                   // show signature image view
                   // _buildShowSignatureButton(),
-                  SizedBox(height: 12.sp),
-
-                  // Mark As Paid Button
-                  if (transaction.transacrtionType == Constant.active)
-                    Hero(
-                      tag: Constant.saveButtonTag,
-                      child: RoundedCornerButton(
-                        onPressed: () => _markAsPaid(
-                          ref,
-                          transaction,
-                          loanCalculator.totalAmount,
-                        ),
-                        icon: Icons.done,
-                        text: "Mark As Paid",
-                      ),
-                    ),
-
                   SizedBox(height: 12.sp),
                 ],
               ),
