@@ -92,7 +92,7 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
                     monthsAndDays: _loanCalculator.monthsAndRemainingDays,
                     principalAmount: _loanCalculator.takenAmount,
                     totalAmount: _loanCalculator.totalAmount,
-                    totalInterest: _loanCalculator.takenAmount,
+                    totalInterest: _loanCalculator.totalInterestAmount,
                   )
                 : Padding(
                     padding: EdgeInsets.only(top: 20.sp),
