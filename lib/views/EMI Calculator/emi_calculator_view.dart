@@ -81,7 +81,7 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
             SizedBox(height: 20.sp),
             RoundedCornerButton(
               onPressed: _doCalculation,
-              text: "DO CALCULATIONS",
+              text: Constant.doCalculation,
             ),
             (_takenDataInput.text.isNotEmpty &&
                     _amountGivenInput.text.isNotEmpty &&
@@ -98,7 +98,7 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
                     padding: EdgeInsets.only(top: 20.sp),
                     child: BodyTwoDefaultText(
                       error: true,
-                      text: "PLEASE FILL ALL FIELDS",
+                      text: Constant.pleaseFillAllFields,
                     ),
                   ),
           ],

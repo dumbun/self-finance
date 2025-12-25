@@ -1,11 +1,13 @@
 abstract class Constant {
   static const String applicationHandleEmail = "sf.help.vamshi@gmail.com";
+  static const String doCalculation = "DO CALCULATIONS";
   static const String errorFetchingTransactionMessage =
       "Error fetching the transactions please restart the application";
 
   static const bool ads = false;
   static const String noImgageError = "No Image Found";
-  static const String noTransactionMessage = "No Transactions present. Add a transaction by pressing the + below ";
+  static const String noTransactionMessage =
+      "No Transactions present. Add a transaction by pressing the + below ";
   static const String contactDeleteMessage =
       "By Pressing 'YES' you will remove all the details of this customer from your DateBase";
   static const String alert = "Alert";
@@ -20,16 +22,19 @@ abstract class Constant {
       "Please add a transaction by pressing the + symbol to create a new contact with new customer or add a new trancation to a existing customer";
   static const String pandp = 'Privacy and Policy';
   static const String firstIndicatorPercentage = 'First Indicator Percentage';
-  static const String secoundIndicatorPercentage = 'Secound Indicator Percentage';
+  static const String secoundIndicatorPercentage =
+      'Secound Indicator Percentage';
   static const String contact = "Contacts";
   static const String intrestAmount = "Intrest Amount";
   static const String zeroContacts = "0 Contacts Found 🫠";
-  static const String errorFetchingContactMessage = "Error fetching customers contacts please try again 😶‍🌫️";
+  static const String errorFetchingContactMessage =
+      "Error fetching customers contacts please try again 😶‍🌫️";
   static const String contactAlreadyExistMessage =
       "Contact number is already present in your database please change the number or if you want to add the transacrtion to existing constact please select the add transaction to existing contact in Home Screen";
   static const String login = "Login";
   static const String loveBharath = "self-finance ❤️ Bharath";
-  static const String userFetchingError = 'Error fetching user data. Please restart the application';
+  static const String userFetchingError =
+      'Error fetching user data. Please restart the application';
   static const String localizedReason = 'Authenticate to access the app';
   static const String appTitle = 'Self-Finance';
   static const String exit = 'Exit';
@@ -48,28 +53,37 @@ abstract class Constant {
   static const String errorUserFetch = "Error of fetching User data";
   static const String testText =
       "Lorem ipsum dolor sit amet. Sit sint magnam qui reiciendis quia cum recusandae voluptatibus quo voluptas ipsa? At praesentium mollitia eum nemo reiciendis eum";
-  static const String testCheckbox = "My billing address is the same as my shipping address";
-  static const String securePinMassage = "Login pin is to Secure your Application from Third Person Using it";
+  static const String testCheckbox =
+      "My billing address is the same as my shipping address";
+  static const String securePinMassage =
+      "Login pin is to Secure your Application from Third Person Using it";
   static const String addNewEntry = "Add New Entry";
   static const String addNewCustomerToolTip = "Add New Customer";
-  static const String addNewTransactionToolTip = "Add New Transaction to a existing customer";
+  static const String addNewTransactionToolTip =
+      "Add New Transaction to a existing customer";
   static const String addNewTransaction = "Add New Transaction";
   static const String history = "History";
   static const String customerItem = "Customer Item";
-  static const String errorUpdatingContactMessage = "Error while updating the contact please try again some other time";
-  static const String contactUpdatedSuccessfully = "Contact Updated Successfully";
+  static const String errorUpdatingContactMessage =
+      "Error while updating the contact please try again some other time";
+  static const String contactUpdatedSuccessfully =
+      "Contact Updated Successfully";
   static const String customerAddress = "Customer Address ";
-  static const String historyToolTip = "History Page : Views all your transactions history";
+  static const String historyToolTip =
+      "History Page : Views all your transactions history";
   static const String next = "next";
   static const String termAcknowledge =
       "By using the Self-Finance App, you acknowledge that you have read, understood, and agreed to these Terms and Conditions. ";
   static const String tAndcString = "Term & Conditions";
   static const String accountSettings = "Account Setting";
-  static const String tAndcUrl = 'https://dumbun.github.io/self-finance/terms_and_conditions';
-  static const String pAndPUrl = "https://dumbun.github.io/self-finance/privacy_and_policy";
+  static const String tAndcUrl =
+      'https://dumbun.github.io/self-finance/terms_and_conditions';
+  static const String pAndPUrl =
+      "https://dumbun.github.io/self-finance/privacy_and_policy";
   static const String savedSuccessfullyText = "Saved successfully ✅";
   static const String emiCalculatorTitle = "EMI Calculator";
-  static const String emiCalculatorToolTip = "EMI calculator page where you can callculate intrests";
+  static const String emiCalculatorToolTip =
+      "EMI calculator page where you can callculate intrests";
   static const String defaultProfileImagePath = "assets/icon/defaultImage.svg";
   static const String defaultProofImagePath = "assets/icon/id_proof_icon.svg";
   static const String defaultItemImagePath = "assets/icon/item_icon.svg";
@@ -103,10 +117,13 @@ abstract class Constant {
   static const String enterCorrectPin = "Please enter the correct pin";
   static const String enterCorrectNumber = "please enter correct mobile number";
   static const String pleaseTryAgain = "please try again";
-  static const String errorAddingTransaction = "Error adding transaction please try agine after some time";
-  static const String transacrtionAddedSuccessfully = "Transaction added Successfully";
+  static const String errorAddingTransaction =
+      "Error adding transaction please try agine after some time";
+  static const String transacrtionAddedSuccessfully =
+      "Transaction added Successfully";
   static const String showTransaction = 'Show trancation';
   static const String transacrtionStatus = 'Tranasction Status';
   static const String transactionDetails = "Transaction Details";
   static const String transactionStatus = "Transaction Status";
+  static const String pleaseFillAllFields = "PLEASE FILL ALL FIELDS";
 }
