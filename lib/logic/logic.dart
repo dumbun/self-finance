@@ -62,13 +62,7 @@ class LoanCalculator {
   }
 
   String _getMonthsAndRemainingDaysString() {
-    final DateTime start = DateUtils.parseDateOnly(takenDate);
-    final DateTime end = tenureDate ?? DateTime.now();
-    final List<int> md = DateUtils.getCalendarMonthsAndRemainingDays(
-      start: start,
-      end: end,
-    );
-    return "${md[0]} Months - ${md[1]} Days";
+    return "${_md[0]} Months - ${_md[1]} Days";
   }
 
   double _getIntrestPerMonth() {
