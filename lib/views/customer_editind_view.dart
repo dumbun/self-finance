@@ -52,10 +52,7 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const BodyTwoDefaultText(
-          text: Constant.editContact,
-          bold: true,
-        ),
+        title: const BodyTwoDefaultText(text: Constant.editContact, bold: true),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -95,23 +92,19 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
         width: 48.sp,
         height: 48.sp,
         child: Consumer(
-          builder: (context, ref, child) {
-            final userImageString = ref.watch(updatedCustomerPhotoStringProvider);
+          builder: (BuildContext context, WidgetRef ref, Widget? child) {
+            final userImageString = ref.watch(
+              updatedCustomerPhotoStringProvider,
+            );
             return GestureDetector(
               onTap: () async {
-                await Utility.pickImageFromCamera().then(
-                  (value) {
-                    if (value.isNotEmpty) {
-                      ref
-                          .read(
-                            updatedCustomerPhotoStringProvider.notifier,
-                          )
-                          .update(
-                            (state) => value,
-                          );
-                    }
-                  },
-                );
+                await Utility.pickImageFromCamera().then((String value) {
+                  if (value.isNotEmpty) {
+                    ref
+                        .read(updatedCustomerPhotoStringProvider.notifier)
+                        .update((String state) => value);
+                  }
+                });
               },
               child: Stack(
                 alignment: Alignment.bottomRight,
@@ -120,10 +113,7 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
                     transitionOnUserGestures: true,
                     tag: Constant.customerImageTag,
                     child: userImageString.isEmpty
-                        ? DefaultUserImage(
-                            height: 46.sp,
-                            width: 46.sp,
-                          )
+                        ? DefaultUserImage(height: 46.sp, width: 46.sp)
                         : SizedBox(
                             height: 46.sp,
                             width: 46.sp,
@@ -134,9 +124,12 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
                   ),
                   Container(
                     padding: EdgeInsets.all(12.sp),
-                    decoration: const BoxDecoration(color: AppColors.getPrimaryColor, shape: BoxShape.circle),
+                    decoration: const BoxDecoration(
+                      color: AppColors.getPrimaryColor,
+                      shape: BoxShape.circle,
+                    ),
                     child: const Icon(Icons.edit_rounded),
-                  )
+                  ),
                 ],
               ),
             );
@@ -149,9 +142,7 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
   void _save() async {
     if (_validateAndSave()) {
       final int response = await ref
-          .read(
-            asyncCustomersContactsProvider.notifier,
-          )
+          .read(asyncCustomersContactsProvider.notifier)
           .updateCustomer(
             customerId: widget.contact.id!,
             newCustomerName: _customerName.text,
@@ -242,7 +233,9 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
       onTap: () async {
         await Utility.pickImageFromCamera().then((value) {
           if (value != "" && value.isNotEmpty) {
-            ref.read(updatedCustomerProofStringProvider.notifier).update((state) => value);
+            ref
+                .read(updatedCustomerProofStringProvider.notifier)
+                .update((state) => value);
           }
         });
       },
@@ -282,10 +275,7 @@ class _ContactEditingViewState extends ConsumerState<ContactEditingView> {
                             defaultImagePath,
                           ),
                     SizedBox(height: 16.sp),
-                    BodyTwoDefaultText(
-                      text: title,
-                      bold: true,
-                    ),
+                    BodyTwoDefaultText(text: title, bold: true),
                   ],
                 ),
               );
