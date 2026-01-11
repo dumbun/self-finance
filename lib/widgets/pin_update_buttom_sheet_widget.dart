@@ -8,15 +8,21 @@ import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
 
 class PinUpdatebuttomSheetWidget extends ConsumerStatefulWidget {
-  const PinUpdatebuttomSheetWidget({super.key, required this.id, required this.userPin});
+  const PinUpdatebuttomSheetWidget({
+    super.key,
+    required this.id,
+    required this.userPin,
+  });
   final int id;
   final String userPin;
 
   @override
-  ConsumerState<PinUpdatebuttomSheetWidget> createState() => _PinUpdatebuttomSheetWidgetState();
+  ConsumerState<PinUpdatebuttomSheetWidget> createState() =>
+      _PinUpdatebuttomSheetWidgetState();
 }
 
-class _PinUpdatebuttomSheetWidgetState extends ConsumerState<PinUpdatebuttomSheetWidget> {
+class _PinUpdatebuttomSheetWidgetState
+    extends ConsumerState<PinUpdatebuttomSheetWidget> {
   final TextEditingController _pin = TextEditingController();
   final TextEditingController _conformPin = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -48,14 +54,13 @@ class _PinUpdatebuttomSheetWidgetState extends ConsumerState<PinUpdatebuttomShee
           children: [
             SizedBox(height: 18.sp),
             const BodyOneDefaultText(text: "Please provide new pin"),
-            PinInputWidget(
-              pinController: _pin,
-              obscureText: false,
-            ),
+            PinInputWidget(pinController: _pin, obscureText: false),
             SizedBox(height: 18.sp),
             const BodyOneDefaultText(text: "Please conform new pin "),
             PinInputWidget(
-              validator: (p0) => _pin.text != _conformPin.text ? "Please provide same pin" : null,
+              validator: (p0) => _pin.text != _conformPin.text
+                  ? "Please provide same pin"
+                  : null,
               pinController: _conformPin,
               obscureText: false,
             ),
@@ -67,7 +72,8 @@ class _PinUpdatebuttomSheetWidgetState extends ConsumerState<PinUpdatebuttomShee
                 _buildActionButton(
                   onPressed: () {
                     if (validateAndSave()) {
-                      if (widget.userPin != _pin.text && widget.userPin != _conformPin.text) {
+                      if (widget.userPin != _pin.text &&
+                          widget.userPin != _conformPin.text) {
                         update();
                       }
                       Navigator.pop(context);
@@ -86,7 +92,7 @@ class _PinUpdatebuttomSheetWidgetState extends ConsumerState<PinUpdatebuttomShee
                   text: "Cancel",
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -94,21 +100,22 @@ class _PinUpdatebuttomSheetWidgetState extends ConsumerState<PinUpdatebuttomShee
   }
 
   void update() {
-    ref.read(asyncUserProvider.notifier).updateUserPin(
-          userId: widget.id,
-          updateUserPin: _conformPin.text,
-        );
+    ref
+        .read(asyncUserProvider.notifier)
+        .updateUserPin(userId: widget.id, updateUserPin: _conformPin.text);
   }
 
-  Expanded _buildActionButton({required void Function()? onPressed, required Widget icon, required String text}) {
+  Expanded _buildActionButton({
+    required void Function()? onPressed,
+    required Widget icon,
+    required String text,
+  }) {
     return Expanded(
       child: ElevatedButton.icon(
         style: const ButtonStyle(elevation: WidgetStatePropertyAll(0)),
         onPressed: onPressed,
         icon: icon,
-        label: BodyTwoDefaultText(
-          text: text,
-        ),
+        label: BodyTwoDefaultText(text: text),
       ),
     );
   }

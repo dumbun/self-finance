@@ -54,7 +54,9 @@ class Utility {
   }
 
   // writefeedback image to the storage
-  static Future<String> writeImageToStorage(Uint8List feedbackScreenshot) async {
+  static Future<String> writeImageToStorage(
+    Uint8List feedbackScreenshot,
+  ) async {
     final Directory output = await getTemporaryDirectory();
     final String screenshotFilePath = '${output.path}/feedback.png';
     final File screenshotFile = File(screenshotFilePath);
@@ -64,10 +66,7 @@ class Utility {
 
   // make call
   static void makeCall({required String phoneNumber}) async {
-    final Uri launchUri = Uri(
-      scheme: 'tel',
-      path: phoneNumber,
-    );
+    final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
     if (!await launchUrl(launchUri)) {
       throw Exception('Could not launch $launchUri');
     }
@@ -85,15 +84,15 @@ class Utility {
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
-  static Widget imageFromBase64String(String base64String, {double? height, double? width}) {
+  static Widget imageFromBase64String(
+    String base64String, {
+    double? height,
+    double? width,
+  }) {
     if (base64String.isNotEmpty) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(100.sp),
-        child: ImageCacheManager.getCachedImage(
-          base64String,
-          height,
-          width,
-        ),
+        child: ImageCacheManager.getCachedImage(base64String, height, width),
       );
     } else {
       return const SizedBox.shrink();
@@ -116,8 +115,9 @@ class Utility {
     return NumberFormat('#,##0').format(number);
   }
 
-  static bool isValidPhoneNumber(String? value) =>
-      RegExp(r'(^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$)').hasMatch(value ?? '');
+  static bool isValidPhoneNumber(String? value) => RegExp(
+    r'(^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$)',
+  ).hasMatch(value ?? '');
 
   static double reduceDecimals(double value) {
     return double.parse(value.toStringAsFixed(2));
@@ -156,9 +156,7 @@ class Utility {
     );
 
     if (imgFile != null) {
-      Uint8List imgBytes = Uint8List.fromList(
-        await imgFile.readAsBytes(),
-      );
+      Uint8List imgBytes = Uint8List.fromList(await imgFile.readAsBytes());
       result = Utility.base64String(imgBytes);
     }
 
@@ -175,32 +173,38 @@ class Utility {
     );
 
     if (imgFile != null) {
-      Uint8List imgBytes = Uint8List.fromList(
-        await imgFile.readAsBytes(),
-      );
+      Uint8List imgBytes = Uint8List.fromList(await imgFile.readAsBytes());
       result = Utility.base64String(imgBytes);
     }
 
     return result;
   }
 
-  static void screenShotShare(ScreenshotController screenshotController, BuildContext context) async {
+  static void screenShotShare(
+    ScreenshotController screenshotController,
+    BuildContext context,
+  ) async {
     double pixelRatio = MediaQuery.of(context).devicePixelRatio;
 
     try {
       await screenshotController
-          .capture(delay: const Duration(milliseconds: 15), pixelRatio: pixelRatio)
+          .capture(
+            delay: const Duration(milliseconds: 15),
+            pixelRatio: pixelRatio,
+          )
           .then((Uint8List? image) async {
-        if (image != null) {
-          final directory = await getApplicationDocumentsDirectory();
-          final imagePath = await File('${directory.path}/image.jpeg').create();
-          await imagePath.writeAsBytes(image);
-          final XFile responce = XFile(imagePath.path);
+            if (image != null) {
+              final directory = await getApplicationDocumentsDirectory();
+              final imagePath = await File(
+                '${directory.path}/image.jpeg',
+              ).create();
+              await imagePath.writeAsBytes(image);
+              final XFile responce = XFile(imagePath.path);
 
-          /// Share Plugin
-          await Share.shareXFiles([responce]);
-        }
-      });
+              /// Share Plugin
+              await Share.shareXFiles([responce]);
+            }
+          });
     } catch (e) {
       //
     }
@@ -213,14 +217,21 @@ class Utility {
     List<Path> paths = signatureGlobalKey.currentState!.toPathList();
     // checks wether the signature pad is empty
     if (paths.isNotEmpty) {
-      final ui.Image data = await signatureGlobalKey.currentState!.toImage(pixelRatio: 3.0);
-      final ByteData? bytes = await data.toByteData(format: ui.ImageByteFormat.png);
+      final ui.Image data = await signatureGlobalKey.currentState!.toImage(
+        pixelRatio: 3.0,
+      );
+      final ByteData? bytes = await data.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
       if (bytes != null && signatureGlobalKey.currentState != null) {
-        Directory applictionDocumentDirectory = await getApplicationDocumentsDirectory();
+        Directory applictionDocumentDirectory =
+            await getApplicationDocumentsDirectory();
         String path = applictionDocumentDirectory.path;
         // create directory on external storage
         await Directory('$path/signature').create(recursive: true);
-        File('$path/signature/$imageName.png').writeAsBytesSync(bytes.buffer.asInt8List());
+        File(
+          '$path/signature/$imageName.png',
+        ).writeAsBytesSync(bytes.buffer.asInt8List());
       }
     }
   }

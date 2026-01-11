@@ -38,9 +38,9 @@ class ImagePickerWidget extends ConsumerWidget {
                   () {
                     Utility.pickImageFromCamera().then((String value) {
                       if (value != "" && value.isNotEmpty) {
-                        ref.read(imageProvider.notifier).update(
-                              (String state) => value,
-                            );
+                        ref
+                            .read(imageProvider.notifier)
+                            .update((String state) => value);
                       }
                     });
                     Navigator.of(context).pop();
@@ -50,15 +50,13 @@ class ImagePickerWidget extends ConsumerWidget {
                 ),
                 _buildCard(
                   () {
-                    Utility.pickImageFromGallery().then(
-                      (String value) {
-                        if (value != "" && value.isNotEmpty) {
-                          ref.read(imageProvider.notifier).update(
-                                (String state) => value,
-                              );
-                        }
-                      },
-                    );
+                    Utility.pickImageFromGallery().then((String value) {
+                      if (value != "" && value.isNotEmpty) {
+                        ref
+                            .read(imageProvider.notifier)
+                            .update((String state) => value);
+                      }
+                    });
                     Navigator.of(context).pop();
                   },
                   "Gallary",
@@ -66,14 +64,14 @@ class ImagePickerWidget extends ConsumerWidget {
                 ),
                 _buildCard(
                   () {
-                    ref.read(imageProvider.notifier).update(
-                          (String state) => "",
-                        );
+                    ref
+                        .read(imageProvider.notifier)
+                        .update((String state) => "");
                     Navigator.of(context).pop();
                   },
                   "Remove",
                   Icons.delete,
-                )
+                ),
               ],
             ),
           );
@@ -101,10 +99,7 @@ class ImagePickerWidget extends ConsumerWidget {
                     : Utility.imageFromBase64String(imageData),
               ),
               SizedBox(height: 10.sp),
-              BodyTwoDefaultText(
-                text: text,
-                bold: true,
-              )
+              BodyTwoDefaultText(text: text, bold: true),
             ],
           ),
         ),
@@ -112,18 +107,19 @@ class ImagePickerWidget extends ConsumerWidget {
     );
   }
 
-  GestureDetector _buildCard(void Function()? onTap, String title, IconData icon) {
+  GestureDetector _buildCard(
+    void Function()? onTap,
+    String title,
+    IconData icon,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            size: 30.sp,
-          ),
-          BodyOneDefaultText(text: title)
+          Icon(icon, size: 30.sp),
+          BodyOneDefaultText(text: title),
         ],
       ),
     );
