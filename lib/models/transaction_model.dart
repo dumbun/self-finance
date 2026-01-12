@@ -9,6 +9,7 @@ class Trx {
     required this.intrestRate,
     required this.intrestAmount,
     required this.remainingAmount,
+    required this.signature,
     required this.createdDate,
   });
 
@@ -21,6 +22,7 @@ class Trx {
   final double intrestRate;
   final double intrestAmount;
   final double remainingAmount;
+  final String signature;
   final String createdDate;
 
   /// [Trx] is a shortform of Transaction class
@@ -51,6 +53,7 @@ class Trx {
         intrestRate: e["Interest_Rate"],
         intrestAmount: e["Interest_Amount"],
         remainingAmount: e["Remaining_Amount"],
+        signature: e["Signature"],
         createdDate: e["Created_Date"],
       );
     }).toList();
@@ -67,6 +70,7 @@ class Trx {
     double? intrestAmount,
     double? remainingAmount,
     String? proofPhoto,
+    String? signature,
     String? createdDate,
   }) {
     return Trx(
@@ -79,6 +83,7 @@ class Trx {
       intrestRate: intrestRate ?? this.intrestRate,
       intrestAmount: intrestAmount ?? this.intrestAmount,
       remainingAmount: remainingAmount ?? this.remainingAmount,
+      signature: signature ?? this.signature,
       createdDate: createdDate ?? this.createdDate,
     );
   }
@@ -109,6 +114,7 @@ class Trx {
       intrestRate: map['intrestRate'] as double,
       intrestAmount: map['intrestAmount'] as double,
       remainingAmount: map['remainingAmount'] as double,
+      signature: map['signature'] as String,
       createdDate: map['createdDate'] as String,
     );
   }

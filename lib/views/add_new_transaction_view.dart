@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/widgets/signature_widget.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
@@ -32,7 +33,8 @@ class AddNewTransactionView extends ConsumerStatefulWidget {
   final int customerID;
 
   @override
-  ConsumerState<AddNewTransactionView> createState() => _AddNewTransactionViewState();
+  ConsumerState<AddNewTransactionView> createState() =>
+      _AddNewTransactionViewState();
 }
 
 class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
@@ -83,15 +85,19 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                 children: [
                   SizedBox(height: 12.sp),
                   InputTextField(
-                    validator: (value) => Utility.amountValidation(value: value),
+                    validator: (value) =>
+                        Utility.amountValidation(value: value),
                     keyboardType: TextInputType.number,
                     hintText: Constant.takenAmount,
                     controller: _amount,
                   ),
                   SizedBox(height: 20.sp),
                   InputTextField(
-                    validator: (value) => Utility.amountValidation(value: value),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    validator: (value) =>
+                        Utility.amountValidation(value: value),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     hintText: Constant.rateOfIntrest,
                     controller: _rateOfIntrest,
                   ),
@@ -112,16 +118,9 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                   SizedBox(height: 30.sp),
                   _buildItemImagePicker(),
 
-                  //! Signature Widget that stores signatures on a app data (if requested provied it on update)
-                  // SizedBox(height: 30.sp),
-                  // const BodyTwoDefaultText(
-                  //   text: "Customer Signature (optional) : ",
-                  //   bold: true,
-                  // ),
-                  // SizedBox(height: 20.sp),
-                  // SignatureWidget(
-                  //   signatureGlobalKey: _signatureGlobalKey,
-                  // ),
+                  //! Signature Widget that stores signatures on a app data
+                  SizedBox(height: 30.sp),
+                  SignatureWidget(signatureGlobalKey: _signatureGlobalKey),
 
                   SizedBox(height: 30.sp),
                   Hero(
@@ -149,16 +148,24 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
       return double.parse(text);
     } catch (e) {
       _isloading = false;
-      return AlertDilogs.alertDialogWithOneAction(context, errorString, e.toString());
+      return AlertDilogs.alertDialogWithOneAction(
+        context,
+        errorString,
+        e.toString(),
+      );
     }
   }
 
   void _save() async {
     if (_validateAndSave()) {
-      final List<Customer> customer = await BackEnd.fetchSingleContactDetails(id: widget.customerID);
+      final List<Customer> customer = await BackEnd.fetchSingleContactDetails(
+        id: widget.customerID,
+      );
       final String presentDate = DateTime.now().toString();
       _isloading = true;
-      final int itemId = await ref.read(asyncItemsProvider.notifier).addItem(
+      final int itemId = await ref
+          .read(asyncItemsProvider.notifier)
+          .addItem(
             item: Items(
               customerid: widget.customerID,
               name: _description.text,
@@ -172,7 +179,15 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
             ),
           );
       if (itemId != 0) {
-        final int transacrtionId = await ref.read(asyncTransactionsProvider.notifier).addTransaction(
+        //saving signature to the storage
+        final String signaturePath = await Utility.saveSignaturesInStorage(
+          signatureGlobalKey: _signatureGlobalKey,
+          imageName: itemId.toString(),
+        );
+
+        final int transacrtionId = await ref
+            .read(asyncTransactionsProvider.notifier)
+            .addTransaction(
               transaction: Trx(
                 customerId: widget.customerID,
                 itemId: itemId,
@@ -180,19 +195,19 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                 transacrtionType: Constant.active,
                 amount: _doubleCheck(_amount.text),
                 intrestRate: _doubleCheck(_rateOfIntrest.text),
-                intrestAmount: _doubleCheck(_amount.text) * (_doubleCheck(_rateOfIntrest.text) / 100),
+                intrestAmount:
+                    _doubleCheck(_amount.text) *
+                    (_doubleCheck(_rateOfIntrest.text) / 100),
                 remainingAmount: 0.0,
+                signature: signaturePath,
                 createdDate: presentDate,
               ),
             );
 
         if (transacrtionId != 0) {
-          //saving signature to the storage
-          // Utility.saveSignaturesInStorage(
-          //   signatureGlobalKey: _signatureGlobalKey,
-          //   imageName: transacrtionId.toString(),
-          // );
-          final int historyId = await ref.read(asyncHistoryProvider.notifier).addHistory(
+          final int historyId = await ref
+              .read(asyncHistoryProvider.notifier)
+              .addHistory(
                 history: UserHistory(
                   userID: 1,
                   customerID: widget.customerID,
@@ -213,7 +228,10 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
 
   void _safeSuccuse() {
     _isloading = false;
-    SnackBarWidget.snackBarWidget(context: context, message: Constant.transacrtionAddedSuccessfully);
+    SnackBarWidget.snackBarWidget(
+      context: context,
+      message: Constant.transacrtionAddedSuccessfully,
+    );
     Navigator.of(context).pop();
   }
 
@@ -238,7 +256,9 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                 try {
                   await Utility.pickImageFromCamera().then((value) {
                     if (value != "" && value.isNotEmpty) {
-                      ref.read(newItemImageProvider.notifier).update((state) => value);
+                      ref
+                          .read(newItemImageProvider.notifier)
+                          .update((state) => value);
                     }
                   });
                 } catch (e) {

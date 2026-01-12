@@ -94,6 +94,7 @@ class BackEnd {
           );
         """);
 
+    // NOTE : Signature is binded to the Item_ID
     await database.execute("""
           -- Transactions Table
           CREATE TABLE Transactions (
@@ -106,6 +107,7 @@ class BackEnd {
           Interest_Rate    REAL NOT NULL,
           Interest_Amount  REAL NOT NULL,
           Remaining_Amount REAL NOT NULL,
+          Signature        TEXT NOT NULL,
           Created_Date     TEXT NOT NULL 
           );
         """);
@@ -400,6 +402,7 @@ class BackEnd {
         "Interest_Rate": transasction.intrestRate,
         "Interest_Amount": transasction.intrestAmount,
         "Remaining_Amount": transasction.remainingAmount,
+        "Signature": transasction.signature,
         "Created_Date": transasction.createdDate,
       };
       final response = await db.insert(
