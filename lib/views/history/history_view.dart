@@ -7,13 +7,9 @@ import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
-import 'package:self_finance/models/customer_model.dart';
-import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history.dart';
 import 'package:self_finance/providers/app_currency_provider.dart';
-import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
-import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
@@ -77,24 +73,13 @@ class HistoryView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ListTile buildListTile(UserHistory data) {
       return ListTile(
-        onTap: () => ref
-            .read(asyncCustomersProvider.notifier)
-            .fetchRequriedCustomerDetails(customerID: data.customerID)
-            .then(
-              (List<Customer> customer) => ref
-                  .read(asyncTransactionsProvider.notifier)
-                  .fetchRequriedTransaction(transactionId: data.transactionID)
-                  .then((List<Trx> transaction) {
-                    if (context.mounted) {
-                      Routes.navigateToHistoryDetailedView(
-                        context: context,
-                        customer: customer.first,
-                        history: data,
-                        transaction: transaction.first,
-                      );
-                    }
-                  }),
-            ),
+        onTap: () => Routes.navigateToHistoryDetailedView(
+          context: context,
+          customerID: data.customerID,
+          history: data,
+          transactionID: data.transactionID,
+        ),
+
         leading: _buildIcon(type: data.eventType),
         title: _buildAmount(
           data.eventType,
@@ -140,8 +125,7 @@ class HistoryView extends ConsumerWidget {
                   .read(asyncHistoryProvider.notifier)
                   .doSearch(givenInput: value),
             ),
-            SizedBox(height: 16.sp),
-            SizedBox(height: 16.sp),
+            SizedBox(height: 32.sp),
             Consumer(
               builder: (BuildContext context, WidgetRef ref, Widget? child) {
                 return ref

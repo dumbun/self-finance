@@ -40,7 +40,7 @@ class SelfFinance extends StatelessWidget {
                 color: AppColors.getBackgroundColor,
                 elevation: 0,
               ),
-              fontFamily: "hell",
+              fontFamily: Constant.appFont,
               appBarTheme: const AppBarTheme(elevation: 0),
               colorScheme: ColorScheme.fromSeed(
                 seedColor: AppColors.getPrimaryColor,
@@ -53,7 +53,7 @@ class SelfFinance extends StatelessWidget {
             ),
             darkTheme: ThemeData(
               brightness: Brightness.dark,
-              fontFamily: "hell",
+              fontFamily: Constant.appFont,
               useMaterial3: true,
               primaryColor: AppColors.getPrimaryColor,
               primaryColorDark: AppColors.getPrimaryTextColor,

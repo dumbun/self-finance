@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
@@ -157,19 +158,28 @@ class Routes {
 
   static void navigateToHistoryDetailedView({
     required BuildContext context,
-    required Customer customer,
+    required int customerID,
     required UserHistory history,
-    required Trx transaction,
-  }) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (BuildContext context) => HistoryDetailedView(
-          customer: customer,
-          history: history,
-          transaction: transaction,
-        ),
-      ),
+    required int transactionID,
+  }) async {
+    List<Customer> customer = await BackEnd.fetchSingleContactDetails(
+      id: customerID,
     );
+    List<Trx> transaction = await BackEnd.fetchRequriedTransaction(
+      transacrtionId: transactionID,
+    );
+
+    if (customer.isNotEmpty && transaction.isNotEmpty && context.mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (BuildContext context) => HistoryDetailedView(
+            customer: customer.first,
+            history: history,
+            transaction: transaction.first,
+          ),
+        ),
+      );
+    }
   }
 
   static void navigateToAddNewEntry({required BuildContext context}) async {

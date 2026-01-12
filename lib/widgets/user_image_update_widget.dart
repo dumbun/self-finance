@@ -35,7 +35,10 @@ class UserImageUpdateWidget extends ConsumerWidget {
                           if (value != "" && value.isNotEmpty) {
                             ref
                                 .read(asyncUserProvider.notifier)
-                                .updateUserProfile(userId: 1, updatedImageString: value);
+                                .updateUserProfile(
+                                  userId: 1,
+                                  updatedImageString: value,
+                                );
                           }
                         });
                         Navigator.of(context).pop();
@@ -44,11 +47,8 @@ class UserImageUpdateWidget extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.camera_alt,
-                            size: 30.sp,
-                          ),
-                          const BodyOneDefaultText(text: "Camera")
+                          Icon(Icons.camera_alt, size: 30.sp),
+                          const BodyOneDefaultText(text: "Camera"),
                         ],
                       ),
                     ),
@@ -58,7 +58,10 @@ class UserImageUpdateWidget extends ConsumerWidget {
                           if (value != "" && value.isNotEmpty) {
                             ref
                                 .read(asyncUserProvider.notifier)
-                                .updateUserProfile(userId: 1, updatedImageString: value);
+                                .updateUserProfile(
+                                  userId: 1,
+                                  updatedImageString: value,
+                                );
                           }
                         });
                         Navigator.of(context).pop();
@@ -67,11 +70,8 @@ class UserImageUpdateWidget extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.photo,
-                            size: 30.sp,
-                          ),
-                          const BodyOneDefaultText(text: "Gallery")
+                          Icon(Icons.photo, size: 30.sp),
+                          const BodyOneDefaultText(text: "Gallery"),
                         ],
                       ),
                     ),
@@ -90,10 +90,7 @@ class UserImageUpdateWidget extends ConsumerWidget {
               Align(
                 alignment: Alignment.topCenter,
                 child: userImageString.isEmpty
-                    ? DefaultUserImage(
-                        width: 46.sp,
-                        height: 46.sp,
-                      )
+                    ? DefaultUserImage(width: 46.sp, height: 46.sp)
                     : SizedBox(
                         height: 46.sp,
                         width: 46.sp,
@@ -103,7 +100,10 @@ class UserImageUpdateWidget extends ConsumerWidget {
               Align(
                 alignment: Alignment.bottomRight,
                 child: Container(
-                  decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.getPrimaryColor),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.getPrimaryColor,
+                  ),
                   padding: EdgeInsets.all(12.sp),
                   child: Icon(
                     size: 24.sp,
@@ -111,7 +111,7 @@ class UserImageUpdateWidget extends ConsumerWidget {
                     color: AppColors.getBackgroundColor,
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

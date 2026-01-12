@@ -7,16 +7,22 @@ import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 
 class UserNameUpdateButtomSheetWidget extends ConsumerStatefulWidget {
-  const UserNameUpdateButtomSheetWidget({super.key, required this.userId, required this.userName});
+  const UserNameUpdateButtomSheetWidget({
+    super.key,
+    required this.userId,
+    required this.userName,
+  });
 
   final int userId;
   final String userName;
 
   @override
-  ConsumerState<UserNameUpdateButtomSheetWidget> createState() => _UserNameUpdateButtomSheetWidgetState();
+  ConsumerState<UserNameUpdateButtomSheetWidget> createState() =>
+      _UserNameUpdateButtomSheetWidgetState();
 }
 
-class _UserNameUpdateButtomSheetWidgetState extends ConsumerState<UserNameUpdateButtomSheetWidget> {
+class _UserNameUpdateButtomSheetWidgetState
+    extends ConsumerState<UserNameUpdateButtomSheetWidget> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _newUserName = TextEditingController();
   bool validateAndSave() {
@@ -70,7 +76,10 @@ class _UserNameUpdateButtomSheetWidgetState extends ConsumerState<UserNameUpdate
                       } else if (validateAndSave()) {
                         ref
                             .read(asyncUserProvider.notifier)
-                            .updateUserName(userId: widget.userId, updateUserName: _newUserName.text);
+                            .updateUserName(
+                              userId: widget.userId,
+                              updateUserName: _newUserName.text,
+                            );
                         Navigator.pop(context);
                       }
                     },
@@ -85,9 +94,9 @@ class _UserNameUpdateButtomSheetWidgetState extends ConsumerState<UserNameUpdate
                       color: AppColors.getErrorColor,
                     ),
                     text: "Cancel",
-                  )
+                  ),
                 ],
-              )
+              ),
             ],
           ),
         ),
@@ -95,16 +104,17 @@ class _UserNameUpdateButtomSheetWidgetState extends ConsumerState<UserNameUpdate
     );
   }
 
-  Expanded _buildActionButton({required void Function()? onPressed, required Widget icon, required String text}) {
+  Expanded _buildActionButton({
+    required void Function()? onPressed,
+    required Widget icon,
+    required String text,
+  }) {
     return Expanded(
       child: ElevatedButton.icon(
         style: const ButtonStyle(elevation: WidgetStatePropertyAll(0)),
         onPressed: onPressed,
         icon: icon,
-        label: BodyTwoDefaultText(
-          text: text,
-          maxLines: 5,
-        ),
+        label: BodyTwoDefaultText(text: text, maxLines: 5),
       ),
     );
   }

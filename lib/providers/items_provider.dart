@@ -28,7 +28,9 @@ class AsyncItems extends _$AsyncItems {
     return result;
   }
 
-  Future<List<Items>> fetchitemOfRequriedCustomer({required int customerID}) async {
+  Future<List<Items>> fetchitemOfRequriedCustomer({
+    required int customerID,
+  }) async {
     state = const AsyncValue.loading();
     // Add the new todo and reload the todo list from the remote repository
     state = await AsyncValue.guard(() async {

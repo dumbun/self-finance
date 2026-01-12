@@ -6,13 +6,9 @@ import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
-import 'package:self_finance/models/customer_model.dart';
-import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history.dart';
 import 'package:self_finance/providers/app_currency_provider.dart';
-import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
-import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 
@@ -47,24 +43,12 @@ class LatestTransactionsWidget extends ConsumerWidget {
     final String appCurrency = ref.watch(currencyProvider);
 
     void navigateToHistoryDetailedView(int customerID, UserHistory history) {
-      ref
-          .read(asyncCustomersProvider.notifier)
-          .fetchRequriedCustomerDetails(customerID: customerID)
-          .then(
-            (List<Customer> customer) => ref
-                .read(asyncTransactionsProvider.notifier)
-                .fetchRequriedTransaction(transactionId: history.transactionID)
-                .then((List<Trx> transaction) {
-                  if (context.mounted) {
-                    Routes.navigateToHistoryDetailedView(
-                      context: context,
-                      customer: customer.first,
-                      history: history,
-                      transaction: transaction.first,
-                    );
-                  }
-                }),
-          );
+      Routes.navigateToHistoryDetailedView(
+        context: context,
+        customerID: customerID,
+        history: history,
+        transactionID: history.transactionID,
+      );
     }
 
     return ref
