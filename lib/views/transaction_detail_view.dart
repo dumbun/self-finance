@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:self_finance/constants/constants.dart';
+import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/logic/logic.dart';
 import 'package:self_finance/models/customer_model.dart';
@@ -107,7 +110,9 @@ class TransactionDetailView extends StatelessWidget {
   Consumer _buildPaymentButton() {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
-        final payments = ref.watch(paymentsProvider(transacrtion.id!));
+        final List<Payment> payments = ref.watch(
+          paymentsProvider(transacrtion.id!),
+        );
         final transactionsProvider = ref.watch(
           asyncRequriedTransactionsProvider(transacrtion.id!),
         );
@@ -187,37 +192,6 @@ class TransactionDetailView extends StatelessWidget {
       ),
     );
   }
-
-  //! Signature button if needed for update
-  // FutureBuilder<Directory> _buildShowSignatureButton() {
-  //   return FutureBuilder<Directory>(
-  //     future: getApplicationDocumentsDirectory(),
-  //     builder: (BuildContext context, AsyncSnapshot<Directory> snapshot) {
-  //       if (snapshot.hasError) {
-  //         return const Text("error");
-  //       } else if (snapshot.connectionState == ConnectionState.waiting) {
-  //         return const CircularProgressIndicator.adaptive();
-  //       } else {
-  //         if (File('${snapshot.data!.path}/signature/${transacrtion.id!}.png').existsSync() == true) {
-  //           File? f = File('${snapshot.data!.path}/signature/${transacrtion.id!}.png');
-  //           return _buildCard(
-  //             onTap: () => Routes.navigateToImageView(
-  //               context: context,
-  //               imageWidget: Image.file(f),
-  //               titile: "Signature",
-  //             ),
-  //             title: "Signature",
-  //             data: "",
-  //             icon: Icons.topic_outlined,
-  //             trailingIcon: Icons.app_registration_sharp,
-  //           );
-  //         } else {
-  //           return const SizedBox.shrink();
-  //         }
-  //       }
-  //     },
-  //   );
-  // }
 
   Consumer _buildTransactionDetails() {
     return Consumer(
@@ -343,7 +317,21 @@ class TransactionDetailView extends StatelessWidget {
                   PawnedItemImageWidget(itemID: transaction.itemId),
 
                   // show signature image view
-                  // _buildShowSignatureButton(),
+                  transaction.signature.isNotEmpty
+                      ? _buildCard(
+                          onTap: () => Routes.navigateToImageView(
+                            context: context,
+                            imageWidget: Image.file(
+                              File(transaction.signature),
+                            ),
+                            titile: "Signature",
+                          ),
+                          title: "Signature",
+                          data: "Show",
+                          icon: Icons.topic_outlined,
+                          trailingIcon: Icons.app_registration_sharp,
+                        )
+                      : SizedBox.shrink(),
                   SizedBox(height: 12.sp),
                 ],
               ),
@@ -388,40 +376,4 @@ class TransactionDetailView extends StatelessWidget {
           ),
         );
   }
-
-  // Card _buildCustomerDetails() {
-  //   return Card(
-  //     child: Padding(
-  //       padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 20.sp),
-  //       child: Row(
-  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //         crossAxisAlignment: CrossAxisAlignment.center,
-  //         children: <Widget>[
-  //           Column(
-  //             mainAxisAlignment: MainAxisAlignment.start,
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: [
-  //               BodyTwoDefaultText(
-  //                 text: customerDetails.name,
-  //                 bold: true,
-  //               ),
-  //               BodyTwoDefaultText(
-  //                 text: customerDetails.number,
-  //                 color: AppColors.getLigthGreyColor,
-  //               ),
-  //               BodyTwoDefaultText(
-  //                 text: customerDetails.address,
-  //                 color: AppColors.getLigthGreyColor,
-  //               ),
-  //             ],
-  //           ),
-  //           CircularImageWidget(
-  //             imageData: customerDetails.photo,
-  //             titile: "${customerDetails.name} photo",
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 }

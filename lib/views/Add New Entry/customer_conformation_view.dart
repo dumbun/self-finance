@@ -16,10 +16,13 @@ import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/items_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/views/Add%20New%20Entry/providers.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/image_picker_widget.dart';
+import 'package:self_finance/widgets/signature_widget.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
+import 'package:signature/signature.dart';
 
 class CustomerConformationView extends ConsumerStatefulWidget {
   final String customerName;
@@ -44,20 +47,30 @@ class CustomerConformationView extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<CustomerConformationView> createState() => _CustomerConformationViewState();
+  ConsumerState<CustomerConformationView> createState() =>
+      _CustomerConformationViewState();
 }
 
-class _CustomerConformationViewState extends ConsumerState<CustomerConformationView> {
+class _CustomerConformationViewState
+    extends ConsumerState<CustomerConformationView> {
+  final SignatureController _signatureGlobalKey = SignatureController(
+    penColor: Colors.black,
+    exportPenColor: Colors.black,
+    exportBackgroundColor: Colors.white,
+    penStrokeWidth: 5,
+  );
+
+  @override
+  void dispose() {
+    _signatureGlobalKey.dispose();
+    super.dispose();
+  }
+
   ListTile _buildListTile({required String title, required String data}) {
     return ListTile(
       contentPadding: EdgeInsets.all(4.sp),
-      subtitle: BodyOneDefaultText(
-        bold: true,
-        text: data,
-      ),
-      title: BodySmallText(
-        text: title,
-      ),
+      subtitle: BodyOneDefaultText(bold: true, text: data),
+      title: BodySmallText(text: title),
     );
   }
 
@@ -110,7 +123,10 @@ class _CustomerConformationViewState extends ConsumerState<CustomerConformationV
       _isloading = false;
     });
 
-    SnackBarWidget.snackBarWidget(context: context, message: Constant.savedSuccessfullyText);
+    SnackBarWidget.snackBarWidget(
+      context: context,
+      message: Constant.savedSuccessfullyText,
+    );
     Routes.navigateToDashboard(context: context);
   }
 
@@ -124,23 +140,24 @@ class _CustomerConformationViewState extends ConsumerState<CustomerConformationV
       _isloading = false;
     });
 
-    _alertDilog(
-      title: "Error",
-      content: Constant.contactAlreadyExistMessage,
-    );
+    _alertDilog(title: "Error", content: Constant.contactAlreadyExistMessage);
   }
 
   void _save() async {
     setState(() => _isloading = true);
 
     /// already Existing mobile number present check [error]
-    final List<String> customerNumbers = await ref.read(asyncCustomersProvider.notifier).fetchAllCustomersNumbers();
+    final List<String> customerNumbers = await ref
+        .read(asyncCustomersProvider.notifier)
+        .fetchAllCustomersNumbers();
     if (customerNumbers.contains(widget.mobileNumber) == false) {
       final String presentDateTime = DateTime.now().toString();
       final takenAmount = widget.takenAmount;
 
       // creating the new customer
-      final int customerCreatedResponse = await ref.read(asyncCustomersContactsProvider.notifier).addCustomer(
+      final int customerCreatedResponse = await ref
+          .read(asyncCustomersContactsProvider.notifier)
+          .addCustomer(
             customer: Customer(
               userID: 1, //? later updates if there are more users
               name: widget.customerName,
@@ -154,41 +171,51 @@ class _CustomerConformationViewState extends ConsumerState<CustomerConformationV
           );
       if (customerCreatedResponse != 0) {
         // creating new item becacuse every new transaction will have a proof item
-        final int itemCreatedResponse = await ref.read(asyncItemsProvider.notifier).addItem(
-                item: Items(
-              customerid: customerCreatedResponse,
-              name: widget.itemDescription,
-              description: widget.itemDescription,
-              pawnedDate: widget.takenDate,
-              expiryDate: presentDateTime,
-              pawnAmount: takenAmount,
-              status: Constant.active,
-              photo: ref.read(pickedCustomerItemImageStringProvider),
-              createdDate: presentDateTime,
-            ));
-        if (itemCreatedResponse != 0) {
-          // creating new transaction
-          final int transactionCreatedResponse = await ref.read(asyncTransactionsProvider.notifier).addTransaction(
-                  transaction: Trx(
-                customerId: customerCreatedResponse,
-                itemId: itemCreatedResponse,
-                transacrtionDate: widget.takenDate,
-                transacrtionType: Constant.active,
-                amount: takenAmount,
-                intrestRate: widget.rateOfIntrest,
-                intrestAmount: (widget.takenAmount * widget.rateOfIntrest) / 100,
-                remainingAmount: 0,
+        final int itemCreatedResponse = await ref
+            .read(asyncItemsProvider.notifier)
+            .addItem(
+              item: Items(
+                customerid: customerCreatedResponse,
+                name: widget.itemDescription,
+                description: widget.itemDescription,
+                pawnedDate: widget.takenDate,
+                expiryDate: presentDateTime,
+                pawnAmount: takenAmount,
+                status: Constant.active,
+                photo: ref.read(pickedCustomerItemImageStringProvider),
                 createdDate: presentDateTime,
-              ));
-          if (transactionCreatedResponse != 0) {
-            //! saving signature to the storage
-            // Utility.saveSignaturesInStorage(
-            //   signatureGlobalKey: _signatureGlobalKey,
-            //   imageName: transactionCreatedResponse.toString(),
-            // );
+              ),
+            );
+        if (itemCreatedResponse != 0) {
+          final String signatureResponse =
+              await Utility.saveSignaturesInStorage(
+                signatureController: _signatureGlobalKey,
+                imageName: itemCreatedResponse.toString(),
+              );
 
+          // creating new transaction
+          final int transactionCreatedResponse = await ref
+              .read(asyncTransactionsProvider.notifier)
+              .addTransaction(
+                transaction: Trx(
+                  customerId: customerCreatedResponse,
+                  itemId: itemCreatedResponse,
+                  transacrtionDate: widget.takenDate,
+                  transacrtionType: Constant.active,
+                  amount: takenAmount,
+                  intrestRate: widget.rateOfIntrest,
+                  intrestAmount:
+                      (widget.takenAmount * widget.rateOfIntrest) / 100,
+                  remainingAmount: 0,
+                  signature: signatureResponse,
+                  createdDate: presentDateTime,
+                ),
+              );
+          if (transactionCreatedResponse != 0) {
             // creating history
-            final int historyResponse = await ref.read(asyncHistoryProvider.notifier).addHistory(
+            final int historyResponse = await ref
+                .read(asyncHistoryProvider.notifier)
+                .addHistory(
                   history: UserHistory(
                     userID: 1,
                     customerID: customerCreatedResponse,
@@ -221,10 +248,7 @@ class _CustomerConformationViewState extends ConsumerState<CustomerConformationV
     String appCurrency = ref.watch(currencyProvider);
     return Scaffold(
       appBar: AppBar(
-        title: BodySmallText(
-          text: "Customer conformation",
-          bold: true,
-        ),
+        title: BodySmallText(text: "Customer conformation", bold: true),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.getPrimaryColor,
@@ -244,14 +268,39 @@ class _CustomerConformationViewState extends ConsumerState<CustomerConformationV
               child: Column(
                 children: [
                   _buildImagePickers(),
-                  _buildListTile(title: Constant.customerName, data: widget.customerName),
-                  _buildListTile(title: Constant.guardianName, data: widget.gaurdianName),
-                  _buildListTile(title: Constant.customerAddress, data: widget.address),
-                  _buildListTile(title: Constant.mobileNumber, data: widget.mobileNumber),
-                  _buildListTile(title: Constant.takenDate, data: widget.takenDate),
-                  _buildListTile(title: Constant.takenAmount, data: "${widget.takenAmount} $appCurrency"),
-                  _buildListTile(title: Constant.rateOfIntrest, data: widget.rateOfIntrest.toString()),
-                  _buildListTile(title: Constant.itemDescription, data: widget.itemDescription),
+                  _buildListTile(
+                    title: Constant.customerName,
+                    data: widget.customerName,
+                  ),
+                  _buildListTile(
+                    title: Constant.guardianName,
+                    data: widget.gaurdianName,
+                  ),
+                  _buildListTile(
+                    title: Constant.customerAddress,
+                    data: widget.address,
+                  ),
+                  _buildListTile(
+                    title: Constant.mobileNumber,
+                    data: widget.mobileNumber,
+                  ),
+                  _buildListTile(
+                    title: Constant.takenDate,
+                    data: widget.takenDate,
+                  ),
+                  _buildListTile(
+                    title: Constant.takenAmount,
+                    data: "${widget.takenAmount} $appCurrency",
+                  ),
+                  _buildListTile(
+                    title: Constant.rateOfIntrest,
+                    data: widget.rateOfIntrest.toString(),
+                  ),
+                  _buildListTile(
+                    title: Constant.itemDescription,
+                    data: widget.itemDescription,
+                  ),
+                  SignatureWidget(controller: _signatureGlobalKey),
                 ],
               ),
             ),
