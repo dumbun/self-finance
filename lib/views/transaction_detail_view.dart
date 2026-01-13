@@ -110,7 +110,9 @@ class TransactionDetailView extends StatelessWidget {
   Consumer _buildPaymentButton() {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
-        final payments = ref.watch(paymentsProvider(transacrtion.id!));
+        final List<Payment> payments = ref.watch(
+          paymentsProvider(transacrtion.id!),
+        );
         final transactionsProvider = ref.watch(
           asyncRequriedTransactionsProvider(transacrtion.id!),
         );
@@ -190,42 +192,6 @@ class TransactionDetailView extends StatelessWidget {
       ),
     );
   }
-
-  // //! Signature button if needed for update
-  // FutureBuilder<Directory> _buildShowSignatureButton() {
-  //   return FutureBuilder<Directory>(
-  //     future: getApplicationDocumentsDirectory(),
-  //     builder: (BuildContext context, AsyncSnapshot<Directory> snapshot) {
-  //       if (snapshot.hasError) {
-  //         return const Text("error");
-  //       } else if (snapshot.connectionState == ConnectionState.waiting) {
-  //         return const CircularProgressIndicator.adaptive();
-  //       } else {
-  //         if (File(
-  //               '${snapshot.data!.path}/signatures/${transacrtion.id!}.png',
-  //             ).existsSync() ==
-  //             true) {
-  //           File? f = File(
-  //             '${snapshot.data!.path}/signatures/${transacrtion.id!}.png',
-  //           );
-  //           return _buildCard(
-  //             onTap: () => Routes.navigateToImageView(
-  //               context: context,
-  //               imageWidget: Image.file(f),
-  //               titile: "Signature",
-  //             ),
-  //             title: "Signature",
-  //             data: "Show",
-  //             icon: Icons.topic_outlined,
-  //             trailingIcon: Icons.app_registration_sharp,
-  //           );
-  //         } else {
-  //           return const SizedBox.shrink();
-  //         }
-  //       }
-  //     },
-  //   );
-  // }
 
   Consumer _buildTransactionDetails() {
     return Consumer(
