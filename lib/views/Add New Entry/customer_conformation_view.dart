@@ -22,7 +22,7 @@ import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:self_finance/widgets/signature_widget.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
-import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
+import 'package:signature/signature.dart';
 
 class CustomerConformationView extends ConsumerStatefulWidget {
   final String customerName;
@@ -53,11 +53,16 @@ class CustomerConformationView extends ConsumerStatefulWidget {
 
 class _CustomerConformationViewState
     extends ConsumerState<CustomerConformationView> {
-  final GlobalKey<SfSignaturePadState> _signatureGlobalKey = GlobalKey();
+  final SignatureController _signatureGlobalKey = SignatureController(
+    penColor: Colors.black,
+    exportPenColor: Colors.black,
+    exportBackgroundColor: Colors.white,
+    penStrokeWidth: 5,
+  );
 
   @override
   void dispose() {
-    _signatureGlobalKey.currentState?.dispose();
+    _signatureGlobalKey.dispose();
     super.dispose();
   }
 
@@ -184,7 +189,7 @@ class _CustomerConformationViewState
         if (itemCreatedResponse != 0) {
           final String signatureResponse =
               await Utility.saveSignaturesInStorage(
-                signatureGlobalKey: _signatureGlobalKey,
+                signatureController: _signatureGlobalKey,
                 imageName: itemCreatedResponse.toString(),
               );
 
@@ -295,7 +300,7 @@ class _CustomerConformationViewState
                     title: Constant.itemDescription,
                     data: widget.itemDescription,
                   ),
-                  SignatureWidget(signatureGlobalKey: _signatureGlobalKey),
+                  SignatureWidget(controller: _signatureGlobalKey),
                 ],
               ),
             ),

@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
-import 'dart:ui' as ui;
 
 import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -16,7 +14,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/utility/image_catch_manager.dart';
-import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
+import 'package:signature/signature.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -211,34 +209,34 @@ class Utility {
   }
 
   static Future<String> saveSignaturesInStorage({
-    required GlobalKey<SfSignaturePadState> signatureGlobalKey,
+    required SignatureController signatureController,
     required String imageName,
   }) async {
-    List<Path> paths = signatureGlobalKey.currentState!.toPathList();
+    // [saveSignaturesInStorage] returns the path of the file in a future String
     // checks wether the signature pad is empty
     try {
-      if (paths.isNotEmpty) {
-        final ui.Image data = await signatureGlobalKey.currentState!.toImage(
-          pixelRatio: 3.0,
+      if (signatureController.isNotEmpty) {
+        final Uint8List? bytes = await signatureController.toPngBytes(
+          height: 300,
+          width: 300,
         );
-        final ByteData? bytes = await data.toByteData(
-          format: ui.ImageByteFormat.png,
-        );
-        if (bytes != null && signatureGlobalKey.currentState != null) {
-          Directory applictionDocumentDirectory =
+        if (bytes != null && signatureController.isNotEmpty) {
+          final Directory applicationDocumentDirectory =
               await getApplicationDocumentsDirectory();
-          String path = applictionDocumentDirectory.path;
+          String path = applicationDocumentDirectory.path;
           // create directory on external storage
           await Directory('$path/signatures').create(recursive: true);
-          String fullPath = '$path/signatures/$imageName.png';
-          File(fullPath).writeAsBytesSync(bytes.buffer.asInt8List());
+          String fullPath =
+              '$path/signatures/signature_itemid_${imageName}_${DateTime.now().millisecondsSinceEpoch}.png';
+          final File file = File(fullPath);
+          await file.writeAsBytes(bytes, flush: true);
           return fullPath;
         }
       }
       return "";
     } catch (e) {
       SnackBar(content: Text(e.toString()));
-      return "";
+      rethrow;
     }
   }
 }

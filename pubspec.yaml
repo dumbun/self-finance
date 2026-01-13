@@ -36,7 +36,7 @@ dependencies:
   package_info_plus: ^9.0.0
   permission_handler: ^12.0.1
   path: ^1.9.1
-  syncfusion_flutter_signaturepad: ^31.2.18
+  signature: ^6.3.0
   
 
 dev_dependencies:

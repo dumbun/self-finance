@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/widgets/signature_widget.dart';
-import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
+import 'package:signature/signature.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/fonts/body_text.dart';
@@ -43,7 +43,12 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   final TextEditingController _transacrtionDate = TextEditingController();
   final TextEditingController _description = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final GlobalKey<SfSignaturePadState> _signatureGlobalKey = GlobalKey();
+  final SignatureController _signatureController = SignatureController(
+    penColor: Colors.black,
+    exportPenColor: Colors.black,
+    exportBackgroundColor: Colors.white,
+    penStrokeWidth: 5,
+  );
 
   bool _isloading = false;
 
@@ -53,7 +58,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
     _rateOfIntrest.dispose();
     _transacrtionDate.dispose();
     _description.dispose();
-    _signatureGlobalKey.currentState?.dispose();
+    _signatureController.dispose();
     super.dispose();
   }
 
@@ -85,7 +90,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                 children: [
                   SizedBox(height: 12.sp),
                   InputTextField(
-                    validator: (value) =>
+                    validator: (String? value) =>
                         Utility.amountValidation(value: value),
                     keyboardType: TextInputType.number,
                     hintText: Constant.takenAmount,
@@ -93,7 +98,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                   ),
                   SizedBox(height: 20.sp),
                   InputTextField(
-                    validator: (value) =>
+                    validator: (String? value) =>
                         Utility.amountValidation(value: value),
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
@@ -120,7 +125,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
 
                   //! Signature Widget that stores signatures on a app data
                   SizedBox(height: 30.sp),
-                  SignatureWidget(signatureGlobalKey: _signatureGlobalKey),
+                  SignatureWidget(controller: _signatureController),
 
                   SizedBox(height: 30.sp),
                   Hero(
@@ -181,7 +186,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
       if (itemId != 0) {
         //saving signature to the storage
         final String signaturePath = await Utility.saveSignaturesInStorage(
-          signatureGlobalKey: _signatureGlobalKey,
+          signatureController: _signatureController,
           imageName: itemId.toString(),
         );
 
@@ -249,16 +254,16 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
       child: Padding(
         padding: EdgeInsets.all(14.sp),
         child: Consumer(
-          builder: (context, ref, child) {
+          builder: (BuildContext context, WidgetRef ref, Widget? child) {
             final String newItemImageString = ref.watch(newItemImageProvider);
             return GestureDetector(
               onTap: () async {
                 try {
-                  await Utility.pickImageFromCamera().then((value) {
+                  await Utility.pickImageFromCamera().then((String value) {
                     if (value != "" && value.isNotEmpty) {
                       ref
                           .read(newItemImageProvider.notifier)
-                          .update((state) => value);
+                          .update((String state) => value);
                     }
                   });
                 } catch (e) {
