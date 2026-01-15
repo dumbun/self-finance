@@ -225,9 +225,9 @@ class Utility {
               await getApplicationDocumentsDirectory();
           String path = applicationDocumentDirectory.path;
           // create directory on external storage
-          await Directory('$path/signatures').create(recursive: true);
+          await Directory('$path/Images/signatures').create(recursive: true);
           String fullPath =
-              '$path/signatures/signature_itemid_${imageName}_${DateTime.now().millisecondsSinceEpoch}.png';
+              '$path/Images/signatures/signature_itemid_${imageName}_${DateTime.now().millisecondsSinceEpoch}_${DateTime.now()}.png';
           final File file = File(fullPath);
           await file.writeAsBytes(bytes, flush: true);
           return fullPath;

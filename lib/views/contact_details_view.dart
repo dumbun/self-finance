@@ -1,7 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
@@ -14,7 +15,6 @@ import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
-import 'package:self_finance/utility/image_catch_manager.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/call_button_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
@@ -42,28 +42,32 @@ class ContactDetailsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     void delateTheContact() {
-      ref.read(asyncCustomersContactsProvider.notifier).deleteCustomer(customerID: customerID);
+      ref
+          .read(asyncCustomersContactsProvider.notifier)
+          .deleteCustomer(customerID: customerID);
       Navigator.of(context).pop();
     }
 
-    void navigateToEditingPage(Customer c) {
-      Routes.navigateToContactEditingView(context: context, contact: c);
-    }
-
-    void preEditingSettings() async {
-      final List<Customer> response = await BackEnd.fetchSingleContactDetails(id: customerID);
-      ref.read(updatedCustomerPhotoStringProvider.notifier).state = response.first.photo;
-      ref.read(updatedCustomerProofStringProvider.notifier).state = response.first.proof;
-      navigateToEditingPage(response.first);
+    void editSelected() async {
+      Routes.navigateToContactEditingView(
+        ref: ref,
+        context: context,
+        customerID: customerID,
+      );
     }
 
     void popUpMenuSelected(String value) async {
       switch (value) {
         case '1':
-          preEditingSettings();
+          editSelected();
           break;
         case '2':
-          if (await AlertDilogs.alertDialogWithTwoAction(context, "Alert", Constant.contactDeleteMessage) == 1) {
+          if (await AlertDilogs.alertDialogWithTwoAction(
+                context,
+                "Alert",
+                Constant.contactDeleteMessage,
+              ) ==
+              1) {
             delateTheContact();
           }
           break;
@@ -77,9 +81,12 @@ class ContactDetailsView extends ConsumerWidget {
       length: 2,
       child: Scaffold(
         floatingActionButton: Fab(
-          icon:   Icons.add,
+          icon: Icons.add,
           heroTag: Constant.saveButtonTag,
-          onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(context: context, customerID: customerID),
+          onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(
+            context: context,
+            customerID: customerID,
+          ),
         ),
         appBar: AppBar(
           forceMaterialTransparency: true,
@@ -131,19 +138,25 @@ class ContactDetailsView extends ConsumerWidget {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
         final String currencyType = ref.watch(currencyProvider);
-        return ref.watch(asyncTransactionsProvider).when(
+        return ref
+            .watch(asyncTransactionsProvider)
+            .when(
               data: (List<Trx> data) {
-                final List<Trx> transactions = data.where((Trx element) => element.customerId == customerID).toList();
+                final List<Trx> transactions = data
+                    .where((Trx element) => element.customerId == customerID)
+                    .toList();
                 return transactions.isNotEmpty
                     ? ListView.separated(
                         itemCount: transactions.length,
-                        separatorBuilder: (BuildContext context, int index) => SizedBox(height: 12.sp),
+                        separatorBuilder: (BuildContext context, int index) =>
+                            SizedBox(height: 12.sp),
                         itemBuilder: (BuildContext context, int index) {
                           return GestureDetector(
-                            onTap: () => Routes.navigateToTransactionDetailsView(
-                              transacrtion: transactions[index],
-                              context: context,
-                            ),
+                            onTap: () =>
+                                Routes.navigateToTransactionDetailsView(
+                                  transacrtion: transactions[index],
+                                  context: context,
+                                ),
                             child: Card(
                               child: Padding(
                                 padding: EdgeInsets.all(16.sp),
@@ -154,30 +167,38 @@ class ContactDetailsView extends ConsumerWidget {
                                     Icon(
                                       Icons.circle,
                                       size: 24.sp,
-                                      color: transactions[index].transacrtionType == Constant.active
+                                      color:
+                                          transactions[index]
+                                                  .transacrtionType ==
+                                              Constant.active
                                           ? AppColors.getGreenColor
                                           : AppColors.getErrorColor,
                                     ),
                                     SizedBox(width: 18.sp),
                                     Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         BodyOneDefaultText(
                                           text:
                                               "${Constant.takenAmount}: ${Utility.doubleFormate(transactions[index].amount)} $currencyType",
                                         ),
                                         BodyOneDefaultText(
-                                          text: "${Constant.takenDateSmall}: ${transactions[index].transacrtionDate}",
+                                          text:
+                                              "${Constant.takenDateSmall}: ${transactions[index].transacrtionDate}",
                                         ),
                                         BodyOneDefaultText(
-                                          text: "${Constant.rateOfIntrest}: ${transactions[index].intrestRate}",
+                                          text:
+                                              "${Constant.rateOfIntrest}: ${transactions[index].intrestRate}",
                                         ),
                                         BodyTwoDefaultText(
-                                          text: transactions[index].transacrtionType,
+                                          text: transactions[index]
+                                              .transacrtionType,
                                         ),
                                       ],
-                                    )
+                                    ),
                                   ],
                                 ),
                               ),
@@ -192,11 +213,12 @@ class ContactDetailsView extends ConsumerWidget {
                       );
               },
               error: (Object error, StackTrace stackTrace) => const Center(
-                child: BodyOneDefaultText(text: Constant.errorFetchingTransactionMessage),
+                child: BodyOneDefaultText(
+                  text: Constant.errorFetchingTransactionMessage,
+                ),
               ),
-              loading: () => const Center(
-                child: CircularProgressIndicator.adaptive(),
-              ),
+              loading: () =>
+                  const Center(child: CircularProgressIndicator.adaptive()),
             );
       },
     );
@@ -205,9 +227,14 @@ class ContactDetailsView extends ConsumerWidget {
   Consumer _buildCustomerDetails() {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
-        return ref.watch(asyncCustomersProvider).when(
+        return ref
+            .watch(asyncCustomersProvider)
+            .when(
               data: (List<Customer> data) {
-                final Customer customer = data.where((Customer element) => element.id! == customerID).toList().first;
+                final Customer customer = data
+                    .where((Customer element) => element.id! == customerID)
+                    .toList()
+                    .first;
                 return Stack(
                   children: [
                     Align(
@@ -218,6 +245,7 @@ class ContactDetailsView extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             SizedBox(height: 20.sp),
+
                             _buildImage(customer.photo, customer.name),
                             SizedBox(height: 16.sp),
 
@@ -260,7 +288,7 @@ class ContactDetailsView extends ConsumerWidget {
                               GestureDetector(
                                 onTap: () => Routes.navigateToImageView(
                                   context: context,
-                                  imageWidget: ImageCacheManager.getCachedImage(customer.proof, 44.sp, 44.sp),
+                                  imageWidget: Image.file(File(customer.proof)),
                                   titile: "${customer.name} proof",
                                 ),
                                 child: Card(
@@ -268,8 +296,10 @@ class ContactDetailsView extends ConsumerWidget {
                                   child: Padding(
                                     padding: EdgeInsets.all(14.sp),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         SizedBox(width: 12.sp),
                                         const Icon(
@@ -296,14 +326,17 @@ class ContactDetailsView extends ConsumerWidget {
                         text: "customer created on ${(customer.createdDate)}",
                         color: AppColors.getLigthGreyColor,
                       ),
-                    )
+                    ),
                   ],
                 );
               },
               error: (Object error, StackTrace stackTrace) => const Center(
-                child: BodyOneDefaultText(text: Constant.errorFetchingContactMessage),
+                child: BodyOneDefaultText(
+                  text: Constant.errorFetchingContactMessage,
+                ),
               ),
-              loading: () => const Center(child: CircularProgressIndicator.adaptive()),
+              loading: () =>
+                  const Center(child: CircularProgressIndicator.adaptive()),
             );
       },
     );
@@ -322,7 +355,9 @@ class ContactDetailsView extends ConsumerWidget {
             icon,
             SizedBox(width: 20.sp),
             Column(
-              mainAxisAlignment: title.isNotEmpty ? MainAxisAlignment.start : MainAxisAlignment.center,
+              mainAxisAlignment: title.isNotEmpty
+                  ? MainAxisAlignment.start
+                  : MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (title.isNotEmpty)
@@ -365,7 +400,7 @@ class ContactDetailsView extends ConsumerWidget {
                   SizedBox(height: 8.sp),
                   SelectableTextWidget(data: customerNumber),
                 ],
-              )
+              ),
             ],
           ),
         ),
@@ -395,10 +430,7 @@ class ContactDetailsView extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            color: iconColor,
-          ),
+          Icon(icon, color: iconColor),
           SizedBox(width: 18.sp),
           BodyTwoDefaultText(text: title),
           SizedBox(width: 18.sp),

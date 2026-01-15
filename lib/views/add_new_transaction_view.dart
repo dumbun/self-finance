@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/utility/image_saving_utility.dart';
 import 'package:self_finance/widgets/signature_widget.dart';
+import 'package:self_finance/widgets/test_image_picker_widget.dart';
 import 'package:signature/signature.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
@@ -121,7 +121,12 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                     controller: _description,
                   ),
                   SizedBox(height: 30.sp),
-                  _buildItemImagePicker(),
+                  // _buildItemImagePicker(),
+                  TestImagePickerWidget(
+                    imageProvier: itemProvider,
+                    title: 'items',
+                    defaultImage: Constant.defaultItemImagePath,
+                  ),
 
                   //! Signature Widget that stores signatures on a app data
                   SizedBox(height: 30.sp),
@@ -168,6 +173,10 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
       );
       final String presentDate = DateTime.now().toString();
       _isloading = true;
+      final String itemImagePath = await ImageSavingUtility.saveImage(
+        location: 'items',
+        image: ref.read(itemProvider),
+      );
       final int itemId = await ref
           .read(asyncItemsProvider.notifier)
           .addItem(
@@ -179,7 +188,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
               expiryDate: presentDate,
               pawnAmount: _doubleCheck(_amount.text),
               status: Constant.active,
-              photo: ref.read(newItemImageProvider),
+              photo: itemImagePath,
               createdDate: DateTime.now().toString(),
             ),
           );
@@ -246,49 +255,6 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
       context,
       Constant.error,
       Constant.errorAddingTransaction,
-    );
-  }
-
-  Widget _buildItemImagePicker() {
-    return Card(
-      child: Padding(
-        padding: EdgeInsets.all(14.sp),
-        child: Consumer(
-          builder: (BuildContext context, WidgetRef ref, Widget? child) {
-            final String newItemImageString = ref.watch(newItemImageProvider);
-            return GestureDetector(
-              onTap: () async {
-                try {
-                  await Utility.pickImageFromCamera().then((String value) {
-                    if (value != "" && value.isNotEmpty) {
-                      ref
-                          .read(newItemImageProvider.notifier)
-                          .update((String state) => value);
-                    }
-                  });
-                } catch (e) {
-                  //
-                }
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  newItemImageString.isNotEmpty
-                      ? Utility.imageFromBase64String(newItemImageString)
-                      : SvgPicture.asset(
-                          height: 28.sp,
-                          width: 28.sp,
-                          Constant.defaultItemImagePath,
-                        ),
-                  SizedBox(height: 12.sp),
-                  const BodyOneDefaultText(text: Constant.customerItem),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
     );
   }
 }

@@ -1,10 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
-import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/utility/image_saving_utility.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 
 class UserImageUpdateWidget extends ConsumerWidget {
@@ -30,18 +32,25 @@ class UserImageUpdateWidget extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        Utility.pickImageFromCamera().then((value) {
-                          if (value != "" && value.isNotEmpty) {
-                            ref
-                                .read(asyncUserProvider.notifier)
-                                .updateUserProfile(
-                                  userId: 1,
-                                  updatedImageString: value,
-                                );
-                          }
-                        });
-                        Navigator.of(context).pop();
+                      onTap: () async {
+                        final String newImagePath =
+                            await ImageSavingUtility.saveImage(
+                              location: 'user',
+                              image: await ImageSavingUtility.doPickImage(
+                                camera: true,
+                              ),
+                            );
+                        if (newImagePath.isNotEmpty) {
+                          ref
+                              .read(asyncUserProvider.notifier)
+                              .updateUserProfile(
+                                userId: 1,
+                                updatedImageString: newImagePath,
+                              );
+                        }
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
                       },
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -53,18 +62,26 @@ class UserImageUpdateWidget extends ConsumerWidget {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () {
-                        Utility.pickImageFromGallery().then((value) {
-                          if (value != "" && value.isNotEmpty) {
-                            ref
-                                .read(asyncUserProvider.notifier)
-                                .updateUserProfile(
-                                  userId: 1,
-                                  updatedImageString: value,
-                                );
-                          }
-                        });
-                        Navigator.of(context).pop();
+                      onTap: () async {
+                        final String newImagePath =
+                            await ImageSavingUtility.saveImage(
+                              location: 'user',
+                              image: await ImageSavingUtility.doPickImage(
+                                camera: false,
+                              ),
+                            );
+                        if (newImagePath.isNotEmpty) {
+                          ref
+                              .read(asyncUserProvider.notifier)
+                              .updateUserProfile(
+                                userId: 1,
+                                updatedImageString: newImagePath,
+                              );
+                        }
+
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
                       },
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -91,10 +108,18 @@ class UserImageUpdateWidget extends ConsumerWidget {
                 alignment: Alignment.topCenter,
                 child: userImageString.isEmpty
                     ? DefaultUserImage(width: 46.sp, height: 46.sp)
-                    : SizedBox(
-                        height: 46.sp,
-                        width: 46.sp,
-                        child: Utility.imageFromBase64String(userImageString),
+                    : ClipRRect(
+                        borderRadius: BorderRadiusGeometry.all(
+                          Radius.circular(100.sp),
+                        ),
+                        child: SizedBox(
+                          height: 46.sp,
+                          width: 46.sp,
+                          child: Image.file(
+                            File(userImageString),
+                            fit: BoxFit.fill,
+                          ),
+                        ),
                       ),
               ),
               Align(

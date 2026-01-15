@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history.dart';
+import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/views/Add%20New%20Entry/customer_conformation_view.dart';
 import 'package:self_finance/views/Add%20New%20Entry/customer_lone_entry_view.dart';
 import 'package:self_finance/views/add_new_transaction_view.dart';
@@ -94,14 +96,20 @@ class Routes {
 
   static void navigateToContactEditingView({
     required BuildContext context,
-    required Customer contact,
-  }) {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => ContactEditingView(contact: contact),
-      ),
-      (route) => true,
-    );
+    required int customerID,
+    required WidgetRef ref,
+  }) async {
+    final List<Customer> customer = await ref
+        .read(asyncCustomersProvider.notifier)
+        .fetchRequriedCustomerDetails(customerID: customerID);
+    if (context.mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => ContactEditingView(contact: customer.first),
+        ),
+        (route) => true,
+      );
+    }
   }
 
   static void navigateToContactDetailsView(

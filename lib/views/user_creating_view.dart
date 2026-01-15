@@ -1,13 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
-import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/utility/image_saving_utility.dart';
 import 'package:self_finance/widgets/currency_type_input_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
@@ -29,30 +32,39 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nameInput = TextEditingController();
   final TextEditingController _currencyInput = TextEditingController();
-  Widget? pickedItemImage;
 
   @override
   void dispose() {
     _nameInput.dispose();
+    _currencyInput.dispose();
     super.dispose();
   }
 
   /// navigates to the main Dashboard view
   void _navigateToDashboard() {
     Routes.navigateToDashboard(context: context);
-    SnackBarWidget.snackBarWidget(context: context, message: "success : user created successfully ");
+    SnackBarWidget.snackBarWidget(
+      context: context,
+      message: "success : user created successfully ",
+    );
   }
 
   /// to show errors if avilable
   void _showAlerts() {
-    AlertDilogs.alertDialogWithOneAction(context, "error", 'Please try after some time');
+    AlertDilogs.alertDialogWithOneAction(
+      context,
+      "error",
+      'Please try after some time',
+    );
   }
 
   /// to create user [createUser]
   void _createUser(User user) async {
     if (_validateAndSave()) {
       try {
-        final bool result = await ref.read(asyncUserProvider.notifier).addUser(user: user);
+        final bool result = await ref
+            .read(asyncUserProvider.notifier)
+            .addUser(user: user);
         result ? _navigateToDashboard() : _showAlerts();
       } catch (e) {
         _showAlerts();
@@ -70,25 +82,19 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
     }
   }
 
+  XFile? pickedImageFile;
+
   Widget _buildImagePickWidget() {
     return GestureDetector(
-      onTap: () {
-        Utility.pickImageFromGallery().then(
-          (String value) {
-            if (value != "" && value.isNotEmpty) {
-              setState(
-                () {
-                  userProfilePicString = value;
-                  pickedItemImage = Utility.imageFromBase64String(
-                    value,
-                    height: height,
-                    width: width,
-                  );
-                },
-              );
-            }
-          },
+      onTap: () async {
+        final XFile? imageFile = await ImageSavingUtility.doPickImage(
+          camera: false,
         );
+        if (imageFile != null) {
+          setState(() {
+            pickedImageFile = imageFile;
+          });
+        }
       },
       child: SizedBox(
         height: height,
@@ -98,12 +104,15 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
             Align(
               alignment: Alignment.center,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.sp),
-                child: pickedItemImage ??
-                    DefaultUserImage(
-                      height: height,
-                      width: width,
-                    ),
+                borderRadius: BorderRadius.circular(100.sp),
+                child: pickedImageFile == null
+                    ? DefaultUserImage(height: height, width: width)
+                    : Image.file(
+                        File(pickedImageFile!.path),
+                        height: height,
+                        width: width,
+                        fit: BoxFit.fill,
+                      ),
               ),
             ),
             Align(
@@ -143,9 +152,7 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
                       keyboardType: TextInputType.name,
                     ),
                     SizedBox(height: 24.sp),
-                    CurrencyTypeInputWidget(
-                      controller: _currencyInput,
-                    ),
+                    CurrencyTypeInputWidget(controller: _currencyInput),
                     // const GoogleSignInButtonWidget(),
                   ],
                 ),
@@ -155,15 +162,21 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _createUser(
-          User(
-            id: 1,
-            userName: _nameInput.text,
-            userPin: widget.pin,
-            userCurrency: _currencyInput.text,
-            profilePicture: userProfilePicString,
-          ),
-        ),
+        onPressed: () async {
+          final String imagePath = await ImageSavingUtility.saveImage(
+            location: 'user',
+            image: pickedImageFile,
+          );
+          _createUser(
+            User(
+              id: 1,
+              userName: _nameInput.text,
+              userPin: widget.pin,
+              userCurrency: _currencyInput.text,
+              profilePicture: imagePath,
+            ),
+          );
+        },
         backgroundColor: AppColors.getPrimaryColor,
         enableFeedback: true,
         autofocus: true,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:screenshot/screenshot.dart';
+import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
@@ -11,12 +12,13 @@ import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history.dart';
 import 'package:self_finance/providers/app_currency_provider.dart';
+import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 
-class HistoryDetailedView extends ConsumerWidget {
+class HistoryDetailedView extends StatelessWidget {
   HistoryDetailedView({
     super.key,
     required this.customer,
@@ -47,8 +49,7 @@ class HistoryDetailedView extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final String appCurrency = ref.read(currencyProvider);
+  Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () =>
@@ -76,12 +77,19 @@ class HistoryDetailedView extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TitleWidget(
-                            color: history.eventType == Constant.debited
-                                ? AppColors.getErrorColor
-                                : AppColors.getGreenColor,
-                            text:
-                                '${history.eventType == Constant.debited ? '-' : '+'} ${Utility.doubleFormate(history.amount)} $appCurrency',
+                          Consumer(
+                            builder: (context, ref, child) {
+                              final String appCurrency = ref.watch(
+                                currencyProvider,
+                              );
+                              return TitleWidget(
+                                color: history.eventType == Constant.debited
+                                    ? AppColors.getErrorColor
+                                    : AppColors.getGreenColor,
+                                text:
+                                    '${history.eventType == Constant.debited ? '-' : '+'} ${Utility.doubleFormate(history.amount)} $appCurrency',
+                              );
+                            },
                           ),
                           GestureDetector(
                             onTap: () => Routes.navigateToContactDetailsView(
@@ -105,9 +113,30 @@ class HistoryDetailedView extends ConsumerWidget {
                       SizedBox(
                         height: 40.sp,
                         width: 40.sp,
-                        child: CircularImageWidget(
-                          imageData: customer.photo,
-                          titile: "${customer.name} photo",
+                        child: Consumer(
+                          builder: (context, ref, child) {
+                            ref.watch(asyncCustomersContactsProvider);
+                            return FutureBuilder(
+                              future: BackEnd.fetchSingleContactDetails(
+                                id: customer.id!,
+                              ),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const CircularProgressIndicator();
+                                } else if (snapshot.hasData &&
+                                    snapshot.data != null) {
+                                  return CircularImageWidget(
+                                    imageData: snapshot.data!.first.photo,
+                                    titile:
+                                        "${snapshot.data!.first.name} photo",
+                                  );
+                                } else {
+                                  return Text(snapshot.error.toString());
+                                }
+                              },
+                            );
+                          },
                         ),
                       ),
                     ],

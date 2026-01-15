@@ -16,12 +16,12 @@ import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/items_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/utility/image_saving_utility.dart';
 import 'package:self_finance/utility/user_utility.dart';
-import 'package:self_finance/views/Add%20New%20Entry/providers.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
-import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:self_finance/widgets/signature_widget.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
+import 'package:self_finance/widgets/test_image_picker_widget.dart';
 import 'package:signature/signature.dart';
 
 class CustomerConformationView extends ConsumerStatefulWidget {
@@ -84,26 +84,26 @@ class _CustomerConformationViewState
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
-              child: ImagePickerWidget(
-                text: Constant.customerPhoto,
+              child: TestImagePickerWidget(
+                imageProvier: imageProvider,
+                title: Constant.customerPhoto,
                 defaultImage: Constant.defaultProfileImagePath,
-                imageProvider: pickedCustomerProfileImageStringProvider,
               ),
             ),
             Expanded(
-              child: ImagePickerWidget(
-                text: Constant.customerProof,
+              child: TestImagePickerWidget(
+                imageProvier: proofProvider,
+                title: Constant.customerProof,
                 defaultImage: Constant.defaultProofImagePath,
-                imageProvider: pickedCustomerProofImageStringProvider,
               ),
             ),
           ],
         ),
         SizedBox(height: 10.sp),
-        ImagePickerWidget(
-          text: Constant.customerItem,
+        TestImagePickerWidget(
+          title: Constant.customerItem,
           defaultImage: Constant.defaultItemImagePath,
-          imageProvider: pickedCustomerItemImageStringProvider,
+          imageProvier: itemProvider,
         ),
       ],
     );
@@ -154,7 +154,19 @@ class _CustomerConformationViewState
       final String presentDateTime = DateTime.now().toString();
       final takenAmount = widget.takenAmount;
 
+      // saving image to storage
+      final String imagePath = await ImageSavingUtility.saveImage(
+        location: 'customers',
+        image: ref.read(imageProvider),
+      );
+
+      final String proofPath = await ImageSavingUtility.saveImage(
+        location: 'proofs',
+        image: ref.read(proofProvider),
+      );
+
       // creating the new customer
+
       final int customerCreatedResponse = await ref
           .read(asyncCustomersContactsProvider.notifier)
           .addCustomer(
@@ -164,13 +176,18 @@ class _CustomerConformationViewState
               guardianName: widget.gaurdianName,
               address: widget.address,
               number: widget.mobileNumber,
-              photo: ref.read(pickedCustomerProfileImageStringProvider),
-              proof: ref.read(pickedCustomerProofImageStringProvider),
+              photo: imagePath,
+              proof: proofPath,
               createdDate: presentDateTime,
             ),
           );
       if (customerCreatedResponse != 0) {
+        // Do image save
         // creating new item becacuse every new transaction will have a proof item
+        final String itemImagePath = await ImageSavingUtility.saveImage(
+          location: 'items',
+          image: ref.read(itemProvider),
+        );
         final int itemCreatedResponse = await ref
             .read(asyncItemsProvider.notifier)
             .addItem(
@@ -182,7 +199,7 @@ class _CustomerConformationViewState
                 expiryDate: presentDateTime,
                 pawnAmount: takenAmount,
                 status: Constant.active,
-                photo: ref.read(pickedCustomerItemImageStringProvider),
+                photo: itemImagePath,
                 createdDate: presentDateTime,
               ),
             );

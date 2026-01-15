@@ -8,7 +8,11 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 class ImageCacheManager {
   static final Map<String, Image> _imageCache = {};
 
-  static Image getCachedImage(String base64String, double? height, double? width) {
+  static Image getCachedImage(
+    String base64String,
+    double? height,
+    double? width,
+  ) {
     if (_imageCache.containsKey(base64String)) {
       final Image cachedImage = _imageCache[base64String]!;
       _reorderCache(base64String, cachedImage);

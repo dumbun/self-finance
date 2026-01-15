@@ -1,43 +1,113 @@
-// import 'dart:io';
-// import 'dart:typed_data';
-// import 'dart:ui' as ui;
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:self_finance/models/customer_model.dart';
+import 'package:uuid/uuid.dart';
 
-// import 'package:flutter/material.dart';
-// import 'package:image_picker/image_picker.dart';
-// import 'package:path_provider/path_provider.dart';
+class ImageSavingUtility {
+  static Future<XFile?> doPickImage({required bool camera}) async {
+    final ImagePicker picker = ImagePicker();
+    if (camera) {
+      return await picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 85,
+      );
+    } else {
+      return await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+      );
+    }
+  }
 
-// class ImageSavingUtility {
-//   //// Save Signature
-//   static void saveSignaturesInStorage({
-//     required GlobalKey<SfSignaturePadState> signatureGlobalKey,
-//     required String imageName,
-//   }) async {
-//     List<Path> paths = signatureGlobalKey.currentState!.toPathList();
-//     // checks wether the signature pad is empty
-//     if (paths.isNotEmpty) {
-//       final ui.Image data = await signatureGlobalKey.currentState!.toImage(pixelRatio: 3.0);
-//       final ByteData? bytes = await data.toByteData(format: ui.ImageByteFormat.png);
-//       if (bytes != null && signatureGlobalKey.currentState != null) {
-//         Directory applictionDocumentDirectory = await getApplicationDocumentsDirectory();
-//         String path = applictionDocumentDirectory.path;
-//         // create directory on external storage
-//         await Directory('$path/signature').create(recursive: true);
-//         File('$path/signature/$imageName.png').writeAsBytesSync(bytes.buffer.asInt8List());
-//       }
-//     }
-//   }
+  static Future<String> saveImage({
+    required String location,
+    XFile? image,
+  }) async {
+    // [captureAndSaveCustomerImage]
+    /*
+    This function:
+    1.Opens camera
+    2.Creates customers/{customerId} folder
+    3.Saves image with timestamp
+    4.Returns saved path
+   */
 
-// Save image
+    if (image == null) return "";
 
-//   static void saveImage({
-//     required String imageName,
-//     required String locationName,
-//     required XFile imageFile,
-//   }) async {
-//     Directory applictionDocumentDirectory = await getApplicationDocumentsDirectory();
-//     String path = applictionDocumentDirectory.path;
-//     // create directory on external storage
-//     await Directory('$path/$locationName').create(recursive: true);
-//     await imageFile.saveTo('$path/$locationName/$imageName');
-//   }
-// }
+    final Directory appDir = await getApplicationDocumentsDirectory();
+    final Directory locationPath = Directory('${appDir.path}/Images/$location');
+
+    if (!await locationPath.exists()) {
+      await locationPath.create(recursive: true);
+    }
+    var uuid = Uuid();
+    final String filePath =
+        '${locationPath.path}/photo_${DateTime.now().millisecondsSinceEpoch}_${uuid.v1()}_${DateTime.now()}.jpg';
+    final File savedImage = await File(image.path).copy(filePath);
+    return savedImage.path;
+  }
+
+  static Future<String> updateCustomerImage({
+    required Customer customer,
+    required bool camera,
+  }) async {
+    final XFile? newImage = await doPickImage(camera: camera);
+
+    if (newImage == null) return customer.photo;
+
+    final Directory appDir = await getApplicationDocumentsDirectory();
+    final Directory customerDir = Directory('${appDir.path}/Images/customers');
+
+    if (!await customerDir.exists()) {
+      await customerDir.create(recursive: true);
+    }
+
+    /// 🔥 Delete old image if exists
+    if (customer.photo.isNotEmpty) {
+      final oldFile = File(customer.photo);
+      if (await oldFile.exists()) {
+        await oldFile.delete();
+      }
+    }
+
+    /// 💾 Save new image
+    var uuid = Uuid();
+    final String newPath =
+        '${customerDir.path}/photo_${DateTime.now().millisecondsSinceEpoch}_${uuid.v1()}_${DateTime.now()}.jpg';
+    await File(newImage.path).copy(newPath);
+    return newPath;
+  }
+
+  static Future<String> updateCustomerProof({
+    required Customer customer,
+    required bool camera,
+  }) async {
+    final XFile? newImage = await doPickImage(camera: camera);
+
+    if (newImage == null) return customer.proof;
+
+    final Directory appDir = await getApplicationDocumentsDirectory();
+    final Directory customerDir = Directory('${appDir.path}/Images/proof');
+
+    if (!await customerDir.exists()) {
+      await customerDir.create(recursive: true);
+    }
+
+    /// 🔥 Delete old image if exists
+    if (customer.proof.isNotEmpty) {
+      final File oldFile = File(customer.proof);
+      if (await oldFile.exists()) {
+        await oldFile.delete();
+      }
+    }
+
+    /// 💾 Save new image
+    Uuid uuid = Uuid();
+    final String newPath =
+        '${customerDir.path}/photo_${DateTime.now().millisecondsSinceEpoch}_${uuid.v1()}_${DateTime.now()}.jpg';
+    await File(newImage.path).copy(newPath);
+
+    return newPath;
+  }
+}

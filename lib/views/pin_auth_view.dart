@@ -6,8 +6,8 @@ import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/strong_heading_one_text.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/theme/app_colors.dart';
-import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/app_icon.dart';
+import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
@@ -43,12 +43,11 @@ class _PinAuthViewState extends State<PinAuthView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      widget.userDate.first.profilePicture != ""
-                          ? Hero(
-                              tag: Constant.userProfileTag,
-                              child: Utility.imageFromBase64String(
-                                widget.userDate.first.profilePicture,
-                              ),
+                      widget.userDate.first.profilePicture != "" &&
+                              widget.userDate.first.profilePicture.isNotEmpty
+                          ? CircularImageWidget(
+                              imageData: widget.userDate.first.profilePicture,
+                              titile: Constant.userProfileTag,
                             )
                           : const AppIcon(),
                       SizedBox(height: 20.sp),
