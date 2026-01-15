@@ -5,6 +5,7 @@ import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_small_text.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/fonts/strong_heading_one_text.dart';
+import 'package:self_finance/utility/restore_utility.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
@@ -38,11 +39,22 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
                 _getCheckBoxWithDescription(),
                 _getPrivacyAndPolicyButton(),
                 _getNextButton(),
+                SizedBox(height: 16.sp),
+                _getRestoreButton(),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _getRestoreButton() {
+    return RoundedCornerButton(
+      text: "Restore",
+      onPressed: () {
+        RestoreUtility.restoreBackupFromZip();
+      },
     );
   }
 
@@ -103,33 +115,6 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
       ),
     );
   }
-
-  // Expanded _getTerms() {
-  //   List<Widget> result = [];
-
-  //   for (var element in TermsAndConditions.termsAndConditionsMap.entries) {
-  //     result.add(BodyTwoDefaultText(
-  //       text: element.key,
-  //       bold: true,
-  //     ));
-  //     result.add(SizedBox(height: 16.sp));
-  //     for (var element in element.value) {
-  //       result.add(BodyTwoDefaultText(
-  //         text: element,
-  //         color: AppColors.getLigthGreyColor,
-  //       ));
-  //       result.add(SizedBox(height: 16.sp));
-  //     }
-  //   }
-
-  //   return Expanded(
-  //     child: ListView.builder(
-  //       scrollDirection: Axis.vertical,
-  //       itemCount: result.length,
-  //       itemBuilder: (BuildContext context, int index) => result[index],
-  //     ),
-  //   );
-  // }
 
   InkWell _getCheckBoxWithDescription() {
     return InkWell(

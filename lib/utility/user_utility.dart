@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
 
@@ -6,14 +5,11 @@ import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/utility/image_catch_manager.dart';
 import 'package:signature/signature.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
@@ -82,29 +78,6 @@ class Utility {
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
-  static Widget imageFromBase64String(
-    String base64String, {
-    double? height,
-    double? width,
-  }) {
-    if (base64String.isNotEmpty) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(100.sp),
-        child: ImageCacheManager.getCachedImage(base64String, height, width),
-      );
-    } else {
-      return const SizedBox.shrink();
-    }
-  }
-
-  static Uint8List dataFromBase64String(String base64String) {
-    return base64Decode(base64String);
-  }
-
-  static String base64String(Uint8List data) {
-    return base64Encode(data);
-  }
-
   static String numberFormate(int number) {
     return NumberFormat('#,##0').format(number);
   }
@@ -142,40 +115,6 @@ class Utility {
     } else {
       return null;
     }
-  }
-
-  static Future<String> pickImageFromCamera() async {
-    final ImagePicker picker = ImagePicker();
-    String result = "";
-
-    final XFile? imgFile = await picker.pickImage(
-      source: ImageSource.camera,
-      imageQuality: 10,
-    );
-
-    if (imgFile != null) {
-      Uint8List imgBytes = Uint8List.fromList(await imgFile.readAsBytes());
-      result = Utility.base64String(imgBytes);
-    }
-
-    return result;
-  }
-
-  static Future<String> pickImageFromGallery() async {
-    final ImagePicker picker = ImagePicker();
-    String result = "";
-
-    final XFile? imgFile = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 25,
-    );
-
-    if (imgFile != null) {
-      Uint8List imgBytes = Uint8List.fromList(await imgFile.readAsBytes());
-      result = Utility.base64String(imgBytes);
-    }
-
-    return result;
   }
 
   static void screenShotShare(
