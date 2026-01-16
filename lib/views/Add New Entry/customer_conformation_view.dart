@@ -21,7 +21,7 @@ import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/signature_widget.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
-import 'package:self_finance/widgets/test_image_picker_widget.dart';
+import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:signature/signature.dart';
 
 class CustomerConformationView extends ConsumerStatefulWidget {
@@ -84,14 +84,14 @@ class _CustomerConformationViewState
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
-              child: TestImagePickerWidget(
+              child: ImagePickerWidget(
                 imageProvier: imageProvider,
                 title: Constant.customerPhoto,
                 defaultImage: Constant.defaultProfileImagePath,
               ),
             ),
             Expanded(
-              child: TestImagePickerWidget(
+              child: ImagePickerWidget(
                 imageProvier: proofProvider,
                 title: Constant.customerProof,
                 defaultImage: Constant.defaultProofImagePath,
@@ -100,7 +100,7 @@ class _CustomerConformationViewState
           ],
         ),
         SizedBox(height: 10.sp),
-        TestImagePickerWidget(
+        ImagePickerWidget(
           title: Constant.customerItem,
           defaultImage: Constant.defaultItemImagePath,
           imageProvier: itemProvider,

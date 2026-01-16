@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/utility/backup_utility.dart';
 
 /// Assumes backupImagesAndSqliteToDownloads is available in scope and
 /// has signature:
-/// Future<String> backupImagesAndSqliteToDownloads({ BackupProgressCallback? onProgress })
+/// Future->String backupImagesAndSqliteToDownloads({ BackupProgressCallback? onProgress })
 ///
 /// Where BackupProgressCallback = void Function(double progress, String currentFile);
 
@@ -162,9 +163,9 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Backup - Images & Database',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            const BodyOneDefaultText(
+              text: 'Backup - Images & Database',
+              bold: true,
             ),
             const SizedBox(height: 12),
 
@@ -254,22 +255,6 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  if (!_running && _zipPath != null) ...[
-                    TextButton.icon(
-                      icon: const Icon(Icons.folder_open),
-                      label: const Text('Open Folder'),
-                      onPressed: () {
-                        // Optionally implement opening the folder / share the file.
-                        // This placeholder just shows the path in a SnackBar.
-                        if (_zipPath != null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Backup file: $_zipPath')),
-                          );
-                        }
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                  ],
                   ElevatedButton.icon(
                     icon: Icon(
                       _running ? Icons.pause_circle_filled : Icons.cloud_upload,

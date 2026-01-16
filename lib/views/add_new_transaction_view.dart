@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/utility/image_saving_utility.dart';
 import 'package:self_finance/widgets/signature_widget.dart';
-import 'package:self_finance/widgets/test_image_picker_widget.dart';
+import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:signature/signature.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
@@ -122,7 +122,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                   ),
                   SizedBox(height: 30.sp),
                   // _buildItemImagePicker(),
-                  TestImagePickerWidget(
+                  ImagePickerWidget(
                     imageProvier: itemProvider,
                     title: 'items',
                     defaultImage: Constant.defaultItemImagePath,

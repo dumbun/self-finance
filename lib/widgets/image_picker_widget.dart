@@ -22,8 +22,8 @@ final AutoDisposeStateProvider<XFile?> itemProvider =
       return null;
     });
 
-class TestImagePickerWidget extends StatefulWidget {
-  const TestImagePickerWidget({
+class ImagePickerWidget extends StatelessWidget {
+  const ImagePickerWidget({
     super.key,
     required this.imageProvier,
     required this.title,
@@ -34,12 +34,6 @@ class TestImagePickerWidget extends StatefulWidget {
   final String defaultImage;
   final AutoDisposeStateProvider<XFile?> imageProvier;
 
-  @override
-  State<TestImagePickerWidget> createState() => _TestImagePickerWidgetState();
-}
-
-class _TestImagePickerWidgetState extends State<TestImagePickerWidget> {
-  XFile? pickedImage;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -74,12 +68,12 @@ class _TestImagePickerWidgetState extends State<TestImagePickerWidget> {
             children: [
               Consumer(
                 builder: (context, ref, child) {
-                  final XFile? image = ref.watch(widget.imageProvier);
+                  final XFile? image = ref.watch(imageProvier);
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(8.sp),
                     child: image == null
                         ? SvgPicture.asset(
-                            widget.defaultImage,
+                            defaultImage,
                             height: 28.sp,
                             width: 28.sp,
                           )
@@ -93,7 +87,7 @@ class _TestImagePickerWidgetState extends State<TestImagePickerWidget> {
                 },
               ),
               SizedBox(height: 10.sp),
-              BodyTwoDefaultText(text: widget.title, bold: true),
+              BodyTwoDefaultText(text: title, bold: true),
             ],
           ),
         ),
@@ -107,17 +101,13 @@ class _TestImagePickerWidgetState extends State<TestImagePickerWidget> {
         return GestureDetector(
           onTap: () async {
             if (title == "Remove") {
-              ref
-                  .read(widget.imageProvier.notifier)
-                  .update((XFile? state) => null);
+              ref.read(imageProvier.notifier).update((XFile? state) => null);
               Navigator.pop(context);
             } else if (title == "Camera") {
               final XFile? image = await ImageSavingUtility.doPickImage(
                 camera: true,
               );
-              ref
-                  .read(widget.imageProvier.notifier)
-                  .update((XFile? state) => image);
+              ref.read(imageProvier.notifier).update((XFile? state) => image);
               if (context.mounted) {
                 Navigator.pop(context);
               }
@@ -125,9 +115,7 @@ class _TestImagePickerWidgetState extends State<TestImagePickerWidget> {
               final XFile? image = await ImageSavingUtility.doPickImage(
                 camera: false,
               );
-              ref
-                  .read(widget.imageProvier.notifier)
-                  .update((XFile? state) => image);
+              ref.read(imageProvier.notifier).update((XFile? state) => image);
               if (context.mounted) {
                 Navigator.pop(context);
               }
