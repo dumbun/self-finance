@@ -52,7 +52,8 @@ class AsyncHistory extends _$AsyncHistory {
     final inputLower = givenInput.toLowerCase();
     final filteredData = historyData.where((UserHistory element) {
       return element.customerNumber.contains(inputLower) ||
-          element.customerName.toLowerCase().contains(inputLower);
+          element.customerName.toLowerCase().contains(inputLower) ||
+          't_${element.transactionID.toString()}'.contains(inputLower);
     }).toList();
 
     state = AsyncValue.data(filteredData);

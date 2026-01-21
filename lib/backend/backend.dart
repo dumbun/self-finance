@@ -567,7 +567,6 @@ class BackEnd {
       "Event_Date": history.eventDate,
       "Event_Type": history.eventType,
     }, conflictAlgorithm: ConflictAlgorithm.abort);
-    print(history.toString());
     return id;
   }
 

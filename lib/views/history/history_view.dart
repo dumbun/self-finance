@@ -125,7 +125,7 @@ class HistoryView extends ConsumerWidget {
                   .read(asyncHistoryProvider.notifier)
                   .doSearch(givenInput: value),
             ),
-            SizedBox(height: 32.sp),
+            SizedBox(height: 12.sp),
             Consumer(
               builder: (BuildContext context, WidgetRef ref, Widget? child) {
                 return ref

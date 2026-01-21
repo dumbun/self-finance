@@ -220,6 +220,13 @@ class TransactionDetailView extends StatelessWidget {
             return Expanded(
               child: ListView(
                 children: [
+                  // # ID
+                  _buildCard(
+                    title: 'Transaction ID',
+                    data: transaction.id.toString(),
+                    icon: Icons.numbers,
+                  ),
+
                   // Transaction Status
                   _buildCard(
                     title: Constant.transactionStatus,

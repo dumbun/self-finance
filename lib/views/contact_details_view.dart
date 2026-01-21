@@ -151,10 +151,11 @@ class ContactDetailsView extends ConsumerWidget {
                         separatorBuilder: (BuildContext context, int index) =>
                             SizedBox(height: 12.sp),
                         itemBuilder: (BuildContext context, int index) {
+                          final Trx transaction = transactions[index];
                           return GestureDetector(
                             onTap: () =>
                                 Routes.navigateToTransactionDetailsView(
-                                  transacrtion: transactions[index],
+                                  transacrtion: transaction,
                                   context: context,
                                 ),
                             child: Card(
@@ -168,8 +169,7 @@ class ContactDetailsView extends ConsumerWidget {
                                       Icons.circle,
                                       size: 24.sp,
                                       color:
-                                          transactions[index]
-                                                  .transacrtionType ==
+                                          transaction.transacrtionType ==
                                               Constant.active
                                           ? AppColors.getGreenColor
                                           : AppColors.getErrorColor,
@@ -183,19 +183,19 @@ class ContactDetailsView extends ConsumerWidget {
                                       children: [
                                         BodyOneDefaultText(
                                           text:
-                                              "${Constant.takenAmount}: ${Utility.doubleFormate(transactions[index].amount)} $currencyType",
+                                              "${Constant.takenAmount}: ${Utility.doubleFormate(transaction.amount)} $currencyType",
                                         ),
                                         BodyOneDefaultText(
                                           text:
-                                              "${Constant.takenDateSmall}: ${transactions[index].transacrtionDate}",
+                                              "${Constant.takenDateSmall}: ${transaction.transacrtionDate}",
                                         ),
                                         BodyOneDefaultText(
                                           text:
-                                              "${Constant.rateOfIntrest}: ${transactions[index].intrestRate}",
+                                              "${Constant.rateOfIntrest}: ${transaction.intrestRate}",
                                         ),
                                         BodyTwoDefaultText(
-                                          text: transactions[index]
-                                              .transacrtionType,
+                                          text:
+                                              'ID:  ${transaction.id.toString()}',
                                         ),
                                       ],
                                     ),

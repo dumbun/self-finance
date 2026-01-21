@@ -114,7 +114,7 @@ class BackupUtility {
 
   /// Compute a nice relative path for the file inside the ZIP archive.
   ///
-  /// - Files under the app documents (e.g. <appDoc>/Images/... ) keep their folder structure.
+  /// - Files under the app documents (e.g. appDoc/Images/... ) keep their folder structure.
   /// - Optionally remaps the top-level Images/ -> customers/ inside the ZIP (so ZIP contains customers/...).
   /// - DB files are stored under databases/...
   static String _computeRelativePathForArchive(

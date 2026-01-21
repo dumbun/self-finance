@@ -126,20 +126,21 @@ class Utility {
     try {
       await screenshotController
           .capture(
-            delay: const Duration(milliseconds: 15),
+            delay: const Duration(milliseconds: 10),
             pixelRatio: pixelRatio,
           )
           .then((Uint8List? image) async {
             if (image != null) {
-              final directory = await getApplicationDocumentsDirectory();
+              final directory = await getTemporaryDirectory();
               final imagePath = await File(
                 '${directory.path}/image.jpeg',
               ).create();
               await imagePath.writeAsBytes(image);
               final XFile responce = XFile(imagePath.path);
+              final params = ShareParams(text: 'Share', files: [responce]);
 
               /// Share Plugin
-              await Share.shareXFiles([responce]);
+              await SharePlus.instance.share(params);
             }
           });
     } catch (e) {
