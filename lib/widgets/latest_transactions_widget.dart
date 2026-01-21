@@ -7,10 +7,10 @@ import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/user_history_model.dart';
-import 'package:self_finance/providers/app_currency_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/widgets/currency_widget.dart';
 
 final AutoDisposeFutureProvider<List<UserHistory>> latestUserHistoryProvider =
     FutureProvider.autoDispose((ref) async {
@@ -40,8 +40,6 @@ class LatestTransactionsWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final String appCurrency = ref.watch(currencyProvider);
-
     void navigateToHistoryDetailedView(int customerID, UserHistory history) {
       Routes.navigateToHistoryDetailedView(
         context: context,
@@ -93,10 +91,15 @@ class LatestTransactionsWidget extends ConsumerWidget {
                                       Icons.arrow_downward_rounded,
                                       color: AppColors.getGreenColor,
                                     ),
-                              title: BodyOneDefaultText(
-                                text:
-                                    '${Utility.doubleFormate(data[index].amount)} $appCurrency',
-                                bold: true,
+                              title: Row(
+                                children: [
+                                  BodyOneDefaultText(
+                                    text:
+                                        '${Utility.doubleFormate(data[index].amount)} ',
+                                    bold: true,
+                                  ),
+                                  CurrencyWidget(),
+                                ],
                               ),
                               subtitle: BodyTwoDefaultText(
                                 text: data[index].customerName,

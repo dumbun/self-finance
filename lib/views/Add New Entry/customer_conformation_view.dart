@@ -9,7 +9,6 @@ import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history_model.dart';
-import 'package:self_finance/providers/app_currency_provider.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
@@ -18,6 +17,8 @@ import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/image_saving_utility.dart';
 import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/widgets/currency_widget.dart';
+// import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/signature_widget.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
@@ -66,10 +67,21 @@ class _CustomerConformationViewState
     super.dispose();
   }
 
-  ListTile _buildListTile({required String title, required String data}) {
+  ListTile _buildListTile({
+    required String title,
+    required String data,
+    bool currency = false,
+  }) {
     return ListTile(
       contentPadding: EdgeInsets.all(4.sp),
-      subtitle: BodyOneDefaultText(bold: true, text: data),
+      subtitle: currency
+          ? Row(
+              children: [
+                BodyOneDefaultText(bold: true, text: data),
+                CurrencyWidget(),
+              ],
+            )
+          : BodyOneDefaultText(bold: true, text: data),
       title: BodySmallText(text: title),
     );
   }
@@ -262,7 +274,6 @@ class _CustomerConformationViewState
 
   @override
   Widget build(BuildContext context) {
-    String appCurrency = ref.watch(currencyProvider);
     return Scaffold(
       appBar: AppBar(
         title: BodySmallText(text: "Customer conformation", bold: true),
@@ -279,9 +290,9 @@ class _CustomerConformationViewState
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(20.sp),
-          child: SizedBox(
-            width: double.infinity,
-            child: SingleChildScrollView(
+          child: SingleChildScrollView(
+            child: SizedBox(
+              width: double.infinity,
               child: Column(
                 children: [
                   _buildImagePickers(),
@@ -306,9 +317,11 @@ class _CustomerConformationViewState
                     data: widget.takenDate,
                   ),
                   _buildListTile(
+                    currency: true,
                     title: Constant.takenAmount,
-                    data: "${widget.takenAmount} $appCurrency",
+                    data: "${widget.takenAmount} ",
                   ),
+
                   _buildListTile(
                     title: Constant.rateOfIntrest,
                     data: widget.rateOfIntrest.toString(),

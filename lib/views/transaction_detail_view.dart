@@ -14,7 +14,6 @@ import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/payment_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history_model.dart';
-import 'package:self_finance/providers/app_currency_provider.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/items_provider.dart';
@@ -22,6 +21,7 @@ import 'package:self_finance/providers/requried_payments_provider.dart';
 import 'package:self_finance/providers/requried_transaction_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/pawned_item_image_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
@@ -169,6 +169,7 @@ class TransactionDetailView extends StatelessWidget {
     required String title,
     required String data,
     required IconData icon,
+    bool currency = false,
     Color? color,
     IconData? trailingIcon,
     Color? trailingIconColor,
@@ -184,6 +185,21 @@ class TransactionDetailView extends StatelessWidget {
                 trailingIcon,
                 color: trailingIconColor ?? AppColors.getPrimaryColor,
               )
+            : currency
+            ? SizedBox(
+                width: 50.sp,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    BodyTwoDefaultText(
+                      text: data,
+                      bold: true,
+                      color: trailingIconColor,
+                    ),
+                    CurrencyWidget(color: trailingIconColor),
+                  ],
+                ),
+              )
             : BodyTwoDefaultText(
                 text: data,
                 bold: true,
@@ -198,7 +214,6 @@ class TransactionDetailView extends StatelessWidget {
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
         // Using ref.read instead of ref.watch for providers that don’t need UI rebuilds.
         final payments = ref.watch(paymentsProvider(transacrtion.id!));
-        final appCurrency = ref.read(currencyProvider);
 
         // Using async provider to fetch transactions
         final asyncTransaction = ref.watch(
@@ -278,9 +293,9 @@ class TransactionDetailView extends StatelessWidget {
 
                   // Taken Amount Widget
                   _buildCard(
+                    currency: true,
                     title: Constant.takenAmount,
-                    data:
-                        '${Utility.doubleFormate(transaction.amount)} $appCurrency',
+                    data: '${Utility.doubleFormate(transaction.amount)} ',
                     icon: Icons.arrow_upward_rounded,
                     trailingIconColor: AppColors.getErrorColor,
                   ),
@@ -295,27 +310,30 @@ class TransactionDetailView extends StatelessWidget {
 
                   // Interest Per Month Widget
                   _buildCard(
+                    currency: true,
                     title: 'Interest Per Month',
                     data:
-                        '${Utility.doubleFormate(loanCalculator.interestPerDay * 30)} $appCurrency',
+                        '${Utility.doubleFormate(loanCalculator.interestPerDay * 30)} ',
                     icon: Icons.timeline,
                     trailingIconColor: AppColors.getPrimaryColor,
                   ),
 
                   // Total Interest Amount Widget
                   _buildCard(
+                    currency: true,
                     title: 'Total Interest Amount',
                     data:
-                        '${Utility.doubleFormate(loanCalculator.totalInterestAmount)} $appCurrency',
+                        '${Utility.doubleFormate(loanCalculator.totalInterestAmount)} ',
                     icon: Icons.assignment_turned_in_outlined,
                     trailingIconColor: AppColors.getPrimaryColor,
                   ),
 
                   // Total Amount Widget
                   _buildCard(
+                    currency: true,
                     title: 'Total Amount',
                     data:
-                        '${Utility.doubleFormate(loanCalculator.totalAmount)} $appCurrency',
+                        '${Utility.doubleFormate(loanCalculator.totalAmount)} ',
                     icon: Icons.arrow_downward_rounded,
                     trailingIconColor: AppColors.contentColorGreen,
                   ),

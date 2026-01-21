@@ -10,7 +10,6 @@ import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/fonts/selectable_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/providers/app_currency_provider.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
@@ -18,6 +17,7 @@ import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/call_button_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
+import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/fab.dart';
 import 'package:self_finance/widgets/title_widget.dart';
@@ -137,7 +137,6 @@ class ContactDetailsView extends ConsumerWidget {
   Consumer _buildTransactionsHistory() {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
-        final String currencyType = ref.watch(currencyProvider);
         return ref
             .watch(asyncTransactionsProvider)
             .when(
@@ -181,9 +180,14 @@ class ContactDetailsView extends ConsumerWidget {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        BodyOneDefaultText(
-                                          text:
-                                              "${Constant.takenAmount}: ${Utility.doubleFormate(transaction.amount)} $currencyType",
+                                        Row(
+                                          children: [
+                                            BodyOneDefaultText(
+                                              text:
+                                                  "${Constant.takenAmount}: ${Utility.doubleFormate(transaction.amount)} ",
+                                            ),
+                                            CurrencyWidget(),
+                                          ],
                                         ),
                                         BodyOneDefaultText(
                                           text:

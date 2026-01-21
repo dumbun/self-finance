@@ -11,11 +11,11 @@ import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history_model.dart';
-import 'package:self_finance/providers/app_currency_provider.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
+import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 
 class HistoryDetailedView extends StatelessWidget {
@@ -77,20 +77,23 @@ class HistoryDetailedView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Consumer(
-                            builder: (context, ref, child) {
-                              final String appCurrency = ref.watch(
-                                currencyProvider,
-                              );
-                              return TitleWidget(
+                          Row(
+                            children: [
+                              TitleWidget(
                                 color: history.eventType == Constant.debited
                                     ? AppColors.getErrorColor
                                     : AppColors.getGreenColor,
                                 text:
-                                    '${history.eventType == Constant.debited ? '-' : '+'} ${Utility.doubleFormate(history.amount)} $appCurrency',
-                              );
-                            },
+                                    '${history.eventType == Constant.debited ? '-' : '+'} ${Utility.doubleFormate(history.amount)} ',
+                              ),
+                              CurrencyWidget(
+                                color: history.eventType == Constant.debited
+                                    ? AppColors.getErrorColor
+                                    : AppColors.getGreenColor,
+                              ),
+                            ],
                           ),
+
                           GestureDetector(
                             onTap: () => Routes.navigateToContactDetailsView(
                               context,

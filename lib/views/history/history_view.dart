@@ -8,23 +8,24 @@ import 'package:self_finance/constants/routes.dart';
 import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/user_history_model.dart';
-import 'package:self_finance/providers/app_currency_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';
 import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
 
 class HistoryView extends ConsumerWidget {
   const HistoryView({super.key});
 
-  BodyOneDefaultText _buildAmount(
-    String type,
-    double amount,
-    String currencyType,
-  ) {
-    return BodyOneDefaultText(
-      bold: true,
-      text: "${Utility.doubleFormate(amount)} $currencyType",
+  Row _buildAmount(String type, double amount) {
+    return Row(
+      children: [
+        BodyOneDefaultText(
+          bold: true,
+          text: "${Utility.doubleFormate(amount)} ",
+        ),
+        CurrencyWidget(),
+      ],
     );
   }
 
@@ -71,41 +72,6 @@ class HistoryView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ListTile buildListTile(UserHistory data) {
-      return ListTile(
-        onTap: () => Routes.navigateToHistoryDetailedView(
-          context: context,
-          customerID: data.customerID,
-          history: data,
-          transactionID: data.transactionID,
-        ),
-
-        leading: _buildIcon(type: data.eventType),
-        title: _buildAmount(
-          data.eventType,
-          data.amount,
-          ref.watch(currencyProvider),
-        ),
-        subtitle: BodyTwoDefaultText(
-          text: data.customerName,
-          color: AppColors.getLigthGreyColor,
-          bold: true,
-        ),
-        trailing: _buildDate(data.eventDate),
-      );
-    }
-
-    Expanded buildhistoryList(List<UserHistory> data, currencyType) {
-      return Expanded(
-        child: ListView.builder(
-          itemBuilder: (context, index) {
-            return buildListTile(data[index]);
-          },
-          itemCount: data.length,
-        ),
-      );
-    }
-
     return RefreshWidget(
       onRefresh: () => ref.refresh(asyncHistoryProvider.future),
       child: Padding(
@@ -131,8 +97,31 @@ class HistoryView extends ConsumerWidget {
                 return ref
                     .watch(asyncHistoryProvider)
                     .when(
-                      data: (List<UserHistory> data) =>
-                          buildhistoryList(data, ref.watch(currencyProvider)),
+                      data: (List<UserHistory> data) => Expanded(
+                        child: ListView.builder(
+                          itemBuilder: (BuildContext context, int index) {
+                            final UserHistory curr = data[index];
+                            return ListTile(
+                              onTap: () => Routes.navigateToHistoryDetailedView(
+                                context: context,
+                                customerID: curr.customerID,
+                                history: curr,
+                                transactionID: curr.transactionID,
+                              ),
+
+                              leading: _buildIcon(type: curr.eventType),
+                              title: _buildAmount(curr.eventType, curr.amount),
+                              subtitle: BodyTwoDefaultText(
+                                text: curr.customerName,
+                                color: AppColors.getLigthGreyColor,
+                                bold: true,
+                              ),
+                              trailing: _buildDate(curr.eventDate),
+                            );
+                          },
+                          itemCount: data.length,
+                        ),
+                      ),
                       error: (Object error, StackTrace stackTrace) =>
                           Text(error.toString()),
                       loading: () => const Center(
