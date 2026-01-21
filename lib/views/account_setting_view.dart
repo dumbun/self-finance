@@ -259,8 +259,8 @@ class AccountSettingsView extends StatelessWidget {
           Constant.exit,
           Constant.signOutMessage,
         ).then((int value) {
-          BackEnd.close().then((bool respond) {
-            if (context.mounted && value == 1 && respond) {
+          BackEnd.close().then((d) {
+            if (context.mounted && value == 1) {
               _logout(context, userData);
             }
           });

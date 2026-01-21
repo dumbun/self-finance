@@ -31,17 +31,25 @@ class AsyncTransactions extends _$AsyncTransactions {
     return result;
   }
 
-  Future<void> fetchRequriedCustomerTransactions({required int customerID}) async {
+  Future<void> fetchRequriedCustomerTransactions({
+    required int customerID,
+  }) async {
     // Set the state to loading
     state = const AsyncValue.loading();
     // Add the new todo and reload the todo list from the remote repository
     state = await AsyncValue.guard(() async {
-      return await BackEnd.fetchRequriedCustomerTransactions(customerId: customerID);
+      return await BackEnd.fetchRequriedCustomerTransactions(
+        customerId: customerID,
+      );
     });
   }
 
-  Future<List<Trx>> fetchRequriedTransaction({required int transactionId}) async {
-    final List<Trx> responce = await BackEnd.fetchRequriedTransaction(transacrtionId: transactionId);
+  Future<List<Trx>> fetchRequriedTransaction({
+    required int transactionId,
+  }) async {
+    final List<Trx> responce = await BackEnd.fetchRequriedTransaction(
+      transacrtionId: transactionId,
+    );
     return responce;
   }
 

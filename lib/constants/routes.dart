@@ -4,7 +4,7 @@ import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/models/user_history.dart';
+import 'package:self_finance/models/user_history_model.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/views/Add%20New%20Entry/customer_conformation_view.dart';
 import 'package:self_finance/views/Add%20New%20Entry/customer_lone_entry_view.dart';

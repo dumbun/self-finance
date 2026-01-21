@@ -43,8 +43,8 @@ class DrawerWidget extends ConsumerWidget {
       Constant.exit,
       Constant.signOutMessage,
     ).then((int value) {
-      BackEnd.close().then((bool respond) {
-        if (value == 1 && context.mounted && respond) {
+      BackEnd.close().then((_) {
+        if (value == 1 && context.mounted) {
           _navigateToPinAuthView(userData, context);
         }
       });

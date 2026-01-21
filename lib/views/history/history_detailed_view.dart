@@ -10,7 +10,7 @@ import 'package:self_finance/fonts/body_text.dart';
 import 'package:self_finance/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/models/user_history.dart';
+import 'package:self_finance/models/user_history_model.dart';
 import 'package:self_finance/providers/app_currency_provider.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/theme/app_colors.dart';

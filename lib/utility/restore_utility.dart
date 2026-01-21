@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:archive/archive_io.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/backend/backend.dart';
@@ -104,20 +103,22 @@ class RestoreUtility {
   /// Restart the app or close it depending on platform
   static Future<void> _restartOrCloseApp() async {
     try {
-      // Small delay to ensure file operations are complete
       await Future.delayed(const Duration(milliseconds: 500));
 
-      if (Platform.isAndroid || Platform.isIOS) {
-        // Use restart_app package for mobile platforms
+      if (Platform.isAndroid) {
         await Restart.restartApp();
+      } else if (Platform.isIOS) {
+        // iOS doesn't allow programmatic restart
+        // Show dialog asking user to manually restart
+        throw Exception(
+          'Please manually close and reopen the app to complete restoration',
+        );
       } else {
-        // For desktop/web, just exit (user will manually restart)
         exit(0);
       }
     } catch (e) {
-      debugPrint('⚠️ Could not restart app automatically: $e');
-      // Fallback: force close the app
-      SystemNavigator.pop(); // This works on Android
+      debugPrint('⚠️ Restart action: $e');
+      rethrow; // Let caller handle this
     }
   }
 }

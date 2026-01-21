@@ -27,9 +27,9 @@ class UserHistory {
     if (data.isEmpty) {
       return []; // If data is empty, return an empty list directly
     }
-    return data.map((e) {
+    return data.map((Map<String, Object?> e) {
       return UserHistory(
-        id: e["Customer_ID"] as int,
+        id: e["History_ID"] as int,
         amount: e["Amount"] as double,
         customerID: e["Customer_ID"] as int,
         eventDate: e["Event_Date"] as String,
@@ -37,7 +37,7 @@ class UserHistory {
         itemID: e["Item_ID"] as int,
         customerName: e["Customer_Name"] as String,
         customerNumber: e["Contact_Number"] as String,
-        transactionID: e["Transacrtion_ID"] as int,
+        transactionID: e["Transaction_ID"] as int,
         userID: e["User_ID"] as int,
       );
     }).toList();

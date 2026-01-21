@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
-import 'package:self_finance/models/user_history.dart';
+import 'package:self_finance/models/user_history_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
@@ -9,7 +9,7 @@ part 'history_provider.g.dart';
 
 @riverpod
 class AsyncHistory extends _$AsyncHistory {
-  Future<List<UserHistory>> _fetchAllItemsData() async {
+  Future<List<UserHistory>> _fetchAllHistoryData() async {
     final data = await BackEnd.fetchAllUserHistory();
     return data;
   }
@@ -20,7 +20,7 @@ class AsyncHistory extends _$AsyncHistory {
     ref.watch(asyncCustomersProvider);
     ref.watch(asyncTransactionsProvider);
     // Load initial todo list from the remote repository
-    return _fetchAllItemsData();
+    return _fetchAllHistoryData();
   }
 
   Future<int> addHistory({required UserHistory history}) async {
@@ -30,7 +30,7 @@ class AsyncHistory extends _$AsyncHistory {
     // Add the new todo and reload the todo list from the remote repository
     state = await AsyncValue.guard(() async {
       result = await BackEnd.createNewHistory(history);
-      return _fetchAllItemsData();
+      return _fetchAllHistoryData();
     });
     return result;
   }
@@ -51,13 +51,14 @@ class AsyncHistory extends _$AsyncHistory {
 
     final inputLower = givenInput.toLowerCase();
     final filteredData = historyData.where((UserHistory element) {
-      return element.customerNumber.contains(inputLower) || element.customerName.toLowerCase().contains(inputLower);
+      return element.customerNumber.contains(inputLower) ||
+          element.customerName.toLowerCase().contains(inputLower);
     }).toList();
 
     state = AsyncValue.data(filteredData);
   }
 
   Future<List<UserHistory>> fetchAllUserHistory() async {
-    return await _fetchAllItemsData();
+    return await _fetchAllHistoryData();
   }
 }
