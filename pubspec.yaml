@@ -1,8 +1,8 @@
 name: self_finance
-description: "A new Flutter project."
+description: "The Self-finance app is a mobile application designed to streamline financial operations for shopkeepers and small finance companies. This solution empowers users with tools to manage their daily transactions and customer accounts efficiently."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 2.2.0+0
+version: 2.3.0+0
 
 environment:
   sdk: ^3.8.1
