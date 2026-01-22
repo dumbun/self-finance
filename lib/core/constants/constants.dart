@@ -6,6 +6,7 @@ abstract class Constant {
 
   static const bool ads = false;
   static const String appFont = "hell";
+  static const String transacrtion = "Transactions";
   static const String noImgageError = "No Image Found";
   static const String noTransactionMessage =
       "No Transactions present. Add a transaction by pressing the + below ";

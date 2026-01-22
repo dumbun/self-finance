@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/constants/routes.dart';
-import 'package:self_finance/fonts/body_text.dart';
-import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/core/constants/routes.dart';
+import 'package:self_finance/core/fonts/body_text.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
-import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
 
 class ContactsView extends ConsumerWidget {

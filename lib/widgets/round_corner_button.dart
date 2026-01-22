@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/fonts/body_text.dart';
-import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/core/fonts/body_text.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 
 class RoundedCornerButton extends StatelessWidget {
   const RoundedCornerButton({
@@ -21,7 +21,9 @@ class RoundedCornerButton extends StatelessWidget {
         ? SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.getPrimaryColor),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.getPrimaryColor,
+              ),
               icon: Icon(icon),
               onPressed: onPressed,
               label: Padding(
@@ -37,16 +39,19 @@ class RoundedCornerButton extends StatelessWidget {
         : SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.getPrimaryColor),
-                onPressed: onPressed,
-                child: Padding(
-                  padding: EdgeInsets.all(14.sp),
-                  child: BodyOneDefaultText(
-                    whiteColor: true,
-                    text: text,
-                    bold: true,
-                  ),
-                )),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.getPrimaryColor,
+              ),
+              onPressed: onPressed,
+              child: Padding(
+                padding: EdgeInsets.all(14.sp),
+                child: BodyOneDefaultText(
+                  whiteColor: true,
+                  text: text,
+                  bold: true,
+                ),
+              ),
+            ),
           );
   }
 }

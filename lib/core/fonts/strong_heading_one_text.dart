@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 
 class StrongHeadingOne extends StatelessWidget {
   final String text;
@@ -13,17 +13,18 @@ class StrongHeadingOne extends StatelessWidget {
   final Color? color;
   final String? font;
 
-  const StrongHeadingOne(
-      {super.key,
-      required this.text,
-      this.textAlign,
-      this.bold = false,
-      this.error = false,
-      this.whiteColor = false,
-      this.maxLines,
-      this.overflow,
-      this.color,
-      this.font});
+  const StrongHeadingOne({
+    super.key,
+    required this.text,
+    this.textAlign,
+    this.bold = false,
+    this.error = false,
+    this.whiteColor = false,
+    this.maxLines,
+    this.overflow,
+    this.color,
+    this.font,
+  });
   @override
   Widget build(BuildContext context) {
     return Text(

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/fonts/body_text.dart';
-import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/fonts/body_text.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/providers/user_provider.dart';
-import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
 
 class PinUpdatebuttomSheetWidget extends ConsumerStatefulWidget {

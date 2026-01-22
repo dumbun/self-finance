@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
 
 class ImageView extends StatelessWidget {
-  const ImageView({
-    super.key,
-    required this.titile,
-    required this.imageWidget,
-  });
+  const ImageView({super.key, required this.titile, required this.imageWidget});
 
   final String titile;
   final Image imageWidget;
@@ -21,10 +17,7 @@ class ImageView extends StatelessWidget {
           icon: const Icon(Icons.close),
         ),
         forceMaterialTransparency: true,
-        title: BodyTwoDefaultText(
-          text: titile,
-          bold: true,
-        ),
+        title: BodyTwoDefaultText(text: titile, bold: true),
       ),
       body: PhotoView(
         heroAttributes: PhotoViewHeroAttributes(tag: titile),

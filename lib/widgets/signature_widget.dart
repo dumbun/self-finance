@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:signature/signature.dart';
 
 class SignatureWidget extends StatefulWidget {

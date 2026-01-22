@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:self_finance/fonts/body_text.dart';
-import 'package:self_finance/utility/backup_utility.dart';
+import 'package:self_finance/core/fonts/body_text.dart';
+import 'package:self_finance/core/utility/backup_utility.dart';
 
 /// Assumes backupImagesAndSqliteToDownloads is available in scope and
 /// has signature:

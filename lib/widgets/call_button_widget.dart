@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:self_finance/theme/app_colors.dart';
-import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
+import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CallButtonWidget extends StatefulWidget {
@@ -29,10 +29,7 @@ class _CallButtonWidgetState extends State<CallButtonWidget> {
   Widget build(BuildContext context) {
     if (Utility.isValidPhoneNumber(widget.phoneNumber)) {
       return _hasCallSupport
-          ? const Icon(
-              Icons.call,
-              color: AppColors.getPrimaryColor,
-            )
+          ? const Icon(Icons.call, color: AppColors.getPrimaryColor)
           : _buildDisabledPhone();
     } else {
       return _buildDisabledPhone();

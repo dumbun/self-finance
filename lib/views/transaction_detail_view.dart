@@ -5,10 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:screenshot/screenshot.dart';
-import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/constants/routes.dart';
-import 'package:self_finance/fonts/body_two_default_text.dart';
-import 'package:self_finance/logic/logic.dart';
+import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/core/constants/routes.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/logic/logic.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/payment_model.dart';
@@ -19,8 +19,8 @@ import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/items_provider.dart';
 import 'package:self_finance/providers/requried_payments_provider.dart';
 import 'package:self_finance/providers/requried_transaction_provider.dart';
-import 'package:self_finance/theme/app_colors.dart';
-import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
+import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/pawned_item_image_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
@@ -75,6 +75,14 @@ class TransactionDetailView extends StatelessWidget {
         elevation: 0,
         actions: [
           IconButton(
+            onPressed: () => Routes.navigateToContactDetailsView(
+              context,
+              customerID: transacrtion.customerId,
+            ),
+            icon: Icon(Icons.person_3_rounded),
+            tooltip: "Show the customer",
+          ),
+          IconButton(
             icon: const Icon(
               Icons.share_rounded,
               color: AppColors.getPrimaryColor,
@@ -128,14 +136,11 @@ class TransactionDetailView extends StatelessWidget {
                     ? DateTime.tryParse(payments.first.paymentDate)
                     : DateTime.now(),
               );
-              return Hero(
-                tag: Constant.saveButtonTag,
-                child: RoundedCornerButton(
-                  onPressed: () =>
-                      _markAsPaid(ref, transaction, loanCalculator.totalAmount),
-                  icon: Icons.done,
-                  text: "Mark As Paid",
-                ),
+              return RoundedCornerButton(
+                onPressed: () =>
+                    _markAsPaid(ref, transaction, loanCalculator.totalAmount),
+                icon: Icons.done,
+                text: "Mark As Paid",
               );
             } else {
               return SizedBox.shrink();

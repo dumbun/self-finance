@@ -2,6 +2,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/providers/home_screen_graph_value_provider.dart';
+import 'package:self_finance/providers/transactions_provider.dart';
 
 part 'customer_provider.g.dart';
 
@@ -55,6 +57,7 @@ class AsyncCustomers extends _$AsyncCustomers {
     state = await AsyncValue.guard(() async {
       return _fetchAllCustomersData();
     });
+
     return response;
   }
 
@@ -74,7 +77,9 @@ class AsyncCustomers extends _$AsyncCustomers {
     return await BackEnd.fetchAllCustomerNumbersWithNames();
   }
 
-  Future<List<Customer>> fetchRequriedCustomerDetails({required int customerID}) async {
+  Future<List<Customer>> fetchRequriedCustomerDetails({
+    required int customerID,
+  }) async {
     return await BackEnd.fetchSingleContactDetails(id: customerID);
   }
 
@@ -82,7 +87,24 @@ class AsyncCustomers extends _$AsyncCustomers {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await BackEnd.deleteTheCustomer(customerID: customerID);
+      // Also invalidate the specific customer provider
       return _fetchAllCustomersData();
     });
+    ref.refresh(homeScreenGraphValuesProvider.future).ignore();
+    ref.refresh(asyncTransactionsProvider.future).ignore();
+  }
+}
+
+// Separate provider for fetching a specific customer
+// This will now automatically update when the customer list changes
+@Riverpod(keepAlive: false)
+Future<Customer?> customerById(CustomerByIdRef ref, int customerId) async {
+  // Watch the customer list - when it changes, this provider rebuilds
+  final customers = await ref.watch(asyncCustomersProvider.future);
+
+  try {
+    return customers.firstWhere((customer) => customer.id == customerId);
+  } catch (e) {
+    return null;
   }
 }

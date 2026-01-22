@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/auth/auth.dart';
-import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/constants/routes.dart';
-import 'package:self_finance/fonts/strong_heading_one_text.dart';
+import 'package:self_finance/core/auth/auth.dart';
+import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/core/constants/routes.dart';
+import 'package:self_finance/core/fonts/strong_heading_one_text.dart';
 import 'package:self_finance/models/user_model.dart';
-import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/widgets/app_icon.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';

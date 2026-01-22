@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 
 Widget getArrowIcon() {
   return const Icon(

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/constants/routes.dart';
-import 'package:self_finance/fonts/body_small_text.dart';
+import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/core/constants/routes.dart';
+import 'package:self_finance/core/fonts/body_small_text.dart';
+import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/widgets/fab.dart';
-import 'package:self_finance/utility/user_utility.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_date_picker.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
@@ -38,7 +38,11 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
     try {
       return double.parse(text);
     } catch (e) {
-      return AlertDilogs.alertDialogWithOneAction(context, errorString, e.toString());
+      return AlertDilogs.alertDialogWithOneAction(
+        context,
+        errorString,
+        e.toString(),
+      );
     }
   }
 
@@ -60,18 +64,12 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
     _itemDescription.dispose();
 
     super.dispose();
-    
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: BodySmallText(
-          text: "Lone Amount",
-          bold: true,
-        ),
-      ),
+      appBar: AppBar(title: BodySmallText(text: "Lone Amount", bold: true)),
       floatingActionButton: Fab(
         onPressed: () {
           if (_validateAndSave()) {
@@ -88,55 +86,61 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
             );
           }
         },
-        icon:Icons.save,
+        icon: Icons.save,
       ),
       body: SafeArea(
-          child: Padding(
-        padding: EdgeInsets.all(20.sp),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              //taken amount
-              SizedBox(height: 20.sp),
-              InputTextField(
-                keyboardType: TextInputType.number,
-                hintText: Constant.takenAmount,
-                validator: (String? value) => Utility.amountValidation(value: value),
-                controller: _takenAmount,
-              ),
+        child: Padding(
+          padding: EdgeInsets.all(20.sp),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                //taken amount
+                SizedBox(height: 20.sp),
+                InputTextField(
+                  keyboardType: TextInputType.number,
+                  hintText: Constant.takenAmount,
+                  validator: (String? value) =>
+                      Utility.amountValidation(value: value),
+                  controller: _takenAmount,
+                ),
 
-              // rate of intrest
-              SizedBox(height: 20.sp),
-              InputTextField(
-                validator: (String? value) => Utility.amountValidation(value: value),
-                hintText: Constant.rateOfIntrest,
-                controller: _rateOfIntrest,
-                keyboardType: const TextInputType.numberWithOptions(signed: false, decimal: true),
-              ),
+                // rate of intrest
+                SizedBox(height: 20.sp),
+                InputTextField(
+                  validator: (String? value) =>
+                      Utility.amountValidation(value: value),
+                  hintText: Constant.rateOfIntrest,
+                  controller: _rateOfIntrest,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    signed: false,
+                    decimal: true,
+                  ),
+                ),
 
-              // taken date picker
-              SizedBox(height: 20.sp),
-              InputDatePicker(
-                controller: _takenDate,
-                labelText: Constant.takenDate,
-                firstDate: DateTime(1000),
-                lastDate: DateTime.now(),
-                initialDate: DateTime.now(),
-              ),
+                // taken date picker
+                SizedBox(height: 20.sp),
+                InputDatePicker(
+                  controller: _takenDate,
+                  labelText: Constant.takenDate,
+                  firstDate: DateTime(1000),
+                  lastDate: DateTime.now(),
+                  initialDate: DateTime.now(),
+                ),
 
-              // item description
-              SizedBox(height: 20.sp),
-              InputTextField(
-                controller: _itemDescription,
-                hintText: Constant.itemDescription,
-              ),
-            ],
+                // item description
+                SizedBox(height: 20.sp),
+                InputTextField(
+                  controller: _itemDescription,
+                  hintText: Constant.itemDescription,
+                ),
+              ],
+            ),
           ),
         ),
-      )),
+      ),
     );
   }
 }

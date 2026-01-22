@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/fonts/body_two_default_text.dart';
-import 'package:self_finance/logic/logic.dart';
-import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/logic/logic.dart';
+import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/widgets/input_date_picker.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';

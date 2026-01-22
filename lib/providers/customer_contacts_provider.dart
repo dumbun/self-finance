@@ -3,7 +3,9 @@ import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/providers/customer_provider.dart';
+import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/home_screen_graph_value_provider.dart';
+import 'package:self_finance/providers/transactions_provider.dart';
 
 part 'customer_contacts_provider.g.dart';
 
@@ -48,7 +50,8 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
     // Create a HashMap for quick lookup
     final Map<String, Contact> customerMap = {
       for (Contact contact in data)
-        "${contact.number} ${contact.name.toLowerCase()}": contact,
+        "${contact.number.trim()} ${contact.name.trim().toLowerCase()}":
+            contact,
     };
 
     state = const AsyncValue.loading();
@@ -56,7 +59,7 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
       return customerMap.entries
           .where(
             (MapEntry<String, Contact> entry) =>
-                entry.key.contains(givenInput.toLowerCase()),
+                entry.key.contains(givenInput.trim().toLowerCase()),
           )
           .map((MapEntry<String, Contact> entry) => entry.value)
           .toList();
@@ -70,6 +73,8 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
       return _fetchAllCustomersContactsData();
     });
     ref.refresh(homeScreenGraphValuesProvider.future).ignore();
+    ref.refresh(asyncTransactionsProvider.future).ignore();
+    ref.refresh(asyncHistoryProvider.future).ignore();
   }
 
   Future<int> updateCustomer({
@@ -99,6 +104,9 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
     state = await AsyncValue.guard(() async {
       return _fetchAllCustomersContactsData();
     });
+    ref.refresh(homeScreenGraphValuesProvider.future).ignore();
+    ref.refresh(asyncTransactionsProvider.future).ignore();
+    ref.refresh(asyncHistoryProvider.future).ignore();
     return response;
   }
 }

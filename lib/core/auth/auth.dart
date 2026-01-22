@@ -1,5 +1,5 @@
 import 'package:local_auth/local_auth.dart';
-import 'package:self_finance/constants/constants.dart';
+import 'package:self_finance/core/constants/constants.dart';
 
 class LocalAuthenticator {
   static LocalAuthentication get _newMethod => LocalAuthentication();

@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/widgets/indicators_widget.dart';
 
 class TwoSlicePieChartWidget extends StatefulWidget {
@@ -46,13 +46,13 @@ class _TwoSlicePieChartWidgetState extends State<TwoSlicePieChartWidget> {
                           touchedIndex = -1;
                           return;
                         }
-                        touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+                        touchedIndex = pieTouchResponse
+                            .touchedSection!
+                            .touchedSectionIndex;
                       });
                     },
                   ),
-                  borderData: FlBorderData(
-                    show: true,
-                  ),
+                  borderData: FlBorderData(show: true),
                   sectionsSpace: 8.sp,
                   centerSpaceRadius: 20.sp,
                   sections: showingSections(),
@@ -94,7 +94,9 @@ class _TwoSlicePieChartWidgetState extends State<TwoSlicePieChartWidget> {
           return PieChartSectionData(
             color: AppColors.getPrimaryColor,
             value: widget.firstIndicatorValue,
-            title: widget.showPercentage! ? '${widget.firstIndicatorValue}%' : "",
+            title: widget.showPercentage!
+                ? '${widget.firstIndicatorValue}%'
+                : "",
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -107,7 +109,9 @@ class _TwoSlicePieChartWidgetState extends State<TwoSlicePieChartWidget> {
           return PieChartSectionData(
             color: AppColors.getLigthGreyColor,
             value: widget.secoundIndicatorValue,
-            title: widget.showPercentage! ? '${widget.secoundIndicatorValue}%' : "",
+            title: widget.showPercentage!
+                ? '${widget.secoundIndicatorValue}%'
+                : "",
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,

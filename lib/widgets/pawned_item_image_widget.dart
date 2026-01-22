@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:self_finance/backend/backend.dart';
-import 'package:self_finance/constants/routes.dart';
-import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/constants/routes.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/items_model.dart';
-import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
 
 class PawnedItemImageWidget extends StatelessWidget {

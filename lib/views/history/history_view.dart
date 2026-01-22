@@ -3,19 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/constants/routes.dart';
-import 'package:self_finance/fonts/body_text.dart';
-import 'package:self_finance/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/core/constants/routes.dart';
+import 'package:self_finance/core/fonts/body_text.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/user_history_model.dart';
 import 'package:self_finance/providers/history_provider.dart';
-import 'package:self_finance/theme/app_colors.dart';
-import 'package:self_finance/utility/user_utility.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
 
-class HistoryView extends ConsumerWidget {
+class HistoryView extends ConsumerStatefulWidget {
   const HistoryView({super.key});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _HistoryViewState();
+}
+
+class _HistoryViewState extends ConsumerState<HistoryView> {
+  final TextEditingController _controller = TextEditingController();
 
   Row _buildAmount(String type, double amount) {
     return Row(
@@ -71,7 +78,13 @@ class HistoryView extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return RefreshWidget(
       onRefresh: () => ref.refresh(asyncHistoryProvider.future),
       child: Padding(
@@ -81,6 +94,29 @@ class HistoryView extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CupertinoSearchTextField(
+              controller: _controller,
+              suffixIcon: Icon(Icons.calendar_month),
+              suffixMode: OverlayVisibilityMode.always,
+              onSuffixTap: () async {
+                _controller.clear();
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  currentDate: DateTime.now(),
+                  keyboardType: TextInputType.datetime,
+                  switchToCalendarEntryModeIcon: Icon(Icons.calendar_month),
+                  firstDate: DateTime(1900),
+                  //DateTime.now() - not to allow to choose before today.
+                  lastDate: DateTime.now(),
+                );
+                if (pickedDate != null) {
+                  //pickedDate output format => 2021-03-10 00:00:00.000
+                  String formattedDate = DateFormat(
+                    'dd-MM-yyyy',
+                  ).format(pickedDate);
+                  _controller.text = formattedDate;
+                }
+              },
               autocorrect: false,
               style: const TextStyle(
                 color: AppColors.getPrimaryColor,
@@ -92,43 +128,69 @@ class HistoryView extends ConsumerWidget {
                   .doSearch(givenInput: value),
             ),
             SizedBox(height: 12.sp),
-            Consumer(
-              builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                return ref
-                    .watch(asyncHistoryProvider)
-                    .when(
-                      data: (List<UserHistory> data) => Expanded(
-                        child: ListView.builder(
-                          itemBuilder: (BuildContext context, int index) {
-                            final UserHistory curr = data[index];
-                            return ListTile(
-                              onTap: () => Routes.navigateToHistoryDetailedView(
-                                context: context,
-                                customerID: curr.customerID,
-                                history: curr,
-                                transactionID: curr.transactionID,
-                              ),
+            Expanded(
+              child: Consumer(
+                builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                  return ref
+                      .watch(asyncHistoryProvider)
+                      .when(
+                        data: (List<UserHistory> data) {
+                          if (data.isNotEmpty) {
+                            return ListView.builder(
+                              shrinkWrap: true, // ← important
+                              itemBuilder: (BuildContext context, int index) {
+                                final UserHistory curr = data[index];
+                                return ListTile(
+                                  onTap: () =>
+                                      Routes.navigateToHistoryDetailedView(
+                                        context: context,
+                                        customerID: curr.customerID,
+                                        history: curr,
+                                        transactionID: curr.transactionID,
+                                      ),
 
-                              leading: _buildIcon(type: curr.eventType),
-                              title: _buildAmount(curr.eventType, curr.amount),
-                              subtitle: BodyTwoDefaultText(
-                                text: curr.customerName,
-                                color: AppColors.getLigthGreyColor,
-                                bold: true,
-                              ),
-                              trailing: _buildDate(curr.eventDate),
+                                  leading: _buildIcon(type: curr.eventType),
+                                  title: _buildAmount(
+                                    curr.eventType,
+                                    curr.amount,
+                                  ),
+                                  subtitle: BodyTwoDefaultText(
+                                    text: curr.customerName,
+                                    color: AppColors.getLigthGreyColor,
+                                    bold: true,
+                                  ),
+                                  trailing: _buildDate(curr.eventDate),
+                                );
+                              },
+                              itemCount: data.length,
                             );
-                          },
-                          itemCount: data.length,
+                          } else {
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  BodyOneDefaultText(
+                                    text: "No histroy to view",
+                                  ),
+                                  Icon(
+                                    Icons.web_asset_off,
+                                    size: 80.sp,
+                                    color: AppColors.getLigthGreyColor,
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        },
+                        error: (Object error, StackTrace stackTrace) =>
+                            Text(error.toString()),
+                        loading: () => const Center(
+                          child: CircularProgressIndicator.adaptive(),
                         ),
-                      ),
-                      error: (Object error, StackTrace stackTrace) =>
-                          Text(error.toString()),
-                      loading: () => const Center(
-                        child: CircularProgressIndicator.adaptive(),
-                      ),
-                    );
-              },
+                      );
+                },
+              ),
             ),
           ],
         ),

@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
-import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 
 class InputTextField extends StatelessWidget {
   /// [InputTextField] input text field helps to add the text field to user to enter the data
@@ -30,7 +30,8 @@ class InputTextField extends StatelessWidget {
     return TextFormField(
       initialValue: initialValue,
       onChanged: onChanged as void Function(String)?,
-      validator: validator ??
+      validator:
+          validator ??
           (value) {
             if (value == null || value.isEmpty || value == "") {
               return 'Please enter a valid value';
@@ -46,9 +47,7 @@ class InputTextField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: hintText,
         border: const OutlineInputBorder(),
-        labelStyle: const TextStyle(
-          color: AppColors.getLigthGreyColor,
-        ),
+        labelStyle: const TextStyle(color: AppColors.getLigthGreyColor),
       ),
     );
   }

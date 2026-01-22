@@ -1,9 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/user_history_model.dart';
-import 'package:self_finance/providers/customer_contacts_provider.dart';
-import 'package:self_finance/providers/customer_provider.dart';
-import 'package:self_finance/providers/transactions_provider.dart';
 
 part 'history_provider.g.dart';
 
@@ -16,9 +13,6 @@ class AsyncHistory extends _$AsyncHistory {
 
   @override
   FutureOr<List<UserHistory>> build() {
-    ref.watch(asyncCustomersContactsProvider);
-    ref.watch(asyncCustomersProvider);
-    ref.watch(asyncTransactionsProvider);
     // Load initial todo list from the remote repository
     return _fetchAllHistoryData();
   }
@@ -36,27 +30,41 @@ class AsyncHistory extends _$AsyncHistory {
   }
 
   Future<void> doSearch({required String givenInput}) async {
-    state = const AsyncValue.loading(); // Set loading state once
-
     final List<UserHistory> historyData = await BackEnd.fetchAllUserHistory();
-    if (historyData.isEmpty) {
-      state = const AsyncValue.data([]);
-      return;
+    if (historyData.isNotEmpty) {
+      state = const AsyncValue.loading(); // Set loading state once
+
+      if (historyData.isEmpty) {
+        state = const AsyncValue.data([]);
+        return;
+      }
+
+      if (givenInput.isEmpty) {
+        state = AsyncValue.data(historyData);
+        return;
+      }
+
+      final inputLower = givenInput.trim().toLowerCase();
+      state = await AsyncValue.guard(() async {
+        return historyData.where((UserHistory element) {
+          return element.customerNumber.contains(inputLower) ||
+              element.customerName.toLowerCase().contains(inputLower) ||
+              't_${element.transactionID.toString()}'.contains(inputLower);
+        }).toList();
+      }, (err) => err is! FormatException);
     }
+  }
 
-    if (givenInput.isEmpty) {
-      state = AsyncValue.data(historyData);
-      return;
+  Future<void> fetchHistoryByDate(String userInputDate) async {
+    if (userInputDate.isNotEmpty) {
+      state = AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        final List<UserHistory> response = await BackEnd.fetchHistoryByDate(
+          inputDate: userInputDate,
+        );
+        return response;
+      });
     }
-
-    final inputLower = givenInput.toLowerCase();
-    final filteredData = historyData.where((UserHistory element) {
-      return element.customerNumber.contains(inputLower) ||
-          element.customerName.toLowerCase().contains(inputLower) ||
-          't_${element.transactionID.toString()}'.contains(inputLower);
-    }).toList();
-
-    state = AsyncValue.data(filteredData);
   }
 
   Future<List<UserHistory>> fetchAllUserHistory() async {

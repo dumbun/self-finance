@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 
 class PinInputWidget extends StatelessWidget {
   const PinInputWidget({
@@ -25,10 +25,7 @@ class PinInputWidget extends StatelessWidget {
     final defaultPinTheme = PinTheme(
       width: 30.sp,
       height: 30.sp,
-      textStyle: TextStyle(
-        fontSize: 22.sp,
-        color: AppColors.getPrimaryColor,
-      ),
+      textStyle: TextStyle(fontSize: 22.sp, color: AppColors.getPrimaryColor),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.sp),
         border: Border.all(color: AppColors.getPrimaryColor),
@@ -64,7 +61,8 @@ class PinInputWidget extends StatelessWidget {
           ),
         ),
         controller: pinController,
-        validator: validator ??
+        validator:
+            validator ??
             (value) {
               if (value == null || value.isEmpty || value == "") {
                 return 'Please enter a valid value';

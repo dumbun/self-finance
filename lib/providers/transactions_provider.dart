@@ -5,7 +5,7 @@ import 'package:self_finance/providers/home_screen_graph_value_provider.dart';
 
 part 'transactions_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 class AsyncTransactions extends _$AsyncTransactions {
   Future<List<Trx>> _fetchAllTransactionsData() async {
     final data = await BackEnd.fetchAllTransactions();
@@ -68,5 +68,49 @@ class AsyncTransactions extends _$AsyncTransactions {
     });
 
     return responce;
+  }
+
+  Future<void> doSearch({required String givenInput}) async {
+    final List<Trx> transactionData = await BackEnd.fetchAllTransactions();
+    if (transactionData.isNotEmpty) {
+      state = const AsyncValue.loading(); // Set loading state once
+      state = await AsyncValue.guard(() async {
+        if (transactionData.isEmpty) {
+          return [];
+        }
+
+        if (givenInput.isEmpty) {
+          return transactionData;
+        }
+
+        final String inputLower = givenInput.trim().toLowerCase();
+        return transactionData.where((Trx element) {
+          return element.id.toString().trim().contains(inputLower);
+        }).toList();
+      }, (err) => err is! FormatException);
+    }
+  }
+
+  Future fetchTransactionsByAge(int input) async {
+    state = AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final List<Trx> responce = await BackEnd.fetchTransactionsByAge(
+        months: input,
+      );
+
+      return responce;
+    });
+  }
+
+  Future<void> fetchTransactionsByDate(String inputDate) async {
+    if (inputDate.isNotEmpty) {
+      state = AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        final List<Trx> responce = await BackEnd.fetchTransactionsByDate(
+          inputDate: inputDate,
+        );
+        return responce;
+      });
+    }
   }
 }

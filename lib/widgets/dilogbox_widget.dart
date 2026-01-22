@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:self_finance/fonts/body_text.dart';
-import 'package:self_finance/fonts/body_two_default_text.dart';
-import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/core/fonts/body_text.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 
 class AlertDilogs {
-  static Future<int> alertDialogWithTwoAction(BuildContext context, String title, String content) async {
+  static Future<int> alertDialogWithTwoAction(
+    BuildContext context,
+    String title,
+    String content,
+  ) async {
     int value = 0;
     await showDialog(
       context: context,
@@ -38,7 +42,11 @@ class AlertDilogs {
     return value;
   }
 
-  static dynamic alertDialogWithOneAction(BuildContext context, String title, String content) {
+  static dynamic alertDialogWithOneAction(
+    BuildContext context,
+    String title,
+    String content,
+  ) {
     return showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog.adaptive(

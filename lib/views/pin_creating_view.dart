@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/constants/routes.dart';
-import 'package:self_finance/fonts/body_text.dart';
+import 'package:self_finance/core/constants/routes.dart';
+import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
@@ -51,10 +51,7 @@ class _PinCreatingViewState extends State<PinCreatingView> {
                   text: "Please create your login pin",
                 ),
                 SizedBox(height: 20.sp),
-                PinInputWidget(
-                  pinController: p1,
-                  obscureText: false,
-                ),
+                PinInputWidget(pinController: p1, obscureText: false),
                 SizedBox(height: 20.sp),
                 const BodyOneDefaultText(
                   bold: true,
@@ -64,7 +61,9 @@ class _PinCreatingViewState extends State<PinCreatingView> {
                 PinInputWidget(
                   pinController: p2,
                   obscureText: false,
-                  validator: (p0) => p1.text == p2.text ? null : "* Please provide the same pin",
+                  validator: (p0) => p1.text == p2.text
+                      ? null
+                      : "* Please provide the same pin",
                 ),
                 SizedBox(height: 20.sp),
                 RoundedCornerButton(

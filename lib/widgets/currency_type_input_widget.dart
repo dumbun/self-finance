@@ -1,10 +1,10 @@
 import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/fonts/body_text.dart';
-import 'package:self_finance/fonts/body_two_default_text.dart';
-import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/core/fonts/body_text.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 
 class CurrencyTypeInputWidget extends StatefulWidget {
   const CurrencyTypeInputWidget({super.key, required this.controller});
@@ -12,7 +12,8 @@ class CurrencyTypeInputWidget extends StatefulWidget {
   final TextEditingController controller;
 
   @override
-  State<CurrencyTypeInputWidget> createState() => _CurrencyTypeInputWidgetState();
+  State<CurrencyTypeInputWidget> createState() =>
+      _CurrencyTypeInputWidgetState();
 }
 
 class _CurrencyTypeInputWidgetState extends State<CurrencyTypeInputWidget> {
@@ -40,16 +41,13 @@ class _CurrencyTypeInputWidgetState extends State<CurrencyTypeInputWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const BodyTwoDefaultText(
-                text: Constant.currencyType,
-                bold: true,
-              ),
+              const BodyTwoDefaultText(text: Constant.currencyType, bold: true),
               BodyOneDefaultText(
                 text: widget.controller.text,
                 bold: true,
                 color: AppColors.getPrimaryColor,
               ),
-              const Icon(Icons.arrow_drop_down)
+              const Icon(Icons.arrow_drop_down),
             ],
           ),
         ),

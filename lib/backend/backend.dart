@@ -1,6 +1,7 @@
 import 'dart:io';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
-import 'package:self_finance/constants/constants.dart';
+import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
@@ -38,13 +39,13 @@ class BackEnd {
   static Future<String> _getDatabasePath() async {
     if (Platform.isIOS) {
       // iOS: Use app documents directory
-      final appDocDir = await getApplicationDocumentsDirectory();
-      final dbDir = Directory(p.join(appDocDir.path, 'databases'));
+      final Directory appDocDir = await getApplicationDocumentsDirectory();
+      final Directory dbDir = Directory(p.join(appDocDir.path, 'databases'));
       await dbDir.create(recursive: true);
       return p.join(dbDir.path, _databaseName);
     } else {
       // Android and others: Use standard database path
-      final databasePath = await getDatabasesPath();
+      final String databasePath = await getDatabasesPath();
       return p.join(databasePath, _databaseName);
     }
   }
@@ -194,8 +195,8 @@ class BackEnd {
     }
 
     try {
-      final db = await BackEnd.db();
-      final id = await db.insert('Customers', {
+      final Database db = await BackEnd.db();
+      final int id = await db.insert('Customers', {
         "User_ID": customer.userID,
         "Customer_Name": customer.name.trim(),
         "Gaurdian_Name": customer.guardianName.trim(),
@@ -216,14 +217,14 @@ class BackEnd {
 
   /// Fetch all customer data
   static Future<List<Customer>> fetchAllCustomerData() async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final response = await db.query('Customers', orderBy: 'Customer_Name ASC');
     return Customer.toList(response);
   }
 
   /// Fetch all customer numbers
   static Future<List<String>> fetchAllCustomerNumbers() async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final response = await db.query(
       'Customers',
       columns: ['Contact_Number'],
@@ -234,7 +235,7 @@ class BackEnd {
 
   /// Fetch all customer numbers with names
   static Future<List<Contact>> fetchAllCustomerNumbersWithNames() async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final response = await db.query(
       'Customers',
       columns: ['Customer_ID', 'Customer_Name', 'Contact_Number'],
@@ -245,7 +246,7 @@ class BackEnd {
 
   /// Fetch required customer name
   static Future<String> fetchRequriedCustomerName(int id) async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final response = await db.query(
       'Customers',
       columns: ['Customer_Name'],
@@ -265,7 +266,7 @@ class BackEnd {
   static Future<List<Customer>> fetchSingleContactDetails({
     required int id,
   }) async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final response = await db.query(
       'Customers',
       where: 'Customer_ID = ?',
@@ -277,7 +278,7 @@ class BackEnd {
 
   /// Delete customer with cascade (transactional)
   static Future<void> deleteTheCustomer({required int customerID}) async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
 
     await db.transaction((txn) async {
       // With CASCADE DELETE enabled, this will automatically delete:
@@ -311,7 +312,7 @@ class BackEnd {
       throw ArgumentError('Invalid contact number');
     }
 
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
 
     return await db.transaction((txn) async {
       // Update customer
@@ -357,7 +358,7 @@ class BackEnd {
       throw ArgumentError('Pawn amount must be greater than 0');
     }
 
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final id = await db.insert('Items', {
       "Customer_ID": item.customerid,
       "Item_Name": item.name.trim(),
@@ -374,7 +375,7 @@ class BackEnd {
 
   /// Fetch all items
   static Future<List<Items>> fetchAllItems() async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final response = await db.query('Items', orderBy: 'Created_Date DESC');
     return Items.toList(response);
   }
@@ -383,7 +384,7 @@ class BackEnd {
   static Future<List<Items>> fetchitemOfRequriedCustomer({
     required int customerID,
   }) async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final response = await db.query(
       'Items',
       where: 'Customer_ID = ?',
@@ -395,7 +396,7 @@ class BackEnd {
 
   /// Fetch required item
   static Future<List<Items>> fetchRequriedItem({required int itemId}) async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final response = await db.query(
       'Items',
       where: 'Item_ID = ?',
@@ -416,7 +417,7 @@ class BackEnd {
       throw ArgumentError('Interest rate cannot be negative');
     }
 
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
 
     final response = await db.insert('Transactions', {
       "Customer_ID": transaction.customerId,
@@ -436,7 +437,7 @@ class BackEnd {
 
   /// Fetch all transactions
   static Future<List<Trx>> fetchAllTransactions() async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final response = await db.query(
       'Transactions',
       orderBy: 'Transaction_Date DESC',
@@ -446,7 +447,7 @@ class BackEnd {
 
   /// Fetch active transactions
   static Future<List<Trx>> fetchActiveTransactions() async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final response = await db.query(
       'Transactions',
       where: 'Transaction_Type = ?',
@@ -460,7 +461,7 @@ class BackEnd {
   static Future<List<Trx>> fetchRequriedCustomerTransactions({
     required int customerId,
   }) async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final response = await db.query(
       'Transactions',
       where: 'Customer_ID = ?',
@@ -474,7 +475,7 @@ class BackEnd {
   static Future<List<Trx>> fetchRequriedTransaction({
     required int transacrtionId,
   }) async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final response = await db.query(
       'Transactions',
       where: 'Transaction_ID = ?',
@@ -486,7 +487,7 @@ class BackEnd {
 
   /// Fetch sum of taken amount
   static Future<double> fetchSumOfTakenAmount() async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final response = await db.rawQuery(
       'SELECT COALESCE(SUM(Amount), 0) as total FROM Transactions WHERE Transaction_Type = ?',
       [Constant.active],
@@ -496,7 +497,7 @@ class BackEnd {
 
   /// Update transaction as paid
   static Future<int> updateTransactionAsPaid({required int id}) async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     return await db.update(
       'Transactions',
       {
@@ -508,14 +509,86 @@ class BackEnd {
     );
   }
 
+  /// Fetch all transactions for a specific date
+  /// [inputDate] - Date string in format 'DD-MM-YYYY' (e.g., '22-01-2026')
+  /// Returns list of transactions for that specific date
+  static Future<List<Trx>> fetchTransactionsByDate({
+    required String inputDate,
+  }) async {
+    try {
+      final Database db = await BackEnd.db();
+
+      final List<Map<String, Object?>> response = await db.query(
+        'Transactions',
+        where: 'Transaction_Date = ?',
+        whereArgs: [inputDate],
+        orderBy: 'Created_Date DESC',
+      );
+
+      return Trx.toList(response);
+    } on DatabaseException catch (e) {
+      throw Exception(
+        'Database error while fetching transactions: ${e.toString()}',
+      );
+    } catch (e) {
+      throw Exception('Failed to fetch transactions by date: $e');
+    }
+  }
+
+  /// [fetchTransactionsByAge] Fetches transactions older than specified months
+  /// [months] - Number of months (1, 3, 6, or 12)
+  /// Returns list of transactions that are older than the specified period
+  static Future<List<Trx>> fetchTransactionsByAge({required int months}) async {
+    if (![1, 3, 6, 12].contains(months)) {
+      throw ArgumentError('Months must be one of: 1, 3, 6, or 12');
+    }
+
+    try {
+      final Database db = await BackEnd.db();
+
+      // Calculate the cutoff date (transactions older than this date)
+      final DateTime now = DateTime.now();
+      final DateTime cutoffDate = DateTime(
+        now.year,
+        now.month - months,
+        now.day,
+      );
+
+      // Format as YYYY-MM-DD for SQL comparison
+      final String cutoffDateStr = DateFormat('yyyy-MM-dd').format(cutoffDate);
+
+      // Convert DD-MM-YYYY to YYYY-MM-DD in SQL for proper date comparison
+      final List<Map<String, Object?>> response = await db.rawQuery(
+        '''
+      SELECT * FROM Transactions
+      WHERE substr(Transaction_Date, 7, 4) || '-' || 
+            substr(Transaction_Date, 4, 2) || '-' || 
+            substr(Transaction_Date, 1, 2) < ?
+      ORDER BY substr(Transaction_Date, 7, 4) DESC,
+               substr(Transaction_Date, 4, 2) DESC,
+               substr(Transaction_Date, 1, 2) DESC
+      ''',
+        [cutoffDateStr],
+      );
+
+      return Trx.toList(response);
+    } on DatabaseException catch (e) {
+      throw Exception(
+        'Database error while fetching transactions: ${e.toString()}',
+      );
+    } catch (e) {
+      throw Exception('Failed to fetch transactions by age: $e');
+    }
+  }
+
   //// P A Y M E N T S
 
   /// Fetch all payments of a transaction
   static Future<List<Payment>> fetchRequriedPaymentsOfTransaction({
     required int transactionId,
   }) async {
-    final db = await BackEnd.db();
-    final response = await db.query(
+    final Database db = await BackEnd.db();
+    final List<Map<String, Object?>> response = await db.query(
       'Payments',
       where: 'Transaction_ID = ?',
       whereArgs: [transactionId],
@@ -530,8 +603,8 @@ class BackEnd {
       throw ArgumentError('Payment amount must be greater than 0');
     }
 
-    final db = await BackEnd.db();
-    final id = await db.insert('Payments', {
+    final Database db = await BackEnd.db();
+    final int id = await db.insert('Payments', {
       "Transaction_ID": payment.transactionId,
       "Payment_Date": payment.paymentDate,
       "Amount_Paid": payment.amountpaid,
@@ -555,7 +628,7 @@ class BackEnd {
 
   /// Create new history entry
   static Future<int> createNewHistory(UserHistory history) async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final id = await db.insert('History', {
       "User_ID": history.userID,
       "Customer_ID": history.customerID,
@@ -570,6 +643,30 @@ class BackEnd {
     return id;
   }
 
+  /// Fetch all History for a specific date
+  /// [inputDate] - Date string in format 'DD-MM-YYYY' (e.g., '22-01-2026')
+  /// Returns list of transactions for that specific date
+  static Future<List<UserHistory>> fetchHistoryByDate({
+    required String inputDate,
+  }) async {
+    try {
+      final Database db = await BackEnd.db();
+
+      final List<Map<String, Object?>> response = await db.query(
+        'History',
+        where: 'Event_Date = ?',
+        whereArgs: [inputDate],
+        orderBy: 'Created_Date DESC',
+      );
+
+      return UserHistory.toList(response);
+    } on DatabaseException catch (e) {
+      throw Exception('Database error while fetching history: ${e.toString()}');
+    } catch (e) {
+      throw Exception('Failed to fetch history by date: $e');
+    }
+  }
+
   //// D A T A B A S E   M A N A G E M E N T
 
   /// Safely close database connection
@@ -582,7 +679,7 @@ class BackEnd {
 
   /// Backup database to a file
   static Future<String> backupDatabase() async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final dbPath = db.path;
 
     final appDocDir = await getApplicationDocumentsDirectory();
@@ -598,20 +695,20 @@ class BackEnd {
 
   /// Get database file size
   static Future<int> getDatabaseSize() async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final file = File(db.path);
     return await file.length();
   }
 
   /// Vacuum database to optimize storage
   static Future<void> vacuumDatabase() async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     await db.execute('VACUUM');
   }
 
   /// Check database integrity
   static Future<bool> checkDatabaseIntegrity() async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
     final result = await db.rawQuery('PRAGMA integrity_check');
     return result.isNotEmpty && result.first['integrity_check'] == 'ok';
   }

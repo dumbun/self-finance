@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/views/Add%20New%20Entry/customer_details_entry_view.dart';
 import 'package:self_finance/views/account_setting_view.dart';
 import 'package:self_finance/views/auth_view.dart';

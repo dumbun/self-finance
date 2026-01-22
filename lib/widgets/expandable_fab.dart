@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/constants/constants.dart';
-import 'package:self_finance/constants/routes.dart';
-import 'package:self_finance/fonts/body_two_default_text.dart';
-import 'package:self_finance/theme/app_colors.dart';
+import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/core/constants/routes.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 
 class ExpandableFab extends StatelessWidget {
   const ExpandableFab({super.key});
@@ -18,10 +18,7 @@ class ExpandableFab extends StatelessWidget {
       color: AppColors.getPrimaryColor,
       child: ListTile(
         onTap: onTap,
-        leading: Icon(
-          icon,
-          color: AppColors.getPrimaryTextColor,
-        ),
+        leading: Icon(icon, color: AppColors.getPrimaryTextColor),
         title: BodyTwoDefaultText(
           text: title,
           color: AppColors.getPrimaryTextColor,
@@ -48,7 +45,7 @@ class ExpandableFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
-      splashColor: AppColors.getPrimaryColor ,
+      splashColor: AppColors.getPrimaryColor,
       backgroundColor: AppColors.getPrimaryColor,
       tooltip: Constant.addNewTransactionToolTip,
       onPressed: () {
@@ -69,9 +66,7 @@ class ExpandableFab extends StatelessWidget {
                     Icons.add,
                     "Create new Contact",
                   ),
-                  SizedBox(
-                    height: 12.sp,
-                  ),
+                  SizedBox(height: 12.sp),
                   _buildFlotingActionButtons(
                     () => _navigateToContactsView(context),
                     Icons.contact_page_rounded,
