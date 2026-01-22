@@ -9,6 +9,17 @@ The Self-Finance app is a mobile application specifically designed for shopkeepe
 - **UI/UX Designer**: Sai Keerthi
 - **Developers**: Vamshi and Akhilesh Kiran
 
+## 📦 Builds (APK / IPA)
+
+Precompiled application builds are available in the **GitHub Releases** section.
+
+- 🔹 Android APK: [Download APK](https://github.com/dumbun/self-finance/releases/download/v2.3.0%2B0/app-release.apk)
+- 🔹 iOS IPA: [Download IPA](https://github.com/dumbun/self-finance/releases/download/v2.3.0%2B0/sf.ipa)
+
+> Note: Source code is available in this repository.  
+> Binaries are provided for testing/demo purposes only.
+
+
 The development team emphasizes thorough testing, effective project management, and collaboration among team members.
 
 ## Getting Started
