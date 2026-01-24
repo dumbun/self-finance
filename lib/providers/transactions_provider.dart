@@ -1,7 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/providers/home_screen_graph_value_provider.dart';
+import 'package:self_finance/providers/analytics_provider.dart';
+import 'package:self_finance/providers/monthly_chart_provider.dart';
 
 part 'transactions_provider.g.dart';
 
@@ -27,7 +28,8 @@ class AsyncTransactions extends _$AsyncTransactions {
       result = await BackEnd.createNewTransaction(transaction);
       return await _fetchAllTransactionsData();
     });
-    ref.refresh(homeScreenGraphValuesProvider.future).ignore();
+    ref.read(analyticsProvider.notifier).refresh().ignore();
+    ref.refresh(monthlyChartProvider.future).ignore();
     return result;
   }
 
@@ -57,16 +59,22 @@ class AsyncTransactions extends _$AsyncTransactions {
     return await BackEnd.fetchSumOfTakenAmount();
   }
 
-  Future<int> markAsPaidTransaction({required int trancationId}) async {
+  Future<int> markAsPaidTransaction({
+    required int trancationId,
+    required double intrestAmount,
+  }) async {
     int responce = 0;
     // Set the state to loading
     state = const AsyncValue.loading();
     // Add the new todo and reload the todo list from the remote repository
     state = await AsyncValue.guard(() async {
-      responce = await BackEnd.updateTransactionAsPaid(id: trancationId);
+      responce = await BackEnd.updateTransactionAsPaid(
+        id: trancationId,
+        intrestAmount: intrestAmount,
+      );
       return await _fetchAllTransactionsData();
     });
-
+    ref.refresh(monthlyChartProvider.future).ignore();
     return responce;
   }
 

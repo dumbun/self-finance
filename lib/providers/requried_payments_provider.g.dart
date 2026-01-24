@@ -7,7 +7,7 @@ part of 'requried_payments_provider.dart';
 // **************************************************************************
 
 String _$asyncRequriedPaymentHash() =>
-    r'6f2dca64ea9945e3d1a3d55c3e39547a3434c909';
+    r'26cd0af3e4c857d75f97528ceb48e22e9f4b6ecb';
 
 /// Copied from Dart SDK
 class _SystemHash {

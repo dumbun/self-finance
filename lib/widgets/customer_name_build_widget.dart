@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/providers/customer_provider.dart';
@@ -19,8 +18,8 @@ class CustomerNameBuildWidget extends ConsumerWidget {
             if (customer == null) {
               return BodyTwoDefaultText(text: 'Customer not found');
             }
-            return BodyOneDefaultText(
-              text: "${customer.name}\n${customer.number} ",
+            return BodyTwoDefaultText(
+              text: customer.name,
               bold: true,
               color: AppColors.getLigthGreyColor,
             );

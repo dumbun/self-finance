@@ -233,8 +233,7 @@ class _CustomerConformationViewState
                   transacrtionType: Constant.active,
                   amount: takenAmount,
                   intrestRate: widget.rateOfIntrest,
-                  intrestAmount:
-                      (widget.takenAmount * widget.rateOfIntrest) / 100,
+                  intrestAmount: 0.0,
                   remainingAmount: 0,
                   signature: signatureResponse,
                   createdDate: presentDateTime,

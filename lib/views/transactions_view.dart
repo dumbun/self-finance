@@ -43,6 +43,8 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             CupertinoSearchTextField(
+              suffixInsets: EdgeInsetsGeometry.all(12.sp),
+
               onSuffixTap: () async {
                 _searchText.clear();
                 ref.read(filterProvider).clear();
@@ -69,7 +71,7 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
                       .fetchTransactionsByDate(formattedDate);
                 } else {}
               },
-              suffixIcon: Icon(Icons.calendar_month),
+              suffixIcon: Icon(Icons.calendar_month, size: 22.sp),
               suffixMode: OverlayVisibilityMode.always,
               controller: _searchText,
               autocorrect: false,

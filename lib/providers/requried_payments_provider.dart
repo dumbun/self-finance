@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/payment_model.dart';
+import 'package:self_finance/providers/monthly_chart_provider.dart';
 
 part 'requried_payments_provider.g.dart';
 
@@ -35,7 +36,7 @@ class AsyncRequriedPayment extends _$AsyncRequriedPayment {
       responce = await BackEnd.addPayment(payment: payment);
       return _fetchPaymentData(transactionId: transactionId);
     });
-
+    ref.refresh(monthlyChartProvider.future).ignore();
     return responce;
   }
 }

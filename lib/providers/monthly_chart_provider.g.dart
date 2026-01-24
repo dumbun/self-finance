@@ -1,26 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'transactions_provider.dart';
+part of 'monthly_chart_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$asyncTransactionsHash() => r'edb48138c2daaf378e8fc60786a7316b4a53c0b9';
+String _$monthlyChartHash() => r'c27e7eaaf808fc5cca8cef40b2b8824c407e8c35';
 
-/// See also [AsyncTransactions].
-@ProviderFor(AsyncTransactions)
-final asyncTransactionsProvider =
-    AutoDisposeAsyncNotifierProvider<AsyncTransactions, List<Trx>>.internal(
-      AsyncTransactions.new,
-      name: r'asyncTransactionsProvider',
+/// See also [MonthlyChart].
+@ProviderFor(MonthlyChart)
+final monthlyChartProvider =
+    AutoDisposeAsyncNotifierProvider<MonthlyChart, MonthlyChartState>.internal(
+      MonthlyChart.new,
+      name: r'monthlyChartProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
           ? null
-          : _$asyncTransactionsHash,
+          : _$monthlyChartHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
 
-typedef _$AsyncTransactions = AutoDisposeAsyncNotifier<List<Trx>>;
+typedef _$MonthlyChart = AutoDisposeAsyncNotifier<MonthlyChartState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

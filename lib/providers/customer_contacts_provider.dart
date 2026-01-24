@@ -2,9 +2,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/providers/analytics_provider.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
-import 'package:self_finance/providers/home_screen_graph_value_provider.dart';
+import 'package:self_finance/providers/monthly_chart_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 
 part 'customer_contacts_provider.g.dart';
@@ -72,9 +73,10 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
       await BackEnd.deleteTheCustomer(customerID: customerID);
       return _fetchAllCustomersContactsData();
     });
-    ref.refresh(homeScreenGraphValuesProvider.future).ignore();
     ref.refresh(asyncTransactionsProvider.future).ignore();
     ref.refresh(asyncHistoryProvider.future).ignore();
+    ref.read(analyticsProvider.notifier).refresh();
+    ref.refresh(monthlyChartProvider.future).ignore();
   }
 
   Future<int> updateCustomer({
@@ -104,7 +106,6 @@ class AsyncCustomersContacts extends _$AsyncCustomersContacts {
     state = await AsyncValue.guard(() async {
       return _fetchAllCustomersContactsData();
     });
-    ref.refresh(homeScreenGraphValuesProvider.future).ignore();
     ref.refresh(asyncTransactionsProvider.future).ignore();
     ref.refresh(asyncHistoryProvider.future).ignore();
     return response;

@@ -147,7 +147,7 @@ class _CustomerByIdProviderElement
   int get customerId => (origin as CustomerByIdProvider).customerId;
 }
 
-String _$asyncCustomersHash() => r'cc25e8b75292ce4f432c3eacc9253ab0404133f9';
+String _$asyncCustomersHash() => r'19ef6007237051fff645c44b961ac619b0d61da4';
 
 /// See also [AsyncCustomers].
 @ProviderFor(AsyncCustomers)

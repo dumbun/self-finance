@@ -7,7 +7,7 @@ part of 'requried_transaction_provider.dart';
 // **************************************************************************
 
 String _$asyncRequriedTransactionsHash() =>
-    r'da27fc7f3d4ca0eac653cf06cd81cd5889378342';
+    r'fc7a3d59857037253317294fd9d4ca232f534b2d';
 
 /// Copied from Dart SDK
 class _SystemHash {

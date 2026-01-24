@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/user_history_model.dart';
+import 'package:self_finance/providers/analytics_provider.dart';
 
 part 'history_provider.g.dart';
 
@@ -26,6 +27,7 @@ class AsyncHistory extends _$AsyncHistory {
       result = await BackEnd.createNewHistory(history);
       return _fetchAllHistoryData();
     });
+    await ref.read(analyticsProvider.notifier).refresh();
     return result;
   }
 

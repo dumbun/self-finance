@@ -2,7 +2,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
-import 'package:self_finance/providers/home_screen_graph_value_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 
 part 'customer_provider.g.dart';
@@ -90,7 +89,7 @@ class AsyncCustomers extends _$AsyncCustomers {
       // Also invalidate the specific customer provider
       return _fetchAllCustomersData();
     });
-    ref.refresh(homeScreenGraphValuesProvider.future).ignore();
+
     ref.refresh(asyncTransactionsProvider.future).ignore();
   }
 }

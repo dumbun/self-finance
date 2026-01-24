@@ -56,65 +56,59 @@ class LatestTransactionsWidget extends ConsumerWidget {
             if (data.isEmpty) {
               return const SizedBox.shrink();
             }
-            return SizedBox(
-              height: 84.sp,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const BodyOneDefaultText(
-                    text: "Recent Activites",
-                    bold: true,
-                  ),
-                  SizedBox(height: 16.sp),
-                  Expanded(
-                    child: ListView.builder(
-                      shrinkWrap: false,
-                      addAutomaticKeepAlives: true,
-                      itemCount: data.length > 4 ? 4 : data.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Card(
-                          elevation: 0,
-                          child: Padding(
-                            padding: EdgeInsets.all(4.sp),
-                            child: ListTile(
-                              onTap: () => navigateToHistoryDetailedView(
-                                data[index].customerID,
-                                data[index],
-                              ),
-                              leading: data[index].eventType == Constant.debited
-                                  ? const Icon(
-                                      Icons.arrow_upward_rounded,
-                                      color: AppColors.getErrorColor,
-                                    )
-                                  : const Icon(
-                                      Icons.arrow_downward_rounded,
-                                      color: AppColors.getGreenColor,
-                                    ),
-                              title: Row(
-                                children: [
-                                  BodyOneDefaultText(
-                                    text:
-                                        '${Utility.doubleFormate(data[index].amount)} ',
-                                    bold: true,
-                                  ),
-                                  CurrencyWidget(),
-                                ],
-                              ),
-                              subtitle: BodyTwoDefaultText(
-                                text: data[index].customerName,
-                                bold: true,
-                                color: AppColors.getLigthGreyColor,
-                              ),
-                              trailing: _buildDate(data[index].eventDate),
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const BodyOneDefaultText(text: "Recent Activites", bold: true),
+                SizedBox(height: 16.sp),
+                Expanded(
+                  child: ListView.builder(
+                    shrinkWrap: false,
+                    addAutomaticKeepAlives: true,
+                    itemCount: data.length > 4 ? 4 : data.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Card(
+                        elevation: 0,
+                        child: Padding(
+                          padding: EdgeInsets.all(4.sp),
+                          child: ListTile(
+                            onTap: () => navigateToHistoryDetailedView(
+                              data[index].customerID,
+                              data[index],
                             ),
+                            leading: data[index].eventType == Constant.debited
+                                ? const Icon(
+                                    Icons.arrow_upward_rounded,
+                                    color: AppColors.getErrorColor,
+                                  )
+                                : const Icon(
+                                    Icons.arrow_downward_rounded,
+                                    color: AppColors.getGreenColor,
+                                  ),
+                            title: Row(
+                              children: [
+                                BodyOneDefaultText(
+                                  text:
+                                      '${Utility.doubleFormate(data[index].amount)} ',
+                                  bold: true,
+                                ),
+                                CurrencyWidget(),
+                              ],
+                            ),
+                            subtitle: BodyTwoDefaultText(
+                              text: data[index].customerName,
+                              bold: true,
+                              color: AppColors.getLigthGreyColor,
+                            ),
+                            trailing: _buildDate(data[index].eventDate),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           },
           error: (Object error, StackTrace stackTrace) =>

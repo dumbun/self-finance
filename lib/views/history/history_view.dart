@@ -95,7 +95,8 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
           children: [
             CupertinoSearchTextField(
               controller: _controller,
-              suffixIcon: Icon(Icons.calendar_month),
+              suffixInsets: EdgeInsetsGeometry.all(12.sp),
+              suffixIcon: Icon(Icons.calendar_month, size: 22.sp),
               suffixMode: OverlayVisibilityMode.always,
               onSuffixTap: () async {
                 _controller.clear();
@@ -171,6 +172,7 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   BodyOneDefaultText(
+                                    bold: true,
                                     text: "No histroy to view",
                                   ),
                                   Icon(

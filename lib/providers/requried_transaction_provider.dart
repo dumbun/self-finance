@@ -6,9 +6,9 @@ part 'requried_transaction_provider.g.dart';
 @riverpod
 class AsyncRequriedTransactions extends _$AsyncRequriedTransactions {
   Future<List<Trx>> _fetchAllTransactionsData(int id) async {
-    final data = await ref.watch(asyncTransactionsProvider.notifier).fetchRequriedTransaction(
-          transactionId: id,
-        );
+    final data = await ref
+        .watch(asyncTransactionsProvider.notifier)
+        .fetchRequriedTransaction(transactionId: id);
 
     return data;
   }
@@ -19,13 +19,21 @@ class AsyncRequriedTransactions extends _$AsyncRequriedTransactions {
     return _fetchAllTransactionsData(id);
   }
 
-  Future<int> markAsPaidTransaction({required int trancationId}) async {
+  Future<int> markAsPaidTransaction({
+    required int trancationId,
+    required double intrestAmount,
+  }) async {
     int responce = 0;
     // Set the state to loading
     state = const AsyncValue.loading();
     // Add the new todo and reload the todo list from the remote repository
     state = await AsyncValue.guard(() async {
-      responce = await ref.read(asyncTransactionsProvider.notifier).markAsPaidTransaction(trancationId: trancationId);
+      responce = await ref
+          .read(asyncTransactionsProvider.notifier)
+          .markAsPaidTransaction(
+            trancationId: trancationId,
+            intrestAmount: intrestAmount,
+          );
       return await _fetchAllTransactionsData(trancationId);
     });
 

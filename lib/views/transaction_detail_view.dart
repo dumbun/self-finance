@@ -137,8 +137,12 @@ class TransactionDetailView extends StatelessWidget {
                     : DateTime.now(),
               );
               return RoundedCornerButton(
-                onPressed: () =>
-                    _markAsPaid(ref, transaction, loanCalculator.totalAmount),
+                onPressed: () => _markAsPaid(
+                  ref: ref,
+                  transaction: transaction,
+                  totalIntrestAmount: loanCalculator.totalInterestAmount,
+                  totalAmountPaid: loanCalculator.totalAmount,
+                ),
                 icon: Icons.done,
                 text: "Mark As Paid",
               );
@@ -228,7 +232,7 @@ class TransactionDetailView extends StatelessWidget {
         return asyncTransaction.when(
           data: (List<Trx> data) {
             final transaction = data.first;
-            final loanCalculator = LoanCalculator(
+            final LoanCalculator loanCalculator = LoanCalculator(
               rateOfInterest: transaction.intrestRate,
               takenAmount: transaction.amount,
               takenDate: transaction.transacrtionDate,
@@ -376,20 +380,25 @@ class TransactionDetailView extends StatelessWidget {
     );
   }
 
-  void _markAsPaid(
-    WidgetRef ref,
-    Trx transaction,
-    double totalAmountPaid,
-  ) async {
+  void _markAsPaid({
+    required WidgetRef ref,
+    required Trx transaction,
+    required double totalIntrestAmount,
+    required double totalAmountPaid,
+  }) async {
+    print(totalAmountPaid);
     final List<Customer> c = await ref
         .read(asyncCustomersProvider.notifier)
         .fetchRequriedCustomerDetails(customerID: transaction.customerId);
     await ref
         .read(AsyncRequriedPaymentProvider(transaction.id!).notifier)
-        .addPayment(amountpaid: transaction.amount);
+        .addPayment(amountpaid: totalAmountPaid);
     await ref
         .read(asyncRequriedTransactionsProvider(transaction.id!).notifier)
-        .markAsPaidTransaction(trancationId: transaction.id!);
+        .markAsPaidTransaction(
+          trancationId: transaction.id!,
+          intrestAmount: totalIntrestAmount,
+        );
     await ref
         .read(asyncHistoryProvider.notifier)
         .addHistory(

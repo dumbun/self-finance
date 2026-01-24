@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/core/logic/logic.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
@@ -496,12 +497,16 @@ class BackEnd {
   }
 
   /// Update transaction as paid
-  static Future<int> updateTransactionAsPaid({required int id}) async {
+  static Future<int> updateTransactionAsPaid({
+    required int id,
+    required double intrestAmount,
+  }) async {
     final Database db = await BackEnd.db();
     return await db.update(
       'Transactions',
       {
         'Transaction_Type': Constant.inactive,
+        'Interest_Amount': intrestAmount,
         'Updated_Date': DateTime.now().toIso8601String(),
       },
       where: 'Transaction_ID = ?',
@@ -711,5 +716,111 @@ class BackEnd {
     final Database db = await BackEnd.db();
     final result = await db.rawQuery('PRAGMA integrity_check');
     return result.isNotEmpty && result.first['integrity_check'] == 'ok';
+  }
+
+  static Future<Map<String, num>> fetchAnalyticsData() async {
+    final db = await BackEnd.db();
+
+    final result = await db.rawQuery(
+      '''
+    SELECT
+      (SELECT COUNT(*) FROM Customers)  AS totalCustomers,
+
+      (SELECT COUNT(*) 
+         FROM Transactions 
+         WHERE Transaction_Type = ?)   AS activeLoans,
+
+      (SELECT COALESCE(SUM(Interest_Amount), 0)
+         FROM Transactions 
+         WHERE Transaction_Type = ?)  AS interestEarned,
+
+      (SELECT COALESCE(SUM(Amount), 0)
+         FROM Transactions) AS totalDisbursed,
+
+      (SELECT COALESCE(SUM(Amount_Paid), 0)
+         FROM Payments)  AS paymentsReceived
+  ''',
+      [
+        Constant.active, // activeLoans
+        Constant.inactive, // interestEarned
+      ],
+    );
+
+    final Map<String, Object?> row = result.first;
+
+    // for outstanding amount
+    final List<Map<String, Object?>> activeTxns = await db.query(
+      'Transactions',
+      where: 'Transaction_Type = ?',
+      whereArgs: [Constant.active],
+    );
+    double totalOutstanding = 0.0;
+    for (final t in activeTxns) {
+      // principal
+      final principal = (t['Amount'] as num?)?.toDouble() ?? 0.0;
+      final double rate = (t['Interest_Rate'] as num?)?.toDouble() ?? 0.0;
+      final String takenDate = (t['Transaction_Date'])?.toString() ?? "";
+      final LoanCalculator l = LoanCalculator(
+        takenAmount: principal,
+        rateOfInterest: rate,
+        takenDate: takenDate,
+      );
+      totalOutstanding = totalOutstanding + l.totalAmount;
+    }
+
+    return {
+      'totalCustomers': (row['totalCustomers'] as num?) ?? 0,
+      'activeLoans': (row['activeLoans'] as num?) ?? 0,
+      'outstandingAmount': totalOutstanding,
+      'interestEarned': (row['interestEarned'] as num?) ?? 0,
+      'totalDisbursed': (row['totalDisbursed'] as num?) ?? 0,
+      'paymentsReceived': (row['paymentsReceived'] as num?) ?? 0,
+    };
+  }
+
+  /// Fetch monthly transaction summary for last 6 months
+  static Future<List<Map<String, dynamic>>> fetchMonthlyChartData() async {
+    final db = await BackEnd.db();
+    final now = DateTime.now();
+    final List<Map<String, dynamic>> results = [];
+
+    for (int i = 5; i >= 0; i--) {
+      final date = DateTime(now.year, now.month - i, 1);
+      final monthStr = DateFormat('MMM').format(date);
+      final year = date.year;
+      final month = date.month.toString().padLeft(2, '0');
+
+      // Get disbursed amount (money going out - new loans)
+      // Transaction_Date format: dd-MM-yyyy
+      final disbursedResult = await db.rawQuery(
+        '''
+      SELECT COALESCE(SUM(Amount), 0) as total
+      FROM Transactions
+      WHERE substr(Transaction_Date, 4, 2) = ? 
+      AND substr(Transaction_Date, 7, 4) = ?
+      ''',
+        [month, year.toString()],
+      );
+
+      // Get received amount (money coming in - payments)
+      // Payment_Date format: ISO 8601 (yyyy-MM-ddTHH:mm:ss.sssZ)
+      // Extract year-month and compare with target year-month
+      final receivedResult = await db.rawQuery(
+        '''
+      SELECT COALESCE(SUM(Amount_Paid), 0) as total
+      FROM Payments
+      WHERE substr(Payment_Date, 1, 7) = ?
+      ''',
+        ['$year-$month'],
+      );
+
+      results.add({
+        'month': monthStr,
+        'disbursed': (disbursedResult.first['total'] as num).toDouble(),
+        'received': (receivedResult.first['total'] as num).toDouble(),
+      });
+    }
+
+    return results;
   }
 }

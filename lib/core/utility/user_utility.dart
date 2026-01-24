@@ -15,6 +15,18 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 
 class Utility {
+  /// Format numbers compactly for charts (e.g., 1000 -> 1K, 1000000 -> 1M)
+  static String compactNumber(double value) {
+    if (value >= 10000000) {
+      return '${(value / 10000000).toStringAsFixed(1)}Cr';
+    } else if (value >= 100000) {
+      return '${(value / 100000).toStringAsFixed(1)}L';
+    } else if (value >= 1000) {
+      return '${(value / 1000).toStringAsFixed(1)}K';
+    }
+    return value.toStringAsFixed(0);
+  }
+
   /// [getAppVersion] this method provides application version
   ///code taken from (https://www.geeksforgeeks.org/flutter-how-to-get-app-name-package-name-version-build-number/)
   // app version provider

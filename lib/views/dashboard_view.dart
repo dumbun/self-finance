@@ -49,6 +49,7 @@ class _DashboardViewState extends State<DashboardView> {
               });
             },
             children: <Widget>[
+              // HomeScreen(),
               HomeScreen(),
               TransactionsView(),
               EMICalculatorView(),

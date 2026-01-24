@@ -209,9 +209,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                 transacrtionType: Constant.active,
                 amount: _doubleCheck(_amount.text),
                 intrestRate: _doubleCheck(_rateOfIntrest.text),
-                intrestAmount:
-                    _doubleCheck(_amount.text) *
-                    (_doubleCheck(_rateOfIntrest.text) / 100),
+                intrestAmount: 0.0,
                 remainingAmount: 0.0,
                 signature: signaturePath,
                 createdDate: presentDate,
