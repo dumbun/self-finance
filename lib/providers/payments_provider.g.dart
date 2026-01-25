@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'requried_payments_provider.dart';
+part of 'payments_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$requriedPaymentsHash() => r'78e678813dcb88711d4caffb6bdd6fcee6fd64ab';
+String _$asyncPaymentHash() => r'7e8e2109c22c20e105b0956d43519c7abf27e323';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,23 +29,30 @@ class _SystemHash {
   }
 }
 
-/// See also [requriedPayments].
-@ProviderFor(requriedPayments)
-const requriedPaymentsProvider = RequriedPaymentsFamily();
+abstract class _$AsyncPayment
+    extends BuildlessAutoDisposeAsyncNotifier<List<Payment>> {
+  late final dynamic transactionId;
 
-/// See also [requriedPayments].
-class RequriedPaymentsFamily extends Family<List<Payment>> {
-  /// See also [requriedPayments].
-  const RequriedPaymentsFamily();
+  FutureOr<List<Payment>> build(dynamic transactionId);
+}
 
-  /// See also [requriedPayments].
-  RequriedPaymentsProvider call(int transactionId) {
-    return RequriedPaymentsProvider(transactionId);
+/// See also [AsyncPayment].
+@ProviderFor(AsyncPayment)
+const asyncPaymentProvider = AsyncPaymentFamily();
+
+/// See also [AsyncPayment].
+class AsyncPaymentFamily extends Family<AsyncValue<List<Payment>>> {
+  /// See also [AsyncPayment].
+  const AsyncPaymentFamily();
+
+  /// See also [AsyncPayment].
+  AsyncPaymentProvider call(dynamic transactionId) {
+    return AsyncPaymentProvider(transactionId);
   }
 
   @override
-  RequriedPaymentsProvider getProviderOverride(
-    covariant RequriedPaymentsProvider provider,
+  AsyncPaymentProvider getProviderOverride(
+    covariant AsyncPaymentProvider provider,
   ) {
     return call(provider.transactionId);
   }
@@ -62,27 +69,28 @@ class RequriedPaymentsFamily extends Family<List<Payment>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'requriedPaymentsProvider';
+  String? get name => r'asyncPaymentProvider';
 }
 
-/// See also [requriedPayments].
-class RequriedPaymentsProvider extends AutoDisposeProvider<List<Payment>> {
-  /// See also [requriedPayments].
-  RequriedPaymentsProvider(int transactionId)
+/// See also [AsyncPayment].
+class AsyncPaymentProvider
+    extends AutoDisposeAsyncNotifierProviderImpl<AsyncPayment, List<Payment>> {
+  /// See also [AsyncPayment].
+  AsyncPaymentProvider(dynamic transactionId)
     : this._internal(
-        (ref) => requriedPayments(ref as RequriedPaymentsRef, transactionId),
-        from: requriedPaymentsProvider,
-        name: r'requriedPaymentsProvider',
+        () => AsyncPayment()..transactionId = transactionId,
+        from: asyncPaymentProvider,
+        name: r'asyncPaymentProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
             ? null
-            : _$requriedPaymentsHash,
-        dependencies: RequriedPaymentsFamily._dependencies,
+            : _$asyncPaymentHash,
+        dependencies: AsyncPaymentFamily._dependencies,
         allTransitiveDependencies:
-            RequriedPaymentsFamily._allTransitiveDependencies,
+            AsyncPaymentFamily._allTransitiveDependencies,
         transactionId: transactionId,
       );
 
-  RequriedPaymentsProvider._internal(
+  AsyncPaymentProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -92,16 +100,19 @@ class RequriedPaymentsProvider extends AutoDisposeProvider<List<Payment>> {
     required this.transactionId,
   }) : super.internal();
 
-  final int transactionId;
+  final dynamic transactionId;
 
   @override
-  Override overrideWith(
-    List<Payment> Function(RequriedPaymentsRef provider) create,
-  ) {
+  FutureOr<List<Payment>> runNotifierBuild(covariant AsyncPayment notifier) {
+    return notifier.build(transactionId);
+  }
+
+  @override
+  Override overrideWith(AsyncPayment Function() create) {
     return ProviderOverride(
       origin: this,
-      override: RequriedPaymentsProvider._internal(
-        (ref) => create(ref as RequriedPaymentsRef),
+      override: AsyncPaymentProvider._internal(
+        () => create()..transactionId = transactionId,
         from: from,
         name: null,
         dependencies: null,
@@ -113,13 +124,14 @@ class RequriedPaymentsProvider extends AutoDisposeProvider<List<Payment>> {
   }
 
   @override
-  AutoDisposeProviderElement<List<Payment>> createElement() {
-    return _RequriedPaymentsProviderElement(this);
+  AutoDisposeAsyncNotifierProviderElement<AsyncPayment, List<Payment>>
+  createElement() {
+    return _AsyncPaymentProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is RequriedPaymentsProvider &&
+    return other is AsyncPaymentProvider &&
         other.transactionId == transactionId;
   }
 
@@ -134,18 +146,18 @@ class RequriedPaymentsProvider extends AutoDisposeProvider<List<Payment>> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin RequriedPaymentsRef on AutoDisposeProviderRef<List<Payment>> {
+mixin AsyncPaymentRef on AutoDisposeAsyncNotifierProviderRef<List<Payment>> {
   /// The parameter `transactionId` of this provider.
-  int get transactionId;
+  dynamic get transactionId;
 }
 
-class _RequriedPaymentsProviderElement
-    extends AutoDisposeProviderElement<List<Payment>>
-    with RequriedPaymentsRef {
-  _RequriedPaymentsProviderElement(super.provider);
+class _AsyncPaymentProviderElement
+    extends AutoDisposeAsyncNotifierProviderElement<AsyncPayment, List<Payment>>
+    with AsyncPaymentRef {
+  _AsyncPaymentProviderElement(super.provider);
 
   @override
-  int get transactionId => (origin as RequriedPaymentsProvider).transactionId;
+  dynamic get transactionId => (origin as AsyncPaymentProvider).transactionId;
 }
 
 // ignore_for_file: type=lint

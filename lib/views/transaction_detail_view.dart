@@ -17,6 +17,7 @@ import 'package:self_finance/models/user_history_model.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/items_provider.dart';
+import 'package:self_finance/providers/payments_provider.dart';
 import 'package:self_finance/providers/requried_payments_provider.dart';
 import 'package:self_finance/providers/requried_transaction_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
@@ -31,34 +32,6 @@ final requriedTransactionItemProvider = FutureProvider.family
       return await ref
           .read(asyncItemsProvider.notifier)
           .fetchRequriedItem(itemId: id);
-    });
-
-final AutoDisposeProviderFamily<List<Payment>, int> paymentsProvider = Provider
-    .family
-    .autoDispose<List<Payment>, int>((ref, int transactionId) {
-      return ref
-          .watch(asyncRequriedPaymentProvider(transactionId))
-          .when(
-            data: (List<Payment> data) => data,
-            error: (Object error, StackTrace stackTrace) => [
-              Payment(
-                transactionId: transactionId,
-                paymentDate: 'error',
-                amountpaid: 0000,
-                type: 'error',
-                createdDate: 'error',
-              ),
-            ],
-            loading: () => [
-              Payment(
-                transactionId: transactionId,
-                paymentDate: 'loading',
-                amountpaid: 402,
-                type: 'loading',
-                createdDate: 'loading',
-              ),
-            ],
-          );
     });
 
 class TransactionDetailView extends StatelessWidget {
@@ -119,7 +92,7 @@ class TransactionDetailView extends StatelessWidget {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
         final List<Payment> payments = ref.watch(
-          paymentsProvider(transacrtion.id!),
+          requriedPaymentsProvider(transacrtion.id!),
         );
         final transactionsProvider = ref.watch(
           asyncRequriedTransactionsProvider(transacrtion.id!),
@@ -222,7 +195,7 @@ class TransactionDetailView extends StatelessWidget {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
         // Using ref.read instead of ref.watch for providers that don’t need UI rebuilds.
-        final payments = ref.watch(paymentsProvider(transacrtion.id!));
+        final payments = ref.watch(requriedPaymentsProvider(transacrtion.id!));
 
         // Using async provider to fetch transactions
         final asyncTransaction = ref.watch(
@@ -386,12 +359,11 @@ class TransactionDetailView extends StatelessWidget {
     required double totalIntrestAmount,
     required double totalAmountPaid,
   }) async {
-    print(totalAmountPaid);
     final List<Customer> c = await ref
         .read(asyncCustomersProvider.notifier)
         .fetchRequriedCustomerDetails(customerID: transaction.customerId);
     await ref
-        .read(AsyncRequriedPaymentProvider(transaction.id!).notifier)
+        .read(AsyncPaymentProvider(transaction.id!).notifier)
         .addPayment(amountpaid: totalAmountPaid);
     await ref
         .read(asyncRequriedTransactionsProvider(transaction.id!).notifier)

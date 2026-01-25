@@ -99,7 +99,9 @@ class AsyncCustomers extends _$AsyncCustomers {
 @Riverpod(keepAlive: false)
 Future<Customer?> customerById(CustomerByIdRef ref, int customerId) async {
   // Watch the customer list - when it changes, this provider rebuilds
-  final customers = await ref.watch(asyncCustomersProvider.future);
+  final List<Customer> customers = await ref.watch(
+    asyncCustomersProvider.future,
+  );
 
   try {
     return customers.firstWhere((customer) => customer.id == customerId);

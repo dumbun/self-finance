@@ -1,15 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/dashboard_stats_model.dart';
 
-final analyticsProvider =
-    StateNotifierProvider<AnalyticsNotifier, AnalyticsState>((ref) {
-      return AnalyticsNotifier();
-    });
+part 'analytics_provider.g.dart'; // Add this for code generation
 
-class AnalyticsNotifier extends StateNotifier<AnalyticsState> {
-  AnalyticsNotifier() : super(AnalyticsState.empty()) {
+@riverpod
+class Analytics extends _$Analytics {
+  @override
+  AnalyticsState build() {
+    // Load analytics when provider is first created
     loadAnalytics();
+    return AnalyticsState.empty();
   }
 
   Future<void> loadAnalytics() async {
@@ -36,26 +38,33 @@ class AnalyticsNotifier extends StateNotifier<AnalyticsState> {
   }
 }
 
-final totalCustomersProvider = Provider<int>(
-  (ref) => ref.watch(analyticsProvider.select((s) => s.totalCustomers)),
-);
+// Derived providers using selectors
+@riverpod
+int totalCustomers(Ref ref) {
+  return ref.watch(analyticsProvider.select((s) => s.totalCustomers));
+}
 
-final activeLoansProvider = Provider<int>(
-  (ref) => ref.watch(analyticsProvider.select((s) => s.activeLoans)),
-);
+@riverpod
+int activeLoans(Ref ref) {
+  return ref.watch(analyticsProvider.select((s) => s.activeLoans));
+}
 
-final Provider<double> outstandingAmountProvider = Provider<double>(
-  (ref) => ref.watch(analyticsProvider.select((s) => s.outstandingAmount)),
-);
+@riverpod
+double outstandingAmount(Ref ref) {
+  return ref.watch(analyticsProvider.select((s) => s.outstandingAmount));
+}
 
-final interestEarnedProvider = Provider<double>(
-  (ref) => ref.watch(analyticsProvider.select((s) => s.interestEarned)),
-);
+@riverpod
+double interestEarned(Ref ref) {
+  return ref.watch(analyticsProvider.select((s) => s.interestEarned));
+}
 
-final totalDisbursedProvider = Provider<double>(
-  (ref) => ref.watch(analyticsProvider.select((s) => s.totalDisbursed)),
-);
+@riverpod
+double totalDisbursed(Ref ref) {
+  return ref.watch(analyticsProvider.select((s) => s.totalDisbursed));
+}
 
-final paymentsReceivedProvider = Provider<double>(
-  (ref) => ref.watch(analyticsProvider.select((s) => s.paymentsReceived)),
-);
+@riverpod
+double paymentsReceived(Ref ref) {
+  return ref.watch(analyticsProvider.select((s) => s.paymentsReceived));
+}

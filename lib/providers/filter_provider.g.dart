@@ -1,26 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'transactions_provider.dart';
+part of 'filter_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$asyncTransactionsHash() => r'6ab3fd61570304753cce783e60ff6c963f359e72';
+String _$filterHash() => r'97bd1b4d12a1e8429ae9ecbef3396850135e1f14';
 
-/// See also [AsyncTransactions].
-@ProviderFor(AsyncTransactions)
-final asyncTransactionsProvider =
-    AutoDisposeAsyncNotifierProvider<AsyncTransactions, List<Trx>>.internal(
-      AsyncTransactions.new,
-      name: r'asyncTransactionsProvider',
+/// See also [Filter].
+@ProviderFor(Filter)
+final filterProvider =
+    AutoDisposeNotifierProvider<Filter, Set<TransactionsFilters>>.internal(
+      Filter.new,
+      name: r'filterProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
           ? null
-          : _$asyncTransactionsHash,
+          : _$filterHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
 
-typedef _$AsyncTransactions = AutoDisposeAsyncNotifier<List<Trx>>;
+typedef _$Filter = AutoDisposeNotifier<Set<TransactionsFilters>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

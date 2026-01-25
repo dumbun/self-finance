@@ -8,6 +8,7 @@ import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/providers/filter_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
@@ -76,9 +77,7 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
               controller: _searchText,
               autocorrect: false,
               onChanged: (String value) {
-                ref
-                    .read(filterProvider.notifier)
-                    .update((Set<TransactionsFilters> state) => {});
+                ref.read(filterProvider.notifier).clear();
                 ref
                     .read(asyncTransactionsProvider.notifier)
                     .doSearch(givenInput: value);

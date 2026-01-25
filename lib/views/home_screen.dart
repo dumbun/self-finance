@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:self_finance/widgets/analatics_grid_widget.dart';
 import 'package:self_finance/widgets/monthly_chart_widget.dart';
 
@@ -10,7 +9,11 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: const Column(
-        children: [AnalaticsGridWidget(), MonthlyChartWidget()],
+        children: [
+          MonthlyChartWidget(),
+          AnalaticsGridWidget(),
+          // TransactionsMoreThanSixMothsWidget(),
+        ],
       ),
     );
   }

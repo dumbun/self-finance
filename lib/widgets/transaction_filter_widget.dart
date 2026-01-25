@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/providers/filter_provider.dart'
+    show filterProvider;
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 
@@ -33,10 +35,6 @@ enum TransactionsFilters {
   }
 }
 
-final filterProvider = StateProvider.autoDispose<Set<TransactionsFilters>>(
-  (ref) => {},
-);
-
 class TransactionFilterWidget extends ConsumerWidget {
   const TransactionFilterWidget({super.key});
 
@@ -59,7 +57,7 @@ class TransactionFilterWidget extends ConsumerWidget {
 
   void _toggleFilter(WidgetRef ref, TransactionsFilters filter, bool selected) {
     // Toggle filter - only one at a time
-    ref.read(filterProvider.notifier).state = selected ? {filter} : {};
+    ref.read(filterProvider.notifier).setFilter(filter, selected);
 
     // Fetch based on selection
     if (selected) {

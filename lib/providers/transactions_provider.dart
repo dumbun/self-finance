@@ -74,7 +74,6 @@ class AsyncTransactions extends _$AsyncTransactions {
       );
       return await _fetchAllTransactionsData();
     });
-    ref.refresh(monthlyChartProvider.future).ignore();
     return responce;
   }
 

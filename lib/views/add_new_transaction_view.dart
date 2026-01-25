@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/utility/image_saving_utility.dart';
+import 'package:self_finance/providers/image_providers.dart';
 import 'package:self_finance/widgets/signature_widget.dart';
 import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:signature/signature.dart';
@@ -21,11 +22,6 @@ import 'package:self_finance/widgets/input_date_picker.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
-
-///providers
-final newItemImageProvider = StateProvider.autoDispose<String>((ref) {
-  return "";
-});
 
 class AddNewTransactionView extends ConsumerStatefulWidget {
   const AddNewTransactionView({super.key, required this.customerID});
@@ -123,8 +119,12 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                   SizedBox(height: 30.sp),
                   // _buildItemImagePicker(),
                   ImagePickerWidget(
-                    imageProvier: itemProvider,
-                    title: 'items',
+                    imageProvider: itemFileProvider,
+                    onSetImage: (file) =>
+                        ref.read(itemFileProvider.notifier).set(file),
+                    onClearImage: () =>
+                        ref.read(itemFileProvider.notifier).clear(),
+                    title: Constant.customerItem,
                     defaultImage: Constant.defaultItemImagePath,
                   ),
 
@@ -175,7 +175,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
       _isloading = true;
       final String itemImagePath = await ImageSavingUtility.saveImage(
         location: 'items',
-        image: ref.read(itemProvider),
+        image: ref.read(itemFileProvider),
       );
       final int itemId = await ref
           .read(asyncItemsProvider.notifier)

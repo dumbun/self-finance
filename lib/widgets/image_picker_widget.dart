@@ -9,33 +9,24 @@ import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/utility/image_saving_utility.dart';
 
-final AutoDisposeStateProvider<XFile?> imageProvider =
-    StateProvider.autoDispose<XFile?>((ref) {
-      return null;
-    });
-final AutoDisposeStateProvider<XFile?> proofProvider =
-    StateProvider.autoDispose<XFile?>((ref) {
-      return null;
-    });
-final AutoDisposeStateProvider<XFile?> itemProvider =
-    StateProvider.autoDispose<XFile?>((ref) {
-      return null;
-    });
-
-class ImagePickerWidget extends StatelessWidget {
+class ImagePickerWidget extends ConsumerWidget {
   const ImagePickerWidget({
     super.key,
-    required this.imageProvier,
+    required this.imageProvider,
+    required this.onSetImage,
+    required this.onClearImage,
     required this.title,
     required this.defaultImage,
   });
 
   final String title;
   final String defaultImage;
-  final AutoDisposeStateProvider<XFile?> imageProvier;
+  final ProviderListenable<XFile?> imageProvider;
+  final void Function(XFile?) onSetImage;
+  final void Function() onClearImage;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
         showModalBottomSheet(
@@ -51,9 +42,9 @@ class ImagePickerWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  _buildCard("Camera", Icons.camera_alt),
-                  _buildCard("Gallary", Icons.photo_library_sharp),
-                  _buildCard("Remove", Icons.delete),
+                  _buildCard(context, "Camera", Icons.camera_alt),
+                  _buildCard(context, "Gallary", Icons.photo_library_sharp),
+                  _buildCard(context, "Remove", Icons.delete),
                 ],
               ),
             );
@@ -66,25 +57,9 @@ class ImagePickerWidget extends StatelessWidget {
           padding: EdgeInsets.all(18.sp),
           child: Column(
             children: [
-              Consumer(
-                builder: (context, ref, child) {
-                  final XFile? image = ref.watch(imageProvier);
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(8.sp),
-                    child: image == null
-                        ? SvgPicture.asset(
-                            defaultImage,
-                            height: 28.sp,
-                            width: 28.sp,
-                          )
-                        : Image.file(
-                            File(image.path),
-                            height: 48.sp,
-                            width: 48.sp,
-                            fit: BoxFit.fill,
-                          ),
-                  );
-                },
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8.sp),
+                child: _buildImageDisplay(ref),
               ),
               SizedBox(height: 10.sp),
               BodyTwoDefaultText(text: title, bold: true),
@@ -95,42 +70,53 @@ class ImagePickerWidget extends StatelessWidget {
     );
   }
 
-  Consumer _buildCard(String title, IconData icon) {
-    return Consumer(
-      builder: (BuildContext context, WidgetRef ref, Widget? child) {
-        return GestureDetector(
-          onTap: () async {
-            if (title == "Remove") {
-              ref.read(imageProvier.notifier).update((XFile? state) => null);
-              Navigator.pop(context);
-            } else if (title == "Camera") {
-              final XFile? image = await ImageSavingUtility.doPickImage(
-                camera: true,
-              );
-              ref.read(imageProvier.notifier).update((XFile? state) => image);
-              if (context.mounted) {
-                Navigator.pop(context);
-              }
-            } else {
-              final XFile? image = await ImageSavingUtility.doPickImage(
-                camera: false,
-              );
-              ref.read(imageProvier.notifier).update((XFile? state) => image);
-              if (context.mounted) {
-                Navigator.pop(context);
-              }
-            }
-          },
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(icon, size: 30.sp),
-              BodyOneDefaultText(text: title),
-            ],
-          ),
-        );
+  Widget _buildImageDisplay(WidgetRef ref) {
+    final XFile? image = ref.watch(imageProvider);
+
+    if (image == null) {
+      return SvgPicture.asset(defaultImage, height: 28.sp, width: 28.sp);
+    }
+
+    return Image.file(
+      File(image.path),
+      height: 42.sp,
+      width: 42.sp,
+      fit: BoxFit.fill,
+    );
+  }
+
+  Widget _buildCard(BuildContext context, String title, IconData icon) {
+    return GestureDetector(
+      onTap: () async {
+        if (title == "Remove") {
+          onClearImage();
+          Navigator.pop(context);
+        } else if (title == "Camera") {
+          final XFile? image = await ImageSavingUtility.doPickImage(
+            camera: true,
+          );
+          onSetImage(image);
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
+        } else {
+          final XFile? image = await ImageSavingUtility.doPickImage(
+            camera: false,
+          );
+          onSetImage(image);
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
+        }
       },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(icon, size: 30.sp),
+          BodyOneDefaultText(text: title),
+        ],
+      ),
     );
   }
 }

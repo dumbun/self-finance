@@ -22,19 +22,6 @@ import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/fab.dart';
 import 'package:self_finance/widgets/title_widget.dart';
 
-/// [updatedCustomerPhotoStringProvider] and [updatedCustomerProofStringProvider]
-/// are the providers for the new updated images for the updating
-/// this providers must update  the costomers old images as the primary values for the respected views before use
-/// because of this providers have inital value has empty state
-
-final updatedCustomerPhotoStringProvider = StateProvider<String>((ref) {
-  return "";
-});
-
-final updatedCustomerProofStringProvider = StateProvider<String>((ref) {
-  return "";
-});
-
 class ContactDetailsView extends ConsumerWidget {
   const ContactDetailsView({super.key, required this.customerID});
   final int customerID;

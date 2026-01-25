@@ -586,6 +586,44 @@ class BackEnd {
     }
   }
 
+  static Future<List<Trx>> fetchTransactionsOlderThanSixMonths() async {
+    try {
+      final Database db = await BackEnd.db();
+
+      // Calculate cutoff date (today - 6 months)
+      final DateTime now = DateTime.now();
+      final DateTime cutoffDate = DateTime(now.year, now.month - 6, now.day);
+
+      // Format cutoff as YYYY-MM-DD for SQL comparison
+      final String cutoffStr = DateFormat('yyyy-MM-dd').format(cutoffDate);
+
+      final List<Map<String, Object?>> response = await db.rawQuery(
+        '''
+      SELECT *
+      FROM Transactions
+      WHERE date(
+        substr(Transaction_Date, 7, 4) || '-' ||
+        substr(Transaction_Date, 4, 2) || '-' ||
+        substr(Transaction_Date, 1, 2)
+      ) < date(?)
+      ORDER BY
+        substr(Transaction_Date, 7, 4) DESC,
+        substr(Transaction_Date, 4, 2) DESC,
+        substr(Transaction_Date, 1, 2) DESC
+      ''',
+        [cutoffStr],
+      );
+
+      return Trx.toList(response);
+    } on DatabaseException catch (e) {
+      throw Exception(
+        'Database error while fetching old transactions: ${e.toString()}',
+      );
+    } catch (e) {
+      throw Exception('Failed to fetch transactions older than 6 months: $e');
+    }
+  }
+
   //// P A Y M E N T S
 
   /// Fetch all payments of a transaction

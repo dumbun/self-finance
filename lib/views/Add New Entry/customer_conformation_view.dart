@@ -12,13 +12,13 @@ import 'package:self_finance/models/user_history_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
+import 'package:self_finance/providers/image_providers.dart';
 import 'package:self_finance/providers/items_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/image_saving_utility.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
-// import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/signature_widget.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
@@ -97,14 +97,22 @@ class _CustomerConformationViewState
           children: [
             Expanded(
               child: ImagePickerWidget(
-                imageProvier: imageProvider,
+                imageProvider: imageFileProvider,
+                onSetImage: (file) =>
+                    ref.read(imageFileProvider.notifier).set(file),
+                onClearImage: () =>
+                    ref.read(imageFileProvider.notifier).clear(),
                 title: Constant.customerPhoto,
                 defaultImage: Constant.defaultProfileImagePath,
               ),
             ),
             Expanded(
               child: ImagePickerWidget(
-                imageProvier: proofProvider,
+                imageProvider: proofFileProvider,
+                onSetImage: (file) =>
+                    ref.read(proofFileProvider.notifier).set(file),
+                onClearImage: () =>
+                    ref.read(proofFileProvider.notifier).clear(),
                 title: Constant.customerProof,
                 defaultImage: Constant.defaultProofImagePath,
               ),
@@ -113,9 +121,11 @@ class _CustomerConformationViewState
         ),
         SizedBox(height: 10.sp),
         ImagePickerWidget(
+          imageProvider: itemFileProvider,
+          onSetImage: (file) => ref.read(itemFileProvider.notifier).set(file),
+          onClearImage: () => ref.read(itemFileProvider.notifier).clear(),
           title: Constant.customerItem,
           defaultImage: Constant.defaultItemImagePath,
-          imageProvier: itemProvider,
         ),
       ],
     );
@@ -169,12 +179,12 @@ class _CustomerConformationViewState
       // saving image to storage
       final String imagePath = await ImageSavingUtility.saveImage(
         location: 'customers',
-        image: ref.read(imageProvider),
+        image: ref.read(imageFileProvider),
       );
 
       final String proofPath = await ImageSavingUtility.saveImage(
         location: 'proofs',
-        image: ref.read(proofProvider),
+        image: ref.read(proofFileProvider),
       );
 
       // creating the new customer
@@ -198,7 +208,7 @@ class _CustomerConformationViewState
         // creating new item becacuse every new transaction will have a proof item
         final String itemImagePath = await ImageSavingUtility.saveImage(
           location: 'items',
-          image: ref.read(itemProvider),
+          image: ref.read(itemFileProvider),
         );
         final int itemCreatedResponse = await ref
             .read(asyncItemsProvider.notifier)
