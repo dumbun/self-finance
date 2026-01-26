@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/transaction_model.dart';
@@ -33,19 +34,6 @@ class AsyncTransactions extends _$AsyncTransactions {
     return result;
   }
 
-  Future<void> fetchRequriedCustomerTransactions({
-    required int customerID,
-  }) async {
-    // Set the state to loading
-    state = const AsyncValue.loading();
-    // Add the new todo and reload the todo list from the remote repository
-    state = await AsyncValue.guard(() async {
-      return await BackEnd.fetchRequriedCustomerTransactions(
-        customerId: customerID,
-      );
-    });
-  }
-
   Future<List<Trx>> fetchRequriedTransaction({
     required int transactionId,
   }) async {
@@ -53,10 +41,6 @@ class AsyncTransactions extends _$AsyncTransactions {
       transacrtionId: transactionId,
     );
     return responce;
-  }
-
-  Future<double> fetchSumOfTakenAmount() async {
-    return await BackEnd.fetchSumOfTakenAmount();
   }
 
   Future<int> markAsPaidTransaction({
@@ -120,4 +104,23 @@ class AsyncTransactions extends _$AsyncTransactions {
       });
     }
   }
+}
+
+@riverpod
+Future<List<Trx?>> transactionsByCustomerId(Ref ref, int customerId) async {
+  // Watch the customer list - when it changes, this provider rebuilds
+  ref.watch(asyncTransactionsProvider);
+  final List<Trx?> transactions =
+      await BackEnd.fetchRequriedCustomerTransactions(customerId: customerId);
+  return transactions;
+}
+
+@riverpod
+Future<List<Trx>> fetchRequriedTransaction(Ref ref, int transactionId) async {
+  // Watch the customer list - when it changes, this provider rebuilds
+  ref.watch(asyncTransactionsProvider);
+  final List<Trx> transactions = await BackEnd.fetchRequriedTransaction(
+    transacrtionId: transactionId,
+  );
+  return transactions;
 }

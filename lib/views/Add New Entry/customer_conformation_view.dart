@@ -75,12 +75,7 @@ class _CustomerConformationViewState
     return ListTile(
       contentPadding: EdgeInsets.all(4.sp),
       subtitle: currency
-          ? Row(
-              children: [
-                BodyOneDefaultText(bold: true, text: data),
-                CurrencyWidget(),
-              ],
-            )
+          ? CurrencyWidget(amount: data)
           : BodyOneDefaultText(bold: true, text: data),
       title: BodySmallText(text: title),
     );

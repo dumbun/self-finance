@@ -86,15 +86,8 @@ class LatestTransactionsWidget extends ConsumerWidget {
                                     Icons.arrow_downward_rounded,
                                     color: AppColors.getGreenColor,
                                   ),
-                            title: Row(
-                              children: [
-                                BodyOneDefaultText(
-                                  text:
-                                      '${Utility.doubleFormate(data[index].amount)} ',
-                                  bold: true,
-                                ),
-                                CurrencyWidget(),
-                              ],
+                            title: CurrencyWidget(
+                              amount: Utility.doubleFormate(data[index].amount),
                             ),
                             subtitle: BodyTwoDefaultText(
                               text: data[index].customerName,

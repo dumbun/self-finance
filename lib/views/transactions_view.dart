@@ -110,7 +110,8 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
                                   child: ListTile(
                                     onTap: () {
                                       Routes.navigateToTransactionDetailsView(
-                                        transacrtion: txn,
+                                        transacrtionId: txn.id!,
+                                        customerId: txn.customerId,
                                         context: context,
                                       );
                                     },
@@ -120,15 +121,8 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
                                           ? AppColors.contentColorGreen
                                           : AppColors.getErrorColor,
                                     ),
-                                    title: Row(
-                                      children: [
-                                        BodyOneDefaultText(
-                                          text:
-                                              '${Utility.doubleFormate(txn.amount)} ',
-                                          bold: true,
-                                        ),
-                                        CurrencyWidget(),
-                                      ],
+                                    title: CurrencyWidget(
+                                      amount: Utility.doubleFormate(txn.amount),
                                     ),
                                     subtitle: CustomerNameBuildWidget(
                                       customerID: txn.customerId,

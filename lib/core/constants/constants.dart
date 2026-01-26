@@ -128,4 +128,10 @@ abstract class Constant {
   static const String transactionDetails = "Transaction Details";
   static const String transactionStatus = "Transaction Status";
   static const String pleaseFillAllFields = "PLEASE FILL ALL FIELDS";
+  static const List<String> guardianList = <String>[
+    's/o',
+    'w/o',
+    'f/o',
+    'h/o, m/o',
+  ];
 }

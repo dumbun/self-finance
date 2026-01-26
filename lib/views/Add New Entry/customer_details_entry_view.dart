@@ -4,6 +4,7 @@ import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
+import 'package:self_finance/widgets/drop_down_gardian_selection.dart';
 import 'package:self_finance/widgets/fab.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 
@@ -22,12 +23,14 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
   final TextEditingController _gaurdianName = TextEditingController();
   final TextEditingController _address = TextEditingController();
   final TextEditingController _mobileNumber = TextEditingController();
+  final TextEditingController _gaurdianAlias = TextEditingController();
 
   @override
   void dispose() {
     _customerName.dispose();
     _mobileNumber.dispose();
     _gaurdianName.dispose();
+    _gaurdianAlias.dispose();
     _address.dispose();
     super.dispose();
   }
@@ -56,7 +59,7 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
               context: context,
               customerName: _customerName.text,
               mobileNumber: _mobileNumber.text,
-              gaurdianName: _gaurdianName.text,
+              gaurdianName: "${_gaurdianAlias.text}  ${_gaurdianName.text}",
               address: _address.text,
             );
           }
@@ -69,6 +72,8 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
             child: Form(
               key: _formKey,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // Customer name
                   SizedBox(height: 20.sp),
@@ -79,6 +84,8 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
                   ),
 
                   // gaurfian Name
+                  SizedBox(height: 20.sp),
+                  DropDownGardianSelection(controller: _gaurdianAlias),
                   SizedBox(height: 20.sp),
                   InputTextField(
                     keyboardType: TextInputType.name,

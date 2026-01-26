@@ -9,7 +9,6 @@ import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/fonts/selectable_text.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
-import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/providers/customer_provider.dart';
@@ -100,9 +99,9 @@ class ContactDetailsView extends ConsumerWidget {
           ],
           toolbarHeight: 32.sp,
           title: const BodyTwoDefaultText(text: "Contact Info", bold: true),
-          bottom: const TabBar(
+          bottom: TabBar(
             dividerColor: Colors.transparent,
-            tabs: [
+            tabs: const [
               Tab(icon: Icon(Icons.person)),
               Tab(icon: Icon(Icons.history)),
             ],
@@ -127,83 +126,84 @@ class ContactDetailsView extends ConsumerWidget {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
         return ref
-            .watch(asyncTransactionsProvider)
+            .watch(transactionsByCustomerIdProvider(customerID))
             .when(
-              data: (List<Trx> data) {
-                final List<Trx> transactions = data
-                    .where((Trx element) => element.customerId == customerID)
-                    .toList();
-                return transactions.isNotEmpty
-                    ? ListView.separated(
-                        itemCount: transactions.length,
-                        separatorBuilder: (BuildContext context, int index) =>
-                            SizedBox(height: 12.sp),
-                        itemBuilder: (BuildContext context, int index) {
-                          final Trx transaction = transactions[index];
-                          return GestureDetector(
-                            onTap: () =>
-                                Routes.navigateToTransactionDetailsView(
-                                  transacrtion: transaction,
-                                  context: context,
-                                ),
-                            child: Card(
-                              child: Padding(
-                                padding: EdgeInsets.all(16.sp),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Icon(
-                                      Icons.circle,
-                                      size: 24.sp,
-                                      color:
-                                          transaction.transacrtionType ==
-                                              Constant.active
-                                          ? AppColors.getGreenColor
-                                          : AppColors.getErrorColor,
-                                    ),
-                                    SizedBox(width: 18.sp),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            BodyOneDefaultText(
-                                              text:
-                                                  "${Constant.takenAmount}: ${Utility.doubleFormate(transaction.amount)} ",
+              data: (List<Trx?> transactions) {
+                if (transactions.isNotEmpty) {
+                  return transactions.isNotEmpty
+                      ? ListView.separated(
+                          itemCount: transactions.length,
+                          separatorBuilder: (BuildContext context, int index) =>
+                              SizedBox(height: 12.sp),
+                          itemBuilder: (BuildContext context, int index) {
+                            final Trx transaction = transactions[index]!;
+                            return GestureDetector(
+                              onTap: () =>
+                                  Routes.navigateToTransactionDetailsView(
+                                    transacrtionId: transaction.id!,
+                                    customerId: customerID,
+                                    context: context,
+                                  ),
+                              child: Card(
+                                child: Padding(
+                                  padding: EdgeInsets.all(16.sp),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.circle,
+                                        size: 24.sp,
+                                        color:
+                                            transaction.transacrtionType ==
+                                                Constant.active
+                                            ? AppColors.getGreenColor
+                                            : AppColors.getErrorColor,
+                                      ),
+                                      SizedBox(width: 18.sp),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          CurrencyWidget(
+                                            amount: Utility.doubleFormate(
+                                              transaction.amount,
                                             ),
-                                            CurrencyWidget(),
-                                          ],
-                                        ),
-                                        BodyOneDefaultText(
-                                          text:
-                                              "${Constant.takenDateSmall}: ${transaction.transacrtionDate}",
-                                        ),
-                                        BodyOneDefaultText(
-                                          text:
-                                              "${Constant.rateOfIntrest}: ${transaction.intrestRate}",
-                                        ),
-                                        BodyTwoDefaultText(
-                                          text:
-                                              'ID:  ${transaction.id.toString()}',
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                          ),
+                                          BodyOneDefaultText(
+                                            text:
+                                                "${Constant.takenDateSmall}: ${transaction.transacrtionDate}",
+                                          ),
+                                          BodyOneDefaultText(
+                                            text:
+                                                "${Constant.rateOfIntrest}: ${transaction.intrestRate}",
+                                          ),
+                                          BodyTwoDefaultText(
+                                            text:
+                                                'ID:  ${transaction.id.toString()}',
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                      )
-                    : const Center(
-                        child: BodyOneDefaultText(
-                          text: Constant.noTransactionMessage,
-                        ),
-                      );
+                            );
+                          },
+                        )
+                      : const Center(
+                          child: BodyOneDefaultText(
+                            text: Constant.noTransactionMessage,
+                          ),
+                        );
+                } else {
+                  return BodyTwoDefaultText(
+                    text: Constant.errorFetchingTransactionMessage,
+                  );
+                }
               },
               error: (Object error, StackTrace stackTrace) => const Center(
                 child: BodyOneDefaultText(
@@ -221,107 +221,109 @@ class ContactDetailsView extends ConsumerWidget {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
         return ref
-            .watch(asyncCustomersProvider)
+            .watch(customerByIdProvider(customerID))
             .when(
-              data: (List<Customer> data) {
-                final Customer customer = data
-                    .where((Customer element) => element.id! == customerID)
-                    .toList()
-                    .first;
-                return Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            SizedBox(height: 20.sp),
+              data: (customer) {
+                if (customer != null) {
+                  return Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              SizedBox(height: 20.sp),
 
-                            _buildImage(customer.photo, customer.name),
-                            SizedBox(height: 16.sp),
+                              _buildImage(customer.photo, customer.name),
+                              SizedBox(height: 16.sp),
 
-                            // Customer Name
-                            Padding(
-                              padding: EdgeInsets.only(
-                                left: 20.sp,
-                                right: 20.sp,
-                              ),
-                              child: Center(
-                                child: TitleWidget(
-                                  textAlign: TextAlign.center,
-                                  text: customer.name,
+                              // Customer Name
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  left: 20.sp,
+                                  right: 20.sp,
                                 ),
-                              ),
-                            ),
-                            SizedBox(height: 16.sp),
-
-                            _buildNumberDetails(customer.number),
-                            SizedBox(height: 12.sp),
-                            _buildDetails(
-                              const Icon(
-                                Icons.location_on,
-                                color: AppColors.getPrimaryColor,
-                              ),
-                              Constant.customerAddress,
-                              customer.address,
-                            ),
-                            SizedBox(height: 12.sp),
-                            _buildDetails(
-                              const Icon(
-                                Icons.family_restroom,
-                                color: AppColors.getPrimaryColor,
-                              ),
-                              Constant.guardianName,
-                              customer.guardianName,
-                            ),
-                            SizedBox(height: 12.sp),
-                            if (customer.proof.isNotEmpty)
-                              GestureDetector(
-                                onTap: () => Routes.navigateToImageView(
-                                  context: context,
-                                  imageWidget: Image.file(File(customer.proof)),
-                                  titile: "${customer.name} proof",
-                                ),
-                                child: Card(
-                                  elevation: 0,
-                                  child: Padding(
-                                    padding: EdgeInsets.all(14.sp),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        SizedBox(width: 12.sp),
-                                        const Icon(
-                                          Icons.arrow_forward_ios_rounded,
-                                          color: AppColors.getPrimaryColor,
-                                        ),
-                                        SizedBox(width: 20.sp),
-                                        const BodyOneDefaultText(
-                                          text: "Show Customer proof",
-                                          color: AppColors.getPrimaryColor,
-                                        ),
-                                      ],
-                                    ),
+                                child: Center(
+                                  child: TitleWidget(
+                                    textAlign: TextAlign.center,
+                                    text: customer.name,
                                   ),
                                 ),
                               ),
-                          ],
+                              SizedBox(height: 16.sp),
+
+                              _buildNumberDetails(customer.number),
+                              SizedBox(height: 12.sp),
+                              _buildDetails(
+                                const Icon(
+                                  Icons.location_on,
+                                  color: AppColors.getPrimaryColor,
+                                ),
+                                Constant.customerAddress,
+                                customer.address,
+                              ),
+                              SizedBox(height: 12.sp),
+                              _buildDetails(
+                                const Icon(
+                                  Icons.family_restroom,
+                                  color: AppColors.getPrimaryColor,
+                                ),
+                                Constant.guardianName,
+                                customer.guardianName,
+                              ),
+                              SizedBox(height: 12.sp),
+                              if (customer.proof.isNotEmpty)
+                                GestureDetector(
+                                  onTap: () => Routes.navigateToImageView(
+                                    context: context,
+                                    imageWidget: Image.file(
+                                      File(customer.proof),
+                                    ),
+                                    titile: "${customer.name} proof",
+                                  ),
+                                  child: Card(
+                                    elevation: 0,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(14.sp),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          SizedBox(width: 12.sp),
+                                          const Icon(
+                                            Icons.arrow_forward_ios_rounded,
+                                            color: AppColors.getPrimaryColor,
+                                          ),
+                                          SizedBox(width: 20.sp),
+                                          const BodyOneDefaultText(
+                                            text: "Show Customer proof",
+                                            color: AppColors.getPrimaryColor,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: BodyTwoDefaultText(
-                        text: "customer created on ${(customer.createdDate)}",
-                        color: AppColors.getLigthGreyColor,
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: BodyTwoDefaultText(
+                          text: "customer created on ${(customer.createdDate)}",
+                          color: AppColors.getLigthGreyColor,
+                        ),
                       ),
-                    ),
-                  ],
-                );
+                    ],
+                  );
+                } else {
+                  return Spacer();
+                }
               },
               error: (Object error, StackTrace stackTrace) => const Center(
                 child: BodyOneDefaultText(

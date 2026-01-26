@@ -8,7 +8,6 @@ import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/providers/customer_contacts_provider.dart';
-import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
 
@@ -16,13 +15,6 @@ class ContactsView extends ConsumerWidget {
   const ContactsView({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    void contactSelected(List<Contact> data, int index, BuildContext context) {
-      ref
-          .read(asyncTransactionsProvider.notifier)
-          .fetchRequriedCustomerTransactions(customerID: data[index].id);
-      Routes.navigateToContactDetailsView(context, customerID: data[index].id);
-    }
-
     Expanded buildCustomerList() {
       return Expanded(
         child: Consumer(
@@ -37,7 +29,10 @@ class ContactsView extends ConsumerWidget {
                             itemBuilder: (BuildContext context, int index) {
                               return GestureDetector(
                                 onTap: () =>
-                                    contactSelected(data, index, context),
+                                    Routes.navigateToContactDetailsView(
+                                      context,
+                                      customerID: data[index].id,
+                                    ),
                                 child: Card(
                                   margin: EdgeInsets.only(top: 16.sp),
                                   elevation: 0,

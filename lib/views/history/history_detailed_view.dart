@@ -16,7 +16,6 @@ import 'package:self_finance/providers/customer_contacts_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
-import 'package:self_finance/widgets/title_widget.dart';
 
 class HistoryDetailedView extends StatelessWidget {
   HistoryDetailedView({
@@ -77,21 +76,13 @@ class HistoryDetailedView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              TitleWidget(
-                                color: history.eventType == Constant.debited
-                                    ? AppColors.getErrorColor
-                                    : AppColors.getGreenColor,
-                                text:
-                                    '${history.eventType == Constant.debited ? '-' : '+'} ${Utility.doubleFormate(history.amount)} ',
-                              ),
-                              CurrencyWidget(
-                                color: history.eventType == Constant.debited
-                                    ? AppColors.getErrorColor
-                                    : AppColors.getGreenColor,
-                              ),
-                            ],
+                          CurrencyWidget(
+                            titleText: true,
+                            color: history.eventType == Constant.debited
+                                ? AppColors.getErrorColor
+                                : AppColors.getGreenColor,
+                            amount:
+                                '${history.eventType == Constant.debited ? '-' : '+'} ${Utility.doubleFormate(history.amount)}',
                           ),
 
                           GestureDetector(
@@ -163,7 +154,8 @@ class HistoryDetailedView extends StatelessWidget {
                 Center(
                   child: TextButton(
                     onPressed: () => Routes.navigateToTransactionDetailsView(
-                      transacrtion: transaction,
+                      transacrtionId: transaction.id!,
+                      customerId: customer.id!,
                       context: context,
                     ),
                     child: const BodyOneDefaultText(

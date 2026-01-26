@@ -24,18 +24,6 @@ class HistoryView extends ConsumerStatefulWidget {
 class _HistoryViewState extends ConsumerState<HistoryView> {
   final TextEditingController _controller = TextEditingController();
 
-  Row _buildAmount(String type, double amount) {
-    return Row(
-      children: [
-        BodyOneDefaultText(
-          bold: true,
-          text: "${Utility.doubleFormate(amount)} ",
-        ),
-        CurrencyWidget(),
-      ],
-    );
-  }
-
   Column _buildDate(String eventDate) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -151,9 +139,8 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
                                       ),
 
                                   leading: _buildIcon(type: curr.eventType),
-                                  title: _buildAmount(
-                                    curr.eventType,
-                                    curr.amount,
+                                  title: CurrencyWidget(
+                                    amount: Utility.doubleFormate(curr.amount),
                                   ),
                                   subtitle: BodyTwoDefaultText(
                                     text: curr.customerName,

@@ -19,12 +19,16 @@ import 'package:self_finance/views/user_creating_view.dart';
 
 class Routes {
   static void navigateToTransactionDetailsView({
-    required Trx transacrtion,
+    required int transacrtionId,
+    required int customerId,
     required BuildContext context,
   }) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => TransactionDetailView(transacrtion: transacrtion),
+        builder: (context) => TransactionDetailView(
+          transacrtionId: transacrtionId,
+          customerId: customerId,
+        ),
       ),
     );
   }

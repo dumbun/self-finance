@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/contacts_model.dart';
@@ -94,18 +95,15 @@ class AsyncCustomers extends _$AsyncCustomers {
   }
 }
 
-// Separate provider for fetching a specific customer
-// This will now automatically update when the customer list changes
-@Riverpod(keepAlive: false)
-Future<Customer?> customerById(CustomerByIdRef ref, int customerId) async {
+// // Separate provider for fetching a specific customer
+// // This will now automatically update when the customer list changes
+@riverpod
+Future<Customer?> customerById(Ref ref, int customerId) async {
   // Watch the customer list - when it changes, this provider rebuilds
-  final List<Customer> customers = await ref.watch(
-    asyncCustomersProvider.future,
-  );
+  ref.watch(asyncCustomersProvider);
+  final List<Customer> customers = await ref
+      .read(asyncCustomersProvider.notifier)
+      .fetchRequriedCustomerDetails(customerID: customerId);
 
-  try {
-    return customers.firstWhere((customer) => customer.id == customerId);
-  } catch (e) {
-    return null;
-  }
+  return customers.first;
 }
