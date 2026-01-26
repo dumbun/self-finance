@@ -6,26 +6,34 @@ part 'monthly_chart_provider.g.dart';
 
 @riverpod
 class MonthlyChart extends _$MonthlyChart {
+  @override
+  Future<MonthlyChartState> build() async {
+    // 🔒 Keep provider alive (optional but recommended for dashboard)
+    ref.keepAlive();
+
+    return _loadChartData();
+  }
+
   Future<MonthlyChartState> _loadChartData() async {
     try {
-      final List<Map<String, dynamic>> rawData =
-          await BackEnd.fetchMonthlyChartData();
-      final List<ChartData> chartData = ChartData.toList(rawData);
+      final rawData = await BackEnd.fetchMonthlyChartData();
+      final chartData = ChartData.toList(rawData);
 
-      // Calculate totals and max value
       double totalDisbursed = 0;
       double totalReceived = 0;
       double maxValue = 0;
 
-      for (var data in chartData) {
+      for (final data in chartData) {
         totalDisbursed += data.disbursed;
         totalReceived += data.received;
 
-        final max = [
-          data.disbursed,
-          data.received,
-        ].reduce((a, b) => a > b ? a : b);
-        if (max > maxValue) maxValue = max;
+        final localMax = data.disbursed > data.received
+            ? data.disbursed
+            : data.received;
+
+        if (localMax > maxValue) {
+          maxValue = localMax;
+        }
       }
 
       return MonthlyChartState(
@@ -34,21 +42,14 @@ class MonthlyChart extends _$MonthlyChart {
         totalDisbursed: totalDisbursed,
         totalReceived: totalReceived,
       );
-    } catch (e) {
+    } catch (_) {
       return MonthlyChartState.empty();
     }
   }
 
-  @override
-  FutureOr<MonthlyChartState> build() {
-    return _loadChartData();
-  }
-
-  /// Call this after any transaction or payment mutation
+  /// Manual refresh (call after insert / update if needed)
   Future<void> refresh() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      return _loadChartData();
-    });
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(_loadChartData);
   }
 }

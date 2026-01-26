@@ -108,7 +108,7 @@ final paymentsReceivedProvider = AutoDisposeProvider<double>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PaymentsReceivedRef = AutoDisposeProviderRef<double>;
-String _$analyticsHash() => r'7dacd0732acb8828a2cc17eb44ad8b720e49b8b4';
+String _$analyticsHash() => r'8fb695205e9a463851a1a540849a4e6eecda9cfc';
 
 /// See also [Analytics].
 @ProviderFor(Analytics)

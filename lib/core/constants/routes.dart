@@ -26,7 +26,7 @@ class Routes {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => TransactionDetailView(
-          transacrtionId: transacrtionId,
+          transactionId: transacrtionId,
           customerId: customerId,
         ),
       ),

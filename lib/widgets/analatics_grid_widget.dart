@@ -6,6 +6,7 @@ import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/providers/analytics_provider.dart';
+import 'package:self_finance/widgets/currency_widget.dart';
 
 class AnalaticsGridWidget extends ConsumerWidget {
   const AnalaticsGridWidget({super.key});
@@ -24,7 +25,7 @@ class AnalaticsGridWidget extends ConsumerWidget {
         final columns = _columnsForWidth(constraints.maxWidth);
 
         return Padding(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.sp),
           child: GridView.count(
             crossAxisCount: columns,
             mainAxisSpacing: 16,
@@ -48,7 +49,6 @@ class AnalaticsGridWidget extends ConsumerWidget {
   }
 }
 
-// Keep all the card widgets exactly as they are...
 /// ---------------------
 /// Individual Cards (each wired to a single provider selector)
 /// ---------------------
@@ -91,6 +91,7 @@ class _OutstandingAmountCard extends ConsumerWidget {
     return StatCardWidget(
       icon: Icons.account_balance_wallet,
       iconColor: AppColors.contentColorYellow,
+      currency: true,
       value: Utility.doubleFormate(value),
       title: 'Outstanding Amount\nTo be collected',
     );
@@ -108,6 +109,7 @@ class _InterestEarnedCard extends ConsumerWidget {
       iconColor: AppColors.contentColorPurple,
       value: Utility.doubleFormate(value),
       title: 'Interest Earned\nFrom completed',
+      currency: true,
     );
   }
 }
@@ -122,6 +124,7 @@ class _TotalDisbursedCard extends ConsumerWidget {
       icon: Icons.arrow_upward,
       iconColor: AppColors.getErrorColor,
       value: Utility.doubleFormate(value),
+      currency: true,
       title: 'Total Disbursed\nAll time',
     );
   }
@@ -136,6 +139,7 @@ class _PaymentsReceivedCard extends ConsumerWidget {
     return StatCardWidget(
       icon: Icons.arrow_downward,
       iconColor: AppColors.getGreenColor,
+      currency: true,
       value: Utility.doubleFormate(value),
       title: 'Payments Received\nTotal collected',
     );
@@ -150,13 +154,14 @@ class StatCardWidget extends StatelessWidget {
   final Color iconColor;
   final String value;
   final String title;
-
+  final bool currency;
   const StatCardWidget({
     super.key,
     required this.icon,
     required this.iconColor,
     required this.value,
     required this.title,
+    this.currency = false,
   });
 
   @override
@@ -166,7 +171,7 @@ class StatCardWidget extends StatelessWidget {
 
     return Card(
       elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.sp)),
       child: Container(
         padding: EdgeInsets.all(16.sp),
         decoration: BoxDecoration(
@@ -180,7 +185,7 @@ class StatCardWidget extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(12.sp),
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.12),
+                color: iconColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12.sp),
               ),
               child: Icon(icon, color: iconColor, size: 18.sp),
@@ -189,7 +194,9 @@ class StatCardWidget extends StatelessWidget {
             const Spacer(),
 
             // Value
-            BodyOneDefaultText(text: value, bold: true),
+            currency
+                ? CurrencyWidget(amount: value)
+                : BodyOneDefaultText(text: value, bold: true),
 
             SizedBox(height: 8.sp),
 

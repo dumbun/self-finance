@@ -5,7 +5,7 @@ import 'package:self_finance/providers/analytics_provider.dart';
 
 part 'history_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class AsyncHistory extends _$AsyncHistory {
   Future<List<UserHistory>> _fetchAllHistoryData() async {
     final data = await BackEnd.fetchAllUserHistory();
@@ -54,18 +54,6 @@ class AsyncHistory extends _$AsyncHistory {
               't_${element.transactionID.toString()}'.contains(inputLower);
         }).toList();
       }, (err) => err is! FormatException);
-    }
-  }
-
-  Future<void> fetchHistoryByDate(String userInputDate) async {
-    if (userInputDate.isNotEmpty) {
-      state = AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final List<UserHistory> response = await BackEnd.fetchHistoryByDate(
-          inputDate: userInputDate,
-        );
-        return response;
-      });
     }
   }
 

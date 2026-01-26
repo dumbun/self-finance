@@ -469,7 +469,6 @@ class BackEnd {
       whereArgs: [customerId],
       orderBy: 'Transaction_Date DESC',
     );
-    print(response.toString());
     return Trx.toList(response);
   }
 
@@ -647,30 +646,6 @@ class BackEnd {
       "Event_Type": history.eventType,
     }, conflictAlgorithm: ConflictAlgorithm.abort);
     return id;
-  }
-
-  /// Fetch all History for a specific date
-  /// [inputDate] - Date string in format 'DD-MM-YYYY' (e.g., '22-01-2026')
-  /// Returns list of transactions for that specific date
-  static Future<List<UserHistory>> fetchHistoryByDate({
-    required String inputDate,
-  }) async {
-    try {
-      final Database db = await BackEnd.db();
-
-      final List<Map<String, Object?>> response = await db.query(
-        'History',
-        where: 'Event_Date = ?',
-        whereArgs: [inputDate],
-        orderBy: 'Created_Date DESC',
-      );
-
-      return UserHistory.toList(response);
-    } on DatabaseException catch (e) {
-      throw Exception('Database error while fetching history: ${e.toString()}');
-    } catch (e) {
-      throw Exception('Failed to fetch history by date: $e');
-    }
   }
 
   //// D A T A B A S E   M A N A G E M E N T

@@ -83,29 +83,6 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
           children: [
             CupertinoSearchTextField(
               controller: _controller,
-              suffixInsets: EdgeInsetsGeometry.all(12.sp),
-              suffixIcon: Icon(Icons.calendar_month, size: 22.sp),
-              suffixMode: OverlayVisibilityMode.always,
-              onSuffixTap: () async {
-                _controller.clear();
-                DateTime? pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  currentDate: DateTime.now(),
-                  keyboardType: TextInputType.datetime,
-                  switchToCalendarEntryModeIcon: Icon(Icons.calendar_month),
-                  firstDate: DateTime(1900),
-                  //DateTime.now() - not to allow to choose before today.
-                  lastDate: DateTime.now(),
-                );
-                if (pickedDate != null) {
-                  //pickedDate output format => 2021-03-10 00:00:00.000
-                  String formattedDate = DateFormat(
-                    'dd-MM-yyyy',
-                  ).format(pickedDate);
-                  _controller.text = formattedDate;
-                }
-              },
               autocorrect: false,
               style: const TextStyle(
                 color: AppColors.getPrimaryColor,

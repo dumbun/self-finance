@@ -2,11 +2,15 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
+import 'package:self_finance/models/chart_model.dart';
 import 'package:self_finance/providers/monthly_chart_provider.dart';
+import 'package:self_finance/widgets/currency_widget.dart';
+import 'package:self_finance/widgets/title_widget.dart';
 
 class MonthlyChartWidget extends ConsumerWidget {
   const MonthlyChartWidget({super.key});
@@ -14,22 +18,21 @@ class MonthlyChartWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final chartStateAsync = ref.watch(monthlyChartProvider);
-    final theme = Theme.of(context);
 
     return chartStateAsync.when(
-      data: (state) {
+      data: (MonthlyChartState state) {
         if (state.data.isEmpty || _isAllZero(state)) {
-          return _EmptyState(theme: theme);
+          return _EmptyState();
         }
 
-        return _ChartContent(state: state, theme: theme);
+        return _ChartContent(state: state);
       },
-      loading: () => _LoadingState(theme: theme),
-      error: (err, stack) => _ErrorState(theme: theme, error: err),
+      loading: () => _LoadingState(),
+      error: (Object err, StackTrace stack) => _ErrorState(error: err),
     );
   }
 
-  bool _isAllZero(dynamic state) {
+  bool _isAllZero(MonthlyChartState state) {
     for (final m in state.data) {
       if (m.disbursed != 0.0 || m.received != 0.0) return false;
     }
@@ -39,54 +42,37 @@ class MonthlyChartWidget extends ConsumerWidget {
 
 // Separate widget to prevent rebuilds
 class _ChartContent extends StatelessWidget {
-  final dynamic state;
-  final ThemeData theme;
+  final MonthlyChartState state;
+
   static const double fontScale = 1.25;
 
-  const _ChartContent({required this.state, required this.theme});
+  const _ChartContent({required this.state});
 
   @override
   Widget build(BuildContext context) {
-    final safeMax = (state.maxValue <= 0) ? 1.0 : state.maxValue;
-    final horizontalInterval = safeMax / 4.0;
+    final double safeMax = (state.maxValue <= 0) ? 1.0 : state.maxValue;
+    final double horizontalInterval = safeMax / 4.0;
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
       padding: EdgeInsets.all(12.sp),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(14.sp),
-        boxShadow: [
-          BoxShadow(
-            color: theme.shadowColor.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          _ChartHeader(state: state, theme: theme, fontScale: fontScale),
+          _ChartHeader(state: state),
           SizedBox(height: 10.sp),
-          _ChartLegend(state: state, theme: theme, fontScale: fontScale),
+          _ChartLegend(state: state),
           SizedBox(height: 12.sp),
           _BarChartWidget(
             state: state,
-            theme: theme,
+
             safeMax: safeMax,
             horizontalInterval: horizontalInterval,
             fontScale: fontScale,
           ),
           SizedBox(height: 8.sp),
-          Text(
-            'Values shown in compact format.',
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontSize: (10.sp * fontScale),
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
-          ),
+          BodySmallText(text: 'Values shown in compact format.'),
         ],
       ),
     );
@@ -94,20 +80,14 @@ class _ChartContent extends StatelessWidget {
 }
 
 class _ChartHeader extends StatelessWidget {
-  final dynamic state;
-  final ThemeData theme;
-  final double fontScale;
+  final MonthlyChartState state;
 
-  const _ChartHeader({
-    required this.state,
-    required this.theme,
-    required this.fontScale,
-  });
+  const _ChartHeader({required this.state});
 
   @override
   Widget build(BuildContext context) {
-    final netFlow = state.totalReceived - state.totalDisbursed;
-    final isPositive = netFlow >= 0;
+    final double netFlow = state.totalReceived - state.totalDisbursed;
+    final bool isPositive = netFlow >= 0;
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 6.sp, vertical: 4.sp),
@@ -117,7 +97,7 @@ class _ChartHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
-              children: [
+              children: <Widget>[
                 const BodyOneDefaultText(text: 'Monthly Overview', bold: true),
                 SizedBox(height: 4.sp),
                 const BodyTwoDefaultText(text: 'Last 6 months performance'),
@@ -130,15 +110,11 @@ class _ChartHeader extends StatelessWidget {
             children: [
               const BodyTwoDefaultText(text: 'Net Flow'),
               SizedBox(height: 4.sp),
-              Text(
-                Utility.doubleFormate(netFlow),
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: (16.sp * fontScale),
-                  color: isPositive
-                      ? AppColors.getGreenColor
-                      : AppColors.contentColorRed,
-                ),
+              CurrencyWidget(
+                amount: Utility.doubleFormate(netFlow),
+                color: isPositive
+                    ? AppColors.getGreenColor
+                    : AppColors.contentColorRed,
               ),
             ],
           ),
@@ -149,15 +125,9 @@ class _ChartHeader extends StatelessWidget {
 }
 
 class _ChartLegend extends StatelessWidget {
-  final dynamic state;
-  final ThemeData theme;
-  final double fontScale;
+  final MonthlyChartState state;
 
-  const _ChartLegend({
-    required this.state,
-    required this.theme,
-    required this.fontScale,
-  });
+  const _ChartLegend({required this.state});
 
   @override
   Widget build(BuildContext context) {
@@ -167,20 +137,16 @@ class _ChartLegend extends StatelessWidget {
         runSpacing: 8.sp,
         spacing: 12.sp,
         crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
+        children: <Widget>[
           _LegendItemSmall(
             color: AppColors.contentColorRed,
             label: 'Disbursed',
             value: Utility.doubleFormate(state.totalDisbursed),
-            fontScale: fontScale,
-            theme: theme,
           ),
           _LegendItemSmall(
             color: AppColors.getGreenColor,
             label: 'Received',
             value: Utility.doubleFormate(state.totalReceived),
-            fontScale: fontScale,
-            theme: theme,
           ),
         ],
       ),
@@ -189,15 +155,13 @@ class _ChartLegend extends StatelessWidget {
 }
 
 class _BarChartWidget extends StatelessWidget {
-  final dynamic state;
-  final ThemeData theme;
+  final MonthlyChartState state;
   final double safeMax;
   final double horizontalInterval;
   final double fontScale;
 
   const _BarChartWidget({
     required this.state,
-    required this.theme,
     required this.safeMax,
     required this.horizontalInterval,
     required this.fontScale,
@@ -233,35 +197,45 @@ class _BarChartWidget extends StatelessWidget {
       enabled: true,
       touchTooltipData: BarTouchTooltipData(
         tooltipPadding: EdgeInsets.all(8.sp),
-        tooltipBorder: BorderSide(color: theme.dividerColor, width: 0.8),
-        getTooltipItem: (group, groupIndex, rod, rodIndex) {
-          final monthIndex = group.x.toInt();
-          if (monthIndex < 0 || monthIndex >= state.data.length) return null;
+        tooltipBorder: BorderSide(width: 0.8.sp),
+        getTooltipItem:
+            (
+              BarChartGroupData group,
+              int groupIndex,
+              BarChartRodData rod,
+              int rodIndex,
+            ) {
+              final int monthIndex = group.x.toInt();
+              if (monthIndex < 0 || monthIndex >= state.data.length) {
+                return null;
+              }
 
-          final monthData = state.data[monthIndex];
-          final labels = ['Disbursed', 'Received'];
-          final values = [monthData.disbursed, monthData.received];
-          final rodColor = rod.color ?? theme.colorScheme.primary;
+              final ChartData monthData = state.data[monthIndex];
+              final List<String> labels = ['Disbursed', 'Received'];
+              final List<double> values = [
+                monthData.disbursed,
+                monthData.received,
+              ];
+              final Color rodColor = rod.color ?? AppColors.borderColor;
 
-          return BarTooltipItem(
-            '${labels[rodIndex]}\n',
-            TextStyle(
-              color: theme.colorScheme.onSurface,
-              fontWeight: FontWeight.w600,
-              fontSize: (12.sp * fontScale),
-            ),
-            children: [
-              TextSpan(
-                text: Utility.doubleFormate(values[rodIndex]),
-                style: TextStyle(
-                  color: rodColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: (14.sp * fontScale),
+              return BarTooltipItem(
+                '${labels[rodIndex]}\n',
+                TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: (12.sp * fontScale),
                 ),
-              ),
-            ],
-          );
-        },
+                children: [
+                  TextSpan(
+                    text: Utility.doubleFormate(values[rodIndex]),
+                    style: TextStyle(
+                      color: rodColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: (14.sp * fontScale),
+                    ),
+                  ),
+                ],
+              );
+            },
       ),
     );
   }
@@ -275,21 +249,17 @@ class _BarChartWidget extends StatelessWidget {
         sideTitles: SideTitles(
           showTitles: true,
           reservedSize: 30.sp,
-          getTitlesWidget: (value, meta) {
-            final idx = value.toInt();
+          getTitlesWidget: (double value, TitleMeta meta) {
+            final int idx = value.toInt();
             if (idx < 0 || idx >= state.data.length) {
               return const SizedBox.shrink();
             }
 
             return Padding(
               padding: EdgeInsets.only(top: 6.sp),
-              child: Text(
-                state.data[idx].month,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontSize: (12.sp * fontScale),
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                ),
+              child: BodyTwoDefaultText(
+                text: state.data[idx].month,
+                bold: true,
               ),
             );
           },
@@ -300,14 +270,8 @@ class _BarChartWidget extends StatelessWidget {
           showTitles: true,
           reservedSize: 36.sp,
           interval: horizontalInterval,
-          getTitlesWidget: (value, meta) {
-            return Text(
-              Utility.compactNumber(value),
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontSize: (12.sp * fontScale),
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-              ),
-            );
+          getTitlesWidget: (double value, TitleMeta meta) {
+            return BodySmallText(text: Utility.compactNumber(value));
           },
         ),
       ),
@@ -318,9 +282,10 @@ class _BarChartWidget extends StatelessWidget {
     return FlGridData(
       show: true,
       drawVerticalLine: false,
+      drawHorizontalLine: true,
       horizontalInterval: horizontalInterval,
-      getDrawingHorizontalLine: (v) => FlLine(
-        color: theme.dividerColor.withValues(alpha: 0.18),
+      getDrawingHorizontalLine: (double v) => FlLine(
+        color: AppColors.getLigthGreyColor.withValues(alpha: 0.18),
         strokeWidth: 1,
       ),
     );
@@ -330,85 +295,62 @@ class _BarChartWidget extends StatelessWidget {
     final red = AppColors.contentColorRed;
     final green = AppColors.getGreenColor;
 
-    return List.generate(
-      state.data.length,
-      (index) {
-        final m = state.data[index];
-        return BarChartGroupData(
-          x: index,
-          barsSpace: 8.sp,
-          barRods: [
-            BarChartRodData(
-              toY: m.disbursed,
-              width: 14.sp,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(4.sp)),
-              color: red.withValues(alpha: 0.85),
-              backDrawRodData: BackgroundBarChartRodData(
-                show: true,
-                toY: safeMax * 1.2,
-                color: theme.dividerColor.withValues(alpha: 0.06),
-              ),
+    return List.generate(state.data.length, (int index) {
+      final m = state.data[index];
+      return BarChartGroupData(
+        x: index,
+        barsSpace: 8.sp,
+        barRods: [
+          BarChartRodData(
+            toY: m.disbursed,
+            width: 14.sp,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(4.sp)),
+            color: red.withValues(alpha: 0.85),
+            backDrawRodData: BackgroundBarChartRodData(
+              show: true,
+              toY: safeMax * 1.2,
+              color: AppColors.getLigthGreyColor.withValues(alpha: 0.06),
             ),
-            BarChartRodData(
-              toY: m.received,
-              width: 14.sp,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(4.sp)),
-              color: green.withValues(alpha: 0.85),
+          ),
+          BarChartRodData(
+            toY: m.received,
+            width: 14.sp,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(4.sp)),
+            color: green.withValues(alpha: 0.85),
+            backDrawRodData: BackgroundBarChartRodData(
+              show: true,
+              toY: safeMax * 1.2,
+              color: AppColors.getLigthGreyColor.withValues(alpha: 0.06),
             ),
-          ],
-        );
-      },
-      growable: false, // Performance optimization
-    );
+          ),
+        ],
+      );
+    });
   }
 }
 
 // Empty, Loading, and Error states as const widgets
 class _EmptyState extends StatelessWidget {
-  final ThemeData theme;
-  static const double fontScale = 1.25;
-
-  const _EmptyState({required this.theme});
-
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.all(16.sp),
       padding: EdgeInsets.all(20.sp),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(14.sp),
-        boxShadow: [
-          BoxShadow(
-            color: theme.shadowColor.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
+        children: <Widget>[
           SizedBox(height: 12.sp),
           Icon(
             Icons.bar_chart,
             size: 56.sp,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
+            color: AppColors.getLigthGreyColor,
           ),
           SizedBox(height: 12.sp),
-          Text(
-            'No monthly data yet',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontSize: (18.sp * fontScale),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          TitleWidget(text: 'No monthly data yet', bold: true),
           SizedBox(height: 6.sp),
-          Text(
-            'We couldn\'t find any transactions to show. Add some transactions to see monthly stats.',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontSize: (13.sp * fontScale),
-            ),
+          BodyTwoDefaultText(
+            text:
+                'We couldn\'t find any transactions to show. Add some transactions to see monthly stats.',
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 12.sp),
@@ -419,61 +361,39 @@ class _EmptyState extends StatelessWidget {
 }
 
 class _LoadingState extends StatelessWidget {
-  final ThemeData theme;
-
-  const _LoadingState({required this.theme});
+  const _LoadingState();
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
       padding: EdgeInsets.all(16.sp),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(14.sp),
-        boxShadow: [
-          BoxShadow(
-            color: theme.shadowColor.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(14.sp)),
       child: const Center(child: CircularProgressIndicator()),
     );
   }
 }
 
 class _ErrorState extends StatelessWidget {
-  final ThemeData theme;
   final Object error;
   static const double fontScale = 1.25;
 
-  const _ErrorState({required this.theme, required this.error});
+  const _ErrorState({required this.error});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.all(16.sp),
       padding: EdgeInsets.all(12.sp),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12.sp),
-      ),
+
       child: Row(
         children: [
-          Icon(
-            Icons.error_outline,
-            color: theme.colorScheme.error,
-            size: (20.sp * fontScale),
-          ),
+          Icon(Icons.error_outline, size: (20.sp * fontScale)),
           SizedBox(width: 12.sp),
           Expanded(
-            child: Text(
-              'Something went wrong while loading the chart.',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: (13.sp * fontScale),
-              ),
+            child: BodyTwoDefaultText(
+              text: 'Something went wrong while loading the chart.',
+              error: true,
             ),
           ),
         ],
@@ -486,62 +406,36 @@ class _LegendItemSmall extends StatelessWidget {
   final Color color;
   final String label;
   final String value;
-  final double fontScale;
-  final ThemeData theme;
 
   const _LegendItemSmall({
     required this.color,
     required this.label,
     required this.value,
-    required this.fontScale,
-    required this.theme,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 6.sp),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(8.sp),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 10.sp,
-            height: 10.sp,
+            width: 16.sp,
+            height: 16.sp,
             decoration: BoxDecoration(
               color: color,
               borderRadius: BorderRadius.circular(2.sp),
             ),
           ),
-          SizedBox(width: 8.sp),
+          SizedBox(width: 10.sp),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontSize: (12.sp * fontScale),
-                ),
-              ),
+            children: <Widget>[
+              BodySmallText(text: label),
               SizedBox(height: 2.sp),
-              Text(
-                value,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: (13.sp * fontScale),
-                ),
-              ),
+              CurrencyWidget(amount: value),
             ],
           ),
         ],

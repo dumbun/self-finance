@@ -9,12 +9,19 @@ part 'analytics_provider.g.dart'; // Add this for code generation
 class Analytics extends _$Analytics {
   @override
   AnalyticsState build() {
-    // Load analytics when provider is first created
-    loadAnalytics();
+    // 🔒 Keep analytics alive
+    final KeepAliveLink link = ref.keepAlive();
+
+    // Optional: release memory after inactivity
+    Future.delayed(const Duration(minutes: 10), () {
+      link.close();
+    });
+
+    _loadAnalytics();
     return AnalyticsState.empty();
   }
 
-  Future<void> loadAnalytics() async {
+  Future<void> _loadAnalytics() async {
     try {
       final Map<String, num> data = await BackEnd.fetchAnalyticsData();
 
@@ -26,15 +33,13 @@ class Analytics extends _$Analytics {
         totalDisbursed: data['totalDisbursed']!.toDouble(),
         paymentsReceived: data['paymentsReceived']!.toDouble(),
       );
-    } catch (e) {
-      // Optional: log error / show snackbar
+    } catch (_) {
       state = AnalyticsState.empty();
     }
   }
 
-  /// Call this after any DB mutation
   Future<void> refresh() async {
-    await loadAnalytics();
+    await _loadAnalytics();
   }
 }
 
