@@ -8,6 +8,7 @@ import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
+import 'package:self_finance/core/utility/invoice_generator_utility.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
@@ -36,7 +37,10 @@ class HistoryDetailedView extends ConsumerWidget {
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Utility.screenShotShare(screenshotController, context),
+        onPressed: () => InvoiceGenerator.shareInvoice(
+          transactionID: history.transactionID,
+          customerID: history.customerID,
+        ),
         child: const Icon(Icons.share_rounded),
       ),
       appBar: AppBar(

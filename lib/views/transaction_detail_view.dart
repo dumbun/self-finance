@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:screenshot/screenshot.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/logic/logic.dart';
+import 'package:self_finance/core/utility/Invoice_generator_utility.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history_model.dart';
 import 'package:self_finance/providers/customer_provider.dart';
@@ -34,7 +34,6 @@ class TransactionDetailView extends ConsumerStatefulWidget {
 }
 
 class _TransactionDetailViewState extends ConsumerState<TransactionDetailView> {
-  final ScreenshotController _screenShotController = ScreenshotController();
   bool _isProcessing = false;
 
   @override
@@ -56,8 +55,12 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView> {
               Icons.share_rounded,
               color: AppColors.getPrimaryColor,
             ),
-            onPressed: () =>
-                Utility.screenShotShare(_screenShotController, context),
+            onPressed: () async {
+              await InvoiceGenerator.shareInvoice(
+                customerID: widget.customerId,
+                transactionID: widget.transactionId,
+              );
+            },
           ),
         ],
         title: const BodyTwoDefaultText(
@@ -65,19 +68,16 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView> {
           bold: true,
         ),
       ),
-      body: Screenshot(
-        controller: _screenShotController,
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.all(12.sp),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                TransactionDetailsWidget(transactionId: widget.transactionId),
-                _buildPaymentButton(),
-              ],
-            ),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(12.sp),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              TransactionDetailsWidget(transactionId: widget.transactionId),
+              _buildPaymentButton(),
+            ],
           ),
         ),
       ),

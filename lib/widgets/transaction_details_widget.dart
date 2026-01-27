@@ -245,7 +245,6 @@ class TransactionDetailsWidget extends ConsumerWidget {
                   icon: Icons.topic_outlined,
                   trailingIcon: Icons.app_registration_sharp,
                 ),
-
               SizedBox(height: 12.sp),
             ],
           ),
