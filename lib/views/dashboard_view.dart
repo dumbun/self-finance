@@ -48,7 +48,7 @@ class _DashboardViewState extends State<DashboardView> {
                 selectedPageIndex = index;
               });
             },
-            children: <Widget>[
+            children: const <Widget>[
               // HomeScreen(),
               HomeScreen(),
               TransactionsView(),

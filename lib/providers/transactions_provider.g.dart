@@ -280,7 +280,7 @@ class _FetchRequriedTransactionProviderElement
       (origin as FetchRequriedTransactionProvider).transactionId;
 }
 
-String _$asyncTransactionsHash() => r'd0a50c0c7cc2b2f64c2f1d85350e4c8217c1afdb';
+String _$asyncTransactionsHash() => r'857b5dc1b00e997884dfbaa67b93f5e4c3689619';
 
 /// See also [AsyncTransactions].
 @ProviderFor(AsyncTransactions)

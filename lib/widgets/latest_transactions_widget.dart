@@ -41,12 +41,7 @@ class LatestTransactionsWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     void navigateToHistoryDetailedView(int customerID, UserHistory history) {
-      Routes.navigateToHistoryDetailedView(
-        context: context,
-        customerID: customerID,
-        history: history,
-        transactionID: history.transactionID,
-      );
+      Routes.navigateToHistoryDetailedView(context: context, history: history);
     }
 
     return ref

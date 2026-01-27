@@ -3,16 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/core/constants/routes.dart';
-import 'package:self_finance/core/fonts/body_text.dart';
-import 'package:self_finance/core/fonts/body_two_default_text.dart';
-import 'package:self_finance/core/utility/user_utility.dart';
-import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/providers/filter_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
-import 'package:self_finance/widgets/currency_widget.dart';
-import 'package:self_finance/widgets/customer_name_build_widget.dart';
+import 'package:self_finance/widgets/build_transactions_list_widget.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
 import 'package:self_finance/widgets/transaction_filter_widget.dart';
 
@@ -42,7 +36,7 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
+          children: <Widget>[
             CupertinoSearchTextField(
               suffixInsets: EdgeInsetsGeometry.all(12.sp),
 
@@ -89,79 +83,10 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
               keyboardType: TextInputType.name,
             ),
             SizedBox(height: 16.sp),
-            TransactionFilterWidget(),
+            const TransactionFilterWidget(),
             SizedBox(height: 16.sp),
             // List Builder
-            Expanded(
-              child: Consumer(
-                builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                  return ref
-                      .watch(asyncTransactionsProvider)
-                      .when(
-                        data: (List<Trx> data) {
-                          if (data.isNotEmpty) {
-                            return ListView.builder(
-                              shrinkWrap: true, // ← important
-                              itemCount: data.length, // ← important
-                              itemBuilder: (context, index) {
-                                final Trx txn = data[index];
-                                return Card(
-                                  elevation: 0,
-                                  child: ListTile(
-                                    onTap: () {
-                                      Routes.navigateToTransactionDetailsView(
-                                        transacrtionId: txn.id!,
-                                        customerId: txn.customerId,
-                                        context: context,
-                                      );
-                                    },
-                                    leading: Icon(
-                                      Icons.circle,
-                                      color: txn.transacrtionType == 'Active'
-                                          ? AppColors.contentColorGreen
-                                          : AppColors.getErrorColor,
-                                    ),
-                                    title: CurrencyWidget(
-                                      amount: Utility.doubleFormate(txn.amount),
-                                    ),
-                                    subtitle: CustomerNameBuildWidget(
-                                      customerID: txn.customerId,
-                                    ),
-                                    trailing: BodyTwoDefaultText(
-                                      text:
-                                          '${txn.transacrtionDate}\nID: ${txn.id}',
-                                      bold: true,
-                                      color: AppColors.getLigthGreyColor,
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          } else {
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                BodyOneDefaultText(
-                                  bold: true,
-                                  text: "No Transactons to view",
-                                ),
-                                Icon(
-                                  Icons.web_asset_off,
-                                  size: 80.sp,
-                                  color: AppColors.getLigthGreyColor,
-                                ),
-                              ],
-                            );
-                          }
-                        },
-                        error: (Object error, StackTrace stackTrace) =>
-                            Text(error.toString()),
-                        loading: () => const CircularProgressIndicator(),
-                      );
-                },
-              ),
-            ),
+            const Expanded(child: BuildTransactionsListWidget()),
           ],
         ),
       ),

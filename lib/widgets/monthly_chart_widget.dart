@@ -72,7 +72,7 @@ class _ChartContent extends StatelessWidget {
             fontScale: fontScale,
           ),
           SizedBox(height: 8.sp),
-          BodySmallText(text: 'Values shown in compact format.'),
+          const BodySmallText(text: 'Values shown in compact format.'),
         ],
       ),
     );
@@ -141,12 +141,12 @@ class _ChartLegend extends StatelessWidget {
           _LegendItemSmall(
             color: AppColors.contentColorRed,
             label: 'Disbursed',
-            value: Utility.doubleFormate(state.totalDisbursed),
+            value: state.totalDisbursed,
           ),
           _LegendItemSmall(
             color: AppColors.getGreenColor,
             label: 'Received',
-            value: Utility.doubleFormate(state.totalReceived),
+            value: state.totalReceived,
           ),
         ],
       ),
@@ -292,11 +292,11 @@ class _BarChartWidget extends StatelessWidget {
   }
 
   List<BarChartGroupData> _buildBarGroups() {
-    final red = AppColors.contentColorRed;
-    final green = AppColors.getGreenColor;
+    final Color red = AppColors.contentColorRed;
+    final Color green = AppColors.getGreenColor;
 
     return List.generate(state.data.length, (int index) {
-      final m = state.data[index];
+      final ChartData m = state.data[index];
       return BarChartGroupData(
         x: index,
         barsSpace: 8.sp,
@@ -346,9 +346,9 @@ class _EmptyState extends StatelessWidget {
             color: AppColors.getLigthGreyColor,
           ),
           SizedBox(height: 12.sp),
-          TitleWidget(text: 'No monthly data yet', bold: true),
+          const TitleWidget(text: 'No monthly data yet', bold: true),
           SizedBox(height: 6.sp),
-          BodyTwoDefaultText(
+          const BodyTwoDefaultText(
             text:
                 'We couldn\'t find any transactions to show. Add some transactions to see monthly stats.',
             textAlign: TextAlign.center,
@@ -391,7 +391,7 @@ class _ErrorState extends StatelessWidget {
           Icon(Icons.error_outline, size: (20.sp * fontScale)),
           SizedBox(width: 12.sp),
           Expanded(
-            child: BodyTwoDefaultText(
+            child: const BodyTwoDefaultText(
               text: 'Something went wrong while loading the chart.',
               error: true,
             ),
@@ -405,7 +405,7 @@ class _ErrorState extends StatelessWidget {
 class _LegendItemSmall extends StatelessWidget {
   final Color color;
   final String label;
-  final String value;
+  final double value;
 
   const _LegendItemSmall({
     required this.color,
@@ -435,7 +435,7 @@ class _LegendItemSmall extends StatelessWidget {
             children: <Widget>[
               BodySmallText(text: label),
               SizedBox(height: 2.sp),
-              CurrencyWidget(amount: value),
+              CurrencyWidget(amount: Utility.doubleFormate(value)),
             ],
           ),
         ],

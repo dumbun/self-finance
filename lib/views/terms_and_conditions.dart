@@ -176,13 +176,4 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
       ),
     );
   }
-
-  // Center _getIcon() {
-  //   return Center(
-  //     child: Container(
-  //       margin: EdgeInsets.only(top: 20.sp, bottom: 24.sp),
-  //       child: const AppIcon(),
-  //     ),
-  //   );
-  // }
 }

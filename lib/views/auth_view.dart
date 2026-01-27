@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:self_finance/backend/user_db.dart' show UserBackEnd;
+import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/views/terms_and_conditions.dart';
@@ -15,10 +16,10 @@ class AuthView extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<List<User>> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           default:
             if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
+              return BodyOneDefaultText(text: 'Error: ${snapshot.error}');
             } else {
               if (snapshot.data!.isNotEmpty) {
                 return PinAuthView(userDate: snapshot.requireData);

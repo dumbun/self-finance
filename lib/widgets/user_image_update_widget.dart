@@ -117,7 +117,11 @@ class UserImageUpdateWidget extends ConsumerWidget {
                           width: 46.sp,
                           child: Image.file(
                             File(userImageString),
-                            fit: BoxFit.fill,
+                            height: 500,
+                            width: 500,
+                            fit: BoxFit.cover,
+                            cacheWidth: 500,
+                            cacheHeight: 500,
                           ),
                         ),
                       ),

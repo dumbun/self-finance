@@ -76,7 +76,7 @@ class _PinAuthViewState extends State<PinAuthView> {
                       SizedBox(height: 20.sp),
                       RoundedCornerButton(
                         text: Constant.login,
-                        onPressed: () => getLogin(widget.userDate.first),
+                        onPressed: () => _getLogin(widget.userDate.first),
                       ),
 
                       IconButton(
@@ -106,7 +106,7 @@ class _PinAuthViewState extends State<PinAuthView> {
     );
   }
 
-  void getLogin(User user) {
+  void _getLogin(User user) {
     if (user.userPin == _pinController.text) {
       Routes.navigateToDashboard(context: context);
     } else {

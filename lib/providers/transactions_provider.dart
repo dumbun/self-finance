@@ -16,7 +16,8 @@ class AsyncTransactions extends _$AsyncTransactions {
 
   @override
   FutureOr<List<Trx>> build() {
-    // Load initial todo list from the remote repository
+    // Load initial todo list from the remote repository\
+    ref.keepAlive();
     return _fetchAllTransactionsData();
   }
 

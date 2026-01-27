@@ -132,6 +132,7 @@ abstract class Constant {
     's/o',
     'w/o',
     'f/o',
-    'h/o, m/o',
+    'h/o',
+    'm/o',
   ];
 }

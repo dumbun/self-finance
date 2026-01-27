@@ -81,7 +81,9 @@ class ImagePickerWidget extends ConsumerWidget {
       File(image.path),
       height: 42.sp,
       width: 42.sp,
-      fit: BoxFit.fill,
+      fit: BoxFit.cover,
+      cacheWidth: 500,
+      cacheHeight: 500,
     );
   }
 

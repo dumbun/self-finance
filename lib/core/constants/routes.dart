@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
-import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history_model.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/views/Add%20New%20Entry/customer_conformation_view.dart';
@@ -170,25 +168,13 @@ class Routes {
 
   static void navigateToHistoryDetailedView({
     required BuildContext context,
-    required int customerID,
     required UserHistory history,
-    required int transactionID,
   }) async {
-    List<Customer> customer = await BackEnd.fetchSingleContactDetails(
-      id: customerID,
-    );
-    List<Trx> transaction = await BackEnd.fetchRequriedTransaction(
-      transacrtionId: transactionID,
-    );
-
-    if (customer.isNotEmpty && transaction.isNotEmpty && context.mounted) {
+    if (context.mounted) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (BuildContext context) => HistoryDetailedView(
-            customer: customer.first,
-            history: history,
-            transaction: transaction.first,
-          ),
+          builder: (BuildContext context) =>
+              HistoryDetailedView(history: history),
         ),
       );
     }
