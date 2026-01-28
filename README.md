@@ -49,7 +49,7 @@ To get started with the development or to run the project locally, ensure you ha
 
 ### Running the Application
 
-***Imprtant***
+***Important***
 
 Before running the application 
 
