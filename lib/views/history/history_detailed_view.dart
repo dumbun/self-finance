@@ -30,10 +30,10 @@ class HistoryDetailedView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final screenshotController = ScreenshotController();
-    final eventDate = DateTime.parse(history.eventDate);
-    final formattedDate = _formatDate(eventDate);
-    final isDebit = history.eventType == Constant.debited;
+    final ScreenshotController screenshotController = ScreenshotController();
+    final DateTime eventDate = DateTime.parse(history.eventDate);
+    final String formattedDate = _formatDate(eventDate);
+    final bool isDebit = history.eventType == Constant.debited;
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
@@ -94,7 +94,9 @@ class _HeaderSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final customerAsync = ref.watch(customerByIdProvider(history.customerID));
+    final AsyncValue<Customer?> customerAsync = ref.watch(
+      customerByIdProvider(history.customerID),
+    );
 
     return Container(
       margin: EdgeInsets.only(top: 18.sp),
@@ -152,7 +154,7 @@ class _HeaderSection extends ConsumerWidget {
             child: CircularProgressIndicator.adaptive(),
           ),
         ),
-        error: (e, _) =>
+        error: (Object e, _) =>
             Center(child: BodyTwoDefaultText(text: 'Error: ${e.toString()}')),
       ),
     );

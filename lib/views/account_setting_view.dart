@@ -96,7 +96,7 @@ class AccountSettingsView extends StatelessWidget {
 
                                       // logout button
                                       SizedBox(height: 12.sp),
-                                      BackupWithProgressWidget(),
+                                      const BackupWithProgressWidget(),
                                       _buildLogoutButton(
                                         context: context,
                                         userData: data,

@@ -53,7 +53,7 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
     });
 
     try {
-      final zipPath = await BackupUtility.backupImagesAndSqliteToDownloads(
+      final zipPath = await BackupUtility.startBackup(
         onProgress: (progress, currentFile) {
           if (!mounted) return;
 
@@ -76,10 +76,6 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
         _zipPath = zipPath;
         _progress = 1.0;
       });
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Backup completed: $zipPath')));
     } catch (e) {
       debugPrint('Backup failed: $e');
       if (!mounted) return;
@@ -154,7 +150,6 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
   @override
   Widget build(BuildContext context) {
     final eta = _estimateRemaining();
-    final percent = (_progress * 100).clamp(0.0, 100.0);
 
     return Card(
       margin: const EdgeInsets.all(12),
@@ -163,89 +158,60 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const BodyOneDefaultText(
-              text: 'Backup - Images & Database',
-              bold: true,
-            ),
+            const BodyOneDefaultText(text: 'Backup', bold: true),
             const SizedBox(height: 12),
 
             // Progress indicator area
             if (!_running && _progress == 0.0) ...[
               ElevatedButton.icon(
-                icon: const Icon(Icons.cloud_upload),
-                label: const Text('Start Backup'),
+                icon: const Icon(Icons.cloud_upload, size: 32),
+                label: const BodyOneDefaultText(
+                  text: 'Start Backup',
+                  bold: true,
+                ),
                 onPressed: _startBackup,
               ),
             ] else ...[
-              // Show circular + linear indicators
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: 56,
-                    height: 56,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Circular indicator: indeterminate until first progress > 0
-                        if (_progress <= 0.0)
-                          const CircularProgressIndicator()
-                        else
-                          CircularProgressIndicator(value: _progress),
-                        if (_progress > 0)
-                          Text(
-                            '${percent.toStringAsFixed(0)}%',
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                      ],
-                    ),
+                  // Linear progress
+                  LinearProgressIndicator(
+                    value: _progress > 0 ? _progress : null,
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Linear progress
-                        LinearProgressIndicator(
-                          value: _progress > 0 ? _progress : null,
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _running
+                              ? 'Backing up: ${_truncateFilename(_currentFile)}'
+                              : (_zipPath != null ? 'Backup saved' : 'Idle'),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                _running
-                                    ? 'Backing up: ${_truncateFilename(_currentFile)}'
-                                    : (_zipPath != null
-                                          ? 'Backup saved'
-                                          : 'Idle'),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            if (_running) ...[
-                              if (eta != null)
-                                Text(
-                                  'ETA: ${_formatDurationShort(eta)}',
-                                  style: const TextStyle(fontSize: 12),
-                                )
-                              else
-                                const Text(
-                                  'Estimating...',
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                            ] else if (_zipPath != null) ...[
-                              Text(
-                                'Saved',
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                            ],
-                          ],
+                      ),
+                      const SizedBox(width: 8),
+                      if (_running) ...[
+                        if (eta != null)
+                          Text(
+                            'ETA: ${_formatDurationShort(eta)}',
+                            style: const TextStyle(fontSize: 12),
+                          )
+                        else
+                          const Text(
+                            'Estimating...',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                      ] else if (_zipPath != null) ...[
+                        Text(
+                          'Saved',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                         ),
                       ],
-                    ),
+                    ],
                   ),
                 ],
               ),

@@ -49,7 +49,19 @@ To get started with the development or to run the project locally, ensure you ha
 
 ### Running the Application
 
-To start the application on your device or emulator, run:
+***Imprtant***
+
+Before running the application 
+
+*Step 1:* Create a .env file in the project root directory (same level as pubspec.yaml)
+
+*Step 2:* Add the following entry to the .env 
+
+```bash
+      BACKUP_PASSWORD=your_strong_password_here
+```
+
+*Step 3:* To start the application on your device or emulator, run:
 
 ```bash
 flutter run

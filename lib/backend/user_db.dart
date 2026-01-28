@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart' as p;
 
 /// An abstract class to handle database operations related to the User model.
 /// Provides methods for creating the database table, performing CRUD operations,
@@ -23,11 +27,30 @@ abstract class UserBackEnd {
   /// Returns a [Database] instance.
 
   static Future<Database> db() async {
-    final String databasePath = await getDatabasesPath();
-    final path = '$databasePath/user.db';
-    return openDatabase(path, version: 1, onCreate: (Database database, int version) async {
-      await createTable(database);
-    });
+    final String databasePath = await _getDatabasePath("user.db");
+
+    return openDatabase(
+      databasePath,
+      version: 1,
+      onCreate: (Database database, int version) async {
+        await createTable(database);
+      },
+    );
+  }
+
+  /// Get platform-specific database path
+  static Future<String> _getDatabasePath(String databaseName) async {
+    if (Platform.isIOS) {
+      // iOS: Use app documents directory
+      final Directory appDocDir = await getApplicationDocumentsDirectory();
+      final Directory dbDir = Directory(p.join(appDocDir.path, 'databases'));
+      await dbDir.create(recursive: true);
+      return p.join(dbDir.path, databaseName);
+    } else {
+      // Android and others: Use standard database path
+      final String databasePath = await getDatabasesPath();
+      return p.join(databasePath, databaseName);
+    }
   }
 
   /// Inserts a new user into the USER table.
@@ -46,7 +69,11 @@ abstract class UserBackEnd {
         "USER_CURRENCY": user.userCurrency,
         "USER_PROFILE_PICTURE": user.profilePicture,
       };
-      final id = await db.insert('USER', data, conflictAlgorithm: ConflictAlgorithm.replace);
+      final id = await db.insert(
+        'USER',
+        data,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
       return id != 0 ? true : false;
     } catch (e) {
       return false;
@@ -105,7 +132,12 @@ abstract class UserBackEnd {
   static Future<int> updateUserName(int id, String name) async {
     final db = await UserBackEnd.db();
     final data = {'USER_NAME': name};
-    final result = await db.update('USER', data, where: "id = ?", whereArgs: [id]);
+    final result = await db.update(
+      'USER',
+      data,
+      where: "id = ?",
+      whereArgs: [id],
+    );
     return result;
   }
   // Update the USER_PIN
@@ -113,7 +145,12 @@ abstract class UserBackEnd {
   static Future<int> updateUserPin(int id, String pin) async {
     final db = await UserBackEnd.db();
     final data = {'USER_PIN': pin};
-    final result = await db.update('USER', data, where: "id = ?", whereArgs: [id]);
+    final result = await db.update(
+      'USER',
+      data,
+      where: "id = ?",
+      whereArgs: [id],
+    );
     return result;
   }
 
@@ -122,7 +159,12 @@ abstract class UserBackEnd {
   static Future<int> updateUserCurrency(int id, String currency) async {
     final db = await UserBackEnd.db();
     final data = {'USER_CURRENCY': currency};
-    final result = await db.update('USER', data, where: "id = ?", whereArgs: [id]);
+    final result = await db.update(
+      'USER',
+      data,
+      where: "id = ?",
+      whereArgs: [id],
+    );
     return result;
   }
   // Update the USER_PROFILE_PIC
@@ -130,7 +172,12 @@ abstract class UserBackEnd {
   static Future<int> updateProfilePic(int id, String imageString) async {
     final db = await UserBackEnd.db();
     final data = {'USER_PROFILE_PICTURE': imageString};
-    final result = await db.update('USER', data, where: "id = ?", whereArgs: [id]);
+    final result = await db.update(
+      'USER',
+      data,
+      where: "id = ?",
+      whereArgs: [id],
+    );
     return result;
   }
   // Update the USER
@@ -144,7 +191,12 @@ abstract class UserBackEnd {
       'USER_CURRENCY': user.userCurrency,
       'USER_PROFILE_PICTURE': user.profilePicture,
     };
-    final result = await db.update('USER', data, where: "id = ?", whereArgs: [user.id]);
+    final result = await db.update(
+      'USER',
+      data,
+      where: "id = ?",
+      whereArgs: [user.id],
+    );
     return result;
   }
 
@@ -153,11 +205,7 @@ abstract class UserBackEnd {
   static Future<List<User>> fetchPin(String pin) async {
     final db = await UserBackEnd.db();
     List<User> data = User.toList(
-      await db.query(
-        "USER",
-        where: "USER_PIN = ?",
-        whereArgs: [pin],
-      ),
+      await db.query("USER", where: "USER_PIN = ?", whereArgs: [pin]),
     );
     return data;
   }

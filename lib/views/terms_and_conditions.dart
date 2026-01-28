@@ -53,7 +53,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
     return RoundedCornerButton(
       text: "Restore",
       onPressed: () {
-        RestoreUtility.restoreBackupFromZip();
+        RestoreUtility.restoreBackupFromZip(context: context);
       },
     );
   }
