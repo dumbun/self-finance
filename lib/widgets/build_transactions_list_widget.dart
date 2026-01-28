@@ -145,20 +145,22 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                 },
               );
             } else {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const BodyOneDefaultText(
-                    bold: true,
-                    text: "No Transactons to view",
-                  ),
-                  Icon(
-                    Icons.web_asset_off,
-                    size: 80.sp,
-                    color: AppColors.getLigthGreyColor,
-                  ),
-                ],
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const BodyOneDefaultText(
+                      bold: true,
+                      text: "No Transactons to view",
+                    ),
+                    Icon(
+                      Icons.web_asset_off,
+                      size: 80.sp,
+                      color: AppColors.getLigthGreyColor,
+                    ),
+                  ],
+                ),
               );
             }
           },

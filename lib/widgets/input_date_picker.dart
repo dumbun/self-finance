@@ -62,32 +62,44 @@ class _InputDatePickerState extends State<InputDatePicker> {
       //     child: SafeArea(
       //       top: false,
 
-      //       child: CupertinoDatePicker(
-      //         initialDateTime: widget.initialDate,
-      //         mode: CupertinoDatePickerMode.date,
-      //         showDayOfWeek: true,
-      //         onDateTimeChanged: (DateTime value) {
-      //           // pickedDate output format => 2021-03-10 00:00:00.000
-      //           String formattedDate = DateFormat('dd-MM-yyyy').format(value);
-      //           //formatted date output using intl package =>  2021-03-16
-      //           setState(
-      //             () => widget.controller.text =
-      //                 formattedDate, //set output date to InputTextField value.
-      //           );
-      //         },
-      //       ),
+      //     child: CupertinoDatePicker(
+      //       initialDateTime: widget.initialDate,
+      //       mode: CupertinoDatePickerMode.date,
+      //       showDayOfWeek: true,
+      //       onDateTimeChanged: (DateTime value) {
+      //         // pickedDate output format => 2021-03-10 00:00:00.000
+      //         String formattedDate = DateFormat('dd-MM-yyyy').format(value);
+      //         //formatted date output using intl package =>  2021-03-16
+      //         setState(
+      //           () => widget.controller.text =
+      //               formattedDate, //set output date to InputTextField value.
+      //         );
+      //       },
       //     ),
       //   ),
+      // ),
       onTap: () async {
         DateTime? pickedDate = await showDatePicker(
+          locale: const Locale('en', 'GB'),
           context: context,
           initialDate: widget.initialDate,
           currentDate: DateTime.now(),
-          keyboardType: TextInputType.datetime,
-          switchToCalendarEntryModeIcon: Icon(Icons.calendar_month),
+          switchToCalendarEntryModeIcon: const Icon(Icons.calendar_month),
           firstDate: widget.firstDate,
           //DateTime.now() - not to allow to choose before today.
           lastDate: widget.lastDate,
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                // You can customize the theme here if needed
+              ),
+              child: Localizations.override(
+                context: context,
+                locale: const Locale('en', 'GB'),
+                child: child!,
+              ),
+            );
+          },
         );
         if (pickedDate != null) {
           //pickedDate output format => 2021-03-10 00:00:00.000

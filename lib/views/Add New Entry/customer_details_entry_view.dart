@@ -78,7 +78,6 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
                   // Customer name
                   SizedBox(height: 20.sp),
                   InputTextField(
-                    keyboardType: TextInputType.name,
                     hintText: Constant.customerName,
                     controller: _customerName,
                   ),
@@ -87,8 +86,9 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
                   SizedBox(height: 20.sp),
                   DropDownGardianSelection(controller: _gaurdianAlias),
                   SizedBox(height: 20.sp),
+
+                  //Guardian name
                   InputTextField(
-                    keyboardType: TextInputType.name,
                     controller: _gaurdianName,
                     hintText: Constant.guardianName,
                   ),

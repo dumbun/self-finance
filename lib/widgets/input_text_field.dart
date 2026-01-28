@@ -38,12 +38,11 @@ class InputTextField extends StatelessWidget {
             }
             return null;
           },
-      keyboardType: keyboardType ?? TextInputType.text,
+      keyboardType: keyboardType,
       textInputAction: TextInputAction.done,
       controller: controller,
       enableSuggestions: true,
       textAlign: TextAlign.start,
-      autocorrect: false,
       decoration: InputDecoration(
         labelText: hintText,
         border: const OutlineInputBorder(),

@@ -1,29 +1,14 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/providers/history_provider.dart';
-import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/widgets/build_history_list_widget.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
 
-class HistoryView extends ConsumerStatefulWidget {
+class HistoryView extends ConsumerWidget {
   const HistoryView({super.key});
-
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _HistoryViewState();
-}
-
-class _HistoryViewState extends ConsumerState<HistoryView> {
-  final TextEditingController _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return RefreshWidget(
       onRefresh: () => ref.refresh(asyncHistoryProvider.future),
       child: Padding(
@@ -32,14 +17,21 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CupertinoSearchTextField(
-              controller: _controller,
-              autocorrect: false,
-              style: const TextStyle(
-                color: AppColors.getPrimaryColor,
-                fontWeight: FontWeight.bold,
+            SearchBar(
+              padding: WidgetStateProperty.all(
+                EdgeInsets.symmetric(horizontal: 12.sp),
               ),
-              keyboardType: TextInputType.name,
+              shape: WidgetStateProperty.all(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadiusGeometry.circular(20.sp),
+                ),
+              ),
+              elevation: WidgetStatePropertyAll(0),
+              hintText: "phone number or t_transactionID or customer name",
+              hintStyle: WidgetStatePropertyAll(
+                TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              ),
+              leading: const Icon(Icons.person_search_sharp),
               onChanged: (String value) => ref
                   .read(asyncHistoryProvider.notifier)
                   .doSearch(givenInput: value),

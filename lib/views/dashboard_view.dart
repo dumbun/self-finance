@@ -65,9 +65,13 @@ class _DashboardViewState extends State<DashboardView> {
         enableFeedback: true,
         showUnselectedLabels: true,
         elevation: 0,
-        unselectedLabelStyle: TextStyle(color: AppColors.getLigthGreyColor),
+        unselectedLabelStyle: const TextStyle(
+          color: AppColors.getLigthGreyColor,
+        ),
         unselectedItemColor: AppColors.getLigthGreyColor,
-        unselectedIconTheme: IconThemeData(color: AppColors.getLigthGreyColor),
+        unselectedIconTheme: const IconThemeData(
+          color: AppColors.getLigthGreyColor,
+        ),
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
