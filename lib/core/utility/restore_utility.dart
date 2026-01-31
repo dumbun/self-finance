@@ -207,9 +207,7 @@ class RestoreUtility {
         onProgress?.call(processed / files.length, zipPath);
       }
 
-      debugPrint(
-        '✅ Restore completed: $restored files restored, $skipped skipped ur mom',
-      );
+      debugPrint('✅ Restore completed: $restored files restored, $skipped');
 
       // 6) Restart app to apply changes
       if (autoRestartApp && context != null && context.mounted) {
@@ -217,6 +215,19 @@ class RestoreUtility {
       }
     } catch (e, st) {
       debugPrint('❌ Restore failed: $e\n$st');
+      if (context!.mounted) {
+        showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('✅ Restore Error'),
+              content: Text(e.toString()),
+            );
+          },
+        );
+      }
+
       rethrow;
     } finally {
       zipInputStream?.close();
@@ -298,7 +309,10 @@ class RestoreUtility {
 
       // Validate ZIP structure
       inputStream = InputFileStream(zipPath);
-      final Archive archive = ZipDecoder().decodeBuffer(inputStream);
+      final Archive archive = ZipDecoder().decodeBuffer(
+        inputStream,
+        password: dotenv.env['BACKUP_PASSWORD'],
+      );
 
       if (archive.isEmpty) {
         debugPrint('❌ Backup ZIP is empty');
