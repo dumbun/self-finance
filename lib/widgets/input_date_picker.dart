@@ -82,13 +82,14 @@ class _InputDatePickerState extends State<InputDatePicker> {
         DateTime? pickedDate = await showDatePicker(
           locale: const Locale('en', 'GB'),
           context: context,
+          keyboardType: TextInputType.text,
           initialDate: widget.initialDate,
           currentDate: DateTime.now(),
           switchToCalendarEntryModeIcon: const Icon(Icons.calendar_month),
           firstDate: widget.firstDate,
           //DateTime.now() - not to allow to choose before today.
           lastDate: widget.lastDate,
-          builder: (context, child) {
+          builder: (BuildContext context, Widget? child) {
             return Theme(
               data: Theme.of(context).copyWith(
                 // You can customize the theme here if needed

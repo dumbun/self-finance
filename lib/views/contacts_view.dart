@@ -32,6 +32,9 @@ class ContactsView extends ConsumerWidget {
                   padding: WidgetStateProperty.all(
                     EdgeInsets.symmetric(horizontal: 12.sp),
                   ),
+                  hintStyle: WidgetStatePropertyAll(
+                    TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
                   shape: WidgetStateProperty.all(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadiusGeometry.circular(20.sp),

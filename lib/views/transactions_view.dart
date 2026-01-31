@@ -44,6 +44,9 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
                   borderRadius: BorderRadiusGeometry.circular(20.sp),
                 ),
               ),
+              hintStyle: WidgetStatePropertyAll(
+                TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              ),
               elevation: WidgetStatePropertyAll(0),
               hintText: "Search transaction ID",
               leading: const Icon(Icons.search),
@@ -61,10 +64,11 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
                     _searchText.clear();
                     ref.read(filterProvider).clear();
                     DateTime? pickedDate = await showDatePicker(
+                      locale: const Locale('en', 'GB'),
                       context: context,
                       initialDate: DateTime.now(),
                       currentDate: DateTime.now(),
-                      keyboardType: TextInputType.datetime,
+                      keyboardType: TextInputType.text,
                       switchToCalendarEntryModeIcon: Icon(Icons.calendar_month),
                       firstDate: DateTime(1900),
                       //DateTime.now() - not to allow to choose before today.

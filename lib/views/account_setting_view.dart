@@ -101,7 +101,7 @@ class AccountSettingsView extends StatelessWidget {
                                         context: context,
                                         userData: data,
                                       ),
-                                      SizedBox(height: 12.sp),
+                                      SizedBox(height: 32.sp),
                                     ],
                                   ),
                                 );
