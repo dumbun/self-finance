@@ -10,7 +10,7 @@ part 'transactions_provider.g.dart';
 @riverpod
 class AsyncTransactions extends _$AsyncTransactions {
   Future<List<Trx>> _fetchAllTransactionsData() async {
-    final data = await BackEnd.fetchAllTransactions();
+    final List<Trx> data = await BackEnd.fetchAllTransactions();
     return data;
   }
 

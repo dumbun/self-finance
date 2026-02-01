@@ -8,7 +8,7 @@ part 'history_provider.g.dart';
 @Riverpod(keepAlive: true)
 class AsyncHistory extends _$AsyncHistory {
   Future<List<UserHistory>> _fetchAllHistoryData() async {
-    final data = await BackEnd.fetchAllUserHistory();
+    final List<UserHistory> data = await BackEnd.fetchAllUserHistory();
     return data;
   }
 

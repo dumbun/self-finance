@@ -16,8 +16,9 @@ class MonthlyChart extends _$MonthlyChart {
 
   Future<MonthlyChartState> _loadChartData() async {
     try {
-      final rawData = await BackEnd.fetchMonthlyChartData();
-      final chartData = ChartData.toList(rawData);
+      final List<Map<String, dynamic>> rawData =
+          await BackEnd.fetchMonthlyChartData();
+      final List<ChartData> chartData = ChartData.toList(rawData);
 
       double totalDisbursed = 0;
       double totalReceived = 0;

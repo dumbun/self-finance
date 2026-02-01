@@ -9,7 +9,7 @@ part 'payments_provider.g.dart';
 @riverpod
 class AsyncPayment extends _$AsyncPayment {
   Future<List<Payment>> _fetchPaymentData({required int transactionId}) async {
-    final data = await BackEnd.fetchRequriedPaymentsOfTransaction(
+    final List<Payment> data = await BackEnd.fetchRequriedPaymentsOfTransaction(
       transactionId: transactionId,
     );
     return data;

@@ -6,7 +6,7 @@ part of 'monthly_chart_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$monthlyChartHash() => r'0e1cde18040a358b07a9c976d62212c0efe44f05';
+String _$monthlyChartHash() => r'8bb6bd6b1efa4bac20d3f73a5098258df3b8cb7d';
 
 /// See also [MonthlyChart].
 @ProviderFor(MonthlyChart)

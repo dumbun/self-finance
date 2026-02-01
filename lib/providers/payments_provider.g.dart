@@ -6,7 +6,7 @@ part of 'payments_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$asyncPaymentHash() => r'7e8e2109c22c20e105b0956d43519c7abf27e323';
+String _$asyncPaymentHash() => r'5068957ac139aa88aefc3f66271c0b5b2dc65f9b';
 
 /// Copied from Dart SDK
 class _SystemHash {
