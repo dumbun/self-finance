@@ -14,7 +14,7 @@ import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/widgets/call_button_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
-import 'package:self_finance/widgets/title_widget.dart';
+import 'package:self_finance/core/fonts/title_widget.dart';
 
 class BuildCustomerDetailsWidget extends ConsumerWidget {
   const BuildCustomerDetailsWidget({super.key, required this.customerID});

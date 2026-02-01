@@ -10,7 +10,7 @@ import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/chart_model.dart';
 import 'package:self_finance/providers/monthly_chart_provider.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
-import 'package:self_finance/widgets/title_widget.dart';
+import 'package:self_finance/core/fonts/title_widget.dart';
 
 class MonthlyChartWidget extends ConsumerWidget {
   const MonthlyChartWidget({super.key});

@@ -14,7 +14,7 @@ import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/widgets/backup_with_progress_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
-import 'package:self_finance/widgets/title_widget.dart';
+import 'package:self_finance/core/fonts/title_widget.dart';
 import 'package:self_finance/widgets/user_image_update_widget.dart';
 import 'package:self_finance/widgets/user_name_update_buttom_sheet_widget.dart';
 import 'package:self_finance/widgets/pin_update_buttom_sheet_widget.dart';

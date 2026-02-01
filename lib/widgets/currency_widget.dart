@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
-import 'package:self_finance/widgets/title_widget.dart';
+import 'package:self_finance/core/fonts/title_widget.dart';
 
 class CurrencyWidget extends ConsumerWidget {
   const CurrencyWidget({
@@ -33,7 +33,8 @@ class CurrencyWidget extends ConsumerWidget {
                     color: color,
                   );
           },
-          error: (error, stackTrace) => BodyOneDefaultText(text: ""),
+          error: (Object error, StackTrace stackTrace) =>
+              BodyOneDefaultText(text: ""),
           loading: () => CircularProgressIndicator.adaptive(),
         );
   }
