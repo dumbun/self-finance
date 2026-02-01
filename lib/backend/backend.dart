@@ -24,7 +24,6 @@ class BackEnd {
     }
 
     final String databasePath = await _getDatabasePath();
-
     _database = await openDatabase(
       databasePath,
       version: _databaseVersion,
@@ -439,9 +438,9 @@ class BackEnd {
   /// Fetch all transactions
   static Future<List<Trx>> fetchAllTransactions() async {
     final Database db = await BackEnd.db();
-    final response = await db.query(
+    final List<Map<String, Object?>> response = await db.query(
       'Transactions',
-      orderBy: 'Transaction_Date DESC',
+      orderBy: 'Transaction_ID DESC',
     );
     return Trx.toList(response);
   }
@@ -449,7 +448,7 @@ class BackEnd {
   /// Fetch active transactions
   static Future<List<Trx>> fetchActiveTransactions() async {
     final Database db = await BackEnd.db();
-    final response = await db.query(
+    final List<Map<String, Object?>> response = await db.query(
       'Transactions',
       where: 'Transaction_Type = ?',
       whereArgs: [Constant.active],
@@ -477,7 +476,7 @@ class BackEnd {
     required int transacrtionId,
   }) async {
     final Database db = await BackEnd.db();
-    final response = await db.query(
+    final List<Map<String, Object?>> response = await db.query(
       'Transactions',
       where: 'Transaction_ID = ?',
       whereArgs: [transacrtionId],
@@ -489,7 +488,7 @@ class BackEnd {
   /// Fetch sum of taken amount
   static Future<double> fetchSumOfTakenAmount() async {
     final Database db = await BackEnd.db();
-    final response = await db.rawQuery(
+    final List<Map<String, Object?>> response = await db.rawQuery(
       'SELECT COALESCE(SUM(Amount), 0) as total FROM Transactions WHERE Transaction_Type = ?',
       [Constant.active],
     );
