@@ -71,7 +71,7 @@ class BackEnd {
 
   /// Create database tables
   static Future<void> _onCreate(Database db, int version) async {
-    await db.transaction((txn) async {
+    await db.transaction((Transaction txn) async {
       // Customers Table with proper constraints
       await txn.execute("""
         CREATE TABLE Customers (
@@ -218,14 +218,17 @@ class BackEnd {
   /// Fetch all customer data
   static Future<List<Customer>> fetchAllCustomerData() async {
     final Database db = await BackEnd.db();
-    final response = await db.query('Customers', orderBy: 'Customer_Name ASC');
+    final List<Map<String, Object?>> response = await db.query(
+      'Customers',
+      orderBy: 'Customer_Name ASC',
+    );
     return Customer.toList(response);
   }
 
   /// Fetch all customer numbers
   static Future<List<String>> fetchAllCustomerNumbers() async {
     final Database db = await BackEnd.db();
-    final response = await db.query(
+    final List<Map<String, Object?>> response = await db.query(
       'Customers',
       columns: ['Contact_Number'],
       orderBy: 'Contact_Number ASC',
@@ -236,7 +239,7 @@ class BackEnd {
   /// Fetch all customer numbers with names
   static Future<List<Contact>> fetchAllCustomerNumbersWithNames() async {
     final Database db = await BackEnd.db();
-    final response = await db.query(
+    final List<Map<String, Object?>> response = await db.query(
       'Customers',
       columns: ['Customer_ID', 'Customer_Name', 'Contact_Number'],
       orderBy: 'Customer_Name ASC',
@@ -247,7 +250,7 @@ class BackEnd {
   /// Fetch required customer name
   static Future<String> fetchRequriedCustomerName(int id) async {
     final Database db = await BackEnd.db();
-    final response = await db.query(
+    final List<Map<String, Object?>> response = await db.query(
       'Customers',
       columns: ['Customer_Name'],
       where: 'Customer_ID = ?',
@@ -267,7 +270,7 @@ class BackEnd {
     required int id,
   }) async {
     final Database db = await BackEnd.db();
-    final response = await db.query(
+    final List<Map<String, Object?>> response = await db.query(
       'Customers',
       where: 'Customer_ID = ?',
       whereArgs: [id],
@@ -316,7 +319,7 @@ class BackEnd {
 
     return await db.transaction((txn) async {
       // Update customer
-      final count = await txn.update(
+      final int count = await txn.update(
         'Customers',
         {
           'Customer_Name': newCustomerName.trim(),
@@ -359,7 +362,7 @@ class BackEnd {
     }
 
     final Database db = await BackEnd.db();
-    final id = await db.insert('Items', {
+    final int id = await db.insert('Items', {
       "Customer_ID": item.customerid,
       "Item_Name": item.name.trim(),
       "Item_Description": item.description.trim(),
@@ -376,7 +379,10 @@ class BackEnd {
   /// Fetch all items
   static Future<List<Items>> fetchAllItems() async {
     final Database db = await BackEnd.db();
-    final response = await db.query('Items', orderBy: 'Created_Date DESC');
+    final List<Map<String, Object?>> response = await db.query(
+      'Items',
+      orderBy: 'Created_Date DESC',
+    );
     return Items.toList(response);
   }
 
@@ -385,7 +391,7 @@ class BackEnd {
     required int customerID,
   }) async {
     final Database db = await BackEnd.db();
-    final response = await db.query(
+    final List<Map<String, Object?>> response = await db.query(
       'Items',
       where: 'Customer_ID = ?',
       whereArgs: [customerID],
@@ -397,7 +403,7 @@ class BackEnd {
   /// Fetch required item
   static Future<List<Items>> fetchRequriedItem({required int itemId}) async {
     final Database db = await BackEnd.db();
-    final response = await db.query(
+    final List<Map<String, Object?>> response = await db.query(
       'Items',
       where: 'Item_ID = ?',
       whereArgs: [itemId],
@@ -419,7 +425,7 @@ class BackEnd {
 
     final Database db = await BackEnd.db();
 
-    final response = await db.insert('Transactions', {
+    final int response = await db.insert('Transactions', {
       "Customer_ID": transaction.customerId,
       "Item_ID": transaction.itemId,
       "Transaction_Date": transaction.transacrtionDate,
@@ -633,7 +639,7 @@ class BackEnd {
   /// Create new history entry
   static Future<int> createNewHistory(UserHistory history) async {
     final Database db = await BackEnd.db();
-    final id = await db.insert('History', {
+    final int id = await db.insert('History', {
       "User_ID": history.userID,
       "Customer_ID": history.customerID,
       "Customer_Name": history.customerName,
@@ -660,10 +666,10 @@ class BackEnd {
   /// Backup database to a file
   static Future<String> backupDatabase() async {
     final Database db = await BackEnd.db();
-    final dbPath = db.path;
+    final String dbPath = db.path;
 
-    final appDocDir = await getApplicationDocumentsDirectory();
-    final backupDir = Directory(p.join(appDocDir.path, 'backups'));
+    final Directory appDocDir = await getApplicationDocumentsDirectory();
+    final Directory backupDir = Directory(p.join(appDocDir.path, 'backups'));
     await backupDir.create(recursive: true);
 
     final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
@@ -676,7 +682,7 @@ class BackEnd {
   /// Get database file size
   static Future<int> getDatabaseSize() async {
     final Database db = await BackEnd.db();
-    final file = File(db.path);
+    final File file = File(db.path);
     return await file.length();
   }
 
@@ -689,14 +695,16 @@ class BackEnd {
   /// Check database integrity
   static Future<bool> checkDatabaseIntegrity() async {
     final Database db = await BackEnd.db();
-    final result = await db.rawQuery('PRAGMA integrity_check');
+    final List<Map<String, Object?>> result = await db.rawQuery(
+      'PRAGMA integrity_check',
+    );
     return result.isNotEmpty && result.first['integrity_check'] == 'ok';
   }
 
   static Future<Map<String, num>> fetchAnalyticsData() async {
-    final db = await BackEnd.db();
+    final Database db = await BackEnd.db();
 
-    final result = await db.rawQuery(
+    final List<Map<String, Object?>> result = await db.rawQuery(
       '''
     SELECT
       (SELECT COUNT(*) FROM Customers)  AS totalCustomers,
@@ -760,14 +768,14 @@ class BackEnd {
     final List<Map<String, dynamic>> results = [];
 
     for (int i = 5; i >= 0; i--) {
-      final date = DateTime(now.year, now.month - i, 1);
-      final monthStr = DateFormat('MMM').format(date);
-      final year = date.year;
-      final month = date.month.toString().padLeft(2, '0');
+      final DateTime date = DateTime(now.year, now.month - i, 1);
+      final String monthStr = DateFormat('MMM').format(date);
+      final int year = date.year;
+      final String month = date.month.toString().padLeft(2, '0');
 
       // Get disbursed amount (money going out - new loans)
       // Transaction_Date format: dd-MM-yyyy
-      final disbursedResult = await db.rawQuery(
+      final List<Map<String, Object?>> disbursedResult = await db.rawQuery(
         '''
       SELECT COALESCE(SUM(Amount), 0) as total
       FROM Transactions
@@ -780,7 +788,7 @@ class BackEnd {
       // Get received amount (money coming in - payments)
       // Payment_Date format: ISO 8601 (yyyy-MM-ddTHH:mm:ss.sssZ)
       // Extract year-month and compare with target year-month
-      final receivedResult = await db.rawQuery(
+      final List<Map<String, Object?>> receivedResult = await db.rawQuery(
         '''
       SELECT COALESCE(SUM(Amount_Paid), 0) as total
       FROM Payments
