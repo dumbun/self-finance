@@ -18,8 +18,9 @@ class UserImageUpdateWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Center(
       child: GestureDetector(
-        onTap: () {
-          showModalBottomSheet(
+        onTap: () async {
+          await showModalBottomSheet(
+            showDragHandle: true,
             enableDrag: true,
             useSafeArea: true,
             context: context,

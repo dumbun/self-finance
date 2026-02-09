@@ -48,8 +48,11 @@ class ExpandableFab extends StatelessWidget {
       splashColor: AppColors.getPrimaryColor,
       backgroundColor: AppColors.getPrimaryColor,
       tooltip: Constant.addNewTransactionToolTip,
-      onPressed: () {
-        showModalBottomSheet(
+      onPressed: () async {
+        await showModalBottomSheet(
+          enableDrag: true,
+          showDragHandle: true,
+          useSafeArea: true,
           context: context,
           builder: (BuildContext context) {
             return Container(

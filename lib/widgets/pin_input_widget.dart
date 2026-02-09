@@ -63,14 +63,14 @@ class PinInputWidget extends StatelessWidget {
         controller: pinController,
         validator:
             validator ??
-            (value) {
+            (String? value) {
               if (value == null || value.isEmpty || value == "") {
                 return 'Please enter a valid value';
               }
               return null;
             },
         defaultPinTheme: defaultPinTheme,
-        separatorBuilder: (index) => SizedBox(width: 12.sp),
+        separatorBuilder: (int index) => SizedBox(width: 12.sp),
         hapticFeedbackType: HapticFeedbackType.lightImpact,
       ),
     );
