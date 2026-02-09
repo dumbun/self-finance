@@ -1,138 +1,204 @@
 abstract class Constant {
   static const String applicationHandleEmail = "sf.help.vamshi@gmail.com";
-  static const String doCalculation = "DO CALCULATIONS";
+  static const String doCalculation = "Do calculations";
+
   static const String errorFetchingTransactionMessage =
-      "Error fetching the transactions please restart the application";
+      "Error fetching transactions. Please restart the application.";
 
   static const bool ads = false;
   static const String appFont = "hell";
-  static const String transacrtion = "Transactions";
-  static const String noImgageError = "No Image Found";
+
+  static const String transacrtions = "Transactions";
+  static const String noImgageError = "No image found";
+
   static const String noTransactionMessage =
-      "No Transactions present. Add a transaction by pressing the + below ";
+      "No transactions found. Add a transaction by pressing the + button below.";
+
   static const String contactDeleteMessage =
-      "By Pressing 'YES' you will remove all the details of this customer from your DateBase";
+      "By pressing 'YES', you will remove all details of this customer from your database.";
+
   static const String alert = "Alert";
-  static const String feedbackSubject = "Self-Finance Appication Feedback";
+
+  static const String feedbackSubject = "Self-Finance application feedback";
   static const String inactive = "Inactive";
+
   static const String currencyChangeAlert =
-      "The application as a whole is affected by this modification. Would you really like to alter the application's currency?";
-  static const String pAndPDistription = 'Accepting Privacy and Policy';
+      "This change affects the entire application. Do you really want to change the application's currency?";
+
+  static const String pAndPDistription = "Accepting Privacy & Policy";
   static const String loading = "Please wait";
-  static const String totalAmountInvested = "Total Amount Invested";
+
+  static const String totalAmountInvested = "Total amount invested";
+
   static const String emptyTransactionsString =
-      "Please add a transaction by pressing the + symbol to create a new contact with new customer or add a new trancation to a existing customer";
-  static const String pandp = 'Privacy and Policy';
-  static const String firstIndicatorPercentage = 'First Indicator Percentage';
-  static const String secoundIndicatorPercentage =
-      'Secound Indicator Percentage';
+      "Please add a transaction by pressing the + button. You can create a new customer or add a transaction to an existing customer.";
+
+  static const String pandp = "Privacy & Policy";
   static const String contact = "Contacts";
-  static const String intrestAmount = "Intrest Amount";
-  static const String zeroContacts = "0 Contacts Found 🫠";
+
+  static const String intrestAmount = "Interest amount";
+
+  static const String zeroContacts = "0 contacts found 🫠";
+
   static const String errorFetchingContactMessage =
-      "Error fetching customers contacts please try again 😶‍🌫️";
+      "Error fetching customer contacts. Please try again. 😶‍🌫️";
+
   static const String contactAlreadyExistMessage =
-      "Contact number is already present in your database please change the number or if you want to add the transacrtion to existing constact please select the add transaction to existing contact in Home Screen";
+      "This contact number is already in your database. Please change the number, or if you want to add a transaction to an existing contact, select 'Add transaction to existing contact' on the Home screen.";
+
   static const String login = "Login";
-  static const String loveBharath = "self-finance ❤️ Bharath";
+
   static const String userFetchingError =
-      'Error fetching user data. Please restart the application';
-  static const String localizedReason = 'Authenticate to access the app';
-  static const String appTitle = 'Self-Finance';
-  static const String exit = 'Exit';
+      "Error fetching user data. Please restart the application.";
+
+  static const String localizedReason = "Authenticate to access the app";
+  static const String appTitle = "Self-Finance";
+
+  static const String exit = "Exit";
   static const String customerImageTag = "customer-image-hero-tag";
-  static const String update = 'Update';
+  static const String update = "Update";
   static const String saveButtonTag = "save-button";
-  static const String editContact = "Edit Contact";
-  static const String signOutMessage = "Press yes to Sign-Out";
-  static const String changePinView = '/changePinView/';
-  static const String dashboardView = '/dashboardview/';
-  static const String addNewEntryView = '/addNewEntry/';
-  static const String contactView = '/contactsView/';
-  static const String accountSettingsView = '/AccountSettingsView/';
-  static const String currencyType = "Please select currency type";
-  static const String pleaseEnterTheName = "Please Enter Your Name";
-  static const String errorUserFetch = "Error of fetching User data";
+  static const String editContact = "Edit contact";
+
+  static const String signOutMessage = "Press 'Yes' to sign out.";
+
+  static const String changePinView = "/changePinView/";
+  static const String dashboardView = "/dashboardview/";
+  static const String addNewEntryView = "/addNewEntry/";
+  static const String contactView = "/contactsView/";
+  static const String accountSettingsView = "/AccountSettingsView/";
+
+  static const String currencyType = "Please select a currency type";
+  static const String pleaseEnterTheName = "Please enter your name";
+  static const String errorUserFetch = "Error fetching user data";
+
   static const String testText =
       "Lorem ipsum dolor sit amet. Sit sint magnam qui reiciendis quia cum recusandae voluptatibus quo voluptas ipsa? At praesentium mollitia eum nemo reiciendis eum";
+
   static const String testCheckbox =
       "My billing address is the same as my shipping address";
+
   static const String securePinMassage =
-      "Login pin is to Secure your Application from Third Person Using it";
-  static const String addNewEntry = "Add New Entry";
-  static const String addNewCustomerToolTip = "Add New Customer";
+      "The login PIN helps secure your application from unauthorized access.";
+
+  static const String addNewEntry = "Add new entry";
+  static const String addNewCustomerToolTip = "Add a new customer";
   static const String addNewTransactionToolTip =
-      "Add New Transaction to a existing customer";
-  static const String addNewTransaction = "Add New Transaction";
+      "Add a new transaction to an existing customer";
+
+  static const String addNewTransaction = "Add new transaction";
   static const String history = "History";
-  static const String customerItem = "Customer Item";
+  static const String customerItem = "Customer item";
+
   static const String errorUpdatingContactMessage =
-      "Error while updating the contact please try again some other time";
+      "Error while updating the contact. Please try again later.";
+
   static const String contactUpdatedSuccessfully =
-      "Contact Updated Successfully";
-  static const String customerAddress = "Customer Address ";
+      "Contact updated successfully.";
+
+  static const String customerAddress = "Customer address";
+
   static const String historyToolTip =
-      "History Page : Views all your transactions history";
-  static const String next = "next";
+      "History page: View your transaction history.";
+
+  static const String next = "Next";
+
   static const String termAcknowledge =
-      "By using the Self-Finance App, you acknowledge that you have read, understood, and agreed to these Terms and Conditions. ";
-  static const String tAndcString = "Term & Conditions";
-  static const String accountSettings = "Account Setting";
+      "By using the Self-Finance app, you acknowledge that you have read, understood, and agreed to these Terms and Conditions.";
+
+  static const String tAndcString = "Terms & Conditions";
+  static const String accountSettings = "Account settings";
+
   static const String tAndcUrl =
-      'https://dumbun.github.io/self-finance/terms_and_conditions';
+      "https://dumbun.github.io/self-finance/terms_and_conditions";
+
   static const String pAndPUrl =
       "https://dumbun.github.io/self-finance/privacy_and_policy";
+
   static const String savedSuccessfullyText = "Saved successfully ✅";
+
   static const String emiCalculatorTitle = "EMI Calculator";
   static const String emiCalculatorToolTip =
-      "EMI calculator page where you can callculate intrests";
+      "EMI calculator page where you can calculate interest.";
+
   static const String defaultProfileImagePath = "assets/icon/defaultImage.svg";
   static const String defaultProofImagePath = "assets/icon/id_proof_icon.svg";
   static const String defaultItemImagePath = "assets/icon/item_icon.svg";
-  static const String searchMobile = "Search using Mobile Number";
-  static const String searchName = "Search using Customer Name";
-  static const String searchPlace = "Search using Customer Place";
-  static const String mobileNumber = "Customer Mobile Number ";
-  static const String noTransactionsFound = "sorry no transactions found. 🫠";
-  static const String customerName = "Customer Full Name ";
-  static const String guardianName = "Gaurdian Full Name ";
-  static const String customerPlace = "Customer Place";
+
+  static const String searchMobile = "Search by mobile number";
+  static const String searchName = "Search by customer name";
+  static const String searchPlace = "Search by customer place";
+
+  static const String mobileNumber = "Customer mobile number";
+  static const String noTransactionsFound = "Sorry, no transactions found. 🫠";
+
+  static const String customerName = "Customer full name";
+  static const String guardianName = "Guardian full name";
+
+  static const String customerPlace = "Customer place";
+
   static const String error = "Error";
-  static const String customerPhoto = "Customer Photo";
-  static const String customerProof = "Customer Proof";
+
+  static const String customerPhoto = "Customer photo";
+  static const String customerProof = "Customer proof";
+
   static const String takenAmount = "Taken amount";
-  static const String itemDescription = "Item Description";
-  static const String takenDate = "Taken Date dd-MM-yyyy";
-  static const String takenDateSmall = "Taken Date";
-  static const String tenureDate = "Tenure Date ( dd - MM - yyyy )";
+  static const String itemDescription = "Item description";
+
+  static const String takenDate = "Taken date (dd-MM-yyyy)";
+  static const String takenDateSmall = "Taken date";
+
+  static const String tenureDate = "Tenure date (dd-MM-yyyy)";
+
   static const String debited = "Debited";
   static const String credit = "Credit";
-  static const String rateOfIntrest = "Rate of Intrest %";
-  static const String homeScreen = "Home Screen";
+
+  static const String rateOfIntrest = "Interest rate (%)";
+
+  static const String homeScreen = "Home screen";
   static const String userProfileTag = "User-Profile-Tag";
+
   static const String logout = "Logout";
   static const String account = "Account";
   static const String home = "Home";
+
   static const String active = "Active";
-  static const String save = " Save + ";
+
+  static const String save = "Save +";
+
   static const String enterYourAppPin = "Enter your app PIN";
-  static const String enterCorrectPin = "Please enter the correct pin";
-  static const String enterCorrectNumber = "please enter correct mobile number";
-  static const String pleaseTryAgain = "please try again";
+  static const String enterCorrectPin = "Please enter the correct PIN";
+  static const String enterCorrectNumber = "Please enter a valid mobile number";
+  static const String pleaseTryAgain = "Please try again";
+
   static const String errorAddingTransaction =
-      "Error adding transaction please try agine after some time";
+      "Error adding transaction. Please try again later.";
+
   static const String transacrtionAddedSuccessfully =
-      "Transaction added Successfully";
-  static const String showTransaction = 'Show trancation';
-  static const String transacrtionStatus = 'Tranasction Status';
-  static const String transactionDetails = "Transaction Details";
-  static const String transactionStatus = "Transaction Status";
+      "Transaction added successfully.";
+
+  static const String showTransaction = "Show transaction";
+  static const String transacrtionStatus = "Transaction status";
+
+  static const String transactionDetails = "Transaction details";
+  static const String transactionStatus = "Transaction status";
+
   static const String pleaseFillAllFields = "PLEASE FILL ALL FIELDS";
+
   static const List<String> guardianList = <String>[
-    's/o',
-    'w/o',
-    'f/o',
-    'h/o',
-    'm/o',
+    "s/o",
+    "w/o",
+    "f/o",
+    "h/o",
+    "m/o",
   ];
+
+  static const String transactionId = "Transaction ID";
+  static const String paymentDate = 'Payment date';
+  static const String presentDate = 'Present date';
+  static const String duetime = "Due time";
+  static const String intrestPerMonth = "Intrest per month";
+  static const String totalIntrestAmount = "Total intrest amount";
+  static const String totalAmount = "Total amount";
+  static const String signature = "Signature";
 }

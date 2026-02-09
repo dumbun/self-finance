@@ -34,7 +34,7 @@ class TransactionDetailsWidget extends ConsumerWidget {
     void showSignature(String signaturePath) {
       try {
         final file = File(signaturePath);
-        if (!file.existsSync()) {
+        if (!file.existsSync() && context.mounted) {
           SnackBarWidget.snackBarWidget(
             context: context,
             message: 'Signature file not found',
@@ -45,7 +45,7 @@ class TransactionDetailsWidget extends ConsumerWidget {
         Routes.navigateToImageView(
           context: context,
           imageWidget: Image.file(file),
-          titile: "Signature",
+          titile: Constant.signature,
         );
       } catch (e) {
         SnackBarWidget.snackBarWidget(
@@ -114,7 +114,7 @@ class TransactionDetailsWidget extends ConsumerWidget {
           return const Expanded(
             child: Center(
               child: BodyTwoDefaultText(
-                text: 'No transaction found',
+                text: Constant.errorFetchingTransactionMessage,
                 bold: true,
               ),
             ),
@@ -139,7 +139,7 @@ class TransactionDetailsWidget extends ConsumerWidget {
             children: [
               // Transaction ID
               buildCard(
-                title: 'Transaction ID',
+                title: Constant.transactionId,
                 data: transaction.id?.toString() ?? 'N/A',
                 icon: Icons.numbers,
               ),
@@ -170,7 +170,9 @@ class TransactionDetailsWidget extends ConsumerWidget {
                 child: ListTile(
                   leading: const Icon(Icons.calendar_month_rounded),
                   title: BodyTwoDefaultText(
-                    text: payments.isNotEmpty ? 'Payment Date' : 'Present Date',
+                    text: payments.isNotEmpty
+                        ? Constant.paymentDate
+                        : Constant.presentDate,
                     bold: true,
                   ),
                   trailing: payments.isNotEmpty
@@ -184,7 +186,7 @@ class TransactionDetailsWidget extends ConsumerWidget {
 
               // Number of Due Dates
               buildCard(
-                title: "No.Due Dates",
+                title: Constant.duetime,
                 data: loanCalculator.monthsAndRemainingDays,
                 icon: Icons.timer,
               ),
@@ -209,7 +211,7 @@ class TransactionDetailsWidget extends ConsumerWidget {
               // Interest Per Month
               buildCard(
                 currency: true,
-                title: 'Interest Per Month',
+                title: Constant.intrestPerMonth,
                 data: Utility.doubleFormate(loanCalculator.interestPerDay * 30),
                 icon: Icons.timeline,
                 trailingIconColor: AppColors.getPrimaryColor,
@@ -218,7 +220,7 @@ class TransactionDetailsWidget extends ConsumerWidget {
               // Total Interest Amount
               buildCard(
                 currency: true,
-                title: 'Total Interest Amount',
+                title: Constant.totalIntrestAmount,
                 data: Utility.doubleFormate(loanCalculator.totalInterestAmount),
                 icon: Icons.assignment_turned_in_outlined,
                 trailingIconColor: AppColors.getPrimaryColor,
@@ -227,7 +229,7 @@ class TransactionDetailsWidget extends ConsumerWidget {
               // Total Amount
               buildCard(
                 currency: true,
-                title: 'Total Amount',
+                title: Constant.totalAmount,
                 data: Utility.doubleFormate(loanCalculator.totalAmount),
                 icon: Icons.arrow_downward_rounded,
                 trailingIconColor: AppColors.contentColorGreen,
@@ -240,7 +242,7 @@ class TransactionDetailsWidget extends ConsumerWidget {
               if (transaction.signature.isNotEmpty)
                 buildCard(
                   onTap: () => showSignature(transaction.signature),
-                  title: "Signature",
+                  title: Constant.signature,
                   data: "Show",
                   icon: Icons.topic_outlined,
                   trailingIcon: Icons.app_registration_sharp,
@@ -260,7 +262,7 @@ class TransactionDetailsWidget extends ConsumerWidget {
                 const Icon(Icons.error_outline, size: 48, color: Colors.red),
                 const SizedBox(height: 16),
                 BodyTwoDefaultText(
-                  text: 'Error loading transaction details',
+                  text: Constant.errorFetchingTransactionMessage,
                   bold: true,
                 ),
                 const SizedBox(height: 8),
@@ -270,7 +272,7 @@ class TransactionDetailsWidget extends ConsumerWidget {
                       fetchRequriedTransactionProvider(transactionId),
                     );
                   },
-                  child: const Text('Retry'),
+                  child: const BodyTwoDefaultText(text: 'Retry'),
                 ),
               ],
             ),

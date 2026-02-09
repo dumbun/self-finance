@@ -83,6 +83,10 @@ class User {
 
   @override
   int get hashCode {
-    return id.hashCode ^ userName.hashCode ^ userPin.hashCode ^ profilePicture.hashCode ^ userCurrency.hashCode;
+    return id.hashCode ^
+        userName.hashCode ^
+        userPin.hashCode ^
+        profilePicture.hashCode ^
+        userCurrency.hashCode;
   }
 }

@@ -28,13 +28,13 @@ class AnalaticsGridWidget extends ConsumerWidget {
           padding: EdgeInsets.all(16.sp),
           child: GridView.count(
             crossAxisCount: columns,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 1.15,
+            mainAxisSpacing: 16.sp,
+            crossAxisSpacing: 16.sp,
+            childAspectRatio: 1.1,
             shrinkWrap: true, // Important: allows grid to size itself
             physics:
                 const NeverScrollableScrollPhysics(), // Disable internal scrolling
-            children: const [
+            children: const <Widget>[
               _TotalCustomersCard(),
               _ActiveLoansCard(),
               _OutstandingAmountCard(),
@@ -166,18 +166,11 @@ class StatCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-
     return Card(
-      elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.sp)),
       child: Container(
         padding: EdgeInsets.all(16.sp),
-        decoration: BoxDecoration(
-          color: colors.surface,
-          borderRadius: BorderRadius.circular(16.sp),
-        ),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(16.sp)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -188,7 +181,7 @@ class StatCardWidget extends StatelessWidget {
                 color: iconColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12.sp),
               ),
-              child: Icon(icon, color: iconColor, size: 18.sp),
+              child: Icon(icon, color: iconColor, size: 0.3.dp),
             ),
 
             const Spacer(),

@@ -106,10 +106,10 @@ class _HeaderSection extends ConsumerWidget {
           if (customer == null) return const SizedBox.shrink();
 
           // Pre-compute values
-          final amountColor = isDebit
+          final Color amountColor = isDebit
               ? AppColors.getErrorColor
               : AppColors.getGreenColor;
-          final formattedAmount =
+          final String formattedAmount =
               '${isDebit ? '-' : '+'} ${Utility.doubleFormate(history.amount)}';
           final namePrefix = isDebit ? 'To' : 'From';
 

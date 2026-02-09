@@ -33,102 +33,85 @@ class AccountSettingsView extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: Stack(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(12.sp),
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: Consumer(
-                  builder:
-                      (BuildContext context, WidgetRef ref, Widget? child) {
-                        return ref
-                            .watch(asyncUserProvider)
-                            .when(
-                              data: (List<User> data) {
-                                final User user = data.first;
-                                return RefreshWidget(
-                                  onRefresh: () =>
-                                      ref.refresh(asyncUserProvider.future),
-                                  child: ListView(
-                                    children: [
-                                      // user profile pic
-                                      SizedBox(height: 20.sp),
-                                      Hero(
-                                        tag: Constant.userProfileTag,
-                                        child: UserImageUpdateWidget(
-                                          userImageString: user.profilePicture,
-                                        ),
-                                      ),
-
-                                      // user name
-                                      SizedBox(height: 20.sp),
-                                      _buildNameUpdateButton(
-                                        context: context,
-                                        userId: user.id!,
-                                        userName: user.userName,
-                                      ),
-
-                                      // user pin update button
-                                      SizedBox(height: 12.sp),
-                                      _buildPinUpdateButton(
-                                        context: context,
-                                        id: user.id!,
-                                        userPin: user.userPin,
-                                      ),
-
-                                      // user Currency update button
-                                      SizedBox(height: 12.sp),
-                                      _buildCurrencyUpdateButton(
-                                        context: context,
-                                        id: user.id!,
-                                        currency: user.userCurrency,
-                                        ref: ref,
-                                      ),
-
-                                      // user terms and condition button
-                                      SizedBox(height: 12.sp),
-                                      _buildTermsAndConditionButton(),
-
-                                      // user privacy Policy button
-                                      SizedBox(height: 12.sp),
-                                      _buildPrivacyPolicyButton(),
-
-                                      // logout button
-                                      SizedBox(height: 12.sp),
-                                      const BackupWithProgressWidget(),
-                                      _buildLogoutButton(
-                                        context: context,
-                                        userData: data,
-                                      ),
-                                      SizedBox(height: 32.sp),
-                                    ],
-                                  ),
-                                );
-                              },
-                              error: (Object error, StackTrace stackTrace) =>
-                                  const Center(
-                                    child: BodyOneDefaultText(
-                                      text: Constant.errorUserFetch,
-                                    ),
-                                  ),
-                              loading: () => const Center(
-                                child: CircularProgressIndicator.adaptive(),
+        child: Padding(
+          padding: EdgeInsets.all(12.sp),
+          child: Consumer(
+            builder: (BuildContext context, WidgetRef ref, Widget? child) {
+              return ref
+                  .watch(asyncUserProvider)
+                  .when(
+                    data: (List<User> data) {
+                      final User user = data.first;
+                      return RefreshWidget(
+                        onRefresh: () => ref.refresh(asyncUserProvider.future),
+                        child: ListView(
+                          children: [
+                            // user profile pic
+                            SizedBox(height: 20.sp),
+                            Hero(
+                              tag: Constant.userProfileTag,
+                              child: UserImageUpdateWidget(
+                                userImageString: user.profilePicture,
                               ),
-                            );
-                      },
-                ),
-              ),
-            ),
-            const Align(
-              alignment: Alignment.bottomCenter,
-              child: BodyTwoDefaultText(
-                text: Constant.loveBharath,
-                bold: true,
-                color: AppColors.getLigthGreyColor,
-              ),
-            ),
-          ],
+                            ),
+
+                            // user name
+                            SizedBox(height: 20.sp),
+                            _buildNameUpdateButton(
+                              context: context,
+                              userId: user.id!,
+                              userName: user.userName,
+                            ),
+
+                            // user pin update button
+                            SizedBox(height: 12.sp),
+                            _buildPinUpdateButton(
+                              context: context,
+                              id: user.id!,
+                              userPin: user.userPin,
+                            ),
+
+                            // user Currency update button
+                            SizedBox(height: 12.sp),
+                            _buildCurrencyUpdateButton(
+                              context: context,
+                              id: user.id!,
+                              currency: user.userCurrency,
+                              ref: ref,
+                            ),
+
+                            // user terms and condition button
+                            SizedBox(height: 12.sp),
+                            _buildTermsAndConditionButton(),
+
+                            // user privacy Policy button
+                            SizedBox(height: 12.sp),
+                            _buildPrivacyPolicyButton(),
+
+                            // logout button
+                            SizedBox(height: 12.sp),
+                            const BackupWithProgressWidget(),
+                            _buildLogoutButton(
+                              context: context,
+                              userData: data,
+                            ),
+                            SizedBox(height: 32.sp),
+                          ],
+                        ),
+                      );
+                    },
+                    error: (Object error, StackTrace stackTrace) =>
+                        const Center(
+                          child: BodyOneDefaultText(
+                            text: Constant.errorUserFetch,
+                          ),
+                        ),
+                    loading: () => const Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    ),
+                  );
+            },
+          ),
         ),
       ),
     );

@@ -46,7 +46,7 @@ class _DashboardViewState extends State<DashboardView> {
             return TitleWidget(
               text: switch (index) {
                 0 => Constant.homeScreen,
-                1 => Constant.transacrtion,
+                1 => Constant.transacrtions,
                 2 => Constant.emiCalculatorTitle,
                 3 => Constant.history,
                 _ => Constant.homeScreen,
@@ -99,7 +99,7 @@ class _DashboardViewState extends State<DashboardView> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.transform_outlined),
                 activeIcon: Icon(Icons.transform_rounded),
-                label: Constant.transacrtion,
+                label: Constant.transacrtions,
                 tooltip: Constant.historyToolTip,
               ),
               BottomNavigationBarItem(
