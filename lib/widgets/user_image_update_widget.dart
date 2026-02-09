@@ -117,6 +117,15 @@ class UserImageUpdateWidget extends ConsumerWidget {
                           height: 46.sp,
                           width: 46.sp,
                           child: Image.file(
+                            errorBuilder:
+                                (
+                                  BuildContext context,
+                                  Object error,
+                                  StackTrace? stackTrace,
+                                ) => DefaultUserImage(
+                                  width: 46.sp,
+                                  height: 46.sp,
+                                ),
                             File(userImageString),
                             height: 500,
                             width: 500,
