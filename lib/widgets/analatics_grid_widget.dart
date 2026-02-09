@@ -21,7 +21,7 @@ class AnalaticsGridWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return LayoutBuilder(
-      builder: (context, constraints) {
+      builder: (BuildContext context, BoxConstraints constraints) {
         final columns = _columnsForWidth(constraints.maxWidth);
 
         return Padding(
@@ -167,16 +167,13 @@ class StatCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.sp)),
-      child: Container(
+      child: Padding(
         padding: EdgeInsets.all(16.sp),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(16.sp)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Icon with soft background
             Container(
-              padding: EdgeInsets.all(12.sp),
+              padding: EdgeInsets.all(0.2.dp),
               decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12.sp),
