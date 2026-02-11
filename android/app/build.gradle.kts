@@ -1,11 +1,11 @@
 import java.util.Properties
 import java.io.FileInputStream
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -15,26 +15,28 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
+        // (alt) jvmTarget = JvmTarget.fromTarget("11")
+    }
+}
+
+
 android {
     namespace = "com.dumbun.self_finance"
     compileSdk = flutter.compileSdkVersion
-    //ndkVersion = flutter.ndkVersion
-    ndkVersion = "27.0.12077973"
+    ndkVersion = flutter.ndkVersion
+    // ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-    }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.dumbun.self_finance"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -60,6 +62,8 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true          // shrink code (R8)
+            isShrinkResources = true        // remove unused resources
         }
     }
 }
