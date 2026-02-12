@@ -17,7 +17,7 @@ class BuildHistoryListWidget extends ConsumerWidget {
 
   Column _buildDate(String eventDate) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(

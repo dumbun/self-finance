@@ -80,7 +80,7 @@ class _DashboardViewState extends State<DashboardView> {
         builder: (_, int index, __) {
           return BottomNavigationBar(
             enableFeedback: true,
-            showUnselectedLabels: true,
+            showUnselectedLabels: false,
             elevation: 0,
             unselectedLabelStyle: const TextStyle(
               color: AppColors.getLigthGreyColor,
@@ -118,9 +118,8 @@ class _DashboardViewState extends State<DashboardView> {
             selectedItemColor: AppColors.getPrimaryColor,
             currentIndex: index,
             landscapeLayout: BottomNavigationBarLandscapeLayout.linear,
-            type: BottomNavigationBarType.fixed,
+            type: BottomNavigationBarType.shifting,
             onTap: (int tappedIndex) {
-              _selectedIndex.value = tappedIndex;
               _pageController.animateToPage(
                 tappedIndex,
                 duration: const Duration(milliseconds: 450),

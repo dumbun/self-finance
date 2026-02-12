@@ -14,51 +14,102 @@ class SlidableWidget extends ConsumerWidget {
     required this.customerId,
     required this.child,
   });
+
   final int transactionId;
   final int customerId;
   final Widget child;
 
+  Future<void> _confirmAndDelete(BuildContext context, WidgetRef ref) async {
+    final int a = await AlertDilogs.alertDialogWithTwoAction(
+      context,
+      "Delete transaction?",
+      "Do you really want to delete this transaction?\n\n"
+          "Deleting this transaction will erase its history, payments, and item details too.",
+    );
+
+    if (a != 1) return;
+    if (!context.mounted) return;
+
+    await ref
+        .read(asyncTransactionsProvider.notifier)
+        .deleteTransactionAndHistory(transactionId);
+
+    if (!context.mounted) return;
+    Slidable.of(context)?.close();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Future<void> delete() async {
-      final int a = await AlertDilogs.alertDialogWithTwoAction(
-        context,
-        "Are you sure ?",
-        "Do you really want to delete this contact.\n\nDeleting this transaction can erease it's history and payments and item details too",
-      );
-      if (a == 1) {
-        await ref
-            .read(asyncTransactionsProvider.notifier)
-            .deleteTransactionAndHistory(transactionId);
-      }
-    }
+    final double iconSize = 22.sp;
 
-    return Slidable(
-      closeOnScroll: true,
-      key: UniqueKey(),
-      endActionPane: ActionPane(
-        dismissible: DismissiblePane(onDismissed: () async => await delete()),
-        motion: StretchMotion(),
-        children: [
-          CustomSlidableAction(
-            onPressed: (BuildContext context) => InvoiceGenerator.shareInvoice(
-              customerID: customerId,
-              transactionID: transactionId,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Slidable(
+        key: ValueKey<int>(transactionId),
+        closeOnScroll: true,
+        endActionPane: ActionPane(
+          motion: const StretchMotion(),
+          extentRatio: 0.45,
+          children: [
+            _RoundedAction(
+              color: AppColors.contentColorCyan,
+              icon: Icons.share_rounded,
+              iconSize: iconSize,
+              onTap: () async {
+                Slidable.of(context)?.close();
+                await InvoiceGenerator.shareInvoice(
+                  customerID: customerId,
+                  transactionID: transactionId,
+                );
+              },
             ),
-            backgroundColor: AppColors.contentColorCyan,
-            foregroundColor: Colors.white,
-            child: Icon(Icons.share_rounded, size: 22.sp),
-          ),
-          CustomSlidableAction(
-            foregroundColor: Colors.white,
-            onPressed: (BuildContext context) async => delete(),
-            backgroundColor: AppColors.getErrorColor,
-            child: Icon(Icons.delete_forever_rounded, size: 22.sp),
-          ),
-        ],
+            _RoundedAction(
+              color: AppColors.getErrorColor,
+              icon: Icons.delete_forever_rounded,
+              iconSize: iconSize,
+              onTap: () => _confirmAndDelete(context, ref),
+            ),
+          ],
+        ),
+        child: SizedBox(width: double.infinity, child: child),
       ),
+    );
+  }
+}
 
-      child: child,
+class _RoundedAction extends StatelessWidget {
+  const _RoundedAction({
+    required this.color,
+    required this.icon,
+    required this.iconSize,
+    required this.onTap,
+  });
+
+  final Color color;
+  final IconData icon;
+  final double iconSize;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomSlidableAction(
+      onPressed: (_) => onTap(),
+      backgroundColor: Colors.transparent,
+      foregroundColor: Colors.white,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 10.sp, horizontal: 6.sp),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(999),
+          child: ColoredBox(
+            color: color,
+            child: SizedBox.expand(
+              child: Center(
+                child: Icon(icon, size: iconSize, color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
