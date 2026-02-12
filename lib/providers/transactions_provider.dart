@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/providers/analytics_provider.dart';
+import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/monthly_chart_provider.dart';
 
 part 'transactions_provider.g.dart';
@@ -104,6 +105,19 @@ class AsyncTransactions extends _$AsyncTransactions {
         return responce;
       });
     }
+  }
+
+  Future<void> deleteTransactionAndHistory(int id) async {
+    state = AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await BackEnd.deleteTransaction(transactionId: id);
+      await ref
+          .read(asyncHistoryProvider.notifier)
+          .deleteHistory(transactionId: id);
+      ref.read(analyticsProvider.notifier).refresh().ignore();
+      ref.refresh(monthlyChartProvider.future).ignore();
+      return _fetchAllTransactionsData();
+    });
   }
 }
 

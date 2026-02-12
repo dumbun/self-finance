@@ -15,6 +15,7 @@ import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/customer_name_build_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
+import 'package:self_finance/widgets/slidable_widget.dart';
 import 'package:self_finance/widgets/status_chip_widget.dart';
 
 class BuildTransactionsListWidget extends ConsumerWidget {
@@ -32,14 +33,16 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                 itemCount: data.length, // ← important
                 itemBuilder: (BuildContext context, int index) {
                   final Trx txn = data[index];
-                  return GestureDetector(
-                    onTap: () => Routes.navigateToTransactionDetailsView(
-                      transacrtionId: txn.id!,
-                      customerId: txn.customerId,
-                      context: context,
-                    ),
-                    child: Card(
-                      elevation: 0,
+                  return SlidableWidget(
+                    customerId: txn.customerId,
+                    transactionId: txn.id!,
+                    child: InkWell(
+                      onTap: () => Routes.navigateToTransactionDetailsView(
+                        transacrtionId: txn.id!,
+                        customerId: txn.customerId,
+                        context: context,
+                      ),
+
                       child: Container(
                         alignment: Alignment.center,
                         padding: EdgeInsets.all(14.sp),
@@ -52,58 +55,66 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Consumer(
-                                  builder: (context, ref, child) {
-                                    final double size = 28.sp;
-                                    final int cacheSize =
-                                        (size *
-                                                MediaQuery.of(
-                                                  context,
-                                                ).devicePixelRatio)
-                                            .round();
+                                  builder:
+                                      (
+                                        BuildContext context,
+                                        WidgetRef ref,
+                                        Widget? child,
+                                      ) {
+                                        final double size = 28.sp;
+                                        final int cacheSize =
+                                            (size *
+                                                    MediaQuery.of(
+                                                      context,
+                                                    ).devicePixelRatio)
+                                                .round();
 
-                                    return ref
-                                        .watch(
-                                          customerByIdProvider(txn.customerId),
-                                        )
-                                        .when(
-                                          data: (Customer? data) {
-                                            if (data == null ||
-                                                data.photo.isEmpty) {
-                                              return DefaultUserImage(
-                                                height: size,
-                                                width: size,
-                                              );
-                                            }
-
-                                            final file = File(data.photo);
-                                            if (!file.existsSync()) {
-                                              return DefaultUserImage(
-                                                height: size,
-                                                width: size,
-                                              );
-                                            }
-
-                                            return ClipOval(
-                                              child: Image.file(
-                                                file,
-                                                height: size,
-                                                width: size,
-                                                cacheWidth: cacheSize,
-                                                cacheHeight: cacheSize,
-                                                fit: BoxFit.cover,
+                                        return ref
+                                            .watch(
+                                              customerByIdProvider(
+                                                txn.customerId,
                                               ),
+                                            )
+                                            .when(
+                                              data: (Customer? data) {
+                                                if (data == null ||
+                                                    data.photo.isEmpty) {
+                                                  return DefaultUserImage(
+                                                    height: size,
+                                                    width: size,
+                                                  );
+                                                }
+
+                                                final file = File(data.photo);
+                                                if (!file.existsSync()) {
+                                                  return DefaultUserImage(
+                                                    height: size,
+                                                    width: size,
+                                                  );
+                                                }
+
+                                                return ClipOval(
+                                                  child: Image.file(
+                                                    file,
+                                                    height: size,
+                                                    width: size,
+                                                    cacheWidth: cacheSize,
+                                                    cacheHeight: cacheSize,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                );
+                                              },
+                                              loading: () => DefaultUserImage(
+                                                height: size,
+                                                width: size,
+                                              ),
+                                              error: (_, __) =>
+                                                  DefaultUserImage(
+                                                    height: size,
+                                                    width: size,
+                                                  ),
                                             );
-                                          },
-                                          loading: () => DefaultUserImage(
-                                            height: size,
-                                            width: size,
-                                          ),
-                                          error: (_, __) => DefaultUserImage(
-                                            height: size,
-                                            width: size,
-                                          ),
-                                        );
-                                  },
+                                      },
                                 ),
                                 SizedBox(width: 16.sp),
                                 Column(
@@ -145,21 +156,10 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                 },
               );
             } else {
-              return SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const BodyOneDefaultText(
-                      bold: true,
-                      text: "No Transactons to view",
-                    ),
-                    Icon(
-                      Icons.web_asset_off,
-                      size: 80.sp,
-                      color: AppColors.getLigthGreyColor,
-                    ),
-                  ],
+              return Center(
+                child: const BodyOneDefaultText(
+                  bold: true,
+                  text: "No Transactons to view",
                 ),
               );
             }

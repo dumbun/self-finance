@@ -5,7 +5,7 @@ import 'package:self_finance/providers/analytics_provider.dart';
 
 part 'history_provider.g.dart';
 
-@Riverpod(keepAlive: true)
+@Riverpod(keepAlive: false)
 class AsyncHistory extends _$AsyncHistory {
   Future<List<UserHistory>> _fetchAllHistoryData() async {
     final List<UserHistory> data = await BackEnd.fetchAllUserHistory();
@@ -55,6 +55,14 @@ class AsyncHistory extends _$AsyncHistory {
         }).toList();
       }, (err) => err is! FormatException);
     }
+  }
+
+  Future<void> deleteHistory({required int transactionId}) async {
+    state = AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await BackEnd.deleteHistory(transactionId: transactionId);
+      return _fetchAllHistoryData();
+    });
   }
 
   Future<List<UserHistory>> fetchAllUserHistory() async {

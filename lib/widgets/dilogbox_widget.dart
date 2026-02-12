@@ -4,6 +4,7 @@ import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 
 class AlertDilogs {
+  /// [alertDialogWithTwoAction] [1 -> Yes] & [2 -> No]
   static Future<int> alertDialogWithTwoAction(
     BuildContext context,
     String title,

@@ -14,6 +14,7 @@ import 'package:self_finance/widgets/build_customer_details_widget.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/fab.dart';
+import 'package:self_finance/widgets/slidable_widget.dart';
 
 class ContactDetailsView extends ConsumerWidget {
   const ContactDetailsView({super.key, required this.customerID});
@@ -131,57 +132,62 @@ class ContactDetailsView extends ConsumerWidget {
                               SizedBox(height: 12.sp),
                           itemBuilder: (BuildContext context, int index) {
                             final Trx transaction = transactions[index]!;
-                            return GestureDetector(
-                              onTap: () =>
-                                  Routes.navigateToTransactionDetailsView(
-                                    transacrtionId: transaction.id!,
-                                    customerId: customerID,
-                                    context: context,
-                                  ),
+                            return SlidableWidget(
+                              transactionId: transaction.id!,
+                              customerId: transaction.customerId,
                               child: Card(
-                                child: Padding(
-                                  padding: EdgeInsets.all(16.sp),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Icon(
-                                        Icons.circle,
-                                        size: 24.sp,
-                                        color:
-                                            transaction.transacrtionType ==
-                                                Constant.active
-                                            ? AppColors.getGreenColor
-                                            : AppColors.getErrorColor,
+                                child: GestureDetector(
+                                  onTap: () =>
+                                      Routes.navigateToTransactionDetailsView(
+                                        transacrtionId: transaction.id!,
+                                        customerId: customerID,
+                                        context: context,
                                       ),
-                                      SizedBox(width: 18.sp),
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          CurrencyWidget(
-                                            amount: Utility.doubleFormate(
-                                              transaction.amount,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(16.sp),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Icon(
+                                          Icons.circle,
+                                          size: 24.sp,
+                                          color:
+                                              transaction.transacrtionType ==
+                                                  Constant.active
+                                              ? AppColors.getGreenColor
+                                              : AppColors.getErrorColor,
+                                        ),
+                                        SizedBox(width: 18.sp),
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            CurrencyWidget(
+                                              amount: Utility.doubleFormate(
+                                                transaction.amount,
+                                              ),
                                             ),
-                                          ),
-                                          BodyOneDefaultText(
-                                            text:
-                                                "${Constant.takenDateSmall}: ${transaction.transacrtionDate}",
-                                          ),
-                                          BodyOneDefaultText(
-                                            text:
-                                                "${Constant.rateOfIntrest}: ${transaction.intrestRate}",
-                                          ),
-                                          BodyTwoDefaultText(
-                                            text:
-                                                'ID:  ${transaction.id.toString()}',
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                            BodyOneDefaultText(
+                                              text:
+                                                  "${Constant.takenDateSmall}: ${transaction.transacrtionDate}",
+                                            ),
+                                            BodyOneDefaultText(
+                                              text:
+                                                  "${Constant.rateOfIntrest}: ${transaction.intrestRate}",
+                                            ),
+                                            BodyTwoDefaultText(
+                                              text:
+                                                  'ID:  ${transaction.id.toString()}',
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -194,13 +200,22 @@ class ContactDetailsView extends ConsumerWidget {
                           ),
                         );
                 } else {
-                  return BodyTwoDefaultText(
-                    text: Constant.errorFetchingTransactionMessage,
+                  return const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      BodyTwoDefaultText(
+                        bold: true,
+                        textAlign: TextAlign.center,
+                        text: Constant.noTransactionMessage,
+                      ),
+                      Icon(Icons.arrow_circle_down_rounded, size: 32),
+                    ],
                   );
                 }
               },
               error: (Object error, StackTrace stackTrace) => const Center(
                 child: BodyOneDefaultText(
+                  error: true,
                   text: Constant.errorFetchingTransactionMessage,
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:self_finance/core/constants/constants.dart';
@@ -591,6 +592,101 @@ class BackEnd {
     }
   }
 
+  static Future<Map<String, int>> deleteTransaction({
+    required int transactionId,
+  }) async {
+    /// Deletes a transaction and its related history records atomically.
+    /// - Deletes from History where Transaction_ID = [transactionId]
+    /// - Deletes from Transactions where Transaction_ID = [transactionId]
+    ///   (Payments will be deleted automatically via ON DELETE CASCADE)
+    ///
+    /// Returns counts of deleted rows for observability.
+    if (transactionId <= 0) {
+      throw ArgumentError.value(
+        transactionId,
+        'transactionId',
+        'transactionId must be a positive integer',
+      );
+    }
+
+    final Database db = await BackEnd.db();
+
+    try {
+      return await db.transaction((txn) async {
+        // Ensure the transaction exists (fast fail)
+        final List<Map<String, Object?>> exists = await txn.query(
+          'Transactions',
+          where: 'Transaction_ID = ?',
+          whereArgs: [transactionId],
+          limit: 1,
+        );
+        final Trx t = Trx.toList(exists).first;
+
+        if (exists.isEmpty) {
+          throw Exception('Transaction not found: $transactionId');
+        }
+
+        // Delete the transaction (Payments will cascade delete)
+        final int txnDeleted = await txn.delete(
+          'Transactions',
+          where: 'Transaction_ID = ?',
+          whereArgs: [transactionId],
+        );
+
+        /// 🔥 Delete image if exists
+        if (t.signature.isNotEmpty) {
+          final File f = File(t.signature);
+          if (await f.exists()) {
+            await f.delete();
+          }
+        }
+
+        if (txnDeleted != 1) {
+          // Should not happen because we checked existence, but keep it safe.
+          throw Exception(
+            'Failed to delete transaction $transactionId (deleted=$txnDeleted)',
+          );
+        }
+
+        final Items i = Items.toList(
+          await txn.query(
+            'Items',
+            where: 'Item_ID = ?',
+            whereArgs: [t.itemId],
+            limit: 1,
+          ),
+        ).first;
+
+        final int itemDeleted = await txn.delete(
+          'Items',
+          where: 'Item_ID = ?',
+          whereArgs: [t.itemId],
+        );
+
+        /// 🔥 Delete image if exists
+        if (i.photo.isNotEmpty) {
+          final File f = File(i.photo);
+          if (await f.exists()) {
+            await f.delete();
+          }
+        }
+
+        if (itemDeleted != 1) {
+          // Should not happen because we checked existence, but keep it safe.
+          throw Exception(
+            'Failed to delete item ${t.id} (deleted=${t.itemId})',
+          );
+        }
+
+        return {'transactionDeleted': txnDeleted, 'itemDeleted': itemDeleted};
+      });
+    } on DatabaseException catch (e) {
+      throw Exception(
+        'Database error while deleting transaction: ${e.toString()}',
+      );
+    }
+  }
+
   //// P A Y M E N T S
 
   /// Fetch all payments of a transaction
@@ -651,6 +747,24 @@ class BackEnd {
       "Event_Type": history.eventType,
     }, conflictAlgorithm: ConflictAlgorithm.abort);
     return id;
+  }
+
+  static Future<int> deleteHistory({required int transactionId}) async {
+    final Database db = await BackEnd.db();
+    try {
+      return await db.transaction((Transaction txn) async {
+        final int historyDeleted = await txn.delete(
+          'History',
+          where: 'Transaction_ID = ?',
+          whereArgs: [transactionId],
+        );
+        return historyDeleted;
+      });
+    } catch (e) {
+      return throw Exception(
+        'Database error while deleting history: ${e.toString()}',
+      );
+    }
   }
 
   //// D A T A B A S E   M A N A G E M E N T

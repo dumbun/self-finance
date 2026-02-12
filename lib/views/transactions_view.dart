@@ -45,7 +45,7 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
                 ),
               ),
               hintStyle: WidgetStatePropertyAll(
-                TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
               ),
               elevation: WidgetStatePropertyAll(0),
               hintText: "Search transaction ID",

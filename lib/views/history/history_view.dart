@@ -29,7 +29,7 @@ class HistoryView extends ConsumerWidget {
               elevation: WidgetStatePropertyAll(0),
               hintText: "phone number or t_transactionID or customer name",
               hintStyle: WidgetStatePropertyAll(
-                TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
               ),
               leading: const Icon(Icons.person_search_sharp),
               onChanged: (String value) => ref

@@ -1,6 +1,7 @@
 // Provider
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/providers/filter_provider.dart'
     show filterProvider;
@@ -42,16 +43,22 @@ class TransactionFilterWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final filters = ref.watch(filterProvider);
 
-    return Wrap(
-      spacing: 5.0,
-      children: TransactionsFilters.values.map((filter) {
-        return FilterChip(
-          checkmarkColor: AppColors.getPrimaryColor,
-          selected: filters.contains(filter),
-          label: BodyTwoDefaultText(text: filter.label),
-          onSelected: (selected) => _toggleFilter(ref, filter, selected),
-        );
-      }).toList(),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: TransactionsFilters.values.map((TransactionsFilters filter) {
+          return Padding(
+            padding: EdgeInsetsGeometry.only(right: 12.sp),
+            child: FilterChip(
+              checkmarkColor: AppColors.getPrimaryColor,
+              selected: filters.contains(filter),
+              label: BodyTwoDefaultText(text: filter.label),
+              onSelected: (bool selected) =>
+                  _toggleFilter(ref, filter, selected),
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 

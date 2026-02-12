@@ -12,7 +12,7 @@ abstract class Constant {
   static const String noImgageError = "No image found";
 
   static const String noTransactionMessage =
-      "No transactions found. Add a transaction by pressing the pen icon button below.";
+      "No transactions found. Add a transaction by pressing the + icon button below.";
 
   static const String contactDeleteMessage =
       "By pressing 'YES', you will remove all details of this customer from your database.";

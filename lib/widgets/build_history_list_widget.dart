@@ -87,23 +87,10 @@ class BuildHistoryListWidget extends ConsumerWidget {
                 itemCount: data.length,
               );
             } else {
-              return SingleChildScrollView(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      BodyOneDefaultText(
-                        bold: true,
-                        text: "No histroy to view",
-                      ),
-                      Icon(
-                        Icons.web_asset_off,
-                        size: 80.sp,
-                        color: AppColors.getLigthGreyColor,
-                      ),
-                    ],
-                  ),
+              return const Center(
+                child: BodyOneDefaultText(
+                  bold: true,
+                  text: "No histroy to view",
                 ),
               );
             }
