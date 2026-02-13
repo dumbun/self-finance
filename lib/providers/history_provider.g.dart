@@ -6,21 +6,50 @@ part of 'history_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$asyncHistoryHash() => r'c75aba488064a0960bf780ebfdfbe701c77f6182';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [AsyncHistory].
 @ProviderFor(AsyncHistory)
-final asyncHistoryProvider =
-    AutoDisposeAsyncNotifierProvider<AsyncHistory, List<UserHistory>>.internal(
-      AsyncHistory.new,
-      name: r'asyncHistoryProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$asyncHistoryHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+final asyncHistoryProvider = AsyncHistoryProvider._();
 
-typedef _$AsyncHistory = AutoDisposeAsyncNotifier<List<UserHistory>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class AsyncHistoryProvider
+    extends $AsyncNotifierProvider<AsyncHistory, List<UserHistory>> {
+  AsyncHistoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'asyncHistoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$asyncHistoryHash();
+
+  @$internal
+  @override
+  AsyncHistory create() => AsyncHistory();
+}
+
+String _$asyncHistoryHash() => r'd8230012a062f55fd9d37831e3095774b4a48b86';
+
+abstract class _$AsyncHistory extends $AsyncNotifier<List<UserHistory>> {
+  FutureOr<List<UserHistory>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref as $Ref<AsyncValue<List<UserHistory>>, List<UserHistory>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<UserHistory>>, List<UserHistory>>,
+              AsyncValue<List<UserHistory>>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

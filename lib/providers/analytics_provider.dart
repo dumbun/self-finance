@@ -9,14 +9,6 @@ part 'analytics_provider.g.dart'; // Add this for code generation
 class Analytics extends _$Analytics {
   @override
   AnalyticsState build() {
-    // 🔒 Keep analytics alive
-    final KeepAliveLink link = ref.keepAlive();
-
-    // Optional: release memory after inactivity
-    Future.delayed(const Duration(minutes: 10), () {
-      link.close();
-    });
-
     _loadAnalytics();
     return AnalyticsState.empty();
   }

@@ -6,147 +6,82 @@ part of 'requried_payments_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$requriedPaymentsHash() => r'78e678813dcb88711d4caffb6bdd6fcee6fd64ab';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [requriedPayments].
 @ProviderFor(requriedPayments)
-const requriedPaymentsProvider = RequriedPaymentsFamily();
+final requriedPaymentsProvider = RequriedPaymentsFamily._();
 
-/// See also [requriedPayments].
-class RequriedPaymentsFamily extends Family<List<Payment>> {
-  /// See also [requriedPayments].
-  const RequriedPaymentsFamily();
+final class RequriedPaymentsProvider
+    extends $FunctionalProvider<List<Payment>, List<Payment>, List<Payment>>
+    with $Provider<List<Payment>> {
+  RequriedPaymentsProvider._({
+    required RequriedPaymentsFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'requriedPaymentsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
-  /// See also [requriedPayments].
-  RequriedPaymentsProvider call(int transactionId) {
-    return RequriedPaymentsProvider(transactionId);
+  @override
+  String debugGetCreateSourceHash() => _$requriedPaymentsHash();
+
+  @override
+  String toString() {
+    return r'requriedPaymentsProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  RequriedPaymentsProvider getProviderOverride(
-    covariant RequriedPaymentsProvider provider,
-  ) {
-    return call(provider.transactionId);
+  $ProviderElement<List<Payment>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  List<Payment> create(Ref ref) {
+    final argument = this.argument as int;
+    return requriedPayments(ref, argument);
   }
 
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'requriedPaymentsProvider';
-}
-
-/// See also [requriedPayments].
-class RequriedPaymentsProvider extends AutoDisposeProvider<List<Payment>> {
-  /// See also [requriedPayments].
-  RequriedPaymentsProvider(int transactionId)
-    : this._internal(
-        (ref) => requriedPayments(ref as RequriedPaymentsRef, transactionId),
-        from: requriedPaymentsProvider,
-        name: r'requriedPaymentsProvider',
-        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-            ? null
-            : _$requriedPaymentsHash,
-        dependencies: RequriedPaymentsFamily._dependencies,
-        allTransitiveDependencies:
-            RequriedPaymentsFamily._allTransitiveDependencies,
-        transactionId: transactionId,
-      );
-
-  RequriedPaymentsProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.transactionId,
-  }) : super.internal();
-
-  final int transactionId;
-
-  @override
-  Override overrideWith(
-    List<Payment> Function(RequriedPaymentsRef provider) create,
-  ) {
-    return ProviderOverride(
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<Payment> value) {
+    return $ProviderOverride(
       origin: this,
-      override: RequriedPaymentsProvider._internal(
-        (ref) => create(ref as RequriedPaymentsRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        transactionId: transactionId,
-      ),
+      providerOverride: $SyncValueProvider<List<Payment>>(value),
     );
   }
 
   @override
-  AutoDisposeProviderElement<List<Payment>> createElement() {
-    return _RequriedPaymentsProviderElement(this);
-  }
-
-  @override
   bool operator ==(Object other) {
-    return other is RequriedPaymentsProvider &&
-        other.transactionId == transactionId;
+    return other is RequriedPaymentsProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, transactionId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin RequriedPaymentsRef on AutoDisposeProviderRef<List<Payment>> {
-  /// The parameter `transactionId` of this provider.
-  int get transactionId;
-}
+String _$requriedPaymentsHash() => r'78e678813dcb88711d4caffb6bdd6fcee6fd64ab';
 
-class _RequriedPaymentsProviderElement
-    extends AutoDisposeProviderElement<List<Payment>>
-    with RequriedPaymentsRef {
-  _RequriedPaymentsProviderElement(super.provider);
+final class RequriedPaymentsFamily extends $Family
+    with $FunctionalFamilyOverride<List<Payment>, int> {
+  RequriedPaymentsFamily._()
+    : super(
+        retry: null,
+        name: r'requriedPaymentsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  RequriedPaymentsProvider call(int transactionId) =>
+      RequriedPaymentsProvider._(argument: transactionId, from: this);
 
   @override
-  int get transactionId => (origin as RequriedPaymentsProvider).transactionId;
+  String toString() => r'requriedPaymentsProvider';
 }
-
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

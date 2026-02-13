@@ -6,162 +6,123 @@ part of 'customer_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$customerByIdHash() => r'21844cb531e720c5efb3279687ef3975c62c7ea0';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
+@ProviderFor(AsyncCustomers)
+final asyncCustomersProvider = AsyncCustomersProvider._();
 
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [customerById].
-@ProviderFor(customerById)
-const customerByIdProvider = CustomerByIdFamily();
-
-/// See also [customerById].
-class CustomerByIdFamily extends Family<AsyncValue<Customer?>> {
-  /// See also [customerById].
-  const CustomerByIdFamily();
-
-  /// See also [customerById].
-  CustomerByIdProvider call(int customerId) {
-    return CustomerByIdProvider(customerId);
-  }
-
-  @override
-  CustomerByIdProvider getProviderOverride(
-    covariant CustomerByIdProvider provider,
-  ) {
-    return call(provider.customerId);
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'customerByIdProvider';
-}
-
-/// See also [customerById].
-class CustomerByIdProvider extends AutoDisposeFutureProvider<Customer?> {
-  /// See also [customerById].
-  CustomerByIdProvider(int customerId)
-    : this._internal(
-        (ref) => customerById(ref as CustomerByIdRef, customerId),
-        from: customerByIdProvider,
-        name: r'customerByIdProvider',
-        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-            ? null
-            : _$customerByIdHash,
-        dependencies: CustomerByIdFamily._dependencies,
-        allTransitiveDependencies:
-            CustomerByIdFamily._allTransitiveDependencies,
-        customerId: customerId,
+final class AsyncCustomersProvider
+    extends $AsyncNotifierProvider<AsyncCustomers, List<Customer>> {
+  AsyncCustomersProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'asyncCustomersProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
       );
 
-  CustomerByIdProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.customerId,
-  }) : super.internal();
+  @override
+  String debugGetCreateSourceHash() => _$asyncCustomersHash();
 
-  final int customerId;
+  @$internal
+  @override
+  AsyncCustomers create() => AsyncCustomers();
+}
+
+String _$asyncCustomersHash() => r'116b2087513917dbf2f0a9394b1ed826a63f11f3';
+
+abstract class _$AsyncCustomers extends $AsyncNotifier<List<Customer>> {
+  FutureOr<List<Customer>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<Customer>>, List<Customer>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<Customer>>, List<Customer>>,
+              AsyncValue<List<Customer>>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(customerById)
+final customerByIdProvider = CustomerByIdFamily._();
+
+final class CustomerByIdProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Customer?>,
+          Customer?,
+          FutureOr<Customer?>
+        >
+    with $FutureModifier<Customer?>, $FutureProvider<Customer?> {
+  CustomerByIdProvider._({
+    required CustomerByIdFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'customerByIdProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
-  Override overrideWith(
-    FutureOr<Customer?> Function(CustomerByIdRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: CustomerByIdProvider._internal(
-        (ref) => create(ref as CustomerByIdRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        customerId: customerId,
-      ),
-    );
+  String debugGetCreateSourceHash() => _$customerByIdHash();
+
+  @override
+  String toString() {
+    return r'customerByIdProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  AutoDisposeFutureProviderElement<Customer?> createElement() {
-    return _CustomerByIdProviderElement(this);
+  $FutureProviderElement<Customer?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Customer?> create(Ref ref) {
+    final argument = this.argument as int;
+    return customerById(ref, argument);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is CustomerByIdProvider && other.customerId == customerId;
+    return other is CustomerByIdProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, customerId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin CustomerByIdRef on AutoDisposeFutureProviderRef<Customer?> {
-  /// The parameter `customerId` of this provider.
-  int get customerId;
-}
+String _$customerByIdHash() => r'21844cb531e720c5efb3279687ef3975c62c7ea0';
 
-class _CustomerByIdProviderElement
-    extends AutoDisposeFutureProviderElement<Customer?>
-    with CustomerByIdRef {
-  _CustomerByIdProviderElement(super.provider);
+final class CustomerByIdFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<Customer?>, int> {
+  CustomerByIdFamily._()
+    : super(
+        retry: null,
+        name: r'customerByIdProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  CustomerByIdProvider call(int customerId) =>
+      CustomerByIdProvider._(argument: customerId, from: this);
 
   @override
-  int get customerId => (origin as CustomerByIdProvider).customerId;
+  String toString() => r'customerByIdProvider';
 }
-
-String _$asyncCustomersHash() => r'19ef6007237051fff645c44b961ac619b0d61da4';
-
-/// See also [AsyncCustomers].
-@ProviderFor(AsyncCustomers)
-final asyncCustomersProvider =
-    AutoDisposeAsyncNotifierProvider<AsyncCustomers, List<Customer>>.internal(
-      AsyncCustomers.new,
-      name: r'asyncCustomersProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$asyncCustomersHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-typedef _$AsyncCustomers = AutoDisposeAsyncNotifier<List<Customer>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

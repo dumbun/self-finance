@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/transaction_model.dart';
@@ -8,7 +7,7 @@ import 'package:self_finance/providers/monthly_chart_provider.dart';
 
 part 'transactions_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class AsyncTransactions extends _$AsyncTransactions {
   Future<List<Trx>> _fetchAllTransactionsData() async {
     final List<Trx> data = await BackEnd.fetchAllTransactions();

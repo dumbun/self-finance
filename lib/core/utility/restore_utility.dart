@@ -110,7 +110,7 @@ class RestoreUtility {
 
       // 4) Extract ZIP file
       zipInputStream = InputFileStream(zipFile.path);
-      final Archive archive = ZipDecoder().decodeBuffer(
+      final Archive archive = ZipDecoder().decodeStream(
         zipInputStream,
         password: dotenv.env['BACKUP_PASSWORD'],
       );
@@ -309,7 +309,7 @@ class RestoreUtility {
 
       // Validate ZIP structure
       inputStream = InputFileStream(zipPath);
-      final Archive archive = ZipDecoder().decodeBuffer(
+      final Archive archive = ZipDecoder().decodeStream(
         inputStream,
         password: dotenv.env['BACKUP_PASSWORD'],
       );

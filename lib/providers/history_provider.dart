@@ -5,7 +5,7 @@ import 'package:self_finance/providers/analytics_provider.dart';
 
 part 'history_provider.g.dart';
 
-@Riverpod(keepAlive: false)
+@riverpod
 class AsyncHistory extends _$AsyncHistory {
   Future<List<UserHistory>> _fetchAllHistoryData() async {
     final List<UserHistory> data = await BackEnd.fetchAllUserHistory();
