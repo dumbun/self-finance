@@ -188,7 +188,7 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView> {
     final customer = customers.first;
 
     await ref
-        .read(AsyncPaymentProvider(transaction.id!).notifier)
+        .read(asyncPaymentProvider(transaction.id!).notifier)
         .addPayment(amountpaid: totalAmountPaid);
 
     await ref

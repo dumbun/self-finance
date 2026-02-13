@@ -55,7 +55,7 @@ class DrawerWidget extends ConsumerWidget {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return PinAuthView(userDate: userData);
+          return PinAuthView();
         },
       ),
       (route) => false,

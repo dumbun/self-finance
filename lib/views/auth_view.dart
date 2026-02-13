@@ -22,7 +22,7 @@ class AuthView extends StatelessWidget {
               return BodyOneDefaultText(text: 'Error: ${snapshot.error}');
             } else {
               if (snapshot.data!.isNotEmpty) {
-                return PinAuthView(userDate: snapshot.requireData);
+                return PinAuthView();
               } else {
                 getPermissions();
                 return const TermsAndConditons();

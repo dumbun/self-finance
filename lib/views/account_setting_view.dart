@@ -223,7 +223,7 @@ class AccountSettingsView extends StatelessWidget {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return PinAuthView(userDate: userData);
+          return PinAuthView();
         },
       ),
       (Route<dynamic> route) => false,
