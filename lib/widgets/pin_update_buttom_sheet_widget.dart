@@ -101,8 +101,8 @@ class _PinUpdatebuttomSheetWidgetState
 
   void update() {
     ref
-        .read(asyncUserProvider.notifier)
-        .updateUserPin(userId: widget.id, updateUserPin: _conformPin.text);
+        .read(userProvider.notifier)
+        .changeUserPin(id: widget.id, newPin: _conformPin.text);
   }
 
   Expanded _buildActionButton({

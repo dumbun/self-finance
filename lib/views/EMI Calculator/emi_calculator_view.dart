@@ -96,7 +96,7 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
                   )
                 : Padding(
                     padding: EdgeInsets.only(top: 20.sp),
-                    child: BodyTwoDefaultText(
+                    child: const BodyTwoDefaultText(
                       error: true,
                       text: Constant.pleaseFillAllFields,
                     ),

@@ -13,7 +13,7 @@ part of 'monthly_chart_provider.dart';
 final monthlyChartProvider = MonthlyChartProvider._();
 
 final class MonthlyChartProvider
-    extends $AsyncNotifierProvider<MonthlyChart, MonthlyChartState> {
+    extends $StreamNotifierProvider<MonthlyChart, MonthlyChartState> {
   MonthlyChartProvider._()
     : super(
         from: null,
@@ -33,10 +33,10 @@ final class MonthlyChartProvider
   MonthlyChart create() => MonthlyChart();
 }
 
-String _$monthlyChartHash() => r'8bb6bd6b1efa4bac20d3f73a5098258df3b8cb7d';
+String _$monthlyChartHash() => r'db36d56acd33c331a8660862afc9fce5ac823c84';
 
-abstract class _$MonthlyChart extends $AsyncNotifier<MonthlyChartState> {
-  FutureOr<MonthlyChartState> build();
+abstract class _$MonthlyChart extends $StreamNotifier<MonthlyChartState> {
+  Stream<MonthlyChartState> build();
   @$mustCallSuper
   @override
   void runBuild() {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/backend/user_database.dart' show UserDBDrift;
 import 'package:self_finance/core/auth/auth.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
@@ -13,8 +12,8 @@ import 'package:self_finance/widgets/pin_input_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
 class PinAuthView extends StatefulWidget {
-  const PinAuthView({super.key});
-
+  const PinAuthView({super.key, required this.userDate});
+  final User userDate;
   @override
   State<PinAuthView> createState() => _PinAuthViewState();
 }
@@ -71,86 +70,71 @@ class _PinAuthViewState extends State<PinAuthView> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: UserDBDrift.watchUserData(), // ✅ Drift stream
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
+    final User user = widget.userDate;
+    final String profilePic = user.profilePicture.trim();
+    final bool hasProfilePic = profilePic.isNotEmpty;
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (hasProfilePic)
+                  CircularImageWidget(
+                    imageData: profilePic,
+                    titile: Constant.userProfileTag,
+                  )
+                else
+                  DefaultUserImage(height: 42.sp),
 
-        final user = snapshot.data;
-        if (user == null) {
-          return const Scaffold(body: Center(child: Text("No user found")));
-        }
+                SizedBox(height: 20.sp),
 
-        final String profilePic = user.profilePicture.trim();
-        final bool hasProfilePic = profilePic.isNotEmpty;
-
-        return Scaffold(
-          body: SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: EdgeInsets.all(12.sp),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (hasProfilePic)
-                      CircularImageWidget(
-                        imageData: profilePic,
-                        titile: Constant.userProfileTag,
-                      )
-                    else
-                      DefaultUserImage(height: 42.sp),
-
-                    SizedBox(height: 20.sp),
-
-                    const StrongHeadingOne(
-                      bold: true,
-                      text: Constant.enterYourAppPin,
-                    ),
-
-                    SizedBox(height: 20.sp),
-
-                    PinInputWidget(
-                      pinController: _pinController,
-                      obscureText: true,
-                      validator: (String? value) {
-                        final v = value?.trim() ?? '';
-                        if (v.isEmpty) return Constant.enterYourAppPin;
-                        if (v != user.userPin) return Constant.enterCorrectPin;
-                        return null;
-                      },
-                    ),
-
-                    SizedBox(height: 20.sp),
-
-                    RoundedCornerButton(
-                      text: Constant.login,
-                      onPressed: () =>
-                          _handlePinSubmit(expectedPin: user.userPin),
-                    ),
-
-                    SizedBox(height: 20.sp),
-
-                    IconButton(
-                      onPressed: _handleBiometric,
-                      icon: Icon(
-                        Icons.fingerprint,
-                        color: AppColors.getPrimaryColor,
-                        size: 32.sp,
-                      ),
-                    ),
-                  ],
+                const StrongHeadingOne(
+                  bold: true,
+                  text: Constant.enterYourAppPin,
                 ),
-              ),
+
+                SizedBox(height: 20.sp),
+
+                PinInputWidget(
+                  pinController: _pinController,
+                  obscureText: true,
+                  validator: (String? value) {
+                    final v = value?.trim() ?? '';
+                    if (v.isEmpty) return Constant.enterYourAppPin;
+                    if (v != user.userPin) return Constant.enterCorrectPin;
+                    return null;
+                  },
+                ),
+
+                SizedBox(height: 20.sp),
+
+                Padding(
+                  padding: EdgeInsetsGeometry.only(left: 22.sp, right: 22.sp),
+                  child: RoundedCornerButton(
+                    text: Constant.login,
+                    onPressed: () =>
+                        _handlePinSubmit(expectedPin: user.userPin),
+                  ),
+                ),
+
+                SizedBox(height: 20.sp),
+
+                IconButton(
+                  onPressed: _handleBiometric,
+                  icon: Icon(
+                    Icons.fingerprint,
+                    color: AppColors.getPrimaryColor,
+                    size: 32.sp,
+                  ),
+                ),
+              ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

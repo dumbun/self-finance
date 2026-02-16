@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
+import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
@@ -20,15 +21,13 @@ class BuildHistoryListWidget extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(
-          DateFormat.yMMMd().format(DateTime.parse(eventDate)),
-          softWrap: true,
-          style: TextStyle(color: AppColors.getLigthGreyColor, fontSize: 14.sp),
+        BodySmallText(
+          text: DateFormat.yMMMd().format(DateTime.parse(eventDate)),
+          color: AppColors.getLigthGreyColor,
         ),
-        Text(
-          DateFormat.Hm().format(DateTime.parse(eventDate)),
-          softWrap: true,
-          style: TextStyle(color: AppColors.getLigthGreyColor, fontSize: 14.sp),
+        BodySmallText(
+          text: DateFormat.Hm().format(DateTime.parse(eventDate)),
+          color: AppColors.getLigthGreyColor,
         ),
       ],
     );
@@ -59,7 +58,7 @@ class BuildHistoryListWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ref
-        .watch(asyncHistoryProvider)
+        .watch(historyProvider)
         .when(
           data: (List<UserHistory> data) {
             if (data.isNotEmpty) {
@@ -96,7 +95,7 @@ class BuildHistoryListWidget extends ConsumerWidget {
             }
           },
           error: (Object error, StackTrace stackTrace) =>
-              Text(error.toString()),
+              BodySmallText(text: error.toString()),
           loading: () =>
               const Center(child: CircularProgressIndicator.adaptive()),
         );

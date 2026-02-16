@@ -9,34 +9,87 @@ part of 'history_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(AsyncHistory)
-final asyncHistoryProvider = AsyncHistoryProvider._();
+@ProviderFor(HistorySearchQuery)
+final historySearchQueryProvider = HistorySearchQueryProvider._();
 
-final class AsyncHistoryProvider
-    extends $AsyncNotifierProvider<AsyncHistory, List<UserHistory>> {
-  AsyncHistoryProvider._()
+final class HistorySearchQueryProvider
+    extends $NotifierProvider<HistorySearchQuery, String> {
+  HistorySearchQueryProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'asyncHistoryProvider',
+        name: r'historySearchQueryProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$asyncHistoryHash();
+  String debugGetCreateSourceHash() => _$historySearchQueryHash();
 
   @$internal
   @override
-  AsyncHistory create() => AsyncHistory();
+  HistorySearchQuery create() => HistorySearchQuery();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
 }
 
-String _$asyncHistoryHash() => r'c75aba488064a0960bf780ebfdfbe701c77f6182';
+String _$historySearchQueryHash() =>
+    r'7a51deec573ed89d1cb2d3655a6168b1122d532a';
 
-abstract class _$AsyncHistory extends $AsyncNotifier<List<UserHistory>> {
-  FutureOr<List<UserHistory>> build();
+abstract class _$HistorySearchQuery extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<String, String>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<String, String>,
+              String,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(HistoryNotifier)
+final historyProvider = HistoryNotifierProvider._();
+
+final class HistoryNotifierProvider
+    extends $StreamNotifierProvider<HistoryNotifier, List<UserHistory>> {
+  HistoryNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'historyProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$historyNotifierHash();
+
+  @$internal
+  @override
+  HistoryNotifier create() => HistoryNotifier();
+}
+
+String _$historyNotifierHash() => r'6d5da4700581f5aa2d3949ec04abee25b47fd89b';
+
+abstract class _$HistoryNotifier extends $StreamNotifier<List<UserHistory>> {
+  Stream<List<UserHistory>> build();
   @$mustCallSuper
   @override
   void runBuild() {

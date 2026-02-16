@@ -7,7 +7,7 @@ import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/models/contacts_model.dart';
-import 'package:self_finance/providers/customer_contacts_provider.dart';
+import 'package:self_finance/providers/contacts_provider.dart';
 
 class BuildCustomersListWidget extends ConsumerWidget {
   const BuildCustomersListWidget({super.key});
@@ -15,7 +15,7 @@ class BuildCustomersListWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ref
-        .watch(asyncCustomersContactsProvider)
+        .watch(contactsProvider)
         .when(
           data: (List<Contact> data) {
             return data.isNotEmpty

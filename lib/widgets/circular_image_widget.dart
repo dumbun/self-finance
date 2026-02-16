@@ -10,15 +10,17 @@ class CircularImageWidget extends StatelessWidget {
     super.key,
     required this.imageData,
     required this.titile,
+    this.customeSize,
   });
 
   final String imageData;
   final String titile;
+  final double? customeSize;
 
   @override
   Widget build(BuildContext context) {
     final File file = File(imageData);
-    final double size = 44.sp;
+    final double size = customeSize ?? 44.sp;
     final int cacheSize = (size * MediaQuery.of(context).devicePixelRatio)
         .round();
 

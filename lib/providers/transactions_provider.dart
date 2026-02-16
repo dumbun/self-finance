@@ -1,141 +1,267 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
+import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/core/utility/image_saving_utility.dart';
+import 'package:self_finance/core/utility/invoice_generator_utility.dart';
+import 'package:self_finance/core/utility/user_utility.dart';
+import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/models/items_model.dart';
+import 'package:self_finance/models/payment_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/providers/analytics_provider.dart';
-import 'package:self_finance/providers/history_provider.dart';
-import 'package:self_finance/providers/monthly_chart_provider.dart';
+import 'package:self_finance/models/user_history_model.dart';
+import 'package:self_finance/providers/image_providers.dart';
+import 'package:self_finance/widgets/transaction_filter_widget.dart';
+import 'package:signature/signature.dart';
 
 part 'transactions_provider.g.dart';
 
 @riverpod
-class AsyncTransactions extends _$AsyncTransactions {
-  Future<List<Trx>> _fetchAllTransactionsData() async {
-    final List<Trx> data = await BackEnd.fetchAllTransactions();
-    return data;
+class Filter extends _$Filter {
+  @override
+  Set<TransactionsFilters> build() => {};
+
+  void add(TransactionsFilters filter) {
+    state = {...state, filter};
+  }
+
+  void remove(TransactionsFilters filter) {
+    state = state.where((f) => f != filter).toSet();
+  }
+
+  void toggle(TransactionsFilters filter) {
+    if (state.contains(filter)) {
+      remove(filter);
+    } else {
+      add(filter);
+    }
+  }
+
+  void set(Set<TransactionsFilters> filters) {
+    ref.read(transactionsSearchQueryProvider.notifier).clear();
+    ref.read(transactionsDateSearchQueryProvider.notifier).clear();
+    state = filters;
+  }
+
+  void setFilter(TransactionsFilters filter, bool selected) {
+    ref.read(transactionsSearchQueryProvider.notifier).clear();
+    ref.read(transactionsDateSearchQueryProvider.notifier).clear();
+    state = selected ? {filter} : {};
+  }
+
+  void clear() {
+    state = {};
+  }
+
+  bool contains(TransactionsFilters filter) {
+    return state.contains(filter);
+  }
+}
+
+@riverpod
+class TransactionsSearchQuery extends _$TransactionsSearchQuery {
+  @override
+  String build() => '';
+
+  void set(String q) {
+    ref.read(filterProvider.notifier).clear();
+    ref.read(transactionsDateSearchQueryProvider.notifier).clear();
+    state = q;
+  }
+
+  void clear() => state = '';
+}
+
+@riverpod
+class TransactionsDateSearchQuery extends _$TransactionsDateSearchQuery {
+  @override
+  String build() => '';
+
+  void set(String q) {
+    ref.read(transactionsSearchQueryProvider.notifier).clear();
+    ref.read(filterProvider.notifier).clear();
+    state = q;
+  }
+
+  void clear() => state = '';
+}
+
+@riverpod
+class TransactionsNotifier extends _$TransactionsNotifier {
+  Stream<List<Trx>> _fetchTransactions() {
+    return BackEnd.watchAllTransactions();
   }
 
   @override
-  FutureOr<List<Trx>> build() {
-    // Load initial todo list from the remote repository\
+  Stream<List<Trx>> build() {
+    final Stream<List<Trx>> base = _fetchTransactions();
+    final String query = ref
+        .watch(transactionsSearchQueryProvider)
+        .trim()
+        .toLowerCase();
+    final String dateQuery = ref.watch(transactionsDateSearchQueryProvider);
+    final filterQuery = ref.watch(filterProvider);
+
+    if (query.isEmpty && dateQuery.isEmpty && filterQuery.isEmpty) return base;
+    if (query.isNotEmpty && dateQuery.isEmpty) {
+      return base.map((List<Trx> transactions) {
+        return transactions
+            .where(
+              (Trx element) => element.id.toString().trim().contains(query),
+            )
+            .toList();
+      });
+    } else if (query.isEmpty && dateQuery.isNotEmpty && filterQuery.isEmpty) {
+      return BackEnd.watchTransactionsByDate(inputDate: dateQuery);
+    } else if (query.isEmpty && dateQuery.isEmpty && filterQuery.isNotEmpty) {
+      return BackEnd.watchTransactionsByAge(months: filterQuery.first.months);
+    } else {
+      return base;
+    }
+  }
+
+  Future<bool> addNewTransactoion({
+    required int customerId,
+    required String discription,
+    required String pawnedDate,
+    required double pawnAmount,
+    required double rateOfIntrest,
+    required SignatureController signatureController,
+  }) async {
     ref.keepAlive();
-    return _fetchAllTransactionsData();
+    final List<Customer> customer = await BackEnd.fetchSingleContactDetails(
+      id: customerId,
+    );
+    final String presentDate = DateTime.now().toString();
+    final String itemImagePath = await ImageSavingUtility.saveImage(
+      location: 'items',
+      image: ref.read(itemFileProvider),
+    );
+    final int itemId = await BackEnd.createNewItem(
+      Items(
+        customerid: customerId,
+        name: discription,
+        description: discription,
+        pawnedDate: pawnedDate,
+        expiryDate: presentDate,
+        pawnAmount: pawnAmount,
+        status: Constant.active,
+        photo: itemImagePath,
+        createdDate: DateTime.now().toString(),
+      ),
+    );
+    if (itemId != 0) {
+      //saving signature to the storage
+      final String signaturePath = await Utility.saveSignaturesInStorage(
+        signatureController: signatureController,
+        imageName: itemId.toString(),
+      );
+      final int transacrtionId = await BackEnd.createNewTransaction(
+        Trx(
+          customerId: customerId,
+          itemId: itemId,
+          transacrtionDate: pawnedDate,
+          transacrtionType: Constant.active,
+          amount: pawnAmount,
+          intrestRate: rateOfIntrest,
+          intrestAmount: 0.0,
+          remainingAmount: 0.0,
+          signature: signaturePath,
+          createdDate: presentDate,
+        ),
+      );
+      if (transacrtionId != 0) {
+        final int historyId = await BackEnd.createNewHistory(
+          UserHistory(
+            userID: 1,
+            customerID: customerId,
+            itemID: itemId,
+            customerNumber: customer.first.number,
+            customerName: customer.first.name,
+            transactionID: transacrtionId,
+            eventDate: presentDate,
+            eventType: Constant.debited,
+            amount: pawnAmount,
+          ),
+        );
+
+        return historyId != 0 ? true : false;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 
-  Future<int> addTransaction({required Trx transaction}) async {
-    int result = 0;
-    // Set the state to loading
-    state = const AsyncValue.loading();
-    // Add the new todo and reload the todo list from the remote repository
-    state = await AsyncValue.guard(() async {
-      result = await BackEnd.createNewTransaction(transaction);
-      return await _fetchAllTransactionsData();
-    });
-    ref.read(analyticsProvider.notifier).refresh().ignore();
-    ref.refresh(monthlyChartProvider.future).ignore();
-    return result;
-  }
-
-  Future<List<Trx>> fetchRequriedTransaction({
+  Future<Map<String, int>> deleteTransaction({
     required int transactionId,
   }) async {
-    final List<Trx> responce = await BackEnd.fetchRequriedTransaction(
-      transacrtionId: transactionId,
-    );
-    return responce;
+    return await BackEnd.deleteTransaction(transactionId: transactionId);
+  }
+}
+
+@Riverpod(keepAlive: false)
+class TransactionByID extends _$TransactionByID {
+  @override
+  Stream<Trx?> build(int transactionId) {
+    return _fetchTransaction(transactionId);
   }
 
-  Future<int> markAsPaidTransaction({
-    required int trancationId,
+  Stream<Trx?> _fetchTransaction(int transactionId) {
+    return BackEnd.watchRequriedTransaction(transactionId: transactionId);
+  }
+
+  Future<void> markAsPaid({
+    required double amountpaid,
     required double intrestAmount,
   }) async {
-    int responce = 0;
-    // Set the state to loading
-    state = const AsyncValue.loading();
-    // Add the new todo and reload the todo list from the remote repository
-    state = await AsyncValue.guard(() async {
-      responce = await BackEnd.updateTransactionAsPaid(
-        id: trancationId,
+    final Trx? trx = state.value;
+    if (trx != null) {
+      final List<Customer> customers = await BackEnd.fetchSingleContactDetails(
+        id: trx.customerId,
+      );
+      if (customers.isEmpty) {
+        throw Exception('Customer not found');
+      }
+      final Customer customer = customers.first;
+      final Payment payment = Payment(
+        transactionId: trx.id!,
+        paymentDate: Utility.presentDate().toIso8601String(),
+        amountpaid: amountpaid,
+        type: 'cash',
+        createdDate: Utility.presentDate().toIso8601String(),
+      );
+      await BackEnd.addPayment(payment: payment);
+      await BackEnd.updateTransactionAsPaid(
+        id: transactionId,
         intrestAmount: intrestAmount,
       );
-      return await _fetchAllTransactionsData();
-    });
-    return responce;
-  }
-
-  Future<void> doSearch({required String givenInput}) async {
-    final List<Trx> transactionData = await BackEnd.fetchAllTransactions();
-    if (transactionData.isNotEmpty) {
-      state = const AsyncValue.loading(); // Set loading state once
-      state = await AsyncValue.guard(() async {
-        if (transactionData.isEmpty) {
-          return [];
-        }
-
-        if (givenInput.isEmpty) {
-          return transactionData;
-        }
-
-        final String inputLower = givenInput.trim().toLowerCase();
-        return transactionData.where((Trx element) {
-          return element.id.toString().trim().contains(inputLower);
-        }).toList();
-      }, (err) => err is! FormatException);
-    }
-  }
-
-  Future fetchTransactionsByAge(int input) async {
-    state = AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final List<Trx> responce = await BackEnd.fetchTransactionsByAge(
-        months: input,
+      await BackEnd.createNewHistory(
+        UserHistory(
+          userID: 1,
+          customerID: customer.id!,
+          itemID: trx.itemId,
+          customerNumber: customer.number,
+          customerName: customer.name,
+          transactionID: transactionId,
+          eventDate: Utility.presentDate().toString(),
+          eventType: Constant.credit,
+          amount: amountpaid,
+        ),
       );
-
-      return responce;
-    });
-  }
-
-  Future<void> fetchTransactionsByDate(String inputDate) async {
-    if (inputDate.isNotEmpty) {
-      state = AsyncValue.loading();
-      state = await AsyncValue.guard(() async {
-        final List<Trx> responce = await BackEnd.fetchTransactionsByDate(
-          inputDate: inputDate,
-        );
-        return responce;
-      });
     }
   }
 
-  Future<void> deleteTransactionAndHistory(int id) async {
-    state = AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await BackEnd.deleteTransaction(transactionId: id);
-      await ref
-          .read(asyncHistoryProvider.notifier)
-          .deleteHistory(transactionId: id);
-      ref.read(analyticsProvider.notifier).refresh().ignore();
-      ref.refresh(monthlyChartProvider.future).ignore();
-      return _fetchAllTransactionsData();
-    });
+  Future<void> shareTransaction() async {
+    final List<Trx> t = await BackEnd.fetchRequriedTransaction(
+      transacrtionId: transactionId,
+    );
+    await InvoiceGenerator.shareInvoice(transaction: t.first);
   }
 }
 
-@riverpod
-Future<List<Trx?>> transactionsByCustomerId(Ref ref, int customerId) async {
-  // Watch the customer list - when it changes, this provider rebuilds
-  ref.watch(asyncTransactionsProvider);
-  final List<Trx?> transactions =
-      await BackEnd.fetchRequriedCustomerTransactions(customerId: customerId);
-  return transactions;
-}
-
-@riverpod
-Future<List<Trx>> fetchRequriedTransaction(Ref ref, int transactionId) async {
-  // Watch the customer list - when it changes, this provider rebuilds
-  ref.watch(asyncTransactionsProvider);
-  final List<Trx> transactions = await BackEnd.fetchRequriedTransaction(
-    transacrtionId: transactionId,
-  );
-  return transactions;
-}
+final requriedCustomerTransactionsProvider = StreamProvider.family
+    .autoDispose<List<Trx>, int>((ref, customerId) {
+      return BackEnd.watchRequriedCustomerTransactions(customerId: customerId);
+    });

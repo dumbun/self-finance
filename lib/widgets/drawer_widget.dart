@@ -8,14 +8,14 @@ import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/user_model.dart';
-import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
+import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 
-class DrawerWidget extends ConsumerWidget {
+class DrawerWidget extends StatelessWidget {
   const DrawerWidget({super.key});
 
   Widget _buildDrawerButtons({
@@ -37,7 +37,7 @@ class DrawerWidget extends ConsumerWidget {
     );
   }
 
-  void _logout(List<User> userData, BuildContext context) {
+  void _logout(User userData, BuildContext context) {
     AlertDilogs.alertDialogWithTwoAction(
       context,
       Constant.exit,
@@ -51,73 +51,20 @@ class DrawerWidget extends ConsumerWidget {
     });
   }
 
-  void _navigateToPinAuthView(List<User> userData, BuildContext context) {
+  void _navigateToPinAuthView(User userData, BuildContext context) {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return PinAuthView();
+          return PinAuthView(userDate: userData);
         },
       ),
       (route) => false,
     );
   }
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Drawer(
-      child: Padding(
-        padding: EdgeInsets.all(16.sp),
-        child: ref
-            .watch(asyncUserProvider)
-            .when(
-              data: (List<User> data) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    data.first.profilePicture.isNotEmpty
-                        ? CircularImageWidget(
-                            imageData: data.first.profilePicture,
-                            titile: 'Account Profile Image',
-                          )
-                        : DefaultUserImage(height: 45.sp, width: 45.sp),
-                    SizedBox(height: 16.sp),
-                    _buildDrawerButtons(
-                      text: Constant.account,
-                      icon: Icons.vpn_key_rounded,
-                      onTap: () => Routes.navigateToAccountSettingsView(
-                        context: context,
-                      ),
-                    ),
-                    _buildDrawerButtons(
-                      text: "Feedback",
-                      icon: Icons.feedback,
-                      onTap: () => Utility.sendFeedbackEmail(context),
-                    ),
-                    _buildDrawerButtons(
-                      text: Constant.logout,
-                      icon: Icons.login_rounded,
-                      color: AppColors.getErrorColor,
-                      onTap: () => _logout(data, context),
-                    ),
-                    SizedBox(height: 12.sp),
-                    SizedBox(height: 20.sp),
-                    _getAppVersion(),
-                  ],
-                );
-              },
-              error: (Object _, StackTrace _) =>
-                  const Center(child: Text(Constant.error)),
-              loading: () =>
-                  const Center(child: CircularProgressIndicator.adaptive()),
-            ),
-      ),
-    );
-  }
-
   FutureBuilder<String> _getAppVersion() {
     return FutureBuilder<String>(
-      future: Utility.getAppVersion(), // async work
+      future: Utility.getAppVersion(),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.connectionState case ConnectionState.waiting) {
           return const BodyTwoDefaultText(text: 'Loading....');
@@ -129,6 +76,69 @@ class DrawerWidget extends ConsumerWidget {
           }
         }
       },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: Padding(
+        padding: EdgeInsets.all(16.sp),
+        child: Consumer(
+          builder: (BuildContext context, WidgetRef ref, Widget? child) {
+            return ref
+                .watch(userProvider)
+                .when(
+                  data: (User? user) {
+                    if (user != null) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          user.profilePicture.isNotEmpty
+                              ? CircularImageWidget(
+                                  imageData: user.profilePicture,
+                                  titile: 'Account Profile Image',
+                                )
+                              : DefaultUserImage(height: 45.sp, width: 45.sp),
+                          SizedBox(height: 16.sp),
+                          _buildDrawerButtons(
+                            text: Constant.account,
+                            icon: Icons.vpn_key_rounded,
+                            onTap: () => Routes.navigateToAccountSettingsView(
+                              context: context,
+                            ),
+                          ),
+                          _buildDrawerButtons(
+                            text: "Feedback",
+                            icon: Icons.feedback,
+                            onTap: () => Utility.sendFeedbackEmail(context),
+                          ),
+                          _buildDrawerButtons(
+                            text: Constant.logout,
+                            icon: Icons.login_rounded,
+                            color: AppColors.getErrorColor,
+                            onTap: () => _logout(user, context),
+                          ),
+                          SizedBox(height: 12.sp),
+                          SizedBox(height: 20.sp),
+                          _getAppVersion(),
+                        ],
+                      );
+                    } else {
+                      return const BodyTwoDefaultText(
+                        text: Constant.errorUserFetch,
+                      );
+                    }
+                  },
+                  error: (Object error, StackTrace stackTrace) =>
+                      const BodyTwoDefaultText(text: Constant.errorUserFetch),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator.adaptive()),
+                );
+          },
+        ),
+      ),
     );
   }
 }

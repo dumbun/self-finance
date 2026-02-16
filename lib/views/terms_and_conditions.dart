@@ -5,8 +5,8 @@ import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/fonts/strong_heading_one_text.dart';
-import 'package:self_finance/core/utility/restore_utility.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
+import 'package:self_finance/widgets/restore_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
 class TermsAndConditons extends StatefulWidget {
@@ -40,21 +40,12 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
                 _getPrivacyAndPolicyButton(),
                 _getNextButton(),
                 SizedBox(height: 16.sp),
-                _getRestoreButton(),
+                const RestoreWithProgressWidget(),
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _getRestoreButton() {
-    return RoundedCornerButton(
-      text: "Restore",
-      onPressed: () {
-        RestoreUtility.restoreBackupFromZip(context: context);
-      },
     );
   }
 

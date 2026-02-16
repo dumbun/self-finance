@@ -24,6 +24,18 @@ class AccountSettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Future<void> doBackUp() async {
+      return await showAdaptiveDialog(
+        useSafeArea: true,
+        barrierDismissible: false,
+        useRootNavigator: true,
+        context: context,
+        builder: (BuildContext context) {
+          return const Center(child: Card(child: BackupWithProgressWidget()));
+        },
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
@@ -38,67 +50,82 @@ class AccountSettingsView extends StatelessWidget {
           child: Consumer(
             builder: (BuildContext context, WidgetRef ref, Widget? child) {
               return ref
-                  .watch(asyncUserProvider)
+                  .watch(userProvider)
                   .when(
-                    data: (List<User> data) {
-                      final User user = data.first;
-                      return RefreshWidget(
-                        onRefresh: () => ref.refresh(asyncUserProvider.future),
-                        child: ListView(
-                          children: [
-                            // user profile pic
-                            SizedBox(height: 20.sp),
-                            Hero(
-                              tag: Constant.userProfileTag,
-                              child: UserImageUpdateWidget(
-                                userImageString: user.profilePicture,
+                    data: (User? data) {
+                      if (data != null) {
+                        return RefreshWidget(
+                          onRefresh: () async =>
+                              await ref.refresh(userProvider),
+                          child: ListView(
+                            children: [
+                              // user profile pic
+                              SizedBox(height: 20.sp),
+                              Hero(
+                                tag: Constant.userProfileTag,
+                                child: UserImageUpdateWidget(
+                                  userImageString: data.profilePicture,
+                                ),
                               ),
-                            ),
 
-                            // user name
-                            SizedBox(height: 20.sp),
-                            _buildNameUpdateButton(
-                              context: context,
-                              userId: user.id!,
-                              userName: user.userName,
-                            ),
+                              // user name
+                              SizedBox(height: 20.sp),
+                              _buildNameUpdateButton(
+                                context: context,
+                                userId: data.id!,
+                                userName: data.userName,
+                              ),
 
-                            // user pin update button
-                            SizedBox(height: 12.sp),
-                            _buildPinUpdateButton(
-                              context: context,
-                              id: user.id!,
-                              userPin: user.userPin,
-                            ),
+                              // user pin update button
+                              SizedBox(height: 12.sp),
+                              _buildPinUpdateButton(
+                                context: context,
+                                id: data.id!,
+                                userPin: data.userPin,
+                              ),
 
-                            // user Currency update button
-                            SizedBox(height: 12.sp),
-                            _buildCurrencyUpdateButton(
-                              context: context,
-                              id: user.id!,
-                              currency: user.userCurrency,
-                              ref: ref,
-                            ),
+                              // user Currency update button
+                              SizedBox(height: 12.sp),
+                              _buildCurrencyUpdateButton(
+                                context: context,
+                                id: data.id!,
+                                currency: data.userCurrency,
+                                ref: ref,
+                              ),
 
-                            // user terms and condition button
-                            SizedBox(height: 12.sp),
-                            _buildTermsAndConditionButton(),
+                              // user terms and condition button
+                              SizedBox(height: 12.sp),
+                              _buildTermsAndConditionButton(),
 
-                            // user privacy Policy button
-                            SizedBox(height: 12.sp),
-                            _buildPrivacyPolicyButton(),
+                              // user privacy Policy button
+                              SizedBox(height: 12.sp),
+                              _buildPrivacyPolicyButton(),
 
-                            // logout button
-                            SizedBox(height: 12.sp),
-                            const BackupWithProgressWidget(),
-                            _buildLogoutButton(
-                              context: context,
-                              userData: data,
-                            ),
-                            SizedBox(height: 32.sp),
-                          ],
-                        ),
-                      );
+                              // logout button
+                              SizedBox(height: 12.sp),
+                              _buildListTile(
+                                title: "Backup",
+                                onPressed: doBackUp,
+                                icon: const Icon(
+                                  Icons.backup_rounded,
+                                  color: AppColors.contentColorBlue,
+                                ),
+                              ),
+
+                              SizedBox(height: 12.sp),
+                              _buildLogoutButton(
+                                context: context,
+                                userData: data,
+                              ),
+                              SizedBox(height: 32.sp),
+                            ],
+                          ),
+                        );
+                      } else {
+                        return const BodyTwoDefaultText(
+                          text: Constant.errorUserFetch,
+                        );
+                      }
                     },
                     error: (Object error, StackTrace stackTrace) =>
                         const Center(
@@ -180,10 +207,10 @@ class AccountSettingsView extends StatelessWidget {
               showCurrencyCode: true,
               onSelect: (Currency selectedCurrency) {
                 ref
-                    .read(asyncUserProvider.notifier)
-                    .updateUserCurrency(
-                      userId: id,
-                      updateUserPin: selectedCurrency.symbol,
+                    .read(userProvider.notifier)
+                    .changeCurrency(
+                      id: id,
+                      newCurrency: selectedCurrency.symbol,
                     );
               },
             );
@@ -219,11 +246,11 @@ class AccountSettingsView extends StatelessWidget {
     );
   }
 
-  void _logout(BuildContext context, List<User> userData) {
+  void _logout(BuildContext context, User userData) {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return PinAuthView();
+          return PinAuthView(userDate: userData);
         },
       ),
       (Route<dynamic> route) => false,
@@ -232,7 +259,7 @@ class AccountSettingsView extends StatelessWidget {
 
   Card _buildLogoutButton({
     required BuildContext context,
-    required List<User> userData,
+    required User userData,
   }) {
     return _buildListTile(
       icon: const Icon(Icons.logout, color: AppColors.getErrorColor),

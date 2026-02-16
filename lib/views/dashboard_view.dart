@@ -42,7 +42,7 @@ class _DashboardViewState extends State<DashboardView> {
         forceMaterialTransparency: true,
         title: ValueListenableBuilder<int>(
           valueListenable: _selectedIndex,
-          builder: (_, int index, __) {
+          builder: (_, int index, _) {
             return TitleWidget(
               text: switch (index) {
                 0 => Constant.homeScreen,
@@ -71,13 +71,13 @@ class _DashboardViewState extends State<DashboardView> {
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       floatingActionButton: ValueListenableBuilder<int>(
         valueListenable: _selectedIndex,
-        builder: (_, int index, __) {
+        builder: (_, int index, _) {
           return index == 0 ? const ExpandableFab() : const SizedBox.shrink();
         },
       ),
       bottomNavigationBar: ValueListenableBuilder<int>(
         valueListenable: _selectedIndex,
-        builder: (_, int index, __) {
+        builder: (_, int index, _) {
           return BottomNavigationBar(
             enableFeedback: true,
             showUnselectedLabels: false,

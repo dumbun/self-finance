@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:self_finance/backend/backend.dart';
-import 'package:self_finance/backend/user_db.dart';
+import 'package:self_finance/backend/user_database.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/logic/logic.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
@@ -45,13 +45,9 @@ class InvoiceGenerator {
 
     // Fetch fresh user data
     try {
-      final List<User> users = await UserBackEnd.fetchIDOneUser();
+      final User users = await UserBackEnd.fetchUserData();
 
-      if (users.isEmpty) {
-        throw Exception('No user found. Please ensure you are logged in.');
-      }
-
-      _cachedUser = users.first;
+      _cachedUser = users;
       _cacheTime = DateTime.now();
 
       return _cachedUser!;
@@ -208,17 +204,11 @@ class InvoiceGenerator {
   /// Share the invoice PDF
   ///
   /// Automatically fetches user data for company information
-  static Future<void> shareInvoice({
-    required int transactionID,
-    required int customerID,
-  }) async {
+  static Future<void> shareInvoice({required Trx transaction}) async {
     try {
-      final List<Trx> transactionResponce =
-          await BackEnd.fetchRequriedTransaction(transacrtionId: transactionID);
       final List<Customer> customerResponce =
-          await BackEnd.fetchSingleContactDetails(id: customerID);
+          await BackEnd.fetchSingleContactDetails(id: transaction.customerId);
 
-      final Trx transaction = transactionResponce.first;
       final Customer customer = customerResponce.first;
 
       final String filePath = await generateInvoice(
@@ -244,7 +234,7 @@ class InvoiceGenerator {
 
   static pw.Widget _buildHeader({required String companyName}) {
     return pw.Container(
-      decoration: pw.BoxDecoration(
+      decoration: const pw.BoxDecoration(
         border: pw.Border(
           bottom: pw.BorderSide(width: 2, color: PdfColors.blue700),
         ),

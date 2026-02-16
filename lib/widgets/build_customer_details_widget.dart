@@ -99,112 +99,97 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ref
-        .watch(customerByIdProvider(customerID))
-        .when(
-          data: (Customer? customer) {
-            if (customer != null) {
-              return Stack(
-                children: [
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          SizedBox(height: 20.sp),
+    return SingleChildScrollView(
+      child: ref
+          .watch(customerProvider(customerID))
+          .when(
+            data: (Customer? customer) {
+              if (customer != null) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(height: 20.sp),
 
-                          _buildImage(customer.photo, customer.name),
-                          SizedBox(height: 16.sp),
+                    _buildImage(customer.photo, customer.name),
+                    SizedBox(height: 16.sp),
 
-                          // Customer Name
-                          Padding(
-                            padding: EdgeInsets.only(left: 20.sp, right: 20.sp),
-                            child: Center(
-                              child: TitleWidget(
-                                textAlign: TextAlign.center,
-                                text: customer.name,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 16.sp),
-
-                          _buildNumberDetails(customer.number),
-                          SizedBox(height: 12.sp),
-                          _buildDetails(
-                            const Icon(
-                              Icons.location_on,
-                              color: AppColors.getPrimaryColor,
-                            ),
-                            Constant.customerAddress,
-                            customer.address,
-                          ),
-                          SizedBox(height: 12.sp),
-                          _buildDetails(
-                            const Icon(
-                              Icons.family_restroom,
-                              color: AppColors.getPrimaryColor,
-                            ),
-                            Constant.guardianName,
-                            customer.guardianName,
-                          ),
-                          SizedBox(height: 12.sp),
-                          if (customer.proof.isNotEmpty)
-                            GestureDetector(
-                              onTap: () => Routes.navigateToImageView(
-                                context: context,
-                                imageWidget: Image.file(File(customer.proof)),
-                                titile: "${customer.name} proof",
-                              ),
-                              child: Card(
-                                elevation: 0,
-                                child: Padding(
-                                  padding: EdgeInsets.all(14.sp),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      SizedBox(width: 12.sp),
-                                      const Icon(
-                                        Icons.arrow_forward_ios_rounded,
-                                        color: AppColors.getPrimaryColor,
-                                      ),
-                                      SizedBox(width: 20.sp),
-                                      const BodyOneDefaultText(
-                                        text: "Show Customer proof",
-                                        color: AppColors.getPrimaryColor,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
+                    // Customer Name
+                    Padding(
+                      padding: EdgeInsets.only(left: 20.sp, right: 20.sp),
+                      child: Center(
+                        child: TitleWidget(
+                          textAlign: TextAlign.center,
+                          text: customer.name,
+                        ),
                       ),
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: BodyTwoDefaultText(
-                      text: "customer created on ${(customer.createdDate)}",
-                      color: AppColors.getLigthGreyColor,
+                    SizedBox(height: 16.sp),
+
+                    _buildNumberDetails(customer.number),
+                    SizedBox(height: 12.sp),
+                    _buildDetails(
+                      const Icon(
+                        Icons.location_on,
+                        color: AppColors.getPrimaryColor,
+                      ),
+                      Constant.customerAddress,
+                      customer.address,
                     ),
-                  ),
-                ],
-              );
-            } else {
-              return Spacer();
-            }
-          },
-          error: (Object error, StackTrace stackTrace) => const Center(
-            child: BodyOneDefaultText(
-              text: Constant.errorFetchingContactMessage,
+                    SizedBox(height: 12.sp),
+                    _buildDetails(
+                      const Icon(
+                        Icons.family_restroom,
+                        color: AppColors.getPrimaryColor,
+                      ),
+                      Constant.guardianName,
+                      customer.guardianName,
+                    ),
+                    SizedBox(height: 12.sp),
+                    if (customer.proof.isNotEmpty)
+                      GestureDetector(
+                        onTap: () => Routes.navigateToImageView(
+                          context: context,
+                          imageWidget: Image.file(File(customer.proof)),
+                          titile: "${customer.name} proof",
+                        ),
+                        child: Card(
+                          elevation: 0,
+                          child: Padding(
+                            padding: EdgeInsets.all(14.sp),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(width: 12.sp),
+                                const Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  color: AppColors.getPrimaryColor,
+                                ),
+                                SizedBox(width: 20.sp),
+                                const BodyOneDefaultText(
+                                  text: "Show Customer proof",
+                                  color: AppColors.getPrimaryColor,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              } else {
+                return const Spacer();
+              }
+            },
+            error: (Object error, StackTrace stackTrace) => const Center(
+              child: BodyOneDefaultText(
+                text: Constant.errorFetchingContactMessage,
+              ),
             ),
+            loading: () =>
+                const Center(child: CircularProgressIndicator.adaptive()),
           ),
-          loading: () =>
-              const Center(child: CircularProgressIndicator.adaptive()),
-        );
+    );
   }
 }

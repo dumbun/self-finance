@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:self_finance/widgets/dilogbox_widget.dart';
 
 typedef RestoreProgressCallback =
     void Function(double progress, String currentFile);
@@ -99,7 +99,9 @@ class RestoreUtility {
         dbPath = p.join(appDocPath, 'databases');
       } else {
         // Android: databases are in standard location
-        dbPath = await getDatabasesPath();
+        final a = await getApplicationDocumentsDirectory();
+        final dbDir = p.join(a.parent.path, 'databases');
+        dbPath = dbDir;
       }
       final Directory dbDir = Directory(dbPath);
       await dbDir.create(recursive: true);
@@ -216,15 +218,10 @@ class RestoreUtility {
     } catch (e, st) {
       debugPrint('❌ Restore failed: $e\n$st');
       if (context!.mounted) {
-        showDialog<void>(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('✅ Restore Error'),
-              content: Text(e.toString()),
-            );
-          },
+        AlertDilogs.alertDialogWithOneAction(
+          context,
+          'Restore Error',
+          e.toString(),
         );
       }
 
@@ -264,20 +261,11 @@ class RestoreUtility {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('✅ Restore Complete'),
-          content: const Text(
-            'Your backup has been restored successfully!\n\n'
-            'Please close and reopen the app to apply the changes.',
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+        return AlertDilogs.alertDialogWithOneAction(
+          context,
+          '✅ Restore Complete',
+          'Your backup has been restored successfully!\n\n'
+              'Please close and reopen the app to apply the changes.',
         );
       },
     );

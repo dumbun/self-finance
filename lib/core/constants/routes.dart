@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/user_history_model.dart';
-import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/views/Add%20New%20Entry/customer_conformation_view.dart';
 import 'package:self_finance/views/Add%20New%20Entry/customer_lone_entry_view.dart';
 import 'package:self_finance/views/add_new_transaction_view.dart';
@@ -23,10 +21,8 @@ class Routes {
   }) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => TransactionDetailView(
-          transactionId: transacrtionId,
-          customerId: customerId,
-        ),
+        builder: (context) =>
+            TransactionDetailView(transactionId: transacrtionId),
       ),
     );
   }
@@ -98,16 +94,12 @@ class Routes {
 
   static void navigateToContactEditingView({
     required BuildContext context,
-    required int customerID,
-    required WidgetRef ref,
+    required Customer customer,
   }) async {
-    final List<Customer> customer = await ref
-        .read(asyncCustomersProvider.notifier)
-        .fetchRequriedCustomerDetails(customerID: customerID);
     if (context.mounted) {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (context) => ContactEditingView(contact: customer.first),
+          builder: (context) => ContactEditingView(contact: customer),
         ),
         (route) => true,
       );
@@ -132,7 +124,7 @@ class Routes {
   static void navigateToUserCreationView(BuildContext context, String pin) {
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => UserCreationView(pin: pin)),
+      MaterialPageRoute(builder: (context) => UserCreatingView(pin: pin)),
       (route) => false,
     );
   }

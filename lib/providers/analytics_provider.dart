@@ -1,67 +1,67 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/dashboard_stats_model.dart';
 
-part 'analytics_provider.g.dart'; // Add this for code generation
+part 'analytics_provider.g.dart';
 
+/// Live dashboard analytics driven by drift streams.
+/// No manual refresh needed - this updates automatically on DB changes.
 @riverpod
-class Analytics extends _$Analytics {
-  @override
-  AnalyticsState build() {
-    _loadAnalytics();
-    return AnalyticsState.empty();
-  }
-
-  Future<void> _loadAnalytics() async {
-    try {
-      final Map<String, num> data = await BackEnd.fetchAnalyticsData();
-
-      state = AnalyticsState(
-        totalCustomers: data['totalCustomers']!.toInt(),
-        activeLoans: data['activeLoans']!.toInt(),
-        outstandingAmount: data['outstandingAmount']!.toDouble(),
-        interestEarned: data['interestEarned']!.toDouble(),
-        totalDisbursed: data['totalDisbursed']!.toDouble(),
-        paymentsReceived: data['paymentsReceived']!.toDouble(),
-      );
-    } catch (_) {
-      state = AnalyticsState.empty();
-    }
-  }
-
-  Future<void> refresh() async {
-    await _loadAnalytics();
-  }
+Stream<AnalyticsState> analytics(Ref ref) {
+  return BackEnd.watchAnalyticsData().map((Map<String, num> data) {
+    return AnalyticsState(
+      totalCustomers: data['totalCustomers']?.toInt() ?? 0,
+      activeLoans: data['activeLoans']?.toInt() ?? 0,
+      outstandingAmount: data['outstandingAmount']?.toDouble() ?? 0.0,
+      interestEarned: data['interestEarned']?.toDouble() ?? 0.0,
+      totalDisbursed: data['totalDisbursed']?.toDouble() ?? 0.0,
+      paymentsReceived: data['paymentsReceived']?.toDouble() ?? 0.0,
+    );
+  });
 }
 
-// Derived providers using selectors
+// ---------------------------------------------------------------------------
+// Derived providers (stable defaults while loading / error)
+// ---------------------------------------------------------------------------
+
 @riverpod
 int totalCustomers(Ref ref) {
-  return ref.watch(analyticsProvider.select((s) => s.totalCustomers));
+  return ref
+      .watch(analyticsProvider)
+      .maybeWhen(data: (a) => a.totalCustomers, orElse: () => 0);
 }
 
 @riverpod
 int activeLoans(Ref ref) {
-  return ref.watch(analyticsProvider.select((s) => s.activeLoans));
+  return ref
+      .watch(analyticsProvider)
+      .maybeWhen(data: (a) => a.activeLoans, orElse: () => 0);
 }
 
 @riverpod
 double outstandingAmount(Ref ref) {
-  return ref.watch(analyticsProvider.select((s) => s.outstandingAmount));
+  return ref
+      .watch(analyticsProvider)
+      .maybeWhen(data: (a) => a.outstandingAmount, orElse: () => 0.0);
 }
 
 @riverpod
 double interestEarned(Ref ref) {
-  return ref.watch(analyticsProvider.select((s) => s.interestEarned));
+  return ref
+      .watch(analyticsProvider)
+      .maybeWhen(data: (a) => a.interestEarned, orElse: () => 0.0);
 }
 
 @riverpod
 double totalDisbursed(Ref ref) {
-  return ref.watch(analyticsProvider.select((s) => s.totalDisbursed));
+  return ref
+      .watch(analyticsProvider)
+      .maybeWhen(data: (a) => a.totalDisbursed, orElse: () => 0.0);
 }
 
 @riverpod
 double paymentsReceived(Ref ref) {
-  return ref.watch(analyticsProvider.select((s) => s.paymentsReceived));
+  return ref
+      .watch(analyticsProvider)
+      .maybeWhen(data: (a) => a.paymentsReceived, orElse: () => 0.0);
 }

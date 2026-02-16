@@ -48,7 +48,7 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: BodySmallText(text: "Customer Details", bold: true),
+        title: const BodySmallText(text: "Customer Details", bold: true),
         forceMaterialTransparency: true,
       ),
       floatingActionButton: Fab(

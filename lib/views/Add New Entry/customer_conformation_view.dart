@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
@@ -9,12 +10,8 @@ import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history_model.dart';
-import 'package:self_finance/providers/customer_contacts_provider.dart';
-import 'package:self_finance/providers/customer_provider.dart';
-import 'package:self_finance/providers/history_provider.dart';
+import 'package:self_finance/providers/contacts_provider.dart';
 import 'package:self_finance/providers/image_providers.dart';
-import 'package:self_finance/providers/items_provider.dart';
-import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/image_saving_utility.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
@@ -76,7 +73,7 @@ class _CustomerConformationViewState
       contentPadding: EdgeInsets.all(4.sp),
       subtitle: currency
           ? CurrencyWidget(amount: data)
-          : BodyOneDefaultText(bold: true, text: data),
+          : BodyOneDefaultText(bold: true, text: data.toString()),
       title: BodySmallText(text: title),
     );
   }
@@ -165,8 +162,9 @@ class _CustomerConformationViewState
 
     /// already Existing mobile number present check [error]
     final List<String> customerNumbers = await ref
-        .read(asyncCustomersProvider.notifier)
-        .fetchAllCustomersNumbers();
+        .read(contactsProvider.notifier)
+        .fetchContactsNumber();
+
     if (customerNumbers.contains(widget.mobileNumber) == false) {
       final String presentDateTime = DateTime.now().toString();
       final takenAmount = widget.takenAmount;
@@ -184,20 +182,19 @@ class _CustomerConformationViewState
 
       // creating the new customer
 
-      final int customerCreatedResponse = await ref
-          .read(asyncCustomersContactsProvider.notifier)
-          .addCustomer(
-            customer: Customer(
-              userID: 1, //? later updates if there are more users
-              name: widget.customerName,
-              guardianName: widget.gaurdianName,
-              address: widget.address,
-              number: widget.mobileNumber,
-              photo: imagePath,
-              proof: proofPath,
-              createdDate: presentDateTime,
-            ),
-          );
+      final int customerCreatedResponse = await BackEnd.createNewCustomer(
+        Customer(
+          userID: 1, //? later updates if there are more users
+          name: widget.customerName,
+          guardianName: widget.gaurdianName,
+          address: widget.address,
+          number: widget.mobileNumber,
+          photo: imagePath,
+          proof: proofPath,
+          createdDate: presentDateTime,
+        ),
+      );
+
       if (customerCreatedResponse != 0) {
         // Do image save
         // creating new item becacuse every new transaction will have a proof item
@@ -205,21 +202,19 @@ class _CustomerConformationViewState
           location: 'items',
           image: ref.read(itemFileProvider),
         );
-        final int itemCreatedResponse = await ref
-            .read(asyncItemsProvider.notifier)
-            .addItem(
-              item: Items(
-                customerid: customerCreatedResponse,
-                name: widget.itemDescription,
-                description: widget.itemDescription,
-                pawnedDate: widget.takenDate,
-                expiryDate: presentDateTime,
-                pawnAmount: takenAmount,
-                status: Constant.active,
-                photo: itemImagePath,
-                createdDate: presentDateTime,
-              ),
-            );
+        final int itemCreatedResponse = await BackEnd.createNewItem(
+          Items(
+            customerid: customerCreatedResponse,
+            name: widget.itemDescription,
+            description: widget.itemDescription,
+            pawnedDate: widget.takenDate,
+            expiryDate: presentDateTime,
+            pawnAmount: takenAmount,
+            status: Constant.active,
+            photo: itemImagePath,
+            createdDate: presentDateTime,
+          ),
+        );
         if (itemCreatedResponse != 0) {
           final String signatureResponse =
               await Utility.saveSignaturesInStorage(
@@ -228,10 +223,9 @@ class _CustomerConformationViewState
               );
 
           // creating new transaction
-          final int transactionCreatedResponse = await ref
-              .read(asyncTransactionsProvider.notifier)
-              .addTransaction(
-                transaction: Trx(
+          final int transactionCreatedResponse =
+              await BackEnd.createNewTransaction(
+                Trx(
                   customerId: customerCreatedResponse,
                   itemId: itemCreatedResponse,
                   transacrtionDate: widget.takenDate,
@@ -246,21 +240,19 @@ class _CustomerConformationViewState
               );
           if (transactionCreatedResponse != 0) {
             // creating history
-            final int historyResponse = await ref
-                .read(asyncHistoryProvider.notifier)
-                .addHistory(
-                  history: UserHistory(
-                    userID: 1,
-                    customerID: customerCreatedResponse,
-                    itemID: itemCreatedResponse,
-                    customerName: widget.customerName,
-                    customerNumber: widget.mobileNumber,
-                    transactionID: transactionCreatedResponse,
-                    eventDate: presentDateTime,
-                    eventType: Constant.debited,
-                    amount: takenAmount,
-                  ),
-                );
+            final int historyResponse = await BackEnd.createNewHistory(
+              UserHistory(
+                userID: 1,
+                customerID: customerCreatedResponse,
+                itemID: itemCreatedResponse,
+                customerName: widget.customerName,
+                customerNumber: widget.mobileNumber,
+                transactionID: transactionCreatedResponse,
+                eventDate: presentDateTime,
+                eventType: Constant.debited,
+                amount: takenAmount,
+              ),
+            );
             // final response
             (customerCreatedResponse != 0 &&
                     itemCreatedResponse != 0 &&
@@ -280,14 +272,14 @@ class _CustomerConformationViewState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: BodySmallText(text: "Customer conformation", bold: true),
+        title: const BodySmallText(text: "Customer conformation", bold: true),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.getPrimaryColor,
         onPressed: _save,
         child: Visibility(
           visible: _isloading,
-          replacement: Icon(Icons.volunteer_activism),
+          replacement: const Icon(Icons.volunteer_activism),
           child: const Center(child: CircularProgressIndicator.adaptive()),
         ),
       ),

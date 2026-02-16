@@ -69,7 +69,9 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: BodySmallText(text: "Lone Amount", bold: true)),
+      appBar: AppBar(
+        title: const BodySmallText(text: "Lone Amount", bold: true),
+      ),
       floatingActionButton: Fab(
         onPressed: () {
           if (_validateAndSave()) {

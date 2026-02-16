@@ -27,7 +27,7 @@ class MonthlyChartWidget extends ConsumerWidget {
 
         return _ChartContent(state: state);
       },
-      loading: () => _LoadingState(),
+      loading: () => const _LoadingState(),
       error: (Object err, StackTrace stack) => _ErrorState(error: err),
     );
   }
@@ -292,8 +292,8 @@ class _BarChartWidget extends StatelessWidget {
   }
 
   List<BarChartGroupData> _buildBarGroups() {
-    final Color red = AppColors.contentColorRed;
-    final Color green = AppColors.getGreenColor;
+    const Color red = AppColors.contentColorRed;
+    const Color green = AppColors.getGreenColor;
 
     return List.generate(state.data.length, (int index) {
       final ChartData m = state.data[index];
@@ -390,8 +390,8 @@ class _ErrorState extends StatelessWidget {
         children: [
           Icon(Icons.error_outline, size: (20.sp * fontScale)),
           SizedBox(width: 12.sp),
-          Expanded(
-            child: const BodyTwoDefaultText(
+          const Expanded(
+            child: BodyTwoDefaultText(
               text: 'Something went wrong while loading the chart.',
               error: true,
             ),

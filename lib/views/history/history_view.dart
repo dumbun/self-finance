@@ -10,7 +10,7 @@ class HistoryView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return RefreshWidget(
-      onRefresh: () => ref.refresh(asyncHistoryProvider.future),
+      onRefresh: () => ref.refresh(historyProvider.future),
       child: Padding(
         padding: EdgeInsets.all(12.sp),
         child: Column(
@@ -26,15 +26,14 @@ class HistoryView extends ConsumerWidget {
                   borderRadius: BorderRadiusGeometry.circular(20.sp),
                 ),
               ),
-              elevation: WidgetStatePropertyAll(0),
+              elevation: const WidgetStatePropertyAll(0),
               hintText: "phone number or t_transactionID or customer name",
               hintStyle: WidgetStatePropertyAll(
                 TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
               ),
               leading: const Icon(Icons.person_search_sharp),
-              onChanged: (String value) => ref
-                  .read(asyncHistoryProvider.notifier)
-                  .doSearch(givenInput: value),
+              onChanged: (String value) =>
+                  ref.read(historyProvider.notifier).doSearch(userInput: value),
             ),
             SizedBox(height: 12.sp),
             const Expanded(child: BuildHistoryListWidget()),

@@ -7,8 +7,8 @@ import 'package:path_provider/path_provider.dart';
 /// code used.
 ///
 /// Legacy behavior in your project:
-/// - iOS: <Documents>/databases/<dbName>
-/// - Android: <app data>/databases/<dbName> (sqflite's getDatabasesPath)
+/// - iOS: Documents/databases/dbName
+/// - Android: app data/databases/dbName (sqflite's getDatabasesPath)
 Future<File> legacySqfliteDbFile(String dbName) async {
   final docs = await getApplicationDocumentsDirectory();
 

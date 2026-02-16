@@ -14,7 +14,7 @@ class AlertDilogs {
     await showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog.adaptive(
-        title: Text(title),
+        title: BodyOneDefaultText(text: title),
         content: BodyTwoDefaultText(text: content),
         actions: [
           TextButton(

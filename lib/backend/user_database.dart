@@ -44,7 +44,7 @@ class UserDatabase extends _$UserDatabase {
 }
 
 /// Drift replacement for your old `UserDB` class.
-class UserDBDrift {
+class UserBackEnd {
   static UserDatabase? _db;
 
   static Future<UserDatabase> db() async {
@@ -66,6 +66,7 @@ class UserDBDrift {
             ),
             mode: InsertMode.insertOrReplace,
           );
+
       return true;
     } catch (_) {
       return false;
@@ -112,13 +113,13 @@ class UserDBDrift {
 
   static Future<int> fetchIDOneUser() async {
     final d = await db();
-    final row =
+    final TypedResult? row =
         await (d.selectOnly(d.userTable)
               ..addColumns([d.userTable.id])
               ..where(d.userTable.id.equals(1))
               ..limit(1))
             .getSingleOrNull();
-
+    if (row != null) {}
     return row?.read(d.userTable.id) ?? 0;
   }
 
@@ -224,18 +225,12 @@ class UserDBDrift {
   }
 
   /// Watches the first (or only) user row.
-  static Stream<User> watchUserData() {
+  static Stream<User?> watchUserData() {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final q = (d.select(d.userTable)..limit(1)).watch();
       return q.map((rows) {
         if (rows.isEmpty) {
-          return User(
-            id: 0,
-            userName: '',
-            userPin: '',
-            userCurrency: '',
-            profilePicture: '',
-          );
+          return null;
         }
         final r = rows.first;
         return User(

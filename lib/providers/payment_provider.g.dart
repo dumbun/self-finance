@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'payments_provider.dart';
+part of 'payment_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,39 +9,39 @@ part of 'payments_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(AsyncPayment)
-final asyncPaymentProvider = AsyncPaymentFamily._();
+@ProviderFor(PaymentByTrxId)
+final paymentByTrxIdProvider = PaymentByTrxIdFamily._();
 
-final class AsyncPaymentProvider
-    extends $AsyncNotifierProvider<AsyncPayment, List<Payment>> {
-  AsyncPaymentProvider._({
-    required AsyncPaymentFamily super.from,
-    required dynamic super.argument,
+final class PaymentByTrxIdProvider
+    extends $StreamNotifierProvider<PaymentByTrxId, List<Payment>> {
+  PaymentByTrxIdProvider._({
+    required PaymentByTrxIdFamily super.from,
+    required int super.argument,
   }) : super(
          retry: null,
-         name: r'asyncPaymentProvider',
+         name: r'paymentByTrxIdProvider',
          isAutoDispose: true,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
 
   @override
-  String debugGetCreateSourceHash() => _$asyncPaymentHash();
+  String debugGetCreateSourceHash() => _$paymentByTrxIdHash();
 
   @override
   String toString() {
-    return r'asyncPaymentProvider'
+    return r'paymentByTrxIdProvider'
         ''
         '($argument)';
   }
 
   @$internal
   @override
-  AsyncPayment create() => AsyncPayment();
+  PaymentByTrxId create() => PaymentByTrxId();
 
   @override
   bool operator ==(Object other) {
-    return other is AsyncPaymentProvider && other.argument == argument;
+    return other is PaymentByTrxIdProvider && other.argument == argument;
   }
 
   @override
@@ -50,38 +50,38 @@ final class AsyncPaymentProvider
   }
 }
 
-String _$asyncPaymentHash() => r'5068957ac139aa88aefc3f66271c0b5b2dc65f9b';
+String _$paymentByTrxIdHash() => r'1574346b6438bffde1bd65f67904af64649805ad';
 
-final class AsyncPaymentFamily extends $Family
+final class PaymentByTrxIdFamily extends $Family
     with
         $ClassFamilyOverride<
-          AsyncPayment,
+          PaymentByTrxId,
           AsyncValue<List<Payment>>,
           List<Payment>,
-          FutureOr<List<Payment>>,
-          dynamic
+          Stream<List<Payment>>,
+          int
         > {
-  AsyncPaymentFamily._()
+  PaymentByTrxIdFamily._()
     : super(
         retry: null,
-        name: r'asyncPaymentProvider',
+        name: r'paymentByTrxIdProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
-  AsyncPaymentProvider call(dynamic transactionId) =>
-      AsyncPaymentProvider._(argument: transactionId, from: this);
+  PaymentByTrxIdProvider call({required int transactionId}) =>
+      PaymentByTrxIdProvider._(argument: transactionId, from: this);
 
   @override
-  String toString() => r'asyncPaymentProvider';
+  String toString() => r'paymentByTrxIdProvider';
 }
 
-abstract class _$AsyncPayment extends $AsyncNotifier<List<Payment>> {
-  late final _$args = ref.$arg as dynamic;
-  dynamic get transactionId => _$args;
+abstract class _$PaymentByTrxId extends $StreamNotifier<List<Payment>> {
+  late final _$args = ref.$arg as int;
+  int get transactionId => _$args;
 
-  FutureOr<List<Payment>> build(dynamic transactionId);
+  Stream<List<Payment>> build({required int transactionId});
   @$mustCallSuper
   @override
   void runBuild() {
@@ -94,6 +94,6 @@ abstract class _$AsyncPayment extends $AsyncNotifier<List<Payment>> {
               Object?,
               Object?
             >;
-    element.handleCreate(ref, () => build(_$args));
+    element.handleCreate(ref, () => build(transactionId: _$args));
   }
 }

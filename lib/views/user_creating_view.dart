@@ -1,15 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/backend/user_database.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/utility/image_saving_utility.dart';
 import 'package:self_finance/models/user_model.dart';
-import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/widgets/currency_type_input_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
@@ -17,15 +16,14 @@ import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
 
-class UserCreationView extends ConsumerStatefulWidget {
-  const UserCreationView({required this.pin, super.key});
+class UserCreatingView extends StatefulWidget {
+  const UserCreatingView({super.key, required this.pin});
   final String pin;
-
   @override
-  ConsumerState<UserCreationView> createState() => _UserCreationViewState();
+  State<UserCreatingView> createState() => _UserCreatingViewState();
 }
 
-class _UserCreationViewState extends ConsumerState<UserCreationView> {
+class _UserCreatingViewState extends State<UserCreatingView> {
   String userProfilePicString = "";
   final double height = 55.sp;
   final double width = 55.sp;
@@ -62,9 +60,7 @@ class _UserCreationViewState extends ConsumerState<UserCreationView> {
   void _createUser(User user) async {
     if (_validateAndSave()) {
       try {
-        final bool result = await ref
-            .read(asyncUserProvider.notifier)
-            .addUser(user: user);
+        final bool result = await UserBackEnd.createNewUser(user);
         result ? _navigateToDashboard() : _showAlerts();
       } catch (e) {
         _showAlerts();

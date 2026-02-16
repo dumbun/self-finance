@@ -9,43 +9,43 @@ part of 'user_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(AsyncUser)
-final asyncUserProvider = AsyncUserProvider._();
+@ProviderFor(UserNotifier)
+final userProvider = UserNotifierProvider._();
 
-final class AsyncUserProvider
-    extends $AsyncNotifierProvider<AsyncUser, List<User>> {
-  AsyncUserProvider._()
+final class UserNotifierProvider
+    extends $StreamNotifierProvider<UserNotifier, User?> {
+  UserNotifierProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'asyncUserProvider',
+        name: r'userProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$asyncUserHash();
+  String debugGetCreateSourceHash() => _$userNotifierHash();
 
   @$internal
   @override
-  AsyncUser create() => AsyncUser();
+  UserNotifier create() => UserNotifier();
 }
 
-String _$asyncUserHash() => r'49cf5fc0cd84c6b76db3affc128d6527a423d25e';
+String _$userNotifierHash() => r'40e73f79537dcf0c0194d8177b109f17a1e488a2';
 
-abstract class _$AsyncUser extends $AsyncNotifier<List<User>> {
-  FutureOr<List<User>> build();
+abstract class _$UserNotifier extends $StreamNotifier<User?> {
+  Stream<User?> build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<List<User>>, List<User>>;
+    final ref = this.ref as $Ref<AsyncValue<User?>, User?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<List<User>>, List<User>>,
-              AsyncValue<List<User>>,
+              AnyNotifier<AsyncValue<User?>, User?>,
+              AsyncValue<User?>,
               Object?,
               Object?
             >;

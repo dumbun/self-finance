@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
-import 'package:self_finance/core/utility/invoice_generator_utility.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 
@@ -31,8 +30,8 @@ class SlidableWidget extends ConsumerWidget {
     if (!context.mounted) return;
 
     await ref
-        .read(asyncTransactionsProvider.notifier)
-        .deleteTransactionAndHistory(transactionId);
+        .read(transactionsProvider.notifier)
+        .deleteTransaction(transactionId: transactionId);
 
     if (!context.mounted) return;
     Slidable.of(context)?.close();
@@ -55,12 +54,11 @@ class SlidableWidget extends ConsumerWidget {
               color: AppColors.contentColorCyan,
               icon: Icons.share_rounded,
               iconSize: iconSize,
-              onTap: () async {
+              onTap: () {
                 Slidable.of(context)?.close();
-                await InvoiceGenerator.shareInvoice(
-                  customerID: customerId,
-                  transactionID: transactionId,
-                );
+                ref
+                    .read(transactionByIDProvider(transactionId).notifier)
+                    .shareTransaction();
               },
             ),
             _RoundedAction(

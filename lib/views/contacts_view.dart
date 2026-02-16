@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
-import 'package:self_finance/providers/customer_contacts_provider.dart';
+import 'package:self_finance/providers/contacts_provider.dart';
 import 'package:self_finance/widgets/build_customers_list.dart';
 import 'package:self_finance/widgets/refresh_widget.dart';
 
@@ -17,7 +17,7 @@ class ContactsView extends ConsumerWidget {
         title: const BodyTwoDefaultText(text: Constant.contact, bold: true),
       ),
       body: RefreshWidget(
-        onRefresh: () => ref.refresh(asyncCustomersContactsProvider.future),
+        onRefresh: () => ref.refresh(contactsProvider.future),
         child: SafeArea(
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 20.sp, horizontal: 16.sp),
@@ -26,9 +26,8 @@ class ContactsView extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SearchBar(
-                  onChanged: (String value) => ref
-                      .read(asyncCustomersContactsProvider.notifier)
-                      .searchCustomer(givenInput: value),
+                  onChanged: (String value) =>
+                      ref.read(contactsProvider.notifier).doSearch(value),
                   padding: WidgetStateProperty.all(
                     EdgeInsets.symmetric(horizontal: 12.sp),
                   ),
@@ -41,7 +40,7 @@ class ContactsView extends ConsumerWidget {
                     ),
                   ),
                   leading: const Icon(Icons.search),
-                  elevation: WidgetStatePropertyAll(0),
+                  elevation: const WidgetStatePropertyAll(0),
                   hintText: "phone no. or name",
                 ),
                 SizedBox(height: 12.sp),

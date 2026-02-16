@@ -8,12 +8,25 @@ part of 'analytics_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Live dashboard analytics driven by drift streams.
+/// No manual refresh needed - this updates automatically on DB changes.
 
-@ProviderFor(Analytics)
+@ProviderFor(analytics)
 final analyticsProvider = AnalyticsProvider._();
 
+/// Live dashboard analytics driven by drift streams.
+/// No manual refresh needed - this updates automatically on DB changes.
+
 final class AnalyticsProvider
-    extends $NotifierProvider<Analytics, AnalyticsState> {
+    extends
+        $FunctionalProvider<
+          AsyncValue<AnalyticsState>,
+          AnalyticsState,
+          Stream<AnalyticsState>
+        >
+    with $FutureModifier<AnalyticsState>, $StreamProvider<AnalyticsState> {
+  /// Live dashboard analytics driven by drift streams.
+  /// No manual refresh needed - this updates automatically on DB changes.
   AnalyticsProvider._()
     : super(
         from: null,
@@ -30,36 +43,17 @@ final class AnalyticsProvider
 
   @$internal
   @override
-  Analytics create() => Analytics();
+  $StreamProviderElement<AnalyticsState> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
 
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(AnalyticsState value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<AnalyticsState>(value),
-    );
-  }
-}
-
-String _$analyticsHash() => r'77ccf7e8745ef81ad653aa53cf53435ac4f8a2ce';
-
-abstract class _$Analytics extends $Notifier<AnalyticsState> {
-  AnalyticsState build();
-  @$mustCallSuper
   @override
-  void runBuild() {
-    final ref = this.ref as $Ref<AnalyticsState, AnalyticsState>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<AnalyticsState, AnalyticsState>,
-              AnalyticsState,
-              Object?,
-              Object?
-            >;
-    element.handleCreate(ref, build);
+  Stream<AnalyticsState> create(Ref ref) {
+    return analytics(ref);
   }
 }
+
+String _$analyticsHash() => r'f7fb86b2adde9db1bb24f85d963d4e11faf0568e';
 
 @ProviderFor(totalCustomers)
 final totalCustomersProvider = TotalCustomersProvider._();
@@ -99,7 +93,7 @@ final class TotalCustomersProvider extends $FunctionalProvider<int, int, int>
   }
 }
 
-String _$totalCustomersHash() => r'2b81a3c6331f32d3876dd62baf0c13aee12ffdc0';
+String _$totalCustomersHash() => r'd2f1b541fea06d4374a037ea06634bfbc92fca84';
 
 @ProviderFor(activeLoans)
 final activeLoansProvider = ActiveLoansProvider._();
@@ -139,7 +133,7 @@ final class ActiveLoansProvider extends $FunctionalProvider<int, int, int>
   }
 }
 
-String _$activeLoansHash() => r'd6e4c30f290e26dcff7fb222bea21820937b525d';
+String _$activeLoansHash() => r'ddc87a1edba0e6e8aa1b162ba9e755e6816475c2';
 
 @ProviderFor(outstandingAmount)
 final outstandingAmountProvider = OutstandingAmountProvider._();
@@ -180,7 +174,7 @@ final class OutstandingAmountProvider
   }
 }
 
-String _$outstandingAmountHash() => r'23e4b0fa2ceb8967d594c1ff6f782a636ccfc37f';
+String _$outstandingAmountHash() => r'8c9e5c47bbafda1308066b9c209469b34210c3a9';
 
 @ProviderFor(interestEarned)
 final interestEarnedProvider = InterestEarnedProvider._();
@@ -221,7 +215,7 @@ final class InterestEarnedProvider
   }
 }
 
-String _$interestEarnedHash() => r'1366dfac12aacf20cfd7b10746dbc96c005d7686';
+String _$interestEarnedHash() => r'0fdb59ba6a08f10c366f5752e8e47920d4c26c36';
 
 @ProviderFor(totalDisbursed)
 final totalDisbursedProvider = TotalDisbursedProvider._();
@@ -262,7 +256,7 @@ final class TotalDisbursedProvider
   }
 }
 
-String _$totalDisbursedHash() => r'7fef2694e289770b336ce3285b723df300e98e52';
+String _$totalDisbursedHash() => r'a8f799b2da831b289ecd9af2bc5530ebeccde06c';
 
 @ProviderFor(paymentsReceived)
 final paymentsReceivedProvider = PaymentsReceivedProvider._();
@@ -303,4 +297,4 @@ final class PaymentsReceivedProvider
   }
 }
 
-String _$paymentsReceivedHash() => r'fc7a692601c942c77a62a1ea1883cc2368cdb7ee';
+String _$paymentsReceivedHash() => r'7ba265d43d30b48f3b75e6dc2422824479d4ecf0';

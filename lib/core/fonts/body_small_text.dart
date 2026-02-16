@@ -37,6 +37,7 @@ class BodySmallText extends StatelessWidget {
       style: TextStyle(
         fontWeight: bold ? FontWeight.bold : FontWeight.w400,
         fontSize: 14.sp,
+        fontFamily: "hell",
         color: !error ? color : AppColors.getErrorColor,
       ),
     );

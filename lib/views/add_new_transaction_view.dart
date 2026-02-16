@@ -1,21 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/core/utility/image_saving_utility.dart';
+import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/providers/image_providers.dart';
 import 'package:self_finance/widgets/signature_widget.dart';
 import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:signature/signature.dart';
-import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
-import 'package:self_finance/models/customer_model.dart';
-import 'package:self_finance/models/items_model.dart';
-import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/models/user_history_model.dart';
-import 'package:self_finance/providers/history_provider.dart';
-import 'package:self_finance/providers/items_provider.dart';
-import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_date_picker.dart';
@@ -168,73 +160,18 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
 
   void _save() async {
     if (_validateAndSave()) {
-      final List<Customer> customer = await BackEnd.fetchSingleContactDetails(
-        id: widget.customerID,
-      );
-      final String presentDate = DateTime.now().toString();
       _isloading = true;
-      final String itemImagePath = await ImageSavingUtility.saveImage(
-        location: 'items',
-        image: ref.read(itemFileProvider),
-      );
-      final int itemId = await ref
-          .read(asyncItemsProvider.notifier)
-          .addItem(
-            item: Items(
-              customerid: widget.customerID,
-              name: _description.text,
-              description: _description.text,
-              pawnedDate: _transacrtionDate.text,
-              expiryDate: presentDate,
-              pawnAmount: _doubleCheck(_amount.text),
-              status: Constant.active,
-              photo: itemImagePath,
-              createdDate: DateTime.now().toString(),
-            ),
+      final bool res = await ref
+          .read(transactionsProvider.notifier)
+          .addNewTransactoion(
+            customerId: widget.customerID,
+            discription: _description.text,
+            pawnedDate: _transacrtionDate.text,
+            pawnAmount: _doubleCheck(_amount.text),
+            rateOfIntrest: _doubleCheck(_rateOfIntrest.text),
+            signatureController: _signatureController,
           );
-      if (itemId != 0) {
-        //saving signature to the storage
-        final String signaturePath = await Utility.saveSignaturesInStorage(
-          signatureController: _signatureController,
-          imageName: itemId.toString(),
-        );
-
-        final int transacrtionId = await ref
-            .read(asyncTransactionsProvider.notifier)
-            .addTransaction(
-              transaction: Trx(
-                customerId: widget.customerID,
-                itemId: itemId,
-                transacrtionDate: _transacrtionDate.text,
-                transacrtionType: Constant.active,
-                amount: _doubleCheck(_amount.text),
-                intrestRate: _doubleCheck(_rateOfIntrest.text),
-                intrestAmount: 0.0,
-                remainingAmount: 0.0,
-                signature: signaturePath,
-                createdDate: presentDate,
-              ),
-            );
-
-        if (transacrtionId != 0) {
-          final int historyId = await ref
-              .read(asyncHistoryProvider.notifier)
-              .addHistory(
-                history: UserHistory(
-                  userID: 1,
-                  customerID: widget.customerID,
-                  customerName: customer.first.name,
-                  customerNumber: customer.first.number,
-                  itemID: itemId,
-                  transactionID: transacrtionId,
-                  eventDate: presentDate,
-                  eventType: Constant.debited,
-                  amount: _doubleCheck(_amount.text),
-                ),
-              );
-          historyId != 0 ? _safeSuccuse() : _saveUnSuccessfull();
-        }
-      }
+      res ? _safeSuccuse() : _saveUnSuccessfull();
     }
   }
 
