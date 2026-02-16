@@ -80,11 +80,11 @@ class _PinAuthViewState extends State<PinAuthView> {
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: [
+              children: <Widget>[
                 if (hasProfilePic)
                   CircularImageWidget(
                     imageData: profilePic,
-                    titile: Constant.userProfileTag,
+                    titile: user.userName,
                   )
                 else
                   DefaultUserImage(height: 42.sp),

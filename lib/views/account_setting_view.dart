@@ -101,7 +101,7 @@ class AccountSettingsView extends StatelessWidget {
                               SizedBox(height: 12.sp),
                               _buildPrivacyPolicyButton(),
 
-                              // logout button
+                              // BackUp button
                               SizedBox(height: 12.sp),
                               _buildListTile(
                                 title: "Backup",
@@ -269,11 +269,13 @@ class AccountSettingsView extends StatelessWidget {
           Constant.exit,
           Constant.signOutMessage,
         ).then((int value) {
-          BackEnd.close().then((d) {
-            if (context.mounted && value == 1) {
-              _logout(context, userData);
-            }
-          });
+          if (value == 1) {
+            BackEnd.close().then((_) {
+              if (context.mounted) {
+                _logout(context, userData);
+              }
+            });
+          }
         });
       },
       title: Constant.logout,

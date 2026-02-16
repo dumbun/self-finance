@@ -43,11 +43,13 @@ class DrawerWidget extends StatelessWidget {
       Constant.exit,
       Constant.signOutMessage,
     ).then((int value) {
-      BackEnd.close().then((_) {
-        if (value == 1 && context.mounted) {
-          _navigateToPinAuthView(userData, context);
-        }
-      });
+      if (value == 1) {
+        BackEnd.close().then((_) {
+          if (context.mounted) {
+            _navigateToPinAuthView(userData, context);
+          }
+        });
+      }
     });
   }
 
