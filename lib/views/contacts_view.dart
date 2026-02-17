@@ -5,7 +5,6 @@ import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/providers/contacts_provider.dart';
 import 'package:self_finance/widgets/build_customers_list.dart';
-import 'package:self_finance/widgets/refresh_widget.dart';
 
 class ContactsView extends ConsumerWidget {
   const ContactsView({super.key});
@@ -16,7 +15,7 @@ class ContactsView extends ConsumerWidget {
         forceMaterialTransparency: true,
         title: const BodyTwoDefaultText(text: Constant.contact, bold: true),
       ),
-      body: RefreshWidget(
+      body: RefreshIndicator.adaptive(
         onRefresh: () => ref.refresh(contactsProvider.future),
         child: SafeArea(
           child: Padding(

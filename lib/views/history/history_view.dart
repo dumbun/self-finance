@@ -3,14 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/widgets/build_history_list_widget.dart';
-import 'package:self_finance/widgets/refresh_widget.dart';
 
 class HistoryView extends ConsumerWidget {
   const HistoryView({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return RefreshWidget(
-      onRefresh: () => ref.refresh(historyProvider.future),
+    return RefreshIndicator.adaptive(
+      onRefresh: () async => await ref.refresh(historyProvider),
       child: Padding(
         padding: EdgeInsets.all(12.sp),
         child: Column(

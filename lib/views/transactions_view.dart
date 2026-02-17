@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/widgets/build_transactions_list_widget.dart';
-import 'package:self_finance/widgets/refresh_widget.dart';
 import 'package:self_finance/widgets/transaction_filter_widget.dart';
 
 class TransactionsView extends ConsumerStatefulWidget {
@@ -26,7 +25,7 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshWidget(
+    return RefreshIndicator.adaptive(
       onRefresh: () async {
         ref.refresh(transactionsProvider.future).ignore();
         ref.read(filterProvider.notifier).clear();

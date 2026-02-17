@@ -10,6 +10,11 @@
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
   <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+  <uses-permission android:name="android.permission.VIBRATE"/>
+  <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+  <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
   <!-- Queries for specific intents -->
   <queries>
@@ -45,9 +50,28 @@
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
     </activity>
+
+
+    <!-- For Local_Notification -->
+    <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+    <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+    <intent-filter>
+    <action android:name="android.intent.action.BOOT_COMPLETED"/>
+    <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+    <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+    <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+    </intent-filter>
+    </receiver>
+    <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.FlutterLocalNotificationsReceiver"/>
+
+
+
+
     <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
     <meta-data android:name="flutterEmbedding" android:value="2"/>
+
+
   </application>
   <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

@@ -13,7 +13,6 @@ import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/widgets/backup_with_progress_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
-import 'package:self_finance/widgets/refresh_widget.dart';
 import 'package:self_finance/core/fonts/title_widget.dart';
 import 'package:self_finance/widgets/user_image_update_widget.dart';
 import 'package:self_finance/widgets/user_name_update_buttom_sheet_widget.dart';
@@ -54,7 +53,7 @@ class AccountSettingsView extends StatelessWidget {
                   .when(
                     data: (User? data) {
                       if (data != null) {
-                        return RefreshWidget(
+                        return RefreshIndicator.adaptive(
                           onRefresh: () async =>
                               await ref.refresh(userProvider),
                           child: ListView(
