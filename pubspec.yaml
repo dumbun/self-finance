@@ -47,7 +47,9 @@ dependencies:
   flutter_slidable: ^4.0.3
   timeline_tile: ^2.0.0
   flutter_local_notifications: ^20.1.0
-
+  timezone: ^0.10.1
+  flutter_timezone: ^5.0.1
+  shared_preferences: ^2.5.4
   
   
 

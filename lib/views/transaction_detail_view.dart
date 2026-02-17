@@ -28,13 +28,17 @@ class TransactionDetailView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
+        forceMaterialTransparency: true,
         actionsPadding: EdgeInsets.only(left: 8.sp),
         actions: [
           IconButton(
             onPressed: () => ref
                 .read(transactionByIDProvider(transactionId).notifier)
                 .shareTransaction(),
-            icon: const Icon(Icons.share_rounded),
+            icon: const Icon(
+              Icons.share_rounded,
+              color: AppColors.contentColorBlue,
+            ),
           ),
         ],
         centerTitle: true,

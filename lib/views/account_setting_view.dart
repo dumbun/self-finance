@@ -8,6 +8,7 @@ import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/user_model.dart';
+import 'package:self_finance/providers/settings_provider.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
@@ -116,6 +117,13 @@ class AccountSettingsView extends StatelessWidget {
                                 context: context,
                                 userData: data,
                               ),
+
+                              SizedBox(height: 12.sp),
+                              _buildDarkModeButton(),
+
+                              SizedBox(height: 12.sp),
+                              _buildNotificationsButton(),
+
                               SizedBox(height: 32.sp),
                             ],
                           ),
@@ -139,6 +147,60 @@ class AccountSettingsView extends StatelessWidget {
             },
           ),
         ),
+      ),
+    );
+  }
+
+  Card _buildNotificationsButton() {
+    return Card(
+      child: Consumer(
+        builder: (BuildContext context, WidgetRef ref, Widget? child) {
+          return ref
+              .watch(notificationsProvider)
+              .when(
+                data: (bool data) => SwitchListTile.adaptive(
+                  title: const BodyOneDefaultText(
+                    text: "Notifications",
+                    bold: true,
+                  ),
+                  value: data,
+                  onChanged: (bool value) =>
+                      ref.read(notificationsProvider.notifier).toggle(),
+                ),
+                error: (error, stackTrace) =>
+                    const BodyTwoDefaultText(text: Constant.errorUserFetch),
+                loading: () =>
+                    const Center(child: CircularProgressIndicator.adaptive()),
+              );
+        },
+      ),
+    );
+  }
+
+  Card _buildDarkModeButton() {
+    return Card(
+      child: Consumer(
+        builder: (context, ref, child) {
+          return ref
+              .watch(themeProvider)
+              .when(
+                data: (bool data) {
+                  return SwitchListTile.adaptive(
+                    value: data,
+                    onChanged: (value) async =>
+                        await ref.read(themeProvider.notifier).toggle(),
+                    title: const BodyOneDefaultText(
+                      text: "Dark mode",
+                      bold: true,
+                    ),
+                  );
+                },
+                error: (error, stackTrace) =>
+                    const BodyTwoDefaultText(text: Constant.errorUserFetch),
+                loading: () =>
+                    const Center(child: CircularProgressIndicator.adaptive()),
+              );
+        },
       ),
     );
   }

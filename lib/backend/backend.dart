@@ -733,7 +733,7 @@ class BackEnd {
       final cutoffDate = DateTime(now.year, now.month - months, now.day);
       final cutoffDateStr = DateFormat('yyyy-MM-dd').format(cutoffDate);
 
-      final rows = await d
+      final List<QueryRow> rows = await d
           .customSelect(
             '''
         SELECT * FROM Transactions
@@ -745,6 +745,7 @@ class BackEnd {
                  substr(Transaction_Date, 1, 2) DESC
         ''',
             variables: [Variable<String>(cutoffDateStr)],
+            readsFrom: {d.transactionsTable},
           )
           .get();
 
@@ -1227,7 +1228,7 @@ class BackEnd {
       final cutoffDate = DateTime(now.year, now.month - months, now.day);
       final cutoffDateStr = DateFormat('yyyy-MM-dd').format(cutoffDate);
 
-      final q = d
+      final Stream<List<QueryRow>> q = d
           .customSelect(
             '''
         SELECT * FROM Transactions

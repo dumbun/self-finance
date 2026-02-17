@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -22,7 +24,34 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>mailto</string>
+		<string>tel</string>
+		<string>UIBackgroundModes</string>
+		<array>
+			<string>processing</string>
+		</array>
+		<string>BGTaskSchedulerPermittedIdentifiers</string>
+		<array>
+			<string>com.self_finance.analytics.periodic</string>
+		</array>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires access to the camera</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>We need access to restore backup files</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Authenticating using face id to start using this application</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to the photo library</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIFileSharingEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
@@ -41,26 +70,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>NSPhotoLibraryUsageDescription</key>
-    <string>This app requires access to the photo library</string>
-    <key>NSCameraUsageDescription</key>
-    <string>This app requires access to the camera</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>Authenticating using face id to start using this application</string>
-	<key>NSDocumentsFolderUsageDescription</key>
-	<string>We need access to restore backup files</string>
-	<key>UIFileSharingEnabled</key>
-	<true/>
-	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<true/>
-	<key>LSApplicationQueriesSchemes</key>
-    <array>
-  	<string>mailto</string>
-  	<string>tel</string>
-</array>
 </dict>
 </plist>
