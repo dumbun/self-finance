@@ -1,3 +1,4 @@
+import 'package:self_finance/core/utility/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A helper class for managing app preferences using SharedPreferences.
@@ -51,6 +52,9 @@ class PreferencesHelper {
   static Future<void> setNotificationsEnabled(bool enabled) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyNotifications, enabled);
+    enabled
+        ? await NotificationService().initNotification()
+        : await NotificationService().cancelAllNotifications();
   }
 
   /// Toggles the current notification setting and returns the new value.

@@ -13,16 +13,12 @@ dependencies:
     sdk: flutter
   drift: ^2.31.0  
   drift_flutter: ^0.2.8
-  cupertino_icons: ^1.0.2
   flutter_email_sender: ^8.0.0
-  flutter_launcher_icons: ^0.14.4
-  flutter_svg: ^2.0.10+1
   responsive_sizer: ^3.3.1
   url_launcher: ^6.3.2
   pinput: ^6.0.1
   path_provider: ^2.1.5
   local_auth: ^3.0.0
-  flutter_svg_provider: ^1.0.7
   intl: ^0.20.2
   fl_chart: ^1.1.1
   image_picker: ^1.2.1
@@ -30,7 +26,6 @@ dependencies:
   flutter_riverpod: ^3.1.0
   riverpod_annotation: ^4.0.0
   currency_picker: ^2.0.21
-  screenshot: ^3.0.0
   share_plus: ^12.0.1
   feedback: ^3.2.0
   package_info_plus: ^9.0.0
@@ -42,7 +37,6 @@ dependencies:
   file_picker: ^10.3.8
   restart_app: ^1.3.1
   pdf: ^3.10.4
-  qr_flutter: ^4.1.0
   flutter_dotenv: ^6.0.0
   flutter_slidable: ^4.0.3
   timeline_tile: ^2.0.0
@@ -69,35 +63,16 @@ analyzer:
   plugins:
     - custom_lint
 
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/icon/logo.png"
-  adaptive_icon_background: "#000"
-  adaptive_icon_foreground: "assets/icon/logo.png"
-  remove_alpha_ios: true
-  min_sdk_android: 21
-  web:
-    generate: false
-    image_path: "assets/icon/logo.png"
-    background_color: "#hexcode"
-    theme_color: "#hexcode"
-  windows:
-    generate: false
-    image_path: "assets/icon/logo.png"
-    icon_size: 48 # min:48, max:256, default: 48
-  macos:
-    generate: false
-    image_path: "assets/icon/logo.png"
 
 
 flutter:
   uses-material-design: true
 
   assets:
-    - assets/
+    - assets/icon/defaultImage.png
+    - assets/icon/item_icon.png
+    - assets/icon/id_proof_icon.png
     - assets/fonts/
-    - assets/icon/
     - .env
 
   fonts:

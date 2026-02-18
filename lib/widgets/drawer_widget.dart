@@ -122,8 +122,8 @@ class DrawerWidget extends StatelessWidget {
                             color: AppColors.getErrorColor,
                             onTap: () => _logout(user, context),
                           ),
-                          SizedBox(height: 12.sp),
-                          SizedBox(height: 20.sp),
+
+                          SizedBox(height: 32.sp),
                           _getAppVersion(),
                         ],
                       );

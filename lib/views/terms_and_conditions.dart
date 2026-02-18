@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
@@ -19,6 +20,19 @@ class TermsAndConditons extends StatefulWidget {
 class _TermsAndConditonsState extends State<TermsAndConditons> {
   bool _ticked = false;
   bool _pAndP = false;
+
+  Future<void> _getPermissions() async {
+    await Permission.camera.request();
+    await Permission.photos.request();
+    await Permission.storage.request();
+    await Permission.notification.request();
+  }
+
+  @override
+  void initState() {
+    _getPermissions();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -121,9 +121,9 @@ abstract class Constant {
   static const String emiCalculatorToolTip =
       "EMI calculator page where you can calculate interest.";
 
-  static const String defaultProfileImagePath = "assets/icon/defaultImage.svg";
-  static const String defaultProofImagePath = "assets/icon/id_proof_icon.svg";
-  static const String defaultItemImagePath = "assets/icon/item_icon.svg";
+  static const String defaultProfileImagePath = "assets/icon/defaultImage.png";
+  static const String defaultProofImagePath = "assets/icon/id_proof_icon.png";
+  static const String defaultItemImagePath = "assets/icon/item_icon.png";
 
   static const String searchMobile = "Search by mobile number";
   static const String searchName = "Search by customer name";

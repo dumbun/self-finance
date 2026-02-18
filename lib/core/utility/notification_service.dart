@@ -15,7 +15,8 @@ class NotificationService {
   bool _isInitialized = false;
 
   Future<void> initNotification() async {
-    if (_isInitialized) return;
+    final bool a = await PreferencesHelper.areNotificationsEnabled();
+    if (_isInitialized || a) return;
     // timezone initalization
     tz.initializeTimeZones();
 

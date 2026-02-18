@@ -23,7 +23,8 @@ class ThemeNotifier extends _$ThemeNotifier {
 @Riverpod(keepAlive: true)
 class NotificationsNotifier extends _$NotificationsNotifier {
   @override
-  Future<bool> build() async => PreferencesHelper.areNotificationsEnabled();
+  Future<bool> build() async =>
+      await PreferencesHelper.areNotificationsEnabled();
 
   Future<void> toggle() async {
     final current = state.value ?? true;

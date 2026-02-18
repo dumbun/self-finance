@@ -8,11 +8,9 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:screenshot/screenshot.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:signature/signature.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:share_plus/share_plus.dart';
 
 class Utility {
   /// Format numbers compactly for charts (e.g., 1000 -> 1K, 1000000 -> 1M)
@@ -126,37 +124,6 @@ class Utility {
       return "please enter the correct value";
     } else {
       return null;
-    }
-  }
-
-  static void screenShotShare(
-    ScreenshotController screenshotController,
-    BuildContext context,
-  ) async {
-    double pixelRatio = MediaQuery.of(context).devicePixelRatio;
-
-    try {
-      await screenshotController
-          .capture(
-            delay: const Duration(milliseconds: 10),
-            pixelRatio: pixelRatio,
-          )
-          .then((Uint8List? image) async {
-            if (image != null) {
-              final directory = await getTemporaryDirectory();
-              final imagePath = await File(
-                '${directory.path}/image.jpeg',
-              ).create();
-              await imagePath.writeAsBytes(image);
-              final XFile responce = XFile(imagePath.path);
-              final params = ShareParams(text: 'Share', files: [responce]);
-
-              /// Share Plugin
-              await SharePlus.instance.share(params);
-            }
-          });
-    } catch (e) {
-      //
     }
   }
 

@@ -1,8 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
@@ -12,6 +11,7 @@ import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
+import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/customer_name_build_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
@@ -75,31 +75,17 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                                             )
                                             .when(
                                               data: (Customer? data) {
-                                                if (data == null ||
-                                                    data.photo.isEmpty) {
-                                                  return DefaultUserImage(
-                                                    height: size,
-                                                    width: size,
+                                                if (data == null) {
+                                                  return const BodyTwoDefaultText(
+                                                    text: Constant
+                                                        .errorUpdatingContactMessage,
                                                   );
                                                 }
-
-                                                final file = File(data.photo);
-                                                if (!file.existsSync()) {
-                                                  return DefaultUserImage(
-                                                    height: size,
-                                                    width: size,
-                                                  );
-                                                }
-
-                                                return ClipOval(
-                                                  child: Image.file(
-                                                    file,
-                                                    height: size,
-                                                    width: size,
-                                                    cacheWidth: cacheSize,
-                                                    cacheHeight: cacheSize,
-                                                    fit: BoxFit.cover,
-                                                  ),
+                                                return CircularImageWidget(
+                                                  cache: cacheSize,
+                                                  customeSize: size,
+                                                  imageData: data.photo,
+                                                  titile: data.name,
                                                 );
                                               },
                                               loading: () => DefaultUserImage(

@@ -234,21 +234,13 @@ class RestoreUtility {
   /// Restart the app or show dialog for iOS
   static Future<void> _restartOrCloseApp({BuildContext? context}) async {
     try {
-      if (Platform.isAndroid) {
-        final a = await Restart.restartApp();
-        if (!a && context != null && context.mounted) {
-          await _showRestartDialog(context);
-        }
-      } else if (Platform.isIOS) {
-        if (context != null && context.mounted) {
-          await _showRestartDialog(context);
-        } else {
-          debugPrint(
-            'ℹ️ Please manually close and reopen the app to complete restoration',
-          );
-        }
+      final a = await Restart.restartApp();
+      if (!a && context != null && context.mounted) {
+        await _showRestartDialog(context);
       } else {
-        exit(0);
+        debugPrint(
+          'ℹ️ Please manually close and reopen the app to complete restoration',
+        );
       }
     } catch (e) {
       debugPrint('⚠️ Restart action: $e');

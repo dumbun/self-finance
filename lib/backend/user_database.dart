@@ -43,7 +43,6 @@ class UserDatabase extends _$UserDatabase {
   int get schemaVersion => 1;
 }
 
-/// Drift replacement for your old `UserDB` class.
 class UserBackEnd {
   static UserDatabase? _db;
 

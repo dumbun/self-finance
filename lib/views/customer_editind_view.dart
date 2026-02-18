@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
@@ -136,11 +135,7 @@ class _ContactEditingViewState extends State<ContactEditingView> {
                       width: 42.sp,
                       fit: BoxFit.fill,
                     )
-                  : SvgPicture.asset(
-                      defaultImages,
-                      height: 42.sp,
-                      width: 42.sp,
-                    ),
+                  : Image.asset(defaultImages, height: 42.sp, width: 42.sp),
             ),
           ),
           BodyTwoDefaultText(text: titile, bold: true),
