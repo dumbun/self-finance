@@ -37,3 +37,20 @@ class NotificationsNotifier extends _$NotificationsNotifier {
     await PreferencesHelper.setNotificationsEnabled(value);
   }
 }
+
+@Riverpod(keepAlive: true)
+class BiometricsNotifier extends _$BiometricsNotifier {
+  @override
+  Future<bool> build() async => await PreferencesHelper.isBiometrics();
+
+  Future<void> toggle() async {
+    final current = state.value ?? true;
+    state = AsyncData(!current);
+    await PreferencesHelper.setBiometrics(!current);
+  }
+
+  Future<void> set(bool value) async {
+    state = AsyncData(value);
+    await PreferencesHelper.setBiometrics(value);
+  }
+}

@@ -9,10 +9,35 @@ class PreferencesHelper {
   // ─── Keys ────────────────────────────────────────────────────────────────
   static const String _keyDarkTheme = 'is_dark_theme';
   static const String _keyNotifications = 'notifications_enabled';
+  static const String _keyBiometrics = 'is_bio_metrics';
 
   // ─── Defaults ─────────────────────────────────────────────────────────────
   static const bool _defaultDarkTheme = false;
   static const bool _defaultNotifications = true;
+  static const bool _defaultBiometrics = true;
+
+  // ─── Biometrics ────────────────────────────────────────────────────────────────
+
+  static Future<bool> isBiometrics() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_keyBiometrics) ?? _defaultBiometrics;
+  }
+
+  /// Saves the biometrics preference.
+  ///
+  /// Pass `true` to enable , `false` for disable.
+  static Future<void> setBiometrics(bool isBiometrics) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyBiometrics, isBiometrics);
+  }
+
+  /// Toggles the current theme and returns the new value.
+  static Future<bool> toggleBiometrics() async {
+    final current = await isBiometrics();
+    final newValue = !current;
+    await setBiometrics(newValue);
+    return newValue;
+  }
 
   // ─── Theme ────────────────────────────────────────────────────────────────
 
@@ -69,13 +94,14 @@ class PreferencesHelper {
 
   /// Loads all preferences at once and returns them as a map.
   ///
-  /// Keys: `isDarkTheme`, `notificationsEnabled`
+  /// Keys: `isDarkTheme`, `notificationsEnabled`, `isBiometrics`
   static Future<Map<String, bool>> loadAll() async {
     final prefs = await SharedPreferences.getInstance();
     return {
       'isDarkTheme': prefs.getBool(_keyDarkTheme) ?? _defaultDarkTheme,
       'notificationsEnabled':
           prefs.getBool(_keyNotifications) ?? _defaultNotifications,
+      'isBiometrics': prefs.getBool(_keyBiometrics) ?? _defaultNotifications,
     };
   }
 
@@ -84,5 +110,6 @@ class PreferencesHelper {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyDarkTheme);
     await prefs.remove(_keyNotifications);
+    await prefs.remove(_keyBiometrics);
   }
 }

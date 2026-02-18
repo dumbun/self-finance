@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/backend/user_database.dart';
@@ -113,10 +112,19 @@ class _UserCreatingViewState extends State<UserCreatingView> {
             ),
             Align(
               alignment: Alignment.bottomRight,
-              child: SvgPicture.asset(
-                "assets/icon/edit_icon.svg",
-                height: 30.sp,
-                width: 30.sp,
+              child: Container(
+                height: 32.sp,
+                width: 32.sp,
+                padding: EdgeInsets.all(12.sp),
+                decoration: BoxDecoration(
+                  color: AppColors.contentColorBlue,
+                  borderRadius: BorderRadius.circular(32.sp),
+                ),
+                child: Icon(
+                  Icons.edit,
+                  size: 22.sp,
+                  color: AppColors.contentColorWhite,
+                ),
               ),
             ),
           ],

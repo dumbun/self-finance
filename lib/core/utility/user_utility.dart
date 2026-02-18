@@ -5,14 +5,34 @@ import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/models/user_model.dart';
+import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:signature/signature.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Utility {
+  static Future<void> closeApp({
+    required BuildContext context,
+    required User userData,
+  }) async {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return PinAuthView(userDate: userData);
+        },
+      ),
+      (Route<dynamic> route) => false,
+    );
+    BackEnd.close();
+    await FlutterExitApp.exitApp();
+  }
+
   /// Format numbers compactly for charts (e.g., 1000 -> 1K, 1000000 -> 1M)
   static String compactNumber(double value) {
     if (value >= 10000000) {

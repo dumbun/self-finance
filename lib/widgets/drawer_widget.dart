@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
@@ -10,7 +9,6 @@ import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/providers/user_provider.dart';
-import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
@@ -37,31 +35,16 @@ class DrawerWidget extends StatelessWidget {
     );
   }
 
-  void _logout(User userData, BuildContext context) {
+  void _logout(User userData, BuildContext context) async {
     AlertDilogs.alertDialogWithTwoAction(
       context,
       Constant.exit,
       Constant.signOutMessage,
-    ).then((int value) {
-      if (value == 1) {
-        BackEnd.close().then((_) {
-          if (context.mounted) {
-            _navigateToPinAuthView(userData, context);
-          }
-        });
+    ).then((int value) async {
+      if (value == 1 && context.mounted) {
+        await Utility.closeApp(context: context, userData: userData);
       }
     });
-  }
-
-  void _navigateToPinAuthView(User userData, BuildContext context) {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return PinAuthView(userDate: userData);
-        },
-      ),
-      (route) => false,
-    );
   }
 
   FutureBuilder<String> _getAppVersion() {

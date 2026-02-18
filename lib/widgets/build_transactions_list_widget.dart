@@ -1,28 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
-import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
-import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
+import 'package:self_finance/widgets/customer_image_widget.dart';
 import 'package:self_finance/widgets/customer_name_build_widget.dart';
-import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/slidable_widget.dart';
 import 'package:self_finance/widgets/status_chip_widget.dart';
 
 class BuildTransactionsListWidget extends ConsumerWidget {
   const BuildTransactionsListWidget({super.key});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final double size = 28.sp;
+    final int cacheSize = (size * MediaQuery.of(context).devicePixelRatio)
+        .round();
+
     return ref
         .watch(transactionsProvider)
         .when(
@@ -43,8 +42,7 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                         context: context,
                       ),
 
-                      child: Container(
-                        alignment: Alignment.center,
+                      child: Padding(
                         padding: EdgeInsets.all(14.sp),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -54,50 +52,10 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Consumer(
-                                  builder:
-                                      (
-                                        BuildContext context,
-                                        WidgetRef ref,
-                                        Widget? child,
-                                      ) {
-                                        final double size = 28.sp;
-                                        final int cacheSize =
-                                            (size *
-                                                    MediaQuery.of(
-                                                      context,
-                                                    ).devicePixelRatio)
-                                                .round();
-
-                                        return ref
-                                            .watch(
-                                              customerProvider(txn.customerId),
-                                            )
-                                            .when(
-                                              data: (Customer? data) {
-                                                if (data == null) {
-                                                  return const BodyTwoDefaultText(
-                                                    text: Constant
-                                                        .errorUpdatingContactMessage,
-                                                  );
-                                                }
-                                                return CircularImageWidget(
-                                                  cache: cacheSize,
-                                                  customeSize: size,
-                                                  imageData: data.photo,
-                                                  titile: data.name,
-                                                );
-                                              },
-                                              loading: () => DefaultUserImage(
-                                                height: size,
-                                                width: size,
-                                              ),
-                                              error: (_, _) => DefaultUserImage(
-                                                height: size,
-                                                width: size,
-                                              ),
-                                            );
-                                      },
+                                CustomerImageWidget(
+                                  cache: cacheSize,
+                                  customerId: txn.customerId,
+                                  size: 28.sp,
                                 ),
                                 SizedBox(width: 16.sp),
                                 Column(

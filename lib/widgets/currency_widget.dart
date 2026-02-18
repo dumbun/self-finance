@@ -24,20 +24,27 @@ class CurrencyWidget extends ConsumerWidget {
     return ref
         .watch(userProvider)
         .when(
-          data: (User? data) {
+          data: (User? user) {
+            if (user == null) {
+              return titleText
+                  ? TitleWidget(text: amount, color: color)
+                  : smallText
+                  ? BodyTwoDefaultText(text: amount, bold: true, color: color)
+                  : BodyOneDefaultText(text: amount, bold: true, color: color);
+            }
             return titleText
                 ? TitleWidget(
-                    text: "$amount ${data!.userCurrency}",
+                    text: "$amount ${user.userCurrency}",
                     color: color,
                   )
                 : smallText
                 ? BodyTwoDefaultText(
-                    text: "$amount ${data!.userCurrency}",
+                    text: "$amount ${user.userCurrency}",
                     bold: true,
                     color: color,
                   )
                 : BodyOneDefaultText(
-                    text: "$amount ${data!.userCurrency}",
+                    text: "$amount ${user.userCurrency}",
                     bold: true,
                     color: color,
                   );

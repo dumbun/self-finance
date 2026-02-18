@@ -4,8 +4,9 @@ import 'package:self_finance/core/auth/auth.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/strong_heading_one_text.dart';
+import 'package:self_finance/core/utility/preferences_helper.dart';
 import 'package:self_finance/models/user_model.dart';
-import 'package:self_finance/core/theme/app_colors.dart';
+import 'package:self_finance/widgets/biometric_button_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
@@ -26,6 +27,12 @@ class _PinAuthViewState extends State<PinAuthView> {
   void dispose() {
     _pinController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    _handleBiometric();
+    super.initState();
   }
 
   void _goToDashboard() {
@@ -61,8 +68,11 @@ class _PinAuthViewState extends State<PinAuthView> {
 
     _isSubmitting = true;
     try {
-      final bool ok = await LocalAuthenticator.authenticate();
-      if (ok) _goToDashboard();
+      final bool res = await PreferencesHelper.isBiometrics();
+      if (res) {
+        final bool ok = await LocalAuthenticator.authenticate();
+        if (ok) _goToDashboard();
+      }
     } finally {
       _isSubmitting = false;
     }
@@ -122,14 +132,7 @@ class _PinAuthViewState extends State<PinAuthView> {
 
                 SizedBox(height: 20.sp),
 
-                IconButton(
-                  onPressed: _handleBiometric,
-                  icon: Icon(
-                    Icons.fingerprint,
-                    color: AppColors.getPrimaryColor,
-                    size: 32.sp,
-                  ),
-                ),
+                BiometricButtonWidget(onPressed: _handleBiometric),
               ],
             ),
           ),

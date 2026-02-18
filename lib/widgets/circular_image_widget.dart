@@ -19,45 +19,8 @@ class CircularImageWidget extends StatelessWidget {
   final double? customeSize;
   final int? cache;
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildImage(int cache, double size, BuildContext context) {
     final File file = File(imageData);
-    final double size = customeSize ?? 44.sp;
-    if (cache != null) {
-      if (imageData.isNotEmpty && file.existsSync()) {
-        return GestureDetector(
-          onTap: () {
-            Routes.navigateToImageView(
-              context: context,
-              titile: titile,
-              imageWidget: Image.file(file, fit: BoxFit.contain),
-            );
-          },
-          child: Hero(
-            tag: titile,
-            child: SizedBox(
-              height: size,
-              width: size,
-              child: ClipOval(
-                child: Image.file(
-                  file,
-                  height: size,
-                  width: size,
-                  cacheWidth: cache,
-                  cacheHeight: cache,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
-        );
-      }
-      return DefaultUserImage(height: size, width: size, cache: cache);
-    }
-
-    final int cacheSize = (size * MediaQuery.of(context).devicePixelRatio)
-        .round();
-
     if (imageData.isNotEmpty && file.existsSync()) {
       return GestureDetector(
         onTap: () {
@@ -77,8 +40,8 @@ class CircularImageWidget extends StatelessWidget {
                 file,
                 height: size,
                 width: size,
-                cacheWidth: cacheSize,
-                cacheHeight: cacheSize,
+                cacheWidth: cache,
+                cacheHeight: cache,
                 fit: BoxFit.cover,
               ),
             ),
@@ -86,7 +49,18 @@ class CircularImageWidget extends StatelessWidget {
         ),
       );
     }
+    return DefaultUserImage(height: size, width: size, cache: cache);
+  }
 
-    return DefaultUserImage(height: size, width: size, cache: cacheSize);
+  @override
+  Widget build(BuildContext context) {
+    final double size = customeSize ?? 44.sp;
+    if (cache != null) {
+      return _buildImage(cache!, size, context);
+    }
+
+    final int cacheSize = (size * MediaQuery.of(context).devicePixelRatio)
+        .round();
+    return _buildImage(cacheSize, size, context);
   }
 }

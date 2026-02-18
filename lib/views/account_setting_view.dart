@@ -2,19 +2,19 @@ import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/user_model.dart';
-import 'package:self_finance/providers/settings_provider.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
-import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/widgets/backup_with_progress_widget.dart';
+import 'package:self_finance/widgets/biometric_switch_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/core/fonts/title_widget.dart';
+import 'package:self_finance/widgets/notification_switch_widget.dart';
+import 'package:self_finance/widgets/theme_switch_widget.dart';
 import 'package:self_finance/widgets/user_image_update_widget.dart';
 import 'package:self_finance/widgets/user_name_update_buttom_sheet_widget.dart';
 import 'package:self_finance/widgets/pin_update_buttom_sheet_widget.dart';
@@ -119,10 +119,13 @@ class AccountSettingsView extends StatelessWidget {
                               ),
 
                               SizedBox(height: 12.sp),
-                              _buildDarkModeButton(),
+                              const ThemeSwitchWidget(),
 
                               SizedBox(height: 12.sp),
-                              _buildNotificationsButton(),
+                              const NotificationSwitchWidget(),
+
+                              SizedBox(height: 12.sp),
+                              const BiometricSwitchWidget(),
 
                               SizedBox(height: 32.sp),
                             ],
@@ -147,60 +150,6 @@ class AccountSettingsView extends StatelessWidget {
             },
           ),
         ),
-      ),
-    );
-  }
-
-  Card _buildNotificationsButton() {
-    return Card(
-      child: Consumer(
-        builder: (BuildContext context, WidgetRef ref, Widget? child) {
-          return ref
-              .watch(notificationsProvider)
-              .when(
-                data: (bool data) => SwitchListTile.adaptive(
-                  title: const BodyOneDefaultText(
-                    text: "Notifications",
-                    bold: true,
-                  ),
-                  value: data,
-                  onChanged: (bool value) =>
-                      ref.read(notificationsProvider.notifier).toggle(),
-                ),
-                error: (error, stackTrace) =>
-                    const BodyTwoDefaultText(text: Constant.errorUserFetch),
-                loading: () =>
-                    const Center(child: CircularProgressIndicator.adaptive()),
-              );
-        },
-      ),
-    );
-  }
-
-  Card _buildDarkModeButton() {
-    return Card(
-      child: Consumer(
-        builder: (context, ref, child) {
-          return ref
-              .watch(themeProvider)
-              .when(
-                data: (bool data) {
-                  return SwitchListTile.adaptive(
-                    value: data,
-                    onChanged: (value) async =>
-                        await ref.read(themeProvider.notifier).toggle(),
-                    title: const BodyOneDefaultText(
-                      text: "Dark mode",
-                      bold: true,
-                    ),
-                  );
-                },
-                error: (error, stackTrace) =>
-                    const BodyTwoDefaultText(text: Constant.errorUserFetch),
-                loading: () =>
-                    const Center(child: CircularProgressIndicator.adaptive()),
-              );
-        },
       ),
     );
   }
@@ -307,17 +256,6 @@ class AccountSettingsView extends StatelessWidget {
     );
   }
 
-  void _logout(BuildContext context, User userData) {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return PinAuthView(userDate: userData);
-        },
-      ),
-      (Route<dynamic> route) => false,
-    );
-  }
-
   Card _buildLogoutButton({
     required BuildContext context,
     required User userData,
@@ -329,13 +267,9 @@ class AccountSettingsView extends StatelessWidget {
           context,
           Constant.exit,
           Constant.signOutMessage,
-        ).then((int value) {
-          if (value == 1) {
-            BackEnd.close().then((_) {
-              if (context.mounted) {
-                _logout(context, userData);
-              }
-            });
+        ).then((int value) async {
+          if (value == 1 && context.mounted) {
+            await Utility.closeApp(context: context, userData: userData);
           }
         });
       },
