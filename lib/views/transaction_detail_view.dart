@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
@@ -79,9 +78,7 @@ class TransactionDetailView extends ConsumerWidget {
                                   rateOfInterest: transaction.intrestRate,
                                   takenDate: transaction.transacrtionDate,
                                   tenureDate: payment.isNotEmpty
-                                      ? DateTime.parse(
-                                          payment.first.paymentDate,
-                                        )
+                                      ? payment.first.paymentDate
                                       : null,
                                 );
 
@@ -211,12 +208,13 @@ class TransactionDetailView extends ConsumerWidget {
                                                           text: Constant
                                                               .takenDate,
                                                         ),
-                                                    trailing:
-                                                        BodyTwoDefaultText(
-                                                          bold: true,
-                                                          text: transaction
-                                                              .transacrtionDate,
-                                                        ),
+                                                    trailing: BodyTwoDefaultText(
+                                                      bold: true,
+                                                      text: Utility.formatDate(
+                                                        date: transaction
+                                                            .transacrtionDate,
+                                                      ),
+                                                    ),
                                                   ),
 
                                                   ListTile(
@@ -232,19 +230,14 @@ class TransactionDetailView extends ConsumerWidget {
                                                     trailing: BodyTwoDefaultText(
                                                       bold: true,
                                                       text: payment.isEmpty
-                                                          ? DateFormat(
-                                                              'dd-MM-yyyy',
-                                                            ).format(
-                                                              DateTime.now(),
+                                                          ? Utility.formatDate(
+                                                              date:
+                                                                  DateTime.now(),
                                                             )
-                                                          : DateFormat(
-                                                              'dd-MM-yyyy',
-                                                            ).format(
-                                                              DateTime.parse(
-                                                                payment
-                                                                    .first
-                                                                    .paymentDate,
-                                                              ),
+                                                          : Utility.formatDate(
+                                                              date: payment
+                                                                  .first
+                                                                  .paymentDate,
                                                             ),
                                                     ),
                                                   ),

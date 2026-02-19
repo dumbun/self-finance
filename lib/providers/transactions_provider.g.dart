@@ -120,7 +120,7 @@ final transactionsDateSearchQueryProvider =
     TransactionsDateSearchQueryProvider._();
 
 final class TransactionsDateSearchQueryProvider
-    extends $NotifierProvider<TransactionsDateSearchQuery, String> {
+    extends $NotifierProvider<TransactionsDateSearchQuery, DateTime?> {
   TransactionsDateSearchQueryProvider._()
     : super(
         from: null,
@@ -140,28 +140,28 @@ final class TransactionsDateSearchQueryProvider
   TransactionsDateSearchQuery create() => TransactionsDateSearchQuery();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(String value) {
+  Override overrideWithValue(DateTime? value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<String>(value),
+      providerOverride: $SyncValueProvider<DateTime?>(value),
     );
   }
 }
 
 String _$transactionsDateSearchQueryHash() =>
-    r'4da992904bece350bb18b2208ce7df05b502c137';
+    r'cf2be1aabaa4bd194973aaedb50efcb4555c7fa8';
 
-abstract class _$TransactionsDateSearchQuery extends $Notifier<String> {
-  String build();
+abstract class _$TransactionsDateSearchQuery extends $Notifier<DateTime?> {
+  DateTime? build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<String, String>;
+    final ref = this.ref as $Ref<DateTime?, DateTime?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<String, String>,
-              String,
+              AnyNotifier<DateTime?, DateTime?>,
+              DateTime?,
               Object?,
               Object?
             >;
@@ -194,7 +194,7 @@ final class TransactionsNotifierProvider
 }
 
 String _$transactionsNotifierHash() =>
-    r'2b6d4f7c11f36ca4d1d60c8b4eb2a2bf6486f9ce';
+    r'146db9da8f2dcc1cea413c5a99e70f76d16e51da';
 
 abstract class _$TransactionsNotifier extends $StreamNotifier<List<Trx>> {
   Stream<List<Trx>> build();
@@ -255,7 +255,7 @@ final class TransactionByIDProvider
   }
 }
 
-String _$transactionByIDHash() => r'5fb5efa5287d0841a531c6594de525544fff4699';
+String _$transactionByIDHash() => r'e0f99aaf971b079223c6661f940d80df7b2e1e73';
 
 final class TransactionByIDFamily extends $Family
     with

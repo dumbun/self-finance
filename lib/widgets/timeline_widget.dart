@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
@@ -21,7 +20,7 @@ class TimelineWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
+      children: <Widget>[
         SizedBox(
           width: double.infinity,
           child: Column(
@@ -52,7 +51,9 @@ class TimelineWidget extends StatelessWidget {
                       BodyTwoDefaultText(
                         bold: true,
                         color: AppColors.getLigthGreyColor,
-                        text: transaction.transacrtionDate,
+                        text: Utility.formatDate(
+                          date: transaction.transacrtionDate,
+                        ),
                       ),
                       Row(
                         children: [
@@ -82,13 +83,11 @@ class TimelineWidget extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: <Widget>[
                       BodyTwoDefaultText(
                         bold: true,
                         color: AppColors.getLigthGreyColor,
-                        text: DateFormat(
-                          'dd-MM-yyyy',
-                        ).format(DateTime.parse(payment.paymentDate)),
+                        text: Utility.formatDate(date: payment.paymentDate),
                       ),
 
                       Row(

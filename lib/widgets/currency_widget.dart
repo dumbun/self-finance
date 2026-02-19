@@ -36,17 +36,23 @@ class CurrencyWidget extends ConsumerWidget {
                 ? TitleWidget(
                     text: "$amount ${user.userCurrency}",
                     color: color,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   )
                 : smallText
                 ? BodyTwoDefaultText(
                     text: "$amount ${user.userCurrency}",
                     bold: true,
                     color: color,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   )
                 : BodyOneDefaultText(
                     text: "$amount ${user.userCurrency}",
                     bold: true,
                     color: color,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   );
           },
           error: (Object error, StackTrace stackTrace) =>

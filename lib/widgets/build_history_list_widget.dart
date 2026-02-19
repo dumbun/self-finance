@@ -80,7 +80,7 @@ class BuildHistoryListWidget extends ConsumerWidget {
                       color: AppColors.getLigthGreyColor,
                       bold: true,
                     ),
-                    trailing: _buildDate(curr.eventDate),
+                    trailing: _buildDate(curr.eventDate.toString()),
                   );
                 },
                 itemCount: data.length,

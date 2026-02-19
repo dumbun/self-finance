@@ -33,6 +33,15 @@ class Utility {
     await FlutterExitApp.exitApp();
   }
 
+  static String formatDate({required DateTime date}) {
+    try {
+      return DateFormat("dd-MM-yyyy").format(date);
+    } catch (e) {
+      Exception(e.toString());
+      return "";
+    }
+  }
+
   /// Format numbers compactly for charts (e.g., 1000 -> 1K, 1000000 -> 1M)
   static String compactNumber(double value) {
     if (value >= 10000000) {
@@ -114,6 +123,11 @@ class Utility {
 
   static String doubleFormate(double number) {
     return NumberFormat('#,##0').format(number);
+  }
+
+  static Future<bool> isNumberPresent(String value) async {
+    final List<String> a = await BackEnd.fetchAllCustomerNumbers();
+    return a.contains(value);
   }
 
   static bool isValidPhoneNumber(String? value) => RegExp(

@@ -1,10 +1,10 @@
 class Payment {
   int? id;
   final int transactionId;
-  final String paymentDate;
+  final DateTime paymentDate;
   final double amountpaid;
   final String type;
-  final String createdDate;
+  final DateTime createdDate;
   Payment({
     this.id,
     required this.transactionId,
@@ -34,10 +34,10 @@ class Payment {
   Payment copyWith({
     int? id,
     int? transactionId,
-    String? paymentDate,
+    DateTime? paymentDate,
     double? amountpaid,
     String? type,
-    String? createdDate,
+    DateTime? createdDate,
   }) {
     return Payment(
       id: id ?? this.id,
@@ -64,10 +64,10 @@ class Payment {
     return Payment(
       id: map['id'] != null ? map['id'] as int : null,
       transactionId: map['transactionId'] as int,
-      paymentDate: map['paymentDate'] as String,
+      paymentDate: map['paymentDate'] as DateTime,
       amountpaid: map['amountpaid'] as double,
       type: map['type'] as String,
-      createdDate: map['createdDate'] as String,
+      createdDate: map['createdDate'] as DateTime,
     );
   }
 

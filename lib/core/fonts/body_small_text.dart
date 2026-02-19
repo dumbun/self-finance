@@ -12,6 +12,7 @@ class BodySmallText extends StatelessWidget {
   final bool whiteColor;
   final Color? color;
   final String? font;
+  final bool? italic;
 
   const BodySmallText({
     super.key,
@@ -24,6 +25,7 @@ class BodySmallText extends StatelessWidget {
     this.overflow,
     this.color,
     this.font,
+    this.italic,
   });
 
   @override
@@ -39,6 +41,7 @@ class BodySmallText extends StatelessWidget {
         fontSize: 14.sp,
         fontFamily: "hell",
         color: !error ? color : AppColors.getErrorColor,
+        fontStyle: italic ?? false ? FontStyle.italic : null,
       ),
     );
   }

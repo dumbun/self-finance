@@ -44,9 +44,12 @@ class SlidableWidget extends ConsumerWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: Slidable(
+        direction: Axis.horizontal,
         key: ValueKey<int>(transactionId),
         closeOnScroll: true,
         endActionPane: ActionPane(
+          dragDismissible: false,
+          key: ValueKey<int>(transactionId),
           motion: const StretchMotion(),
           extentRatio: 0.45,
           children: [

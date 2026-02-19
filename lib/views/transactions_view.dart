@@ -61,7 +61,6 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () async {
                     DateTime? pickedDate = await showDatePicker(
-                      locale: const Locale('en', 'GB'),
                       context: context,
                       initialDate: DateTime.now(),
                       currentDate: DateTime.now(),
@@ -83,7 +82,7 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
                       });
                       ref
                           .read(transactionsDateSearchQueryProvider.notifier)
-                          .set(formattedDate);
+                          .set(pickedDate);
                     }
                   },
                 ),

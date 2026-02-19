@@ -77,7 +77,9 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 BodyTwoDefaultText(
-                                  text: txn.transacrtionDate,
+                                  text: Utility.formatDate(
+                                    date: txn.transacrtionDate,
+                                  ),
                                   bold: true,
                                   color: AppColors.getLigthGreyColor,
                                 ),

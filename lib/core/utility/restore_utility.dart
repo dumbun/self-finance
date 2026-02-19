@@ -4,6 +4,7 @@ import 'package:archive/archive_io.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:restart_app/restart_app.dart';
@@ -234,9 +235,12 @@ class RestoreUtility {
   /// Restart the app or show dialog for iOS
   static Future<void> _restartOrCloseApp({BuildContext? context}) async {
     try {
-      final a = await Restart.restartApp();
-      if (!a && context != null && context.mounted) {
-        await _showRestartDialog(context);
+      if (context != null && context.mounted) {
+        if (Platform.isAndroid) {
+          await Restart.restartApp();
+        } else {
+          await FlutterExitApp.exitApp();
+        }
       } else {
         debugPrint(
           'ℹ️ Please manually close and reopen the app to complete restoration',
@@ -245,22 +249,6 @@ class RestoreUtility {
     } catch (e) {
       debugPrint('⚠️ Restart action: $e');
     }
-  }
-
-  /// Show dialog for iOS users
-  static Future<void> _showRestartDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDilogs.alertDialogWithOneAction(
-          context,
-          '✅ Restore Complete',
-          'Your backup has been restored successfully!\n\n'
-              'Please close and reopen the app to apply the changes.',
-        );
-      },
-    );
   }
 
   /// Validate backup ZIP file before restoration

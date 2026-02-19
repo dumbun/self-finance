@@ -75,15 +75,15 @@ class TransactionsSearchQuery extends _$TransactionsSearchQuery {
 @riverpod
 class TransactionsDateSearchQuery extends _$TransactionsDateSearchQuery {
   @override
-  String build() => '';
+  DateTime? build() => null;
 
-  void set(String q) {
+  void set(DateTime? q) {
     ref.read(transactionsSearchQueryProvider.notifier).clear();
     ref.read(filterProvider.notifier).clear();
     state = q;
   }
 
-  void clear() => state = '';
+  void clear() => state = null;
 }
 
 @riverpod
@@ -99,21 +99,19 @@ class TransactionsNotifier extends _$TransactionsNotifier {
         .watch(transactionsSearchQueryProvider)
         .trim()
         .toLowerCase();
-    final String dateQuery = ref.watch(transactionsDateSearchQueryProvider);
+    final DateTime? dateQuery = ref.watch(transactionsDateSearchQueryProvider);
     final filterQuery = ref.watch(filterProvider);
 
-    if (query.isEmpty && dateQuery.isEmpty && filterQuery.isEmpty) return base;
-    if (query.isNotEmpty && dateQuery.isEmpty) {
+    if (query.isEmpty && dateQuery == null && filterQuery.isEmpty) return base;
+    if (query.isNotEmpty && dateQuery == null && filterQuery.isEmpty) {
       return base.map((List<Trx> transactions) {
         return transactions
-            .where(
-              (Trx element) => element.id.toString().trim().contains(query),
-            )
+            .where((Trx element) => element.id.toString().trim() == query)
             .toList();
       });
-    } else if (query.isEmpty && dateQuery.isNotEmpty && filterQuery.isEmpty) {
+    } else if (query.isEmpty && dateQuery != null && filterQuery.isEmpty) {
       return BackEnd.watchTransactionsByDate(inputDate: dateQuery);
-    } else if (query.isEmpty && dateQuery.isEmpty && filterQuery.isNotEmpty) {
+    } else if (query.isEmpty && dateQuery == null && filterQuery.isNotEmpty) {
       return BackEnd.watchTransactionsByAge(months: filterQuery.first.months);
     } else {
       return base;
@@ -122,17 +120,16 @@ class TransactionsNotifier extends _$TransactionsNotifier {
 
   Future<bool> addNewTransactoion({
     required int customerId,
+    required String customerName,
+    required String customerNumber,
     required String discription,
-    required String pawnedDate,
+    required DateTime userInputDate,
     required double pawnAmount,
     required double rateOfIntrest,
     required SignatureController signatureController,
   }) async {
     ref.keepAlive();
-    final List<Customer> customer = await BackEnd.fetchSingleContactDetails(
-      id: customerId,
-    );
-    final String presentDate = DateTime.now().toString();
+
     final String itemImagePath = await ImageSavingUtility.saveImage(
       location: 'items',
       image: ref.read(itemFileProvider),
@@ -142,12 +139,12 @@ class TransactionsNotifier extends _$TransactionsNotifier {
         customerid: customerId,
         name: discription,
         description: discription,
-        pawnedDate: pawnedDate,
-        expiryDate: presentDate,
+        pawnedDate: userInputDate,
+        expiryDate: userInputDate,
         pawnAmount: pawnAmount,
         status: Constant.active,
         photo: itemImagePath,
-        createdDate: DateTime.now().toString(),
+        createdDate: DateTime.now(),
       ),
     );
     if (itemId != 0) {
@@ -160,26 +157,26 @@ class TransactionsNotifier extends _$TransactionsNotifier {
         Trx(
           customerId: customerId,
           itemId: itemId,
-          transacrtionDate: pawnedDate,
+          transacrtionDate: userInputDate,
           transacrtionType: Constant.active,
           amount: pawnAmount,
           intrestRate: rateOfIntrest,
           intrestAmount: 0.0,
           remainingAmount: 0.0,
           signature: signaturePath,
-          createdDate: presentDate,
+          createdDate: DateTime.now(),
         ),
       );
       if (transacrtionId != 0) {
         final int historyId = await BackEnd.createNewHistory(
           UserHistory(
             userID: 1,
-            customerID: customerId,
             itemID: itemId,
-            customerNumber: customer.first.number,
-            customerName: customer.first.name,
+            customerID: customerId,
+            customerName: customerName,
+            customerNumber: customerNumber,
             transactionID: transacrtionId,
-            eventDate: presentDate,
+            eventDate: DateTime.now(),
             eventType: Constant.debited,
             amount: pawnAmount,
           ),
@@ -227,10 +224,10 @@ class TransactionByID extends _$TransactionByID {
       final Customer customer = customers.first;
       final Payment payment = Payment(
         transactionId: trx.id!,
-        paymentDate: Utility.presentDate().toIso8601String(),
+        paymentDate: DateTime.now(),
         amountpaid: amountpaid,
         type: 'cash',
-        createdDate: Utility.presentDate().toIso8601String(),
+        createdDate: Utility.presentDate(),
       );
       await BackEnd.addPayment(payment: payment);
       await BackEnd.updateTransactionAsPaid(
@@ -245,7 +242,7 @@ class TransactionByID extends _$TransactionByID {
           customerNumber: customer.number,
           customerName: customer.name,
           transactionID: transactionId,
-          eventDate: Utility.presentDate().toString(),
+          eventDate: Utility.presentDate(),
           eventType: Constant.credit,
           amount: amountpaid,
         ),

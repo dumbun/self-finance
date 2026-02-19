@@ -6,7 +6,7 @@ class UserHistory {
   final String customerNumber;
   final String customerName;
   final int transactionID;
-  final String eventDate;
+  final DateTime eventDate;
   final String eventType; // credited or debited
   final double amount;
 
@@ -32,7 +32,7 @@ class UserHistory {
         id: e["History_ID"] as int,
         amount: e["Amount"] as double,
         customerID: e["Customer_ID"] as int,
-        eventDate: e["Event_Date"] as String,
+        eventDate: e["Event_Date"] as DateTime,
         eventType: e["Event_Type"] as String,
         itemID: e["Item_ID"] as int,
         customerName: e["Customer_Name"] as String,
@@ -51,7 +51,7 @@ class UserHistory {
     String? customerNumber,
     String? customerName,
     int? transactionID,
-    String? eventDate,
+    DateTime? eventDate,
     String? eventType,
     double? amount,
   }) {
@@ -93,7 +93,7 @@ class UserHistory {
       customerNumber: map['customerNumber'] as String,
       customerName: map['customerName'] as String,
       transactionID: map['transactionID'] as int,
-      eventDate: map['eventDate'] as String,
+      eventDate: map['eventDate'] as DateTime,
       eventType: map['eventType'] as String,
       amount: map['amount'] as double,
     );

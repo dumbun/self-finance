@@ -16,71 +16,73 @@ class SelfFinance extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = ref.watch(themeProvider);
-    return isDark.when(
-      data: (data) {
-        return ResponsiveSizer(
-          builder:
-              (
-                BuildContext context,
-                Orientation orientation,
-                ScreenType screenType,
-              ) => MaterialApp(
-                routes: {
-                  Constant.dashboardView: (BuildContext context) =>
-                      const DashboardView(),
-                  Constant.addNewEntryView: (BuildContext context) =>
-                      const CustomerDetailsEntryView(),
-                  Constant.contactView: (BuildContext context) =>
-                      const ContactsView(),
-                  Constant.accountSettingsView: (BuildContext context) =>
-                      const AccountSettingsView(),
-                },
-                color: AppColors.getPrimaryColor,
-                title: Constant.appTitle,
-                debugShowCheckedModeBanner: false,
-                theme: ThemeData(
-                  useMaterial3: true,
-                  fontFamily: Constant.appFont,
-                  primaryColor: AppColors.getPrimaryColor,
-                  cardTheme: const CardThemeData(elevation: 2),
-                  primarySwatch: Colors.blue,
-                  colorScheme: ColorScheme.fromSeed(
-                    seedColor: AppColors.getPrimaryColor,
-                    error: AppColors.getErrorColor,
-                    brightness: Brightness.light,
-                    primary: AppColors.getPrimaryColor,
-                    onPrimary: Colors.white,
+    return ref
+        .watch(themeProvider)
+        .when(
+          data: (bool data) {
+            return ResponsiveSizer(
+              builder:
+                  (
+                    BuildContext context,
+                    Orientation orientation,
+                    ScreenType screenType,
+                  ) => MaterialApp(
+                    routes: {
+                      Constant.dashboardView: (BuildContext context) =>
+                          const DashboardView(),
+                      Constant.addNewEntryView: (BuildContext context) =>
+                          const CustomerDetailsEntryView(),
+                      Constant.contactView: (BuildContext context) =>
+                          const ContactsView(),
+                      Constant.accountSettingsView: (BuildContext context) =>
+                          const AccountSettingsView(),
+                    },
+                    color: AppColors.getPrimaryColor,
+                    title: Constant.appTitle,
+                    debugShowCheckedModeBanner: false,
+                    theme: ThemeData(
+                      useMaterial3: true,
+                      fontFamily: Constant.appFont,
+                      primaryColor: AppColors.getPrimaryColor,
+                      cardTheme: const CardThemeData(elevation: 2),
+                      primarySwatch: Colors.blue,
+                      colorScheme: ColorScheme.fromSeed(
+                        seedColor: AppColors.getPrimaryColor,
+                        error: AppColors.getErrorColor,
+                        brightness: Brightness.light,
+                        primary: AppColors.getPrimaryColor,
+                        onPrimary: Colors.white,
+                      ),
+                    ),
+                    darkTheme: ThemeData(
+                      primaryColor: AppColors.getPrimaryColor,
+                      useMaterial3: true,
+                      cardTheme: const CardThemeData(elevation: 2),
+                      canvasColor: AppColors.getPrimaryTextColor,
+                      scaffoldBackgroundColor: AppColors.getPrimaryTextColor,
+                      fontFamily: Constant.appFont,
+                      primarySwatch: Colors.blue,
+                      colorScheme: ColorScheme.fromSeed(
+                        seedColor: AppColors.getPrimaryColor,
+                        error: AppColors.getErrorColor,
+                        brightness: Brightness.dark,
+                        primary: AppColors.getPrimaryColor,
+                        onPrimary: Colors.white,
+                      ),
+                    ),
+                    themeAnimationCurve: Curves.easeInOut,
+                    themeMode: data ? ThemeMode.dark : ThemeMode.light,
+                    home: const AuthView(),
                   ),
-                ),
-                darkTheme: ThemeData(
-                  primaryColor: AppColors.getPrimaryColor,
-                  useMaterial3: true,
-                  cardTheme: const CardThemeData(elevation: 2),
-                  canvasColor: AppColors.getPrimaryTextColor,
-                  scaffoldBackgroundColor: AppColors.getPrimaryTextColor,
-                  fontFamily: Constant.appFont,
-                  primarySwatch: Colors.blue,
-                  colorScheme: ColorScheme.fromSeed(
-                    seedColor: AppColors.getPrimaryColor,
-                    error: AppColors.getErrorColor,
-                    brightness: Brightness.dark,
-                    primary: AppColors.getPrimaryColor,
-                    onPrimary: Colors.white,
-                  ),
-                ),
-                themeAnimationCurve: Curves.easeInOut,
-                themeMode: data ? ThemeMode.dark : ThemeMode.light,
-                home: const AuthView(),
-              ),
+            );
+          },
+          error: (error, stackTrace) => const Center(
+            child: BodyTwoDefaultText(
+              text: "Error happend! Please restart the application",
+            ),
+          ),
+          loading: () =>
+              const Center(child: CircularProgressIndicator.adaptive()),
         );
-      },
-      error: (error, stackTrace) => const Center(
-        child: BodyTwoDefaultText(
-          text: "Error happend! Please restart the application",
-        ),
-      ),
-      loading: () => const Center(child: CircularProgressIndicator.adaptive()),
-    );
   }
 }

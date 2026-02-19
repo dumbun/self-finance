@@ -1,400 +1,530 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/fonts/title_widget.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/chart_model.dart';
+import 'package:self_finance/providers/chart_tab_providers.dart';
 import 'package:self_finance/providers/monthly_chart_provider.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
-import 'package:self_finance/core/fonts/title_widget.dart';
 
-class MonthlyChartWidget extends ConsumerWidget {
-  const MonthlyChartWidget({super.key});
+class MonthlyChartSection extends StatefulWidget {
+  const MonthlyChartSection({super.key});
+  @override
+  State<MonthlyChartSection> createState() => _MonthlyChartSection();
+}
+
+class _MonthlyChartSection extends State<MonthlyChartSection>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 480),
+    )..forward();
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _anim,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.06),
+          end: Offset.zero,
+        ).animate(_anim),
+        child: const _Content(),
+      ),
+    );
+  }
+}
+
+// =============================================================================
+// CONTENT  (header + tabs + animated body switcher)
+// =============================================================================
+
+class _Content extends ConsumerWidget {
+  const _Content();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final chartStateAsync = ref.watch(monthlyChartProvider);
+    final tab = ref.watch(activeChartTabProvider);
 
-    return chartStateAsync.when(
-      data: (MonthlyChartState state) {
-        if (state.data.isEmpty || _isAllZero(state)) {
-          return _EmptyState();
-        }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // ── Header ─────────────────────────────────────────────────────────
+        Padding(
+          padding: EdgeInsets.fromLTRB(16.sp, 16.sp, 16.sp, 0),
+          child: Row(
+            children: [
+              Expanded(
+                child: BodyTwoDefaultText(text: _title(tab), bold: true),
+              ),
+              const _LegendDot(
+                color: AppColors.getPrimaryColor,
+                label: 'Received',
+              ),
+              SizedBox(width: 14.sp),
+              const _LegendDot(
+                color: AppColors.getErrorColor,
+                label: 'Disbursed',
+              ),
+            ],
+          ),
+        ),
 
-        return _ChartContent(state: state);
-      },
-      loading: () => const _LoadingState(),
-      error: (Object err, StackTrace stack) => _ErrorState(error: err),
+        SizedBox(height: 14.sp),
+
+        // ── Tab bar ────────────────────────────────────────────────────────
+        _TabBar(
+          active: tab,
+          onChanged: (t) {
+            HapticFeedback.selectionClick();
+            ref.read(activeChartTabProvider.notifier).setTab(t);
+          },
+        ),
+
+        SizedBox(height: 4.sp),
+
+        // ── Animated body ──────────────────────────────────────────────────
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 280),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeIn,
+          transitionBuilder: (child, anim) => FadeTransition(
+            opacity: anim,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.03, 0),
+                end: Offset.zero,
+              ).animate(anim),
+              child: child,
+            ),
+          ),
+          child: KeyedSubtree(
+            key: ValueKey(tab),
+            child: switch (tab) {
+              ChartTab.yearly => const _YearlyBody(),
+              ChartTab.monthly => const _MonthlyBody(),
+              ChartTab.weekly => const _WeeklyBody(),
+              ChartTab.today => const _TodayBody(),
+            },
+          ),
+        ),
+      ],
     );
   }
 
-  bool _isAllZero(MonthlyChartState state) {
-    for (final m in state.data) {
-      if (m.disbursed != 0.0 || m.received != 0.0) return false;
-    }
-    return true;
-  }
+  String _title(ChartTab t) => switch (t) {
+    ChartTab.yearly => 'Last 12 Months',
+    ChartTab.monthly => 'Last 6 Months',
+    ChartTab.weekly => 'Last 7 Days',
+    ChartTab.today => "Today's Overview",
+  };
 }
 
-// Separate widget to prevent rebuilds
-class _ChartContent extends StatelessWidget {
-  final MonthlyChartState state;
+// =============================================================================
+// SEGMENTED TAB BAR
+// =============================================================================
 
-  static const double fontScale = 1.25;
+class _TabBar extends StatelessWidget {
+  const _TabBar({required this.active, required this.onChanged});
+  final ChartTab active;
+  final ValueChanged<ChartTab> onChanged;
 
-  const _ChartContent({required this.state});
+  static const _labels = {
+    ChartTab.yearly: 'Yearly',
+    ChartTab.monthly: 'Monthly',
+    ChartTab.weekly: 'Weekly',
+    ChartTab.today: 'Today',
+  };
 
   @override
   Widget build(BuildContext context) {
-    final double safeMax = (state.maxValue <= 0) ? 1.0 : state.maxValue;
-    final double horizontalInterval = safeMax / 4.0;
-
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
-      padding: EdgeInsets.all(12.sp),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _ChartHeader(state: state),
-          SizedBox(height: 10.sp),
-          _ChartLegend(state: state),
-          SizedBox(height: 12.sp),
-          _BarChartWidget(
-            state: state,
-
-            safeMax: safeMax,
-            horizontalInterval: horizontalInterval,
-            fontScale: fontScale,
-          ),
-          SizedBox(height: 8.sp),
-          const BodySmallText(text: 'Values shown in compact format.'),
-        ],
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: AppColors.getLigthGreyColor.withAlpha(35),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: ChartTab.values.map((tab) {
+          final isActive = tab == active;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onChanged(tab),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOutCubic,
+                padding: const EdgeInsets.symmetric(vertical: 7),
+                decoration: BoxDecoration(
+                  color: isActive ? AppColors.getPrimaryColor : null,
+                  borderRadius: BorderRadius.circular(9),
+                  boxShadow: isActive
+                      ? [
+                          BoxShadow(
+                            color: AppColors.getPrimaryColor.withAlpha(75),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: BodySmallText(
+                  color: isActive ? AppColors.getBackgroundColor : null,
+                  text: _labels[tab]!,
+                  textAlign: TextAlign.center,
+                  bold: isActive,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
 }
 
-class _ChartHeader extends StatelessWidget {
-  final MonthlyChartState state;
+// =============================================================================
+// TAB BODIES
+// All three line-chart tabs pass MonthlyChartState into the shared
+// _LineChartBody widget — zero duplication.
+// =============================================================================
 
-  const _ChartHeader({required this.state});
+class _YearlyBody extends ConsumerWidget {
+  const _YearlyBody();
 
   @override
-  Widget build(BuildContext context) {
-    final double netFlow = state.totalReceived - state.totalDisbursed;
-    final bool isPositive = netFlow >= 0;
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref
+        .watch(yearlyChartProvider)
+        .when(
+          data: (MonthlyChartState state) => _LineChartBody(
+            state: state,
+            onPointTapped:
+                (
+                  ChartData data,
+                  int index,
+                  List<Map<String, dynamic>>? rawMaps,
+                ) {
+                  // Yearly: derive month + year from the raw map's hidden fields
+                  final raw = rawMaps != null && index < rawMaps.length
+                      ? rawMaps[index]
+                      : null;
+                  final DateTime now = DateTime.now();
+                  final int offset = state.data.length - 1 - index;
+                  final DateTime date = DateTime(
+                    now.year,
+                    now.month - offset,
+                    1,
+                  );
+                  final int month = raw?['_monthNum'] as int? ?? date.month;
+                  final int year = raw?['_year'] as int? ?? date.year;
+                  _openDrill(
+                    context,
+                    ref,
+                    DrillMonth(month: month, year: year),
+                    '${data.month} $year',
+                  );
+                },
+            rawProvider: yearlyChartRawProvider,
+          ),
+          loading: () => const _Skeleton(),
+          error: (_, _) => const _Err(),
+        );
+  }
+}
 
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 6.sp, vertical: 4.sp),
-      child: Row(
-        children: [
-          Expanded(
+class _MonthlyBody extends ConsumerWidget {
+  const _MonthlyBody();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // ← uses the EXISTING monthlyChartProvider from monthly_chart_provider.dart
+    return ref
+        .watch(monthlyChartProvider)
+        .when(
+          data: (MonthlyChartState state) => _LineChartBody(
+            state: state,
+            onPointTapped: (data, index, _) {
+              final now = DateTime.now();
+              final offset = state.data.length - 1 - index;
+              final date = DateTime(now.year, now.month - offset, 1);
+              _openDrill(
+                context,
+                ref,
+                DrillMonth(month: date.month, year: date.year),
+                '${data.month} ${date.year}',
+              );
+            },
+            rawProvider: null,
+          ),
+          loading: () => const _Skeleton(),
+          error: (_, _) => const _Err(),
+        );
+  }
+}
+
+class _WeeklyBody extends ConsumerWidget {
+  const _WeeklyBody();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref
+        .watch(weeklyChartProvider)
+        .when(
+          data: (state) => _LineChartBody(
+            state: state,
+            onPointTapped: (data, index, rawMaps) {
+              final raw = rawMaps != null && index < rawMaps.length
+                  ? rawMaps[index]
+                  : null;
+              if (raw == null) return;
+              _openDrill(
+                context,
+                ref,
+                DrillDay(
+                  txnDate: raw['_txnDate'] as String,
+                  payDate: raw['_payDate'] as String,
+                ),
+                data.month, // e.g. 'Mon'
+              );
+            },
+            rawProvider: weeklyRawProvider,
+          ),
+          loading: () => const _Skeleton(),
+          error: (_, _) => const _Err(),
+        );
+  }
+}
+
+class _TodayBody extends ConsumerWidget {
+  const _TodayBody();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref
+        .watch(todayChartProvider)
+        .when(
+          data: (TodayState s) => Padding(
+            padding: EdgeInsets.fromLTRB(18.sp, 10.sp, 18.sp, 10.sp),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                const BodyOneDefaultText(text: 'Monthly Overview', bold: true),
-                SizedBox(height: 4.sp),
-                const BodyTwoDefaultText(text: 'Last 6 months performance'),
+              children: [
+                SizedBox(height: 20.sp),
+                _SplitGauge(state: s),
+                SizedBox(height: 16.sp),
+                _NetBanner(net: s.net),
+                SizedBox(height: 16.sp),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _CountCard(
+                        label: 'Loans today',
+                        count: s.disbursedCount,
+                        amount: s.disbursed,
+                        color: AppColors.getErrorColor,
+                        icon: Icons.arrow_upward_rounded,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _CountCard(
+                        label: 'Payments today',
+                        count: s.receivedCount,
+                        amount: s.received,
+                        color: AppColors.getPrimaryColor,
+                        icon: Icons.arrow_downward_rounded,
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const BodyTwoDefaultText(text: 'Net Flow'),
-              SizedBox(height: 4.sp),
-              CurrencyWidget(
-                amount: Utility.doubleFormate(netFlow),
-                color: isPositive
-                    ? AppColors.getGreenColor
-                    : AppColors.contentColorRed,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+          loading: () => const _Skeleton(),
+          error: (_, _) => const _Err(),
+        );
   }
 }
 
-class _ChartLegend extends StatelessWidget {
-  final MonthlyChartState state;
+// =============================================================================
+// SHARED LINE CHART BODY
+// Accepts MonthlyChartState — works for yearly, monthly AND weekly tabs.
+// rawProvider is optional: only needed when the drill-down requires extra
+// fields (_txnDate, _payDate, _monthNum, _year) from the raw backend maps.
+// =============================================================================
 
-  const _ChartLegend({required this.state});
+// Provider type alias to keep the signature readable
+typedef _RawProvider =
+    ProviderListenable<AsyncValue<List<Map<String, dynamic>>>>;
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 6.sp),
-      child: Wrap(
-        runSpacing: 8.sp,
-        spacing: 12.sp,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: <Widget>[
-          _LegendItemSmall(
-            color: AppColors.contentColorRed,
-            label: 'Disbursed',
-            value: state.totalDisbursed,
-          ),
-          _LegendItemSmall(
-            color: AppColors.getGreenColor,
-            label: 'Received',
-            value: state.totalReceived,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _BarChartWidget extends StatelessWidget {
-  final MonthlyChartState state;
-  final double safeMax;
-  final double horizontalInterval;
-  final double fontScale;
-
-  const _BarChartWidget({
+class _LineChartBody extends ConsumerStatefulWidget {
+  const _LineChartBody({
     required this.state,
-    required this.safeMax,
-    required this.horizontalInterval,
-    required this.fontScale,
+    required this.onPointTapped,
+    required this.rawProvider,
   });
 
+  final MonthlyChartState state;
+  // index, raw maps list (null when not needed)
+  final void Function(ChartData, int, List<Map<String, dynamic>>?)
+  onPointTapped;
+  final _RawProvider? rawProvider;
+
   @override
-  Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 16 / 9,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(6.sp, 0, 6.sp, 6.sp),
-        child: BarChart(
-          BarChartData(
-            maxY: safeMax * 1.2,
-            minY: 0,
-            alignment: BarChartAlignment.spaceBetween,
-            groupsSpace: 12.sp,
-            barTouchData: _buildBarTouchData(),
-            titlesData: _buildTitlesData(),
-            gridData: _buildGridData(),
-            borderData: FlBorderData(show: false),
-            barGroups: _buildBarGroups(),
-          ),
-          duration: const Duration(milliseconds: 700),
-          curve: Curves.easeInOut,
-        ),
-      ),
-    );
+  ConsumerState<_LineChartBody> createState() => _LineChartBodyState();
+}
+
+class _LineChartBodyState extends ConsumerState<_LineChartBody>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _anim;
+  int? _sel;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 850),
+    )..forward();
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutCubic);
   }
 
-  BarTouchData _buildBarTouchData() {
-    return BarTouchData(
-      enabled: true,
-      touchTooltipData: BarTouchTooltipData(
-        tooltipPadding: EdgeInsets.all(8.sp),
-        tooltipBorder: BorderSide(width: 0.8.sp),
-        getTooltipItem:
-            (
-              BarChartGroupData group,
-              int groupIndex,
-              BarChartRodData rod,
-              int rodIndex,
-            ) {
-              final int monthIndex = group.x.toInt();
-              if (monthIndex < 0 || monthIndex >= state.data.length) {
-                return null;
-              }
+  @override
+  void didUpdateWidget(_LineChartBody old) {
+    super.didUpdateWidget(old);
+    if (old.state.data != widget.state.data) {
+      _sel = null;
+      _ctrl.forward(from: 0);
+    }
+  }
 
-              final ChartData monthData = state.data[monthIndex];
-              final List<String> labels = ['Disbursed', 'Received'];
-              final List<double> values = [
-                monthData.disbursed,
-                monthData.received,
-              ];
-              final Color rodColor = rod.color ?? AppColors.borderColor;
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 
-              return BarTooltipItem(
-                '${labels[rodIndex]}\n',
-                TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: (12.sp * fontScale),
-                ),
-                children: [
-                  TextSpan(
-                    text: Utility.doubleFormate(values[rodIndex]),
-                    style: TextStyle(
-                      color: rodColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: (14.sp * fontScale),
+  void _onTap(TapDownDetails d, double width) {
+    final int n = widget.state.data.length;
+    if (n < 2) return;
+    final int idx = (d.localPosition.dx / (width / (n - 1))).round().clamp(
+      0,
+      n - 1,
+    );
+    HapticFeedback.lightImpact();
+    if (_sel == idx) {
+      // Second tap → drill down
+      final List<Map<String, dynamic>>? rawMaps = widget.rawProvider != null
+          ? ref.read(widget.rawProvider!).value
+          : null;
+      widget.onPointTapped(widget.state.data[idx], idx, rawMaps);
+    } else {
+      setState(() => _sel = idx);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final data = widget.state.data;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Tooltip / hint ─────────────────────────────────────────────
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 180),
+            child: _sel != null && _sel! < data.length
+                ? _Tooltip(
+                    key: ValueKey(_sel),
+                    label: data[_sel!].month,
+                    received: data[_sel!].received,
+                    disbursed: data[_sel!].disbursed,
+                    onDetails: () {
+                      final rawMaps = widget.rawProvider != null
+                          ? ref.read(widget.rawProvider!).value
+                          : null;
+                      widget.onPointTapped(data[_sel!], _sel!, rawMaps);
+                    },
+                  )
+                : SizedBox(
+                    key: const ValueKey('hint'),
+                    height: 52,
+                    child: Center(
+                      child: BodySmallText(
+                        italic: true,
+                        text: 'Tap a point  ·  tap again for details',
+                        color: AppColors.getLigthGreyColor.withAlpha(90),
+                      ),
                     ),
                   ),
-                ],
+          ),
+
+          const SizedBox(height: 6),
+
+          // ── Chart canvas ───────────────────────────────────────────────
+          LayoutBuilder(
+            builder: (_, c) {
+              final w = c.maxWidth;
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTapDown: (d) => _onTap(d, w),
+                child: AnimatedBuilder(
+                  animation: _anim,
+                  builder: (_, _) => CustomPaint(
+                    size: Size(w, 180),
+                    painter: _ChartPainter(
+                      received: data.map((d) => d.received).toList(),
+                      disbursed: data.map((d) => d.disbursed).toList(),
+                      maxValue: widget.state.maxValue,
+                      progress: _anim.value,
+                      sel: _sel,
+                      rcvColor: AppColors.getPrimaryColor,
+                      disColor: AppColors.getErrorColor,
+                      gridColor: AppColors.getLigthGreyColor.withAlpha(50),
+                    ),
+                  ),
+                ),
               );
             },
-      ),
-    );
-  }
-
-  FlTitlesData _buildTitlesData() {
-    return FlTitlesData(
-      show: true,
-      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-      bottomTitles: AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: true,
-          reservedSize: 30.sp,
-          getTitlesWidget: (double value, TitleMeta meta) {
-            final int idx = value.toInt();
-            if (idx < 0 || idx >= state.data.length) {
-              return const SizedBox.shrink();
-            }
-
-            return Padding(
-              padding: EdgeInsets.only(top: 6.sp),
-              child: BodyTwoDefaultText(
-                text: state.data[idx].month,
-                bold: true,
-              ),
-            );
-          },
-        ),
-      ),
-      leftTitles: AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: true,
-          reservedSize: 36.sp,
-          interval: horizontalInterval,
-          getTitlesWidget: (double value, TitleMeta meta) {
-            return BodySmallText(text: Utility.compactNumber(value));
-          },
-        ),
-      ),
-    );
-  }
-
-  FlGridData _buildGridData() {
-    return FlGridData(
-      show: true,
-      drawVerticalLine: false,
-      drawHorizontalLine: true,
-      horizontalInterval: horizontalInterval,
-      getDrawingHorizontalLine: (double v) => FlLine(
-        color: AppColors.getLigthGreyColor.withValues(alpha: 0.18),
-        strokeWidth: 1,
-      ),
-    );
-  }
-
-  List<BarChartGroupData> _buildBarGroups() {
-    const Color red = AppColors.contentColorRed;
-    const Color green = AppColors.getGreenColor;
-
-    return List.generate(state.data.length, (int index) {
-      final ChartData m = state.data[index];
-      return BarChartGroupData(
-        x: index,
-        barsSpace: 8.sp,
-        barRods: [
-          BarChartRodData(
-            toY: m.disbursed,
-            width: 14.sp,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(4.sp)),
-            color: red.withValues(alpha: 0.85),
-            backDrawRodData: BackgroundBarChartRodData(
-              show: true,
-              toY: safeMax * 1.2,
-              color: AppColors.getLigthGreyColor.withValues(alpha: 0.06),
-            ),
           ),
-          BarChartRodData(
-            toY: m.received,
-            width: 14.sp,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(4.sp)),
-            color: green.withValues(alpha: 0.85),
-            backDrawRodData: BackgroundBarChartRodData(
-              show: true,
-              toY: safeMax * 1.2,
-              color: AppColors.getLigthGreyColor.withValues(alpha: 0.06),
-            ),
+
+          // ── X-axis labels ──────────────────────────────────────────────
+          SizedBox(height: 10.sp),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: data.map((d) => BodySmallText(text: d.month)).toList(),
           ),
-        ],
-      );
-    });
-  }
-}
 
-// Empty, Loading, and Error states as const widgets
-class _EmptyState extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(16.sp),
-      padding: EdgeInsets.all(20.sp),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          SizedBox(height: 12.sp),
-          Icon(
-            Icons.bar_chart,
-            size: 56.sp,
-            color: AppColors.getLigthGreyColor,
-          ),
-          SizedBox(height: 12.sp),
-          const TitleWidget(text: 'No monthly data yet', bold: true),
-          SizedBox(height: 6.sp),
-          const BodyTwoDefaultText(
-            text:
-                'We couldn\'t find any transactions to show. Add some transactions to see monthly stats.',
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 12.sp),
-        ],
-      ),
-    );
-  }
-}
+          SizedBox(height: 14.sp),
 
-class _LoadingState extends StatelessWidget {
-  const _LoadingState();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
-      padding: EdgeInsets.all(16.sp),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(14.sp)),
-      child: const Center(child: CircularProgressIndicator()),
-    );
-  }
-}
-
-class _ErrorState extends StatelessWidget {
-  final Object error;
-  static const double fontScale = 1.25;
-
-  const _ErrorState({required this.error});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(16.sp),
-      padding: EdgeInsets.all(12.sp),
-
-      child: Row(
-        children: [
-          Icon(Icons.error_outline, size: (20.sp * fontScale)),
-          SizedBox(width: 12.sp),
-          const Expanded(
-            child: BodyTwoDefaultText(
-              text: 'Something went wrong while loading the chart.',
-              error: true,
-            ),
+          // ── Summary strip ──────────────────────────────────────────────
+          _SummaryStrip(
+            totalReceived: widget.state.totalReceived,
+            totalDisbursed: widget.state.totalDisbursed,
           ),
         ],
       ),
@@ -402,43 +532,881 @@ class _ErrorState extends StatelessWidget {
   }
 }
 
-class _LegendItemSmall extends StatelessWidget {
-  final Color color;
-  final String label;
-  final double value;
+// raw stream providers wired up for yearly + weekly
+// (monthly doesn't need it — month/year are derived from offset)
+final yearlyChartRawProvider =
+    StreamProvider.autoDispose<List<Map<String, dynamic>>>(
+      (ref) => BackEnd.watchYearlyChartData(),
+    );
 
-  const _LegendItemSmall({
-    required this.color,
-    required this.label,
-    required this.value,
+// =============================================================================
+// CUSTOM PAINTER
+// =============================================================================
+
+class _ChartPainter extends CustomPainter {
+  const _ChartPainter({
+    required this.received,
+    required this.disbursed,
+    required this.maxValue,
+    required this.progress,
+    required this.sel,
+    required this.rcvColor,
+    required this.disColor,
+    required this.gridColor,
   });
 
+  final List<double> received, disbursed;
+  final double maxValue, progress;
+  final int? sel;
+  final Color rcvColor, disColor, gridColor;
+
+  static const _top = 14.0;
+  static const _bot = 4.0;
+  static const _gridLines = 4;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (received.isEmpty) return;
+
+    final n = received.length;
+    final dh = size.height - _top - _bot;
+    final eff = maxValue == 0 ? 1.0 : maxValue;
+    final stepX = n > 1 ? size.width / (n - 1) : size.width;
+
+    // Grid
+    final gPaint = Paint()
+      ..color = gridColor
+      ..strokeWidth = 0.6;
+    for (int i = 0; i <= _gridLines; i++) {
+      final y = _top + dh * (1 - i / _gridLines);
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), gPaint);
+    }
+
+    double cy(double v) => _top + dh * (1 - v / eff);
+    double cx(int i) => n == 1 ? size.width / 2 : i * stepX;
+
+    final rPts = [for (int i = 0; i < n; i++) Offset(cx(i), cy(received[i]))];
+    final dPts = [for (int i = 0; i < n; i++) Offset(cx(i), cy(disbursed[i]))];
+
+    // Clip to animated draw-in progress
+    canvas.save();
+    canvas.clipRect(Rect.fromLTWH(0, 0, size.width * progress, size.height));
+    _fill(canvas, size, rPts, rcvColor, dh);
+    _fill(canvas, size, dPts, disColor, dh);
+    _line(canvas, rPts, rcvColor);
+    _line(canvas, dPts, disColor);
+    canvas.restore();
+
+    // Selection overlay (drawn outside clip so it always shows)
+    if (sel != null && sel! < n) {
+      final x = cx(sel!);
+      canvas.drawLine(
+        Offset(x, _top),
+        Offset(x, _top + dh),
+        Paint()
+          ..color = gridColor
+          ..strokeWidth = 1.2,
+      );
+      canvas.drawCircle(
+        rPts[sel!],
+        16,
+        Paint()..color = rcvColor.withAlpha(10),
+      );
+      _dot(canvas, rPts[sel!], rcvColor);
+      _dot(canvas, dPts[sel!], disColor);
+    }
+  }
+
+  Path _curve(List<Offset> pts) {
+    if (pts.length == 1) return Path()..moveTo(pts[0].dx, pts[0].dy);
+    final path = Path()..moveTo(pts[0].dx, pts[0].dy);
+    for (int i = 0; i < pts.length - 1; i++) {
+      final mx = (pts[i].dx + pts[i + 1].dx) / 2;
+      path.cubicTo(
+        mx,
+        pts[i].dy,
+        mx,
+        pts[i + 1].dy,
+        pts[i + 1].dx,
+        pts[i + 1].dy,
+      );
+    }
+    return path;
+  }
+
+  void _fill(Canvas c, Size sz, List<Offset> pts, Color col, double dh) {
+    final path = Path()
+      ..addPath(_curve(pts), Offset.zero)
+      ..lineTo(pts.last.dx, _top + dh)
+      ..lineTo(pts.first.dx, _top + dh)
+      ..close();
+    c.drawPath(
+      path,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [col.withAlpha(50), col.withAlpha(0)],
+        ).createShader(Rect.fromLTWH(0, _top, sz.width, dh)),
+    );
+  }
+
+  void _line(Canvas c, List<Offset> pts, Color col) {
+    if (pts.length < 2) return;
+    c.drawPath(
+      _curve(pts),
+      Paint()
+        ..color = col
+        ..strokeWidth = 2.2
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+  }
+
+  void _dot(Canvas c, Offset pt, Color col) {
+    c.drawCircle(pt, 6, Paint()..color = Colors.white);
+    c.drawCircle(
+      pt,
+      6,
+      Paint()
+        ..color = col
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.2,
+    );
+    c.drawCircle(pt, 3, Paint()..color = col);
+  }
+
+  @override
+  bool shouldRepaint(_ChartPainter o) =>
+      o.progress != progress ||
+      o.received != received ||
+      o.sel != sel ||
+      o.maxValue != maxValue;
+}
+
+// =============================================================================
+// TOOLTIP
+// =============================================================================
+
+class _Tooltip extends StatelessWidget {
+  const _Tooltip({
+    super.key,
+    required this.label,
+    required this.received,
+    required this.disbursed,
+    required this.onDetails,
+  });
+
+  final String label;
+  final double received, disbursed;
+  final VoidCallback onDetails;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 6.sp),
+      margin: EdgeInsets.only(top: 12.sp),
+      height: 28.sp,
+      padding: EdgeInsets.symmetric(horizontal: 14.sp),
+      decoration: BoxDecoration(
+        color: AppColors.getLigthGreyColor.withAlpha(70),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 16.sp,
-            height: 16.sp,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(2.sp),
+          BodySmallText(
+            text: label,
+            color: AppColors.getLigthGreyColor,
+            bold: true,
+          ),
+          SizedBox(width: 14.sp),
+          _TVal('In', received, AppColors.getGreenColor),
+          SizedBox(width: 12.sp),
+          _TVal('Out', disbursed, AppColors.getErrorColor),
+          SizedBox(width: 12.sp),
+          const Spacer(),
+          GestureDetector(
+            onTap: onDetails,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: AppColors.getPrimaryColor.withAlpha(30),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  BodySmallText(
+                    text: 'Details',
+                    bold: true,
+                    color: AppColors.getPrimaryColor,
+                  ),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: AppColors.getPrimaryColor,
+                    size: 14,
+                  ),
+                ],
+              ),
             ),
           ),
-          SizedBox(width: 10.sp),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              BodySmallText(text: label),
-              SizedBox(height: 2.sp),
-              CurrencyWidget(amount: Utility.doubleFormate(value)),
-            ],
+        ],
+      ),
+    );
+  }
+}
+
+class _TVal extends StatelessWidget {
+  const _TVal(this.label, this.value, this.color);
+  final String label;
+  final double value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        BodySmallText(text: label, color: AppColors.getLigthGreyColor),
+        CurrencyWidget(
+          amount: Utility.doubleFormate(value),
+          smallText: true,
+          color: color,
+        ),
+      ],
+    );
+  }
+}
+
+// =============================================================================
+// SUMMARY STRIP
+// =============================================================================
+
+class _SummaryStrip extends StatelessWidget {
+  const _SummaryStrip({
+    required this.totalReceived,
+    required this.totalDisbursed,
+  });
+  final double totalReceived, totalDisbursed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _SummaryTile(
+            label: 'Total Received',
+            value: totalReceived,
+            color: AppColors.getPrimaryColor,
+            icon: Icons.arrow_downward_rounded,
+          ),
+        ),
+        SizedBox(width: 12.sp),
+        Expanded(
+          child: _SummaryTile(
+            label: 'Total Disbursed',
+            value: totalDisbursed,
+            color: AppColors.getErrorColor,
+            icon: Icons.arrow_upward_rounded,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SummaryTile extends StatelessWidget {
+  const _SummaryTile({
+    required this.label,
+    required this.value,
+    required this.color,
+    required this.icon,
+  });
+  final String label;
+  final double value;
+  final Color color;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withAlpha(20),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withAlpha(100)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 22.sp,
+            height: 22.sp,
+            decoration: BoxDecoration(
+              color: color.withAlpha(50),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 0.25.dp),
+          ),
+          SizedBox(width: 12.sp),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BodySmallText(text: label, bold: true),
+                SizedBox(height: 2.sp),
+                CurrencyWidget(
+                  amount: value.toStringAsFixed(2),
+                  color: color,
+                  smallText: true,
+                ),
+              ],
+            ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// =============================================================================
+// TODAY WIDGETS
+// =============================================================================
+
+class _SplitGauge extends StatelessWidget {
+  const _SplitGauge({required this.state});
+  final TodayState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final double total = state.received + state.disbursed;
+    final double ratio = total == 0 ? 0.0 : state.received / total;
+
+    return Column(
+      children: <Widget>[
+        Row(
+          children: [
+            Expanded(
+              child: _AmountTile(
+                label: 'Received',
+                amount: state.received,
+                color: AppColors.getPrimaryColor,
+                icon: Icons.arrow_downward_rounded,
+              ),
+            ),
+            SizedBox(width: 12.sp),
+            Expanded(
+              child: _AmountTile(
+                label: 'Disbursed',
+                amount: state.disbursed,
+                color: AppColors.getErrorColor,
+                icon: Icons.arrow_upward_rounded,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 12.sp),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: SizedBox(
+            height: 12.sp,
+            child: LayoutBuilder(
+              builder: (_, c) {
+                return Stack(
+                  children: [
+                    Container(color: AppColors.getErrorColor.withAlpha(32)),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 650),
+                      curve: Curves.easeOutCubic,
+                      width: c.maxWidth * ratio,
+                      color: AppColors.getPrimaryColor,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+        SizedBox(height: 6.sp),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            BodySmallText(
+              text: '${(ratio * 100).toStringAsFixed(0)}% received',
+              color: AppColors.getPrimaryColor,
+            ),
+            BodySmallText(
+              text: '${((1 - ratio) * 100).toStringAsFixed(0)}% disbursed',
+              error: true,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _AmountTile extends StatelessWidget {
+  const _AmountTile({
+    required this.label,
+    required this.amount,
+    required this.color,
+    required this.icon,
+  });
+  final String label;
+  final double amount;
+  final Color color;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withAlpha(18),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withAlpha(70)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 14),
+              SizedBox(width: 8.sp),
+              BodySmallText(text: label, color: color, bold: true),
+            ],
+          ),
+          SizedBox(height: 12.sp),
+          CurrencyWidget(
+            amount: Utility.doubleFormate(amount),
+            color: color,
+            smallText: true,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NetBanner extends StatelessWidget {
+  const _NetBanner({required this.net});
+  final double net;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isPos = net >= 0;
+    final Color color = isPos
+        ? AppColors.getGreenColor
+        : AppColors.getErrorColor;
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
+      decoration: BoxDecoration(
+        color: color.withAlpha(30),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withAlpha(70)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isPos ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+            color: color,
+            size: 16.sp,
+          ),
+          const SizedBox(width: 8),
+          BodySmallText(
+            text: 'Net ${isPos ? 'Profit' : 'Deficit'}',
+            color: color,
+            bold: true,
+          ),
+          const Spacer(),
+          CurrencyWidget(
+            amount: Utility.doubleFormate(net),
+            color: color,
+            smallText: true,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CountCard extends StatelessWidget {
+  const _CountCard({
+    required this.label,
+    required this.count,
+    required this.amount,
+    required this.color,
+    required this.icon,
+  });
+  final String label;
+  final int count;
+  final double amount;
+  final Color color;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(12.sp),
+      decoration: BoxDecoration(
+        color: color.withAlpha(20),
+        borderRadius: BorderRadius.circular(12.sp),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color, size: 16),
+          SizedBox(height: 12.sp),
+          TitleWidget(text: '$count', color: color, bold: true),
+          BodySmallText(text: label, color: AppColors.getLigthGreyColor),
+          SizedBox(height: 8.sp),
+          CurrencyWidget(amount: Utility.doubleFormate(amount), color: color),
+        ],
+      ),
+    );
+  }
+}
+
+// =============================================================================
+// LEGEND DOT
+// =============================================================================
+
+class _LegendDot extends StatelessWidget {
+  const _LegendDot({required this.color, required this.label});
+  final Color color;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.circle, size: 12.sp, color: color),
+        SizedBox(width: 8.sp),
+        BodySmallText(text: label, color: AppColors.getLigthGreyColor),
+      ],
+    );
+  }
+}
+
+// =============================================================================
+// DRILL-DOWN SHEET
+// Container captured BEFORE showModalBottomSheet — the sheet's own BuildContext
+// has no ProviderScope ancestor so we must use UncontrolledProviderScope.
+// =============================================================================
+
+void _openDrill(
+  BuildContext context,
+  WidgetRef ref,
+  DrillTarget target,
+  String title,
+) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => _DrillSheet(target: target, title: title),
+  );
+}
+
+class _DrillSheet extends ConsumerWidget {
+  const _DrillSheet({required this.target, required this.title});
+  final DrillTarget target;
+  final String title;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<List<DrillItem>> dataAsync = ref.watch(
+      drillDownProvider(target),
+    );
+    final ColorScheme cs = Theme.of(context).colorScheme;
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.55,
+      minChildSize: 0.35,
+      maxChildSize: 0.92,
+      builder: (_, ScrollController sc) => Container(
+        decoration: BoxDecoration(
+          color: cs.surface, //with out this it will became transaparent
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            SizedBox(height: 16.sp),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.sp),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: BodyTwoDefaultText(
+                      text: 'Transactions · $title',
+                      bold: true,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+            ),
+            Divider(height: 1.sp),
+            Expanded(
+              child: dataAsync.when(
+                data: (List<DrillItem> items) {
+                  if (items.isEmpty) {
+                    return const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.inbox_rounded,
+                            size: 44,
+                            color: AppColors.getLigthGreyColor,
+                          ),
+                          SizedBox(height: 8),
+                          BodyOneDefaultText(
+                            text: 'No transactions for this period',
+                            color: AppColors.getLigthGreyColor,
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  final double totalRec = items
+                      .where((e) => e.isReceived)
+                      .fold(0.0, (s, e) => s + e.amount);
+                  final double totalDis = items
+                      .where((e) => !e.isReceived)
+                      .fold(0.0, (s, e) => s + e.amount);
+
+                  return ListView(
+                    controller: sc,
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+                    children: [
+                      // Mini summary
+                      Row(
+                        children: [
+                          _MiniStat('In', totalRec, AppColors.getPrimaryColor),
+                          SizedBox(width: 12.sp),
+                          _MiniStat('Out', totalDis, AppColors.getErrorColor),
+                          SizedBox(width: 12.sp),
+                        ],
+                      ),
+                      SizedBox(height: 14.sp),
+                      ...items.map((item) => _DrillRow(item: item)),
+                    ],
+                  );
+                },
+                loading: () =>
+                    const Center(child: CircularProgressIndicator.adaptive()),
+                error: (e, _) => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: BodySmallText(
+                      text: 'Failed to load: $e',
+                      color: AppColors.getErrorColor,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MiniStat extends StatelessWidget {
+  const _MiniStat(this.label, this.value, this.color);
+  final String label;
+  final double value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
+        decoration: BoxDecoration(
+          color: color.withAlpha(20),
+          borderRadius: BorderRadius.circular(10.sp),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BodySmallText(text: label, color: color),
+            CurrencyWidget(
+              amount: Utility.doubleFormate(value),
+              smallText: true,
+              color: color,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DrillRow extends StatelessWidget {
+  const _DrillRow({required this.item});
+  final DrillItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color color = item.isReceived
+        ? AppColors.getPrimaryColor
+        : AppColors.getErrorColor;
+    final IconData icon = item.isReceived
+        ? Icons.arrow_downward_rounded
+        : Icons.arrow_upward_rounded;
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 14.sp),
+      padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 14.sp),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.getLigthGreyColor.withAlpha(50)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 24.sp,
+            height: 24.sp,
+            decoration: BoxDecoration(
+              color: color.withAlpha(30),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 16),
+          ),
+          SizedBox(width: 12.sp),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BodySmallText(
+                  text: item.isReceived ? 'Payment Received' : 'Loan Disbursed',
+                  bold: true,
+                ),
+                BodySmallText(
+                  text: 'ID: ${item.id}  ·  ${item.date}',
+                  color: AppColors.getLigthGreyColor,
+                ),
+              ],
+            ),
+          ),
+          CurrencyWidget(
+            amount:
+                '${item.isReceived ? '+' : '-'}\$${Utility.doubleFormate(item.amount)}',
+            smallText: true,
+            color: color,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// =============================================================================
+// SKELETON + ERROR
+// =============================================================================
+
+class _Skeleton extends StatefulWidget {
+  const _Skeleton();
+  @override
+  State<_Skeleton> createState() => _SkeletonState();
+}
+
+class _SkeletonState extends State<_Skeleton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Color base = AppColors.getLigthGreyColor.withAlpha(5);
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (_, _) {
+        final double op = 0.3 + 0.7 * _ctrl.value;
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: Column(
+            children: [
+              _Bone(52, op, base),
+              SizedBox(height: 14.sp),
+              _Bone(180, op, base),
+              SizedBox(height: 14.sp),
+              Row(
+                children: [
+                  Expanded(child: _Bone(58, op, base)),
+                  SizedBox(width: 12.sp),
+                  Expanded(child: _Bone(58, op, base)),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _Bone extends StatelessWidget {
+  const _Bone(this.h, this.op, this.base);
+  final double h, op;
+  final Color base;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    height: h,
+    width: double.infinity,
+    decoration: BoxDecoration(
+      color: base.withAlpha((op * 100).toInt()),
+      borderRadius: BorderRadius.circular(12.sp),
+    ),
+  );
+}
+
+class _Err extends StatelessWidget {
+  const _Err();
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 180,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.bar_chart_outlined,
+              size: 40,
+              color: AppColors.getLigthGreyColor,
+            ),
+            SizedBox(height: 8),
+            BodyTwoDefaultText(text: 'Could not load chart data'),
+          ],
+        ),
       ),
     );
   }

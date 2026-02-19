@@ -104,11 +104,11 @@ class $CustomersTableTable extends CustomersTable
     'createdDate',
   );
   @override
-  late final GeneratedColumn<String> createdDate = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> createdDate = GeneratedColumn<DateTime>(
     'Created_Date',
     aliasedName,
     false,
-    type: DriftSqlType.string,
+    type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _updatedDateMeta = const VerificationMeta(
@@ -286,7 +286,7 @@ class $CustomersTableTable extends CustomersTable
         data['${effectivePrefix}Proof_Photo'],
       )!,
       createdDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
+        DriftSqlType.dateTime,
         data['${effectivePrefix}Created_Date'],
       )!,
       updatedDate: attachedDatabase.typeMapping.read(
@@ -311,7 +311,9 @@ class CustomerRow extends DataClass implements Insertable<CustomerRow> {
   final String contactNumber;
   final String customerPhoto;
   final String proofPhoto;
-  final String createdDate;
+  final DateTime createdDate;
+
+  /// keeping as TEXT (your code uses ISO strings)
   final String? updatedDate;
   const CustomerRow({
     required this.userId,
@@ -336,7 +338,7 @@ class CustomerRow extends DataClass implements Insertable<CustomerRow> {
     map['Contact_Number'] = Variable<String>(contactNumber);
     map['Customer_Photo'] = Variable<String>(customerPhoto);
     map['Proof_Photo'] = Variable<String>(proofPhoto);
-    map['Created_Date'] = Variable<String>(createdDate);
+    map['Created_Date'] = Variable<DateTime>(createdDate);
     if (!nullToAbsent || updatedDate != null) {
       map['Updated_Date'] = Variable<String>(updatedDate);
     }
@@ -374,7 +376,7 @@ class CustomerRow extends DataClass implements Insertable<CustomerRow> {
       contactNumber: serializer.fromJson<String>(json['contactNumber']),
       customerPhoto: serializer.fromJson<String>(json['customerPhoto']),
       proofPhoto: serializer.fromJson<String>(json['proofPhoto']),
-      createdDate: serializer.fromJson<String>(json['createdDate']),
+      createdDate: serializer.fromJson<DateTime>(json['createdDate']),
       updatedDate: serializer.fromJson<String?>(json['updatedDate']),
     );
   }
@@ -390,7 +392,7 @@ class CustomerRow extends DataClass implements Insertable<CustomerRow> {
       'contactNumber': serializer.toJson<String>(contactNumber),
       'customerPhoto': serializer.toJson<String>(customerPhoto),
       'proofPhoto': serializer.toJson<String>(proofPhoto),
-      'createdDate': serializer.toJson<String>(createdDate),
+      'createdDate': serializer.toJson<DateTime>(createdDate),
       'updatedDate': serializer.toJson<String?>(updatedDate),
     };
   }
@@ -404,7 +406,7 @@ class CustomerRow extends DataClass implements Insertable<CustomerRow> {
     String? contactNumber,
     String? customerPhoto,
     String? proofPhoto,
-    String? createdDate,
+    DateTime? createdDate,
     Value<String?> updatedDate = const Value.absent(),
   }) => CustomerRow(
     userId: userId ?? this.userId,
@@ -506,7 +508,7 @@ class CustomersTableCompanion extends UpdateCompanion<CustomerRow> {
   final Value<String> contactNumber;
   final Value<String> customerPhoto;
   final Value<String> proofPhoto;
-  final Value<String> createdDate;
+  final Value<DateTime> createdDate;
   final Value<String?> updatedDate;
   const CustomersTableCompanion({
     this.userId = const Value.absent(),
@@ -529,7 +531,7 @@ class CustomersTableCompanion extends UpdateCompanion<CustomerRow> {
     required String contactNumber,
     required String customerPhoto,
     required String proofPhoto,
-    required String createdDate,
+    required DateTime createdDate,
     this.updatedDate = const Value.absent(),
   }) : userId = Value(userId),
        customerName = Value(customerName),
@@ -548,7 +550,7 @@ class CustomersTableCompanion extends UpdateCompanion<CustomerRow> {
     Expression<String>? contactNumber,
     Expression<String>? customerPhoto,
     Expression<String>? proofPhoto,
-    Expression<String>? createdDate,
+    Expression<DateTime>? createdDate,
     Expression<String>? updatedDate,
   }) {
     return RawValuesInsertable({
@@ -574,7 +576,7 @@ class CustomersTableCompanion extends UpdateCompanion<CustomerRow> {
     Value<String>? contactNumber,
     Value<String>? customerPhoto,
     Value<String>? proofPhoto,
-    Value<String>? createdDate,
+    Value<DateTime>? createdDate,
     Value<String?>? updatedDate,
   }) {
     return CustomersTableCompanion(
@@ -619,7 +621,7 @@ class CustomersTableCompanion extends UpdateCompanion<CustomerRow> {
       map['Proof_Photo'] = Variable<String>(proofPhoto.value);
     }
     if (createdDate.present) {
-      map['Created_Date'] = Variable<String>(createdDate.value);
+      map['Created_Date'] = Variable<DateTime>(createdDate.value);
     }
     if (updatedDate.present) {
       map['Updated_Date'] = Variable<String>(updatedDate.value);
@@ -704,22 +706,22 @@ class $ItemsTableTable extends ItemsTable
     'pawnedDate',
   );
   @override
-  late final GeneratedColumn<String> pawnedDate = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> pawnedDate = GeneratedColumn<DateTime>(
     'Pawned_Date',
     aliasedName,
     false,
-    type: DriftSqlType.string,
+    type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _expiryDateMeta = const VerificationMeta(
     'expiryDate',
   );
   @override
-  late final GeneratedColumn<String> expiryDate = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> expiryDate = GeneratedColumn<DateTime>(
     'Expiry_Date',
     aliasedName,
     false,
-    type: DriftSqlType.string,
+    type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _pawnAmountMeta = const VerificationMeta(
@@ -759,11 +761,11 @@ class $ItemsTableTable extends ItemsTable
     'createdDate',
   );
   @override
-  late final GeneratedColumn<String> createdDate = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> createdDate = GeneratedColumn<DateTime>(
     'Created_Date',
     aliasedName,
     false,
-    type: DriftSqlType.string,
+    type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _updatedDateMeta = const VerificationMeta(
@@ -922,11 +924,11 @@ class $ItemsTableTable extends ItemsTable
         data['${effectivePrefix}Item_Description'],
       )!,
       pawnedDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
+        DriftSqlType.dateTime,
         data['${effectivePrefix}Pawned_Date'],
       )!,
       expiryDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
+        DriftSqlType.dateTime,
         data['${effectivePrefix}Expiry_Date'],
       )!,
       pawnAmount: attachedDatabase.typeMapping.read(
@@ -942,7 +944,7 @@ class $ItemsTableTable extends ItemsTable
         data['${effectivePrefix}Item_Photo'],
       )!,
       createdDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
+        DriftSqlType.dateTime,
         data['${effectivePrefix}Created_Date'],
       )!,
       updatedDate: attachedDatabase.typeMapping.read(
@@ -963,12 +965,14 @@ class ItemRow extends DataClass implements Insertable<ItemRow> {
   final int customerId;
   final String itemName;
   final String itemDescription;
-  final String pawnedDate;
-  final String expiryDate;
+  final DateTime pawnedDate;
+  final DateTime expiryDate;
   final double pawnAmount;
   final String itemStatus;
   final String itemPhoto;
-  final String createdDate;
+  final DateTime createdDate;
+
+  /// keeping as TEXT (your code uses ISO strings)
   final String? updatedDate;
   const ItemRow({
     required this.itemId,
@@ -990,12 +994,12 @@ class ItemRow extends DataClass implements Insertable<ItemRow> {
     map['Customer_ID'] = Variable<int>(customerId);
     map['Item_Name'] = Variable<String>(itemName);
     map['Item_Description'] = Variable<String>(itemDescription);
-    map['Pawned_Date'] = Variable<String>(pawnedDate);
-    map['Expiry_Date'] = Variable<String>(expiryDate);
+    map['Pawned_Date'] = Variable<DateTime>(pawnedDate);
+    map['Expiry_Date'] = Variable<DateTime>(expiryDate);
     map['Pawn_Amount'] = Variable<double>(pawnAmount);
     map['Item_Status'] = Variable<String>(itemStatus);
     map['Item_Photo'] = Variable<String>(itemPhoto);
-    map['Created_Date'] = Variable<String>(createdDate);
+    map['Created_Date'] = Variable<DateTime>(createdDate);
     if (!nullToAbsent || updatedDate != null) {
       map['Updated_Date'] = Variable<String>(updatedDate);
     }
@@ -1030,12 +1034,12 @@ class ItemRow extends DataClass implements Insertable<ItemRow> {
       customerId: serializer.fromJson<int>(json['customerId']),
       itemName: serializer.fromJson<String>(json['itemName']),
       itemDescription: serializer.fromJson<String>(json['itemDescription']),
-      pawnedDate: serializer.fromJson<String>(json['pawnedDate']),
-      expiryDate: serializer.fromJson<String>(json['expiryDate']),
+      pawnedDate: serializer.fromJson<DateTime>(json['pawnedDate']),
+      expiryDate: serializer.fromJson<DateTime>(json['expiryDate']),
       pawnAmount: serializer.fromJson<double>(json['pawnAmount']),
       itemStatus: serializer.fromJson<String>(json['itemStatus']),
       itemPhoto: serializer.fromJson<String>(json['itemPhoto']),
-      createdDate: serializer.fromJson<String>(json['createdDate']),
+      createdDate: serializer.fromJson<DateTime>(json['createdDate']),
       updatedDate: serializer.fromJson<String?>(json['updatedDate']),
     );
   }
@@ -1047,12 +1051,12 @@ class ItemRow extends DataClass implements Insertable<ItemRow> {
       'customerId': serializer.toJson<int>(customerId),
       'itemName': serializer.toJson<String>(itemName),
       'itemDescription': serializer.toJson<String>(itemDescription),
-      'pawnedDate': serializer.toJson<String>(pawnedDate),
-      'expiryDate': serializer.toJson<String>(expiryDate),
+      'pawnedDate': serializer.toJson<DateTime>(pawnedDate),
+      'expiryDate': serializer.toJson<DateTime>(expiryDate),
       'pawnAmount': serializer.toJson<double>(pawnAmount),
       'itemStatus': serializer.toJson<String>(itemStatus),
       'itemPhoto': serializer.toJson<String>(itemPhoto),
-      'createdDate': serializer.toJson<String>(createdDate),
+      'createdDate': serializer.toJson<DateTime>(createdDate),
       'updatedDate': serializer.toJson<String?>(updatedDate),
     };
   }
@@ -1062,12 +1066,12 @@ class ItemRow extends DataClass implements Insertable<ItemRow> {
     int? customerId,
     String? itemName,
     String? itemDescription,
-    String? pawnedDate,
-    String? expiryDate,
+    DateTime? pawnedDate,
+    DateTime? expiryDate,
     double? pawnAmount,
     String? itemStatus,
     String? itemPhoto,
-    String? createdDate,
+    DateTime? createdDate,
     Value<String?> updatedDate = const Value.absent(),
   }) => ItemRow(
     itemId: itemId ?? this.itemId,
@@ -1168,12 +1172,12 @@ class ItemsTableCompanion extends UpdateCompanion<ItemRow> {
   final Value<int> customerId;
   final Value<String> itemName;
   final Value<String> itemDescription;
-  final Value<String> pawnedDate;
-  final Value<String> expiryDate;
+  final Value<DateTime> pawnedDate;
+  final Value<DateTime> expiryDate;
   final Value<double> pawnAmount;
   final Value<String> itemStatus;
   final Value<String> itemPhoto;
-  final Value<String> createdDate;
+  final Value<DateTime> createdDate;
   final Value<String?> updatedDate;
   const ItemsTableCompanion({
     this.itemId = const Value.absent(),
@@ -1193,12 +1197,12 @@ class ItemsTableCompanion extends UpdateCompanion<ItemRow> {
     required int customerId,
     required String itemName,
     required String itemDescription,
-    required String pawnedDate,
-    required String expiryDate,
+    required DateTime pawnedDate,
+    required DateTime expiryDate,
     required double pawnAmount,
     required String itemStatus,
     required String itemPhoto,
-    required String createdDate,
+    required DateTime createdDate,
     this.updatedDate = const Value.absent(),
   }) : customerId = Value(customerId),
        itemName = Value(itemName),
@@ -1214,12 +1218,12 @@ class ItemsTableCompanion extends UpdateCompanion<ItemRow> {
     Expression<int>? customerId,
     Expression<String>? itemName,
     Expression<String>? itemDescription,
-    Expression<String>? pawnedDate,
-    Expression<String>? expiryDate,
+    Expression<DateTime>? pawnedDate,
+    Expression<DateTime>? expiryDate,
     Expression<double>? pawnAmount,
     Expression<String>? itemStatus,
     Expression<String>? itemPhoto,
-    Expression<String>? createdDate,
+    Expression<DateTime>? createdDate,
     Expression<String>? updatedDate,
   }) {
     return RawValuesInsertable({
@@ -1242,12 +1246,12 @@ class ItemsTableCompanion extends UpdateCompanion<ItemRow> {
     Value<int>? customerId,
     Value<String>? itemName,
     Value<String>? itemDescription,
-    Value<String>? pawnedDate,
-    Value<String>? expiryDate,
+    Value<DateTime>? pawnedDate,
+    Value<DateTime>? expiryDate,
     Value<double>? pawnAmount,
     Value<String>? itemStatus,
     Value<String>? itemPhoto,
-    Value<String>? createdDate,
+    Value<DateTime>? createdDate,
     Value<String?>? updatedDate,
   }) {
     return ItemsTableCompanion(
@@ -1281,10 +1285,10 @@ class ItemsTableCompanion extends UpdateCompanion<ItemRow> {
       map['Item_Description'] = Variable<String>(itemDescription.value);
     }
     if (pawnedDate.present) {
-      map['Pawned_Date'] = Variable<String>(pawnedDate.value);
+      map['Pawned_Date'] = Variable<DateTime>(pawnedDate.value);
     }
     if (expiryDate.present) {
-      map['Expiry_Date'] = Variable<String>(expiryDate.value);
+      map['Expiry_Date'] = Variable<DateTime>(expiryDate.value);
     }
     if (pawnAmount.present) {
       map['Pawn_Amount'] = Variable<double>(pawnAmount.value);
@@ -1296,7 +1300,7 @@ class ItemsTableCompanion extends UpdateCompanion<ItemRow> {
       map['Item_Photo'] = Variable<String>(itemPhoto.value);
     }
     if (createdDate.present) {
-      map['Created_Date'] = Variable<String>(createdDate.value);
+      map['Created_Date'] = Variable<DateTime>(createdDate.value);
     }
     if (updatedDate.present) {
       map['Updated_Date'] = Variable<String>(updatedDate.value);
@@ -1374,13 +1378,14 @@ class $TransactionsTableTable extends TransactionsTable
     'transactionDate',
   );
   @override
-  late final GeneratedColumn<String> transactionDate = GeneratedColumn<String>(
-    'Transaction_Date',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
+  late final GeneratedColumn<DateTime> transactionDate =
+      GeneratedColumn<DateTime>(
+        'Transaction_Date',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
   static const VerificationMeta _transactionTypeMeta = const VerificationMeta(
     'transactionType',
   );
@@ -1449,11 +1454,11 @@ class $TransactionsTableTable extends TransactionsTable
     'createdDate',
   );
   @override
-  late final GeneratedColumn<String> createdDate = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> createdDate = GeneratedColumn<DateTime>(
     'Created_Date',
     aliasedName,
     false,
-    type: DriftSqlType.string,
+    type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _updatedDateMeta = const VerificationMeta(
@@ -1632,7 +1637,7 @@ class $TransactionsTableTable extends TransactionsTable
         data['${effectivePrefix}Item_ID'],
       )!,
       transactionDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
+        DriftSqlType.dateTime,
         data['${effectivePrefix}Transaction_Date'],
       )!,
       transactionType: attachedDatabase.typeMapping.read(
@@ -1660,7 +1665,7 @@ class $TransactionsTableTable extends TransactionsTable
         data['${effectivePrefix}Signature'],
       )!,
       createdDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
+        DriftSqlType.dateTime,
         data['${effectivePrefix}Created_Date'],
       )!,
       updatedDate: attachedDatabase.typeMapping.read(
@@ -1680,14 +1685,16 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
   final int transactionId;
   final int customerId;
   final int itemId;
-  final String transactionDate;
+  final DateTime transactionDate;
   final String transactionType;
   final double amount;
   final double interestRate;
   final double interestAmount;
   final double remainingAmount;
   final String signature;
-  final String createdDate;
+  final DateTime createdDate;
+
+  /// keeping as TEXT (your code uses ISO strings)
   final String? updatedDate;
   const TransactionRow({
     required this.transactionId,
@@ -1709,14 +1716,14 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
     map['Transaction_ID'] = Variable<int>(transactionId);
     map['Customer_ID'] = Variable<int>(customerId);
     map['Item_ID'] = Variable<int>(itemId);
-    map['Transaction_Date'] = Variable<String>(transactionDate);
+    map['Transaction_Date'] = Variable<DateTime>(transactionDate);
     map['Transaction_Type'] = Variable<String>(transactionType);
     map['Amount'] = Variable<double>(amount);
     map['Interest_Rate'] = Variable<double>(interestRate);
     map['Interest_Amount'] = Variable<double>(interestAmount);
     map['Remaining_Amount'] = Variable<double>(remainingAmount);
     map['Signature'] = Variable<String>(signature);
-    map['Created_Date'] = Variable<String>(createdDate);
+    map['Created_Date'] = Variable<DateTime>(createdDate);
     if (!nullToAbsent || updatedDate != null) {
       map['Updated_Date'] = Variable<String>(updatedDate);
     }
@@ -1751,14 +1758,14 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
       transactionId: serializer.fromJson<int>(json['transactionId']),
       customerId: serializer.fromJson<int>(json['customerId']),
       itemId: serializer.fromJson<int>(json['itemId']),
-      transactionDate: serializer.fromJson<String>(json['transactionDate']),
+      transactionDate: serializer.fromJson<DateTime>(json['transactionDate']),
       transactionType: serializer.fromJson<String>(json['transactionType']),
       amount: serializer.fromJson<double>(json['amount']),
       interestRate: serializer.fromJson<double>(json['interestRate']),
       interestAmount: serializer.fromJson<double>(json['interestAmount']),
       remainingAmount: serializer.fromJson<double>(json['remainingAmount']),
       signature: serializer.fromJson<String>(json['signature']),
-      createdDate: serializer.fromJson<String>(json['createdDate']),
+      createdDate: serializer.fromJson<DateTime>(json['createdDate']),
       updatedDate: serializer.fromJson<String?>(json['updatedDate']),
     );
   }
@@ -1769,14 +1776,14 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
       'transactionId': serializer.toJson<int>(transactionId),
       'customerId': serializer.toJson<int>(customerId),
       'itemId': serializer.toJson<int>(itemId),
-      'transactionDate': serializer.toJson<String>(transactionDate),
+      'transactionDate': serializer.toJson<DateTime>(transactionDate),
       'transactionType': serializer.toJson<String>(transactionType),
       'amount': serializer.toJson<double>(amount),
       'interestRate': serializer.toJson<double>(interestRate),
       'interestAmount': serializer.toJson<double>(interestAmount),
       'remainingAmount': serializer.toJson<double>(remainingAmount),
       'signature': serializer.toJson<String>(signature),
-      'createdDate': serializer.toJson<String>(createdDate),
+      'createdDate': serializer.toJson<DateTime>(createdDate),
       'updatedDate': serializer.toJson<String?>(updatedDate),
     };
   }
@@ -1785,14 +1792,14 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
     int? transactionId,
     int? customerId,
     int? itemId,
-    String? transactionDate,
+    DateTime? transactionDate,
     String? transactionType,
     double? amount,
     double? interestRate,
     double? interestAmount,
     double? remainingAmount,
     String? signature,
-    String? createdDate,
+    DateTime? createdDate,
     Value<String?> updatedDate = const Value.absent(),
   }) => TransactionRow(
     transactionId: transactionId ?? this.transactionId,
@@ -1899,14 +1906,14 @@ class TransactionsTableCompanion extends UpdateCompanion<TransactionRow> {
   final Value<int> transactionId;
   final Value<int> customerId;
   final Value<int> itemId;
-  final Value<String> transactionDate;
+  final Value<DateTime> transactionDate;
   final Value<String> transactionType;
   final Value<double> amount;
   final Value<double> interestRate;
   final Value<double> interestAmount;
   final Value<double> remainingAmount;
   final Value<String> signature;
-  final Value<String> createdDate;
+  final Value<DateTime> createdDate;
   final Value<String?> updatedDate;
   const TransactionsTableCompanion({
     this.transactionId = const Value.absent(),
@@ -1926,14 +1933,14 @@ class TransactionsTableCompanion extends UpdateCompanion<TransactionRow> {
     this.transactionId = const Value.absent(),
     required int customerId,
     required int itemId,
-    required String transactionDate,
+    required DateTime transactionDate,
     required String transactionType,
     required double amount,
     required double interestRate,
     required double interestAmount,
     required double remainingAmount,
     required String signature,
-    required String createdDate,
+    required DateTime createdDate,
     this.updatedDate = const Value.absent(),
   }) : customerId = Value(customerId),
        itemId = Value(itemId),
@@ -1949,14 +1956,14 @@ class TransactionsTableCompanion extends UpdateCompanion<TransactionRow> {
     Expression<int>? transactionId,
     Expression<int>? customerId,
     Expression<int>? itemId,
-    Expression<String>? transactionDate,
+    Expression<DateTime>? transactionDate,
     Expression<String>? transactionType,
     Expression<double>? amount,
     Expression<double>? interestRate,
     Expression<double>? interestAmount,
     Expression<double>? remainingAmount,
     Expression<String>? signature,
-    Expression<String>? createdDate,
+    Expression<DateTime>? createdDate,
     Expression<String>? updatedDate,
   }) {
     return RawValuesInsertable({
@@ -1979,14 +1986,14 @@ class TransactionsTableCompanion extends UpdateCompanion<TransactionRow> {
     Value<int>? transactionId,
     Value<int>? customerId,
     Value<int>? itemId,
-    Value<String>? transactionDate,
+    Value<DateTime>? transactionDate,
     Value<String>? transactionType,
     Value<double>? amount,
     Value<double>? interestRate,
     Value<double>? interestAmount,
     Value<double>? remainingAmount,
     Value<String>? signature,
-    Value<String>? createdDate,
+    Value<DateTime>? createdDate,
     Value<String?>? updatedDate,
   }) {
     return TransactionsTableCompanion(
@@ -2018,7 +2025,7 @@ class TransactionsTableCompanion extends UpdateCompanion<TransactionRow> {
       map['Item_ID'] = Variable<int>(itemId.value);
     }
     if (transactionDate.present) {
-      map['Transaction_Date'] = Variable<String>(transactionDate.value);
+      map['Transaction_Date'] = Variable<DateTime>(transactionDate.value);
     }
     if (transactionType.present) {
       map['Transaction_Type'] = Variable<String>(transactionType.value);
@@ -2039,7 +2046,7 @@ class TransactionsTableCompanion extends UpdateCompanion<TransactionRow> {
       map['Signature'] = Variable<String>(signature.value);
     }
     if (createdDate.present) {
-      map['Created_Date'] = Variable<String>(createdDate.value);
+      map['Created_Date'] = Variable<DateTime>(createdDate.value);
     }
     if (updatedDate.present) {
       map['Updated_Date'] = Variable<String>(updatedDate.value);
@@ -2106,11 +2113,11 @@ class $PaymentsTableTable extends PaymentsTable
     'paymentDate',
   );
   @override
-  late final GeneratedColumn<String> paymentDate = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> paymentDate = GeneratedColumn<DateTime>(
     'Payment_Date',
     aliasedName,
     false,
-    type: DriftSqlType.string,
+    type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _amountPaidMeta = const VerificationMeta(
@@ -2139,11 +2146,11 @@ class $PaymentsTableTable extends PaymentsTable
     'createdDate',
   );
   @override
-  late final GeneratedColumn<String> createdDate = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> createdDate = GeneratedColumn<DateTime>(
     'Created_Date',
     aliasedName,
     false,
-    type: DriftSqlType.string,
+    type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
   @override
@@ -2243,7 +2250,7 @@ class $PaymentsTableTable extends PaymentsTable
         data['${effectivePrefix}Transaction_ID'],
       )!,
       paymentDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
+        DriftSqlType.dateTime,
         data['${effectivePrefix}Payment_Date'],
       )!,
       amountPaid: attachedDatabase.typeMapping.read(
@@ -2255,7 +2262,7 @@ class $PaymentsTableTable extends PaymentsTable
         data['${effectivePrefix}Payment_Type'],
       )!,
       createdDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
+        DriftSqlType.dateTime,
         data['${effectivePrefix}Created_Date'],
       )!,
     );
@@ -2270,10 +2277,10 @@ class $PaymentsTableTable extends PaymentsTable
 class PaymentRow extends DataClass implements Insertable<PaymentRow> {
   final int paymentId;
   final int transactionId;
-  final String paymentDate;
+  final DateTime paymentDate;
   final double amountPaid;
   final String paymentType;
-  final String createdDate;
+  final DateTime createdDate;
   const PaymentRow({
     required this.paymentId,
     required this.transactionId,
@@ -2287,10 +2294,10 @@ class PaymentRow extends DataClass implements Insertable<PaymentRow> {
     final map = <String, Expression>{};
     map['Payment_ID'] = Variable<int>(paymentId);
     map['Transaction_ID'] = Variable<int>(transactionId);
-    map['Payment_Date'] = Variable<String>(paymentDate);
+    map['Payment_Date'] = Variable<DateTime>(paymentDate);
     map['Amount_Paid'] = Variable<double>(amountPaid);
     map['Payment_Type'] = Variable<String>(paymentType);
-    map['Created_Date'] = Variable<String>(createdDate);
+    map['Created_Date'] = Variable<DateTime>(createdDate);
     return map;
   }
 
@@ -2313,10 +2320,10 @@ class PaymentRow extends DataClass implements Insertable<PaymentRow> {
     return PaymentRow(
       paymentId: serializer.fromJson<int>(json['paymentId']),
       transactionId: serializer.fromJson<int>(json['transactionId']),
-      paymentDate: serializer.fromJson<String>(json['paymentDate']),
+      paymentDate: serializer.fromJson<DateTime>(json['paymentDate']),
       amountPaid: serializer.fromJson<double>(json['amountPaid']),
       paymentType: serializer.fromJson<String>(json['paymentType']),
-      createdDate: serializer.fromJson<String>(json['createdDate']),
+      createdDate: serializer.fromJson<DateTime>(json['createdDate']),
     );
   }
   @override
@@ -2325,20 +2332,20 @@ class PaymentRow extends DataClass implements Insertable<PaymentRow> {
     return <String, dynamic>{
       'paymentId': serializer.toJson<int>(paymentId),
       'transactionId': serializer.toJson<int>(transactionId),
-      'paymentDate': serializer.toJson<String>(paymentDate),
+      'paymentDate': serializer.toJson<DateTime>(paymentDate),
       'amountPaid': serializer.toJson<double>(amountPaid),
       'paymentType': serializer.toJson<String>(paymentType),
-      'createdDate': serializer.toJson<String>(createdDate),
+      'createdDate': serializer.toJson<DateTime>(createdDate),
     };
   }
 
   PaymentRow copyWith({
     int? paymentId,
     int? transactionId,
-    String? paymentDate,
+    DateTime? paymentDate,
     double? amountPaid,
     String? paymentType,
-    String? createdDate,
+    DateTime? createdDate,
   }) => PaymentRow(
     paymentId: paymentId ?? this.paymentId,
     transactionId: transactionId ?? this.transactionId,
@@ -2405,10 +2412,10 @@ class PaymentRow extends DataClass implements Insertable<PaymentRow> {
 class PaymentsTableCompanion extends UpdateCompanion<PaymentRow> {
   final Value<int> paymentId;
   final Value<int> transactionId;
-  final Value<String> paymentDate;
+  final Value<DateTime> paymentDate;
   final Value<double> amountPaid;
   final Value<String> paymentType;
-  final Value<String> createdDate;
+  final Value<DateTime> createdDate;
   const PaymentsTableCompanion({
     this.paymentId = const Value.absent(),
     this.transactionId = const Value.absent(),
@@ -2420,10 +2427,10 @@ class PaymentsTableCompanion extends UpdateCompanion<PaymentRow> {
   PaymentsTableCompanion.insert({
     this.paymentId = const Value.absent(),
     required int transactionId,
-    required String paymentDate,
+    required DateTime paymentDate,
     required double amountPaid,
     required String paymentType,
-    required String createdDate,
+    required DateTime createdDate,
   }) : transactionId = Value(transactionId),
        paymentDate = Value(paymentDate),
        amountPaid = Value(amountPaid),
@@ -2432,10 +2439,10 @@ class PaymentsTableCompanion extends UpdateCompanion<PaymentRow> {
   static Insertable<PaymentRow> custom({
     Expression<int>? paymentId,
     Expression<int>? transactionId,
-    Expression<String>? paymentDate,
+    Expression<DateTime>? paymentDate,
     Expression<double>? amountPaid,
     Expression<String>? paymentType,
-    Expression<String>? createdDate,
+    Expression<DateTime>? createdDate,
   }) {
     return RawValuesInsertable({
       if (paymentId != null) 'Payment_ID': paymentId,
@@ -2450,10 +2457,10 @@ class PaymentsTableCompanion extends UpdateCompanion<PaymentRow> {
   PaymentsTableCompanion copyWith({
     Value<int>? paymentId,
     Value<int>? transactionId,
-    Value<String>? paymentDate,
+    Value<DateTime>? paymentDate,
     Value<double>? amountPaid,
     Value<String>? paymentType,
-    Value<String>? createdDate,
+    Value<DateTime>? createdDate,
   }) {
     return PaymentsTableCompanion(
       paymentId: paymentId ?? this.paymentId,
@@ -2475,7 +2482,7 @@ class PaymentsTableCompanion extends UpdateCompanion<PaymentRow> {
       map['Transaction_ID'] = Variable<int>(transactionId.value);
     }
     if (paymentDate.present) {
-      map['Payment_Date'] = Variable<String>(paymentDate.value);
+      map['Payment_Date'] = Variable<DateTime>(paymentDate.value);
     }
     if (amountPaid.present) {
       map['Amount_Paid'] = Variable<double>(amountPaid.value);
@@ -2484,7 +2491,7 @@ class PaymentsTableCompanion extends UpdateCompanion<PaymentRow> {
       map['Payment_Type'] = Variable<String>(paymentType.value);
     }
     if (createdDate.present) {
-      map['Created_Date'] = Variable<String>(createdDate.value);
+      map['Created_Date'] = Variable<DateTime>(createdDate.value);
     }
     return map;
   }
@@ -2602,11 +2609,11 @@ class $HistoryTableTable extends HistoryTable
     'eventDate',
   );
   @override
-  late final GeneratedColumn<String> eventDate = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> eventDate = GeneratedColumn<DateTime>(
     'Event_Date',
     aliasedName,
     false,
-    type: DriftSqlType.string,
+    type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _eventTypeMeta = const VerificationMeta(
@@ -2774,7 +2781,7 @@ class $HistoryTableTable extends HistoryTable
         data['${effectivePrefix}Amount'],
       )!,
       eventDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
+        DriftSqlType.dateTime,
         data['${effectivePrefix}Event_Date'],
       )!,
       eventType: attachedDatabase.typeMapping.read(
@@ -2799,7 +2806,7 @@ class HistoryRow extends DataClass implements Insertable<HistoryRow> {
   final int itemId;
   final int transactionId;
   final double amount;
-  final String eventDate;
+  final DateTime eventDate;
   final String eventType;
   const HistoryRow({
     required this.historyId,
@@ -2824,7 +2831,7 @@ class HistoryRow extends DataClass implements Insertable<HistoryRow> {
     map['Item_ID'] = Variable<int>(itemId);
     map['Transaction_ID'] = Variable<int>(transactionId);
     map['Amount'] = Variable<double>(amount);
-    map['Event_Date'] = Variable<String>(eventDate);
+    map['Event_Date'] = Variable<DateTime>(eventDate);
     map['Event_Type'] = Variable<String>(eventType);
     return map;
   }
@@ -2858,7 +2865,7 @@ class HistoryRow extends DataClass implements Insertable<HistoryRow> {
       itemId: serializer.fromJson<int>(json['itemId']),
       transactionId: serializer.fromJson<int>(json['transactionId']),
       amount: serializer.fromJson<double>(json['amount']),
-      eventDate: serializer.fromJson<String>(json['eventDate']),
+      eventDate: serializer.fromJson<DateTime>(json['eventDate']),
       eventType: serializer.fromJson<String>(json['eventType']),
     );
   }
@@ -2874,7 +2881,7 @@ class HistoryRow extends DataClass implements Insertable<HistoryRow> {
       'itemId': serializer.toJson<int>(itemId),
       'transactionId': serializer.toJson<int>(transactionId),
       'amount': serializer.toJson<double>(amount),
-      'eventDate': serializer.toJson<String>(eventDate),
+      'eventDate': serializer.toJson<DateTime>(eventDate),
       'eventType': serializer.toJson<String>(eventType),
     };
   }
@@ -2888,7 +2895,7 @@ class HistoryRow extends DataClass implements Insertable<HistoryRow> {
     int? itemId,
     int? transactionId,
     double? amount,
-    String? eventDate,
+    DateTime? eventDate,
     String? eventType,
   }) => HistoryRow(
     historyId: historyId ?? this.historyId,
@@ -2980,7 +2987,7 @@ class HistoryTableCompanion extends UpdateCompanion<HistoryRow> {
   final Value<int> itemId;
   final Value<int> transactionId;
   final Value<double> amount;
-  final Value<String> eventDate;
+  final Value<DateTime> eventDate;
   final Value<String> eventType;
   const HistoryTableCompanion({
     this.historyId = const Value.absent(),
@@ -3003,7 +3010,7 @@ class HistoryTableCompanion extends UpdateCompanion<HistoryRow> {
     required int itemId,
     required int transactionId,
     required double amount,
-    required String eventDate,
+    required DateTime eventDate,
     required String eventType,
   }) : userId = Value(userId),
        customerId = Value(customerId),
@@ -3023,7 +3030,7 @@ class HistoryTableCompanion extends UpdateCompanion<HistoryRow> {
     Expression<int>? itemId,
     Expression<int>? transactionId,
     Expression<double>? amount,
-    Expression<String>? eventDate,
+    Expression<DateTime>? eventDate,
     Expression<String>? eventType,
   }) {
     return RawValuesInsertable({
@@ -3049,7 +3056,7 @@ class HistoryTableCompanion extends UpdateCompanion<HistoryRow> {
     Value<int>? itemId,
     Value<int>? transactionId,
     Value<double>? amount,
-    Value<String>? eventDate,
+    Value<DateTime>? eventDate,
     Value<String>? eventType,
   }) {
     return HistoryTableCompanion(
@@ -3094,7 +3101,7 @@ class HistoryTableCompanion extends UpdateCompanion<HistoryRow> {
       map['Amount'] = Variable<double>(amount.value);
     }
     if (eventDate.present) {
-      map['Event_Date'] = Variable<String>(eventDate.value);
+      map['Event_Date'] = Variable<DateTime>(eventDate.value);
     }
     if (eventType.present) {
       map['Event_Type'] = Variable<String>(eventType.value);
@@ -3190,7 +3197,7 @@ typedef $$CustomersTableTableCreateCompanionBuilder =
       required String contactNumber,
       required String customerPhoto,
       required String proofPhoto,
-      required String createdDate,
+      required DateTime createdDate,
       Value<String?> updatedDate,
     });
 typedef $$CustomersTableTableUpdateCompanionBuilder =
@@ -3203,7 +3210,7 @@ typedef $$CustomersTableTableUpdateCompanionBuilder =
       Value<String> contactNumber,
       Value<String> customerPhoto,
       Value<String> proofPhoto,
-      Value<String> createdDate,
+      Value<DateTime> createdDate,
       Value<String?> updatedDate,
     });
 
@@ -3339,7 +3346,7 @@ class $$CustomersTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get createdDate => $composableBuilder(
+  ColumnFilters<DateTime> get createdDate => $composableBuilder(
     column: $table.createdDate,
     builder: (column) => ColumnFilters(column),
   );
@@ -3474,7 +3481,7 @@ class $$CustomersTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get createdDate => $composableBuilder(
+  ColumnOrderings<DateTime> get createdDate => $composableBuilder(
     column: $table.createdDate,
     builder: (column) => ColumnOrderings(column),
   );
@@ -3532,7 +3539,7 @@ class $$CustomersTableTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get createdDate => $composableBuilder(
+  GeneratedColumn<DateTime> get createdDate => $composableBuilder(
     column: $table.createdDate,
     builder: (column) => column,
   );
@@ -3661,7 +3668,7 @@ class $$CustomersTableTableTableManager
                 Value<String> contactNumber = const Value.absent(),
                 Value<String> customerPhoto = const Value.absent(),
                 Value<String> proofPhoto = const Value.absent(),
-                Value<String> createdDate = const Value.absent(),
+                Value<DateTime> createdDate = const Value.absent(),
                 Value<String?> updatedDate = const Value.absent(),
               }) => CustomersTableCompanion(
                 userId: userId,
@@ -3685,7 +3692,7 @@ class $$CustomersTableTableTableManager
                 required String contactNumber,
                 required String customerPhoto,
                 required String proofPhoto,
-                required String createdDate,
+                required DateTime createdDate,
                 Value<String?> updatedDate = const Value.absent(),
               }) => CustomersTableCompanion.insert(
                 userId: userId,
@@ -3818,12 +3825,12 @@ typedef $$ItemsTableTableCreateCompanionBuilder =
       required int customerId,
       required String itemName,
       required String itemDescription,
-      required String pawnedDate,
-      required String expiryDate,
+      required DateTime pawnedDate,
+      required DateTime expiryDate,
       required double pawnAmount,
       required String itemStatus,
       required String itemPhoto,
-      required String createdDate,
+      required DateTime createdDate,
       Value<String?> updatedDate,
     });
 typedef $$ItemsTableTableUpdateCompanionBuilder =
@@ -3832,12 +3839,12 @@ typedef $$ItemsTableTableUpdateCompanionBuilder =
       Value<int> customerId,
       Value<String> itemName,
       Value<String> itemDescription,
-      Value<String> pawnedDate,
-      Value<String> expiryDate,
+      Value<DateTime> pawnedDate,
+      Value<DateTime> expiryDate,
       Value<double> pawnAmount,
       Value<String> itemStatus,
       Value<String> itemPhoto,
-      Value<String> createdDate,
+      Value<DateTime> createdDate,
       Value<String?> updatedDate,
     });
 
@@ -3916,12 +3923,12 @@ class $$ItemsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get pawnedDate => $composableBuilder(
+  ColumnFilters<DateTime> get pawnedDate => $composableBuilder(
     column: $table.pawnedDate,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get expiryDate => $composableBuilder(
+  ColumnFilters<DateTime> get expiryDate => $composableBuilder(
     column: $table.expiryDate,
     builder: (column) => ColumnFilters(column),
   );
@@ -3941,7 +3948,7 @@ class $$ItemsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get createdDate => $composableBuilder(
+  ColumnFilters<DateTime> get createdDate => $composableBuilder(
     column: $table.createdDate,
     builder: (column) => ColumnFilters(column),
   );
@@ -4024,12 +4031,12 @@ class $$ItemsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get pawnedDate => $composableBuilder(
+  ColumnOrderings<DateTime> get pawnedDate => $composableBuilder(
     column: $table.pawnedDate,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get expiryDate => $composableBuilder(
+  ColumnOrderings<DateTime> get expiryDate => $composableBuilder(
     column: $table.expiryDate,
     builder: (column) => ColumnOrderings(column),
   );
@@ -4049,7 +4056,7 @@ class $$ItemsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get createdDate => $composableBuilder(
+  ColumnOrderings<DateTime> get createdDate => $composableBuilder(
     column: $table.createdDate,
     builder: (column) => ColumnOrderings(column),
   );
@@ -4103,12 +4110,12 @@ class $$ItemsTableTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get pawnedDate => $composableBuilder(
+  GeneratedColumn<DateTime> get pawnedDate => $composableBuilder(
     column: $table.pawnedDate,
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get expiryDate => $composableBuilder(
+  GeneratedColumn<DateTime> get expiryDate => $composableBuilder(
     column: $table.expiryDate,
     builder: (column) => column,
   );
@@ -4126,7 +4133,7 @@ class $$ItemsTableTableAnnotationComposer
   GeneratedColumn<String> get itemPhoto =>
       $composableBuilder(column: $table.itemPhoto, builder: (column) => column);
 
-  GeneratedColumn<String> get createdDate => $composableBuilder(
+  GeneratedColumn<DateTime> get createdDate => $composableBuilder(
     column: $table.createdDate,
     builder: (column) => column,
   );
@@ -4218,12 +4225,12 @@ class $$ItemsTableTableTableManager
                 Value<int> customerId = const Value.absent(),
                 Value<String> itemName = const Value.absent(),
                 Value<String> itemDescription = const Value.absent(),
-                Value<String> pawnedDate = const Value.absent(),
-                Value<String> expiryDate = const Value.absent(),
+                Value<DateTime> pawnedDate = const Value.absent(),
+                Value<DateTime> expiryDate = const Value.absent(),
                 Value<double> pawnAmount = const Value.absent(),
                 Value<String> itemStatus = const Value.absent(),
                 Value<String> itemPhoto = const Value.absent(),
-                Value<String> createdDate = const Value.absent(),
+                Value<DateTime> createdDate = const Value.absent(),
                 Value<String?> updatedDate = const Value.absent(),
               }) => ItemsTableCompanion(
                 itemId: itemId,
@@ -4244,12 +4251,12 @@ class $$ItemsTableTableTableManager
                 required int customerId,
                 required String itemName,
                 required String itemDescription,
-                required String pawnedDate,
-                required String expiryDate,
+                required DateTime pawnedDate,
+                required DateTime expiryDate,
                 required double pawnAmount,
                 required String itemStatus,
                 required String itemPhoto,
-                required String createdDate,
+                required DateTime createdDate,
                 Value<String?> updatedDate = const Value.absent(),
               }) => ItemsTableCompanion.insert(
                 itemId: itemId,
@@ -4362,14 +4369,14 @@ typedef $$TransactionsTableTableCreateCompanionBuilder =
       Value<int> transactionId,
       required int customerId,
       required int itemId,
-      required String transactionDate,
+      required DateTime transactionDate,
       required String transactionType,
       required double amount,
       required double interestRate,
       required double interestAmount,
       required double remainingAmount,
       required String signature,
-      required String createdDate,
+      required DateTime createdDate,
       Value<String?> updatedDate,
     });
 typedef $$TransactionsTableTableUpdateCompanionBuilder =
@@ -4377,14 +4384,14 @@ typedef $$TransactionsTableTableUpdateCompanionBuilder =
       Value<int> transactionId,
       Value<int> customerId,
       Value<int> itemId,
-      Value<String> transactionDate,
+      Value<DateTime> transactionDate,
       Value<String> transactionType,
       Value<double> amount,
       Value<double> interestRate,
       Value<double> interestAmount,
       Value<double> remainingAmount,
       Value<String> signature,
-      Value<String> createdDate,
+      Value<DateTime> createdDate,
       Value<String?> updatedDate,
     });
 
@@ -4480,7 +4487,7 @@ class $$TransactionsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get transactionDate => $composableBuilder(
+  ColumnFilters<DateTime> get transactionDate => $composableBuilder(
     column: $table.transactionDate,
     builder: (column) => ColumnFilters(column),
   );
@@ -4515,7 +4522,7 @@ class $$TransactionsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get createdDate => $composableBuilder(
+  ColumnFilters<DateTime> get createdDate => $composableBuilder(
     column: $table.createdDate,
     builder: (column) => ColumnFilters(column),
   );
@@ -4611,7 +4618,7 @@ class $$TransactionsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get transactionDate => $composableBuilder(
+  ColumnOrderings<DateTime> get transactionDate => $composableBuilder(
     column: $table.transactionDate,
     builder: (column) => ColumnOrderings(column),
   );
@@ -4646,7 +4653,7 @@ class $$TransactionsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get createdDate => $composableBuilder(
+  ColumnOrderings<DateTime> get createdDate => $composableBuilder(
     column: $table.createdDate,
     builder: (column) => ColumnOrderings(column),
   );
@@ -4717,7 +4724,7 @@ class $$TransactionsTableTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get transactionDate => $composableBuilder(
+  GeneratedColumn<DateTime> get transactionDate => $composableBuilder(
     column: $table.transactionDate,
     builder: (column) => column,
   );
@@ -4748,7 +4755,7 @@ class $$TransactionsTableTableAnnotationComposer
   GeneratedColumn<String> get signature =>
       $composableBuilder(column: $table.signature, builder: (column) => column);
 
-  GeneratedColumn<String> get createdDate => $composableBuilder(
+  GeneratedColumn<DateTime> get createdDate => $composableBuilder(
     column: $table.createdDate,
     builder: (column) => column,
   );
@@ -4870,14 +4877,14 @@ class $$TransactionsTableTableTableManager
                 Value<int> transactionId = const Value.absent(),
                 Value<int> customerId = const Value.absent(),
                 Value<int> itemId = const Value.absent(),
-                Value<String> transactionDate = const Value.absent(),
+                Value<DateTime> transactionDate = const Value.absent(),
                 Value<String> transactionType = const Value.absent(),
                 Value<double> amount = const Value.absent(),
                 Value<double> interestRate = const Value.absent(),
                 Value<double> interestAmount = const Value.absent(),
                 Value<double> remainingAmount = const Value.absent(),
                 Value<String> signature = const Value.absent(),
-                Value<String> createdDate = const Value.absent(),
+                Value<DateTime> createdDate = const Value.absent(),
                 Value<String?> updatedDate = const Value.absent(),
               }) => TransactionsTableCompanion(
                 transactionId: transactionId,
@@ -4898,14 +4905,14 @@ class $$TransactionsTableTableTableManager
                 Value<int> transactionId = const Value.absent(),
                 required int customerId,
                 required int itemId,
-                required String transactionDate,
+                required DateTime transactionDate,
                 required String transactionType,
                 required double amount,
                 required double interestRate,
                 required double interestAmount,
                 required double remainingAmount,
                 required String signature,
-                required String createdDate,
+                required DateTime createdDate,
                 Value<String?> updatedDate = const Value.absent(),
               }) => TransactionsTableCompanion.insert(
                 transactionId: transactionId,
@@ -5042,19 +5049,19 @@ typedef $$PaymentsTableTableCreateCompanionBuilder =
     PaymentsTableCompanion Function({
       Value<int> paymentId,
       required int transactionId,
-      required String paymentDate,
+      required DateTime paymentDate,
       required double amountPaid,
       required String paymentType,
-      required String createdDate,
+      required DateTime createdDate,
     });
 typedef $$PaymentsTableTableUpdateCompanionBuilder =
     PaymentsTableCompanion Function({
       Value<int> paymentId,
       Value<int> transactionId,
-      Value<String> paymentDate,
+      Value<DateTime> paymentDate,
       Value<double> amountPaid,
       Value<String> paymentType,
-      Value<String> createdDate,
+      Value<DateTime> createdDate,
     });
 
 final class $$PaymentsTableTableReferences
@@ -5102,7 +5109,7 @@ class $$PaymentsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get paymentDate => $composableBuilder(
+  ColumnFilters<DateTime> get paymentDate => $composableBuilder(
     column: $table.paymentDate,
     builder: (column) => ColumnFilters(column),
   );
@@ -5117,7 +5124,7 @@ class $$PaymentsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get createdDate => $composableBuilder(
+  ColumnFilters<DateTime> get createdDate => $composableBuilder(
     column: $table.createdDate,
     builder: (column) => ColumnFilters(column),
   );
@@ -5160,7 +5167,7 @@ class $$PaymentsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get paymentDate => $composableBuilder(
+  ColumnOrderings<DateTime> get paymentDate => $composableBuilder(
     column: $table.paymentDate,
     builder: (column) => ColumnOrderings(column),
   );
@@ -5175,7 +5182,7 @@ class $$PaymentsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get createdDate => $composableBuilder(
+  ColumnOrderings<DateTime> get createdDate => $composableBuilder(
     column: $table.createdDate,
     builder: (column) => ColumnOrderings(column),
   );
@@ -5216,7 +5223,7 @@ class $$PaymentsTableTableAnnotationComposer
   GeneratedColumn<int> get paymentId =>
       $composableBuilder(column: $table.paymentId, builder: (column) => column);
 
-  GeneratedColumn<String> get paymentDate => $composableBuilder(
+  GeneratedColumn<DateTime> get paymentDate => $composableBuilder(
     column: $table.paymentDate,
     builder: (column) => column,
   );
@@ -5231,7 +5238,7 @@ class $$PaymentsTableTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get createdDate => $composableBuilder(
+  GeneratedColumn<DateTime> get createdDate => $composableBuilder(
     column: $table.createdDate,
     builder: (column) => column,
   );
@@ -5293,10 +5300,10 @@ class $$PaymentsTableTableTableManager
               ({
                 Value<int> paymentId = const Value.absent(),
                 Value<int> transactionId = const Value.absent(),
-                Value<String> paymentDate = const Value.absent(),
+                Value<DateTime> paymentDate = const Value.absent(),
                 Value<double> amountPaid = const Value.absent(),
                 Value<String> paymentType = const Value.absent(),
-                Value<String> createdDate = const Value.absent(),
+                Value<DateTime> createdDate = const Value.absent(),
               }) => PaymentsTableCompanion(
                 paymentId: paymentId,
                 transactionId: transactionId,
@@ -5309,10 +5316,10 @@ class $$PaymentsTableTableTableManager
               ({
                 Value<int> paymentId = const Value.absent(),
                 required int transactionId,
-                required String paymentDate,
+                required DateTime paymentDate,
                 required double amountPaid,
                 required String paymentType,
-                required String createdDate,
+                required DateTime createdDate,
               }) => PaymentsTableCompanion.insert(
                 paymentId: paymentId,
                 transactionId: transactionId,
@@ -5398,7 +5405,7 @@ typedef $$HistoryTableTableCreateCompanionBuilder =
       required int itemId,
       required int transactionId,
       required double amount,
-      required String eventDate,
+      required DateTime eventDate,
       required String eventType,
     });
 typedef $$HistoryTableTableUpdateCompanionBuilder =
@@ -5411,7 +5418,7 @@ typedef $$HistoryTableTableUpdateCompanionBuilder =
       Value<int> itemId,
       Value<int> transactionId,
       Value<double> amount,
-      Value<String> eventDate,
+      Value<DateTime> eventDate,
       Value<String> eventType,
     });
 
@@ -5486,7 +5493,7 @@ class $$HistoryTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get eventDate => $composableBuilder(
+  ColumnFilters<DateTime> get eventDate => $composableBuilder(
     column: $table.eventDate,
     builder: (column) => ColumnFilters(column),
   );
@@ -5564,7 +5571,7 @@ class $$HistoryTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get eventDate => $composableBuilder(
+  ColumnOrderings<DateTime> get eventDate => $composableBuilder(
     column: $table.eventDate,
     builder: (column) => ColumnOrderings(column),
   );
@@ -5634,7 +5641,7 @@ class $$HistoryTableTableAnnotationComposer
   GeneratedColumn<double> get amount =>
       $composableBuilder(column: $table.amount, builder: (column) => column);
 
-  GeneratedColumn<String> get eventDate =>
+  GeneratedColumn<DateTime> get eventDate =>
       $composableBuilder(column: $table.eventDate, builder: (column) => column);
 
   GeneratedColumn<String> get eventType =>
@@ -5700,7 +5707,7 @@ class $$HistoryTableTableTableManager
                 Value<int> itemId = const Value.absent(),
                 Value<int> transactionId = const Value.absent(),
                 Value<double> amount = const Value.absent(),
-                Value<String> eventDate = const Value.absent(),
+                Value<DateTime> eventDate = const Value.absent(),
                 Value<String> eventType = const Value.absent(),
               }) => HistoryTableCompanion(
                 historyId: historyId,
@@ -5724,7 +5731,7 @@ class $$HistoryTableTableTableManager
                 required int itemId,
                 required int transactionId,
                 required double amount,
-                required String eventDate,
+                required DateTime eventDate,
                 required String eventType,
               }) => HistoryTableCompanion.insert(
                 historyId: historyId,

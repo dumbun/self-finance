@@ -3,10 +3,11 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:intl/intl.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+
 import 'package:self_finance/core/logic/logic.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
@@ -18,6 +19,10 @@ import 'package:self_finance/models/user_history_model.dart';
 import 'db_paths.dart';
 
 part 'backend.g.dart';
+
+// =============================================================================
+// TABLES
+// =============================================================================
 
 @DataClassName('CustomerRow')
 class CustomersTable extends Table {
@@ -40,8 +45,9 @@ class CustomersTable extends Table {
 
   TextColumn get proofPhoto => text().named('Proof_Photo')();
 
-  TextColumn get createdDate => text().named('Created_Date')();
+  DateTimeColumn get createdDate => dateTime().named('Created_Date')();
 
+  /// keeping as TEXT (your code uses ISO strings)
   TextColumn get updatedDate => text().named('Updated_Date').nullable()();
 }
 
@@ -60,9 +66,9 @@ class ItemsTable extends Table {
 
   TextColumn get itemDescription => text().named('Item_Description')();
 
-  TextColumn get pawnedDate => text().named('Pawned_Date')();
+  DateTimeColumn get pawnedDate => dateTime().named('Pawned_Date')();
 
-  TextColumn get expiryDate => text().named('Expiry_Date')();
+  DateTimeColumn get expiryDate => dateTime().named('Expiry_Date')();
 
   RealColumn get pawnAmount => real().named('Pawn_Amount')();
 
@@ -70,8 +76,9 @@ class ItemsTable extends Table {
 
   TextColumn get itemPhoto => text().named('Item_Photo')();
 
-  TextColumn get createdDate => text().named('Created_Date')();
+  DateTimeColumn get createdDate => dateTime().named('Created_Date')();
 
+  /// keeping as TEXT (your code uses ISO strings)
   TextColumn get updatedDate => text().named('Updated_Date').nullable()();
 }
 
@@ -91,7 +98,7 @@ class TransactionsTable extends Table {
       .named('Item_ID')
       .references(ItemsTable, #itemId, onDelete: KeyAction.cascade)();
 
-  TextColumn get transactionDate => text().named('Transaction_Date')();
+  DateTimeColumn get transactionDate => dateTime().named('Transaction_Date')();
 
   TextColumn get transactionType => text().named('Transaction_Type')();
 
@@ -105,8 +112,9 @@ class TransactionsTable extends Table {
 
   TextColumn get signature => text().named('Signature')();
 
-  TextColumn get createdDate => text().named('Created_Date')();
+  DateTimeColumn get createdDate => dateTime().named('Created_Date')();
 
+  /// keeping as TEXT (your code uses ISO strings)
   TextColumn get updatedDate => text().named('Updated_Date').nullable()();
 }
 
@@ -125,13 +133,13 @@ class PaymentsTable extends Table {
         onDelete: KeyAction.cascade,
       )();
 
-  TextColumn get paymentDate => text().named('Payment_Date')();
+  DateTimeColumn get paymentDate => dateTime().named('Payment_Date')();
 
   RealColumn get amountPaid => real().named('Amount_Paid')();
 
   TextColumn get paymentType => text().named('Payment_Type')();
 
-  TextColumn get createdDate => text().named('Created_Date')();
+  DateTimeColumn get createdDate => dateTime().named('Created_Date')();
 }
 
 @DataClassName('HistoryRow')
@@ -157,10 +165,14 @@ class HistoryTable extends Table {
 
   RealColumn get amount => real().named('Amount')();
 
-  TextColumn get eventDate => text().named('Event_Date')();
+  DateTimeColumn get eventDate => dateTime().named('Event_Date')();
 
   TextColumn get eventType => text().named('Event_Type')();
 }
+
+// =============================================================================
+// DATABASE
+// =============================================================================
 
 @DriftDatabase(
   tables: [
@@ -174,16 +186,11 @@ class HistoryTable extends Table {
 class ItDataDatabase extends _$ItDataDatabase {
   ItDataDatabase(super.e);
 
-  /// Default constructor used by your Flutter app.
-  ///
-  /// IMPORTANT: We point drift to the same file that sqflite used, so your
-  /// existing data stays intact.
   factory ItDataDatabase.defaults() {
     return ItDataDatabase(
       driftDatabase(
         name: 'itdata',
         native: DriftNativeOptions(
-          // Reuse the exact file path used by the old sqflite backend.
           databasePath: () async =>
               (await legacySqfliteDbFile('itdata.db')).path,
           shareAcrossIsolates: true,
@@ -192,10 +199,10 @@ class ItDataDatabase extends _$ItDataDatabase {
     );
   }
 
+  /// ✅ bumped because we now migrate old TEXT dates into DateTime (ms epoch)
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 4;
 
-  /// Handy access to the underlying file (for backup / size).
   Future<File> get dbFile async => legacySqfliteDbFile('itdata.db');
 
   @override
@@ -204,18 +211,21 @@ class ItDataDatabase extends _$ItDataDatabase {
       await m.createAll();
       await _ensureIndexes();
     },
+    onUpgrade: (m, from, to) async {
+      if (from < 3) {
+        await _coerceLegacyTextDatesOnOpen();
+      }
+      await _ensureIndexes();
+    },
     beforeOpen: (details) async {
-      // Match your old sqflite configuration.
       await customStatement('PRAGMA foreign_keys = ON');
       await customStatement('PRAGMA journal_mode = WAL');
       await customStatement('PRAGMA cache_size = 10000');
-
       await _ensureIndexes();
     },
   );
 
   Future<void> _ensureIndexes() async {
-    // Safe to run on every open.
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_customer_contact ON Customers(Contact_Number)',
     );
@@ -244,17 +254,172 @@ class ItDataDatabase extends _$ItDataDatabase {
       'CREATE INDEX IF NOT EXISTS idx_history_date ON History(Event_Date)',
     );
   }
+
+  Future<void> _coerceLegacyTextDatesOnOpen() async {
+    // If any of these columns still contain TEXT dates, convert them once.
+    // This runs fast and will no-op after conversion.
+
+    try {
+      // Quick check: if Transactions.Transaction_Date is TEXT, we definitely need conversion.
+      final check = await customSelect('''
+      SELECT 1 AS x
+      FROM Transactions
+      WHERE Transaction_Date IS NOT NULL
+        AND typeof(Transaction_Date) = 'text'
+      LIMIT 1
+      ''').getSingleOrNull();
+
+      if (check == null) {
+        // Still convert other columns if needed (in case Transaction_Date was already ok)
+        // But to keep it simple, do a broader check:
+        final any = await customSelect('''
+        SELECT 1 AS x
+        WHERE EXISTS(SELECT 1 FROM Customers WHERE typeof(Created_Date)='text' LIMIT 1)
+           OR EXISTS(SELECT 1 FROM Items WHERE typeof(Pawned_Date)='text' LIMIT 1)
+           OR EXISTS(SELECT 1 FROM Items WHERE typeof(Expiry_Date)='text' LIMIT 1)
+           OR EXISTS(SELECT 1 FROM Items WHERE typeof(Created_Date)='text' LIMIT 1)
+           OR EXISTS(SELECT 1 FROM Transactions WHERE typeof(Created_Date)='text' LIMIT 1)
+           OR EXISTS(SELECT 1 FROM Payments WHERE typeof(Payment_Date)='text' LIMIT 1)
+           OR EXISTS(SELECT 1 FROM Payments WHERE typeof(Created_Date)='text' LIMIT 1)
+           OR EXISTS(SELECT 1 FROM History WHERE typeof(Event_Date)='text' LIMIT 1)
+        LIMIT 1
+        ''').getSingleOrNull();
+
+        if (any == null) return;
+      }
+
+      await transaction(() async {
+        // Customers
+        await _convertTextDateColumn(
+          table: 'Customers',
+          pk: 'Customer_ID',
+          column: 'Created_Date',
+        );
+
+        // Items
+        await _convertTextDateColumn(
+          table: 'Items',
+          pk: 'Item_ID',
+          column: 'Pawned_Date',
+        );
+        await _convertTextDateColumn(
+          table: 'Items',
+          pk: 'Item_ID',
+          column: 'Expiry_Date',
+        );
+        await _convertTextDateColumn(
+          table: 'Items',
+          pk: 'Item_ID',
+          column: 'Created_Date',
+        );
+
+        // Transactions
+        await _convertTextDateColumn(
+          table: 'Transactions',
+          pk: 'Transaction_ID',
+          column: 'Transaction_Date',
+        );
+        await _convertTextDateColumn(
+          table: 'Transactions',
+          pk: 'Transaction_ID',
+          column: 'Created_Date',
+        );
+
+        // Payments
+        await _convertTextDateColumn(
+          table: 'Payments',
+          pk: 'Payment_ID',
+          column: 'Payment_Date',
+        );
+        await _convertTextDateColumn(
+          table: 'Payments',
+          pk: 'Payment_ID',
+          column: 'Created_Date',
+        );
+
+        // History
+        await _convertTextDateColumn(
+          table: 'History',
+          pk: 'History_ID',
+          column: 'Event_Date',
+        );
+      });
+    } catch (_) {
+      // If tables don't exist yet (fresh install) or any edge case, ignore.
+    }
+  }
+
+  Future<void> _convertTextDateColumn({
+    required String table,
+    required String pk,
+    required String column,
+  }) async {
+    final rows = await customSelect('''
+    SELECT $pk AS id, $column AS d
+    FROM $table
+    WHERE $column IS NOT NULL
+      AND typeof($column) = 'text'
+    ''').get();
+
+    if (rows.isEmpty) return;
+
+    for (final r in rows) {
+      final id = (r.data['id'] as num).toInt();
+      final raw = r.data['d'];
+
+      final parsed = _parseLegacyDate(raw);
+
+      // Store as real drift DateTime (binds as INTEGER millis)
+      await customUpdate(
+        'UPDATE $table SET $column = ? WHERE $pk = ?',
+        variables: [Variable<DateTime>(parsed), Variable<int>(id)],
+      );
+    }
+  }
+
+  DateTime _parseLegacyDate(dynamic v) {
+    if (v == null) return DateTime.fromMillisecondsSinceEpoch(0);
+
+    // If it was already stored as int/num, keep it
+    if (v is int) return DateTime.fromMillisecondsSinceEpoch(v);
+    if (v is num) return DateTime.fromMillisecondsSinceEpoch(v.toInt());
+
+    final s = v.toString().trim();
+    if (s.isEmpty) return DateTime.fromMillisecondsSinceEpoch(0);
+
+    // 1) ISO (2026-01-30...)
+    try {
+      final d = DateTime.parse(s);
+      return DateTime(d.year, d.month, d.day);
+    } catch (_) {}
+
+    final formats = <DateFormat>[
+      DateFormat('dd-MM-yyyy'),
+      DateFormat('dd/MM/yyyy'),
+      DateFormat('yyyy-MM-dd'),
+      DateFormat('yyyy-MM-dd HH:mm:ss.SSS'),
+
+      // ISO with milliseconds:
+      DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS"),
+
+      // ISO with microseconds (sometimes):
+      DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS"),
+    ];
+
+    for (final f in formats) {
+      try {
+        final d = f.parseStrict(s);
+        return DateTime(d.year, d.month, d.day);
+      } catch (_) {}
+    }
+    // Fallback
+    return DateTime.fromMillisecondsSinceEpoch(0);
+  }
 }
 
-/// Drop-in replacement for your old `BackEnd` class, but powered by drift.
-///
-/// You can either:
-/// - rename this class to `BackEnd` and delete the old sqflite backend, OR
-/// - update call sites from `BackEnd.` -> `BackEndDrift.`
-
-// ---------------------------------------------------------------------------
-// Stream helpers
-// ---------------------------------------------------------------------------
+// =============================================================================
+// combineLatest2
+// =============================================================================
 
 Stream<R> _combineLatest2<A, B, R>(
   Stream<A> a,
@@ -299,6 +464,10 @@ Stream<R> _combineLatest2<A, B, R>(
   return controller.stream;
 }
 
+// =============================================================================
+// BACKEND
+// =============================================================================
+
 class BackEnd {
   static ItDataDatabase? _db;
 
@@ -307,7 +476,57 @@ class BackEnd {
     return _db!;
   }
 
-  //// C U S T O M E R S
+  // ---------- Date helpers (date-only ranges) ----------
+  static DateTime _dayStart(DateTime d) => DateTime(d.year, d.month, d.day);
+  static DateTime _dayEnd(DateTime d) =>
+      _dayStart(d).add(const Duration(days: 1));
+
+  static DateTime _monthStart(DateTime d) => DateTime(d.year, d.month, 1);
+  static DateTime _monthEnd(DateTime d) => DateTime(d.year, d.month + 1, 1);
+
+  static Future<double> _sumTransactionsInRange(
+    ItDataDatabase d,
+    DateTime start,
+    DateTime end,
+  ) async {
+    final totalExpr = d.transactionsTable.amount.sum();
+
+    final row =
+        await (d.selectOnly(d.transactionsTable)
+              ..addColumns([totalExpr])
+              ..where(
+                d.transactionsTable.transactionDate.isBiggerOrEqualValue(
+                      start,
+                    ) &
+                    d.transactionsTable.transactionDate.isSmallerThanValue(end),
+              ))
+            .getSingle();
+
+    return (row.read(totalExpr) ?? 0).toDouble();
+  }
+
+  static Future<double> _sumPaymentsInRange(
+    ItDataDatabase d,
+    DateTime start,
+    DateTime end,
+  ) async {
+    final totalExpr = d.paymentsTable.amountPaid.sum();
+
+    final row =
+        await (d.selectOnly(d.paymentsTable)
+              ..addColumns([totalExpr])
+              ..where(
+                d.paymentsTable.paymentDate.isBiggerOrEqualValue(start) &
+                    d.paymentsTable.paymentDate.isSmallerThanValue(end),
+              ))
+            .getSingle();
+
+    return (row.read(totalExpr) ?? 0).toDouble();
+  }
+
+  // ===========================================================================
+  // CUSTOMERS
+  // ===========================================================================
 
   static Future<int> createNewCustomer(Customer customer) async {
     if (customer.name.trim().isEmpty) {
@@ -334,11 +553,6 @@ class BackEnd {
             ),
           );
     } on SqliteException {
-      // Provide a nicer message for duplicate numbers.
-      // if (e.extendedResultCode ==
-      //     SqlExtendedResultCodes.sqliteConstraintUnique) {
-      //   throw Exception('Contact number already exists');
-      // }
       rethrow;
     }
   }
@@ -457,7 +671,7 @@ class BackEnd {
     required String newContactNumber,
     required String newCustomerPhoto,
     required String newProofPhoto,
-    required String newCreatedDate,
+    required DateTime newCreatedDate,
   }) async {
     if (newCustomerName.trim().isEmpty) {
       throw ArgumentError('Customer name cannot be empty');
@@ -484,7 +698,6 @@ class BackEnd {
             ),
           );
 
-      // keep History in sync like your sqflite code
       await (d.update(
         d.historyTable,
       )..where((t) => t.customerId.equals(customerId))).write(
@@ -498,7 +711,9 @@ class BackEnd {
     });
   }
 
-  //// I T E M S
+  // ===========================================================================
+  // ITEMS
+  // ===========================================================================
 
   static Future<int> createNewItem(Items item) async {
     if (item.name.trim().isEmpty) {
@@ -603,7 +818,9 @@ class BackEnd {
     ];
   }
 
-  //// T R A N S A C T I O N S
+  // ===========================================================================
+  // TRANSACTIONS
+  // ===========================================================================
 
   static Future<int> createNewTransaction(Trx transaction) async {
     if (transaction.amount <= 0) {
@@ -648,6 +865,7 @@ class BackEnd {
               ..where((t) => t.transactionType.equals('Active'))
               ..orderBy([(t) => OrderingTerm.desc(t.transactionDate)]))
             .get();
+
     return rows.map(_trxFromRow).toList();
   }
 
@@ -660,6 +878,7 @@ class BackEnd {
               ..where((t) => t.customerId.equals(customerId))
               ..orderBy([(t) => OrderingTerm.desc(t.transactionDate)]))
             .get();
+
     return rows.map(_trxFromRow).toList();
   }
 
@@ -672,6 +891,7 @@ class BackEnd {
               ..where((t) => t.transactionId.equals(transacrtionId))
               ..limit(1))
             .getSingleOrNull();
+
     if (row == null) return [];
     return [_trxFromRow(row)];
   }
@@ -704,16 +924,25 @@ class BackEnd {
     );
   }
 
+  /// ✅ DATE RANGE instead of equals (handles time too)
   static Future<List<Trx>> fetchTransactionsByDate({
-    required String inputDate,
+    required DateTime inputDate,
   }) async {
     try {
       final d = await db();
+      final start = _dayStart(inputDate);
+      final end = _dayEnd(inputDate);
+
       final rows =
           await (d.select(d.transactionsTable)
-                ..where((t) => t.transactionDate.equals(inputDate))
+                ..where(
+                  (t) =>
+                      t.transactionDate.isBiggerOrEqualValue(start) &
+                      t.transactionDate.isSmallerThanValue(end),
+                )
                 ..orderBy([(t) => OrderingTerm.desc(t.createdDate)]))
               .get();
+
       return rows.map(_trxFromRow).toList();
     } on SqliteException catch (e) {
       throw Exception('Database error while fetching transactions: $e');
@@ -730,26 +959,18 @@ class BackEnd {
     try {
       final d = await db();
       final now = DateTime.now();
-      final cutoffDate = DateTime(now.year, now.month - months, now.day);
-      final cutoffDateStr = DateFormat('yyyy-MM-dd').format(cutoffDate);
+      final cutoff = DateTime(now.year, now.month - months, now.day);
 
-      final List<QueryRow> rows = await d
-          .customSelect(
-            '''
-        SELECT * FROM Transactions
-        WHERE substr(Transaction_Date, 7, 4) || '-' ||
-              substr(Transaction_Date, 4, 2) || '-' ||
-              substr(Transaction_Date, 1, 2) < ?
-        ORDER BY substr(Transaction_Date, 7, 4) DESC,
-                 substr(Transaction_Date, 4, 2) DESC,
-                 substr(Transaction_Date, 1, 2) DESC
-        ''',
-            variables: [Variable<String>(cutoffDateStr)],
-            readsFrom: {d.transactionsTable},
-          )
-          .get();
+      final rows =
+          await (d.select(d.transactionsTable)
+                ..where((t) => t.transactionDate.isSmallerThanValue(cutoff))
+                ..orderBy([
+                  (t) => OrderingTerm.desc(t.transactionDate),
+                  (t) => OrderingTerm.desc(t.transactionId),
+                ]))
+              .get();
 
-      return Trx.toList(rows.map((r) => r.data).toList());
+      return rows.map(_trxFromRow).toList();
     } on SqliteException catch (e) {
       throw Exception('Database error while fetching transactions: $e');
     } catch (e) {
@@ -782,23 +1003,19 @@ class BackEnd {
           throw Exception('Transaction not found: $transactionId');
         }
 
-        // Delete signature file (same behavior as old code).
         if (trxRow.signature.isNotEmpty) {
           final f = File(trxRow.signature);
-          if (await f.exists()) {
-            await f.delete();
-          }
+          if (await f.exists()) await f.delete();
         }
+
         final historyDeleted = await (d.delete(
           d.historyTable,
         )..where((h) => h.transactionId.equals(transactionId))).go();
 
-        // Delete transaction (payments cascade).
         final txnDeleted = await (d.delete(
           d.transactionsTable,
         )..where((t) => t.transactionId.equals(transactionId))).go();
 
-        // Delete item row (and item photo file) like your sqflite code.
         final itemRow =
             await (d.select(d.itemsTable)
                   ..where((i) => i.itemId.equals(trxRow.itemId))
@@ -809,11 +1026,8 @@ class BackEnd {
         if (itemRow != null) {
           if (itemRow.itemPhoto.isNotEmpty) {
             final f = File(itemRow.itemPhoto);
-            if (await f.exists()) {
-              await f.delete();
-            }
+            if (await f.exists()) await f.delete();
           }
-
           itemDeleted = await (d.delete(
             d.itemsTable,
           )..where((i) => i.itemId.equals(trxRow.itemId))).go();
@@ -830,7 +1044,9 @@ class BackEnd {
     }
   }
 
-  //// P A Y M E N T S
+  // ===========================================================================
+  // PAYMENTS
+  // ===========================================================================
 
   static Future<List<Payment>> fetchRequriedPaymentsOfTransaction({
     required int transactionId,
@@ -875,7 +1091,9 @@ class BackEnd {
         );
   }
 
-  //// H I S T O R Y
+  // ===========================================================================
+  // HISTORY
+  // ===========================================================================
 
   static Future<List<UserHistory>> fetchAllUserHistory() async {
     final d = await db();
@@ -924,24 +1142,20 @@ class BackEnd {
     final d = await db();
     try {
       return await d.transaction(() async {
-        final deleted = await (d.delete(
+        return (d.delete(
           d.historyTable,
         )..where((t) => t.transactionId.equals(transactionId))).go();
-        return deleted;
       });
     } catch (e) {
       throw Exception('Database error while deleting history: $e');
     }
   }
 
-  //// D A T A B A S E   M A N A G E M E N T
+  // ===========================================================================
+  // STREAMS (reactive)
+  // ===========================================================================
 
-  // ---------------------------------------------------------------------------
-  // STREAMS (reactive reads)
-  // ---------------------------------------------------------------------------
-
-  //// C U S T O M E R S (streams)
-
+  // CUSTOMERS streams
   static Stream<List<Customer>> watchAllCustomerData() {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final q = (d.select(
@@ -949,9 +1163,9 @@ class BackEnd {
       )..orderBy([(t) => OrderingTerm.asc(t.customerName)])).watch();
 
       return q.map(
-        (List<CustomerRow> rows) => rows
+        (rows) => rows
             .map(
-              (CustomerRow r) => Customer(
+              (r) => Customer(
                 id: r.customerId,
                 userID: r.userId,
                 name: r.customerName,
@@ -969,23 +1183,23 @@ class BackEnd {
   }
 
   static Stream<List<String>> watchAllCustomerNumbers() {
-    return Stream.fromFuture(db()).asyncExpand((ItDataDatabase d) {
-      final Stream<List<TypedResult>> q =
+    return Stream.fromFuture(db()).asyncExpand((d) {
+      final q =
           (d.selectOnly(d.customersTable)
                 ..addColumns([d.customersTable.contactNumber])
                 ..orderBy([OrderingTerm.asc(d.customersTable.contactNumber)]))
               .watch();
 
       return q.map(
-        (List<TypedResult> rows) =>
+        (rows) =>
             rows.map((r) => r.read(d.customersTable.contactNumber)!).toList(),
       );
     });
   }
 
   static Stream<List<Contact>> watchAllCustomerNumbersWithNames() {
-    return Stream.fromFuture(db()).asyncExpand((ItDataDatabase d) {
-      final Stream<List<TypedResult>> q =
+    return Stream.fromFuture(db()).asyncExpand((d) {
+      final q =
           (d.selectOnly(d.customersTable)
                 ..addColumns([
                   d.customersTable.customerId,
@@ -995,23 +1209,23 @@ class BackEnd {
                 ..orderBy([OrderingTerm.asc(d.customersTable.customerName)]))
               .watch();
 
-      return q.map((List<TypedResult> rows) {
-        return rows
+      return q.map(
+        (rows) => rows
             .map(
-              (TypedResult r) => Contact(
+              (r) => Contact(
                 name: r.read(d.customersTable.customerName) ?? '',
                 number: r.read(d.customersTable.contactNumber) ?? '',
                 id: r.read(d.customersTable.customerId) ?? 0,
               ),
             )
-            .toList();
-      });
+            .toList(),
+      );
     });
   }
 
   static Stream<String> watchRequriedCustomerName({required int customerId}) {
-    return Stream.fromFuture(db()).asyncExpand((ItDataDatabase d) {
-      final Stream<List<TypedResult>> q =
+    return Stream.fromFuture(db()).asyncExpand((d) {
+      final q =
           (d.selectOnly(d.customersTable)
                 ..addColumns([d.customersTable.customerName])
                 ..where(d.customersTable.customerId.equals(customerId))
@@ -1019,7 +1233,7 @@ class BackEnd {
               .watch();
 
       return q.map(
-        (List<TypedResult> rows) => rows.isEmpty
+        (rows) => rows.isEmpty
             ? ''
             : (rows.first.read(d.customersTable.customerName) ?? ''),
       );
@@ -1028,7 +1242,7 @@ class BackEnd {
 
   static Stream<Customer?> watchSingleCustomer({required int id}) {
     return Stream.fromFuture(db()).asyncExpand((d) {
-      final Stream<List<CustomerRow>> q =
+      final q =
           (d.select(d.customersTable)
                 ..where((t) => t.customerId.equals(id))
                 ..limit(1))
@@ -1052,8 +1266,7 @@ class BackEnd {
     });
   }
 
-  //// I T E M S (streams)
-
+  // ITEMS streams
   static Stream<List<Items>> watchAllItems() {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final q = (d.select(
@@ -1139,13 +1352,13 @@ class BackEnd {
     });
   }
 
-  //// T R A N S A C T I O N S (streams)
-
+  // TRANSACTIONS streams
   static Stream<List<Trx>> watchAllTransactions() {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final q = (d.select(
         d.transactionsTable,
       )..orderBy([(t) => OrderingTerm.desc(t.transactionId)])).watch();
+
       return q.map((rows) => rows.map(_trxFromRow).toList());
     });
   }
@@ -1157,6 +1370,7 @@ class BackEnd {
                 ..where((t) => t.transactionType.equals('Active'))
                 ..orderBy([(t) => OrderingTerm.desc(t.transactionDate)]))
               .watch();
+
       return q.map((rows) => rows.map(_trxFromRow).toList());
     });
   }
@@ -1170,6 +1384,7 @@ class BackEnd {
                 ..where((t) => t.customerId.equals(customerId))
                 ..orderBy([(t) => OrderingTerm.desc(t.createdDate)]))
               .watch();
+
       return q.map((rows) => rows.map(_trxFromRow).toList());
     });
   }
@@ -1206,14 +1421,22 @@ class BackEnd {
   }
 
   static Stream<List<Trx>> watchTransactionsByDate({
-    required String inputDate,
+    required DateTime inputDate,
   }) {
     return Stream.fromFuture(db()).asyncExpand((d) {
+      final start = _dayStart(inputDate);
+      final end = _dayEnd(inputDate);
+
       final q =
           (d.select(d.transactionsTable)
-                ..where((t) => t.transactionDate.equals(inputDate))
+                ..where(
+                  (t) =>
+                      t.transactionDate.isBiggerOrEqualValue(start) &
+                      t.transactionDate.isSmallerThanValue(end),
+                )
                 ..orderBy([(t) => OrderingTerm.desc(t.createdDate)]))
               .watch();
+
       return q.map((rows) => rows.map(_trxFromRow).toList());
     });
   }
@@ -1225,31 +1448,22 @@ class BackEnd {
 
     return Stream.fromFuture(db()).asyncExpand((d) {
       final now = DateTime.now();
-      final cutoffDate = DateTime(now.year, now.month - months, now.day);
-      final cutoffDateStr = DateFormat('yyyy-MM-dd').format(cutoffDate);
+      final cutoff = DateTime(now.year, now.month - months, now.day);
 
-      final Stream<List<QueryRow>> q = d
-          .customSelect(
-            '''
-        SELECT * FROM Transactions
-        WHERE substr(Transaction_Date, 7, 4) || '-' ||
-              substr(Transaction_Date, 4, 2) || '-' ||
-              substr(Transaction_Date, 1, 2) < ?
-        ORDER BY substr(Transaction_Date, 7, 4) DESC,
-                 substr(Transaction_Date, 4, 2) DESC,
-                 substr(Transaction_Date, 1, 2) DESC
-        ''',
-            variables: [Variable<String>(cutoffDateStr)],
-            readsFrom: {d.transactionsTable},
-          )
-          .watch();
+      final q =
+          (d.select(d.transactionsTable)
+                ..where((t) => t.transactionDate.isSmallerThanValue(cutoff))
+                ..orderBy([
+                  (t) => OrderingTerm.desc(t.transactionDate),
+                  (t) => OrderingTerm.desc(t.transactionId),
+                ]))
+              .watch();
 
-      return q.map((rows) => Trx.toList(rows.map((r) => r.data).toList()));
+      return q.map((rows) => rows.map(_trxFromRow).toList());
     });
   }
 
-  //// P A Y M E N T S (streams)
-
+  // PAYMENTS streams
   static Stream<List<Payment>> watchRequriedPaymentsOfTransaction({
     required int transactionId,
   }) {
@@ -1277,8 +1491,7 @@ class BackEnd {
     });
   }
 
-  //// H I S T O R Y (streams)
-
+  // HISTORY streams
   static Stream<List<UserHistory>> watchAllUserHistory() {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final q = (d.select(
@@ -1306,12 +1519,10 @@ class BackEnd {
     });
   }
 
-  //// A N A L Y T I C S (streams)
+  // ===========================================================================
+  // ANALYTICS (streams)
+  // ===========================================================================
 
-  /// Reactive version of [fetchAnalyticsData].
-  ///
-  /// NOTE: The "outstandingAmount" is computed in Dart from active transactions.
-  /// This stream will update whenever Customers / Transactions / Payments change.
   static Stream<Map<String, num>> watchAnalyticsData() {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final base = d
@@ -1336,7 +1547,7 @@ class BackEnd {
         ''',
             variables: const [
               Variable<String>('Active'),
-              Variable<String>('Active'),
+              Variable<String>('Inactive'), // ✅ earned when closed
             ],
             readsFrom: {d.customersTable, d.transactionsTable, d.paymentsTable},
           )
@@ -1351,13 +1562,10 @@ class BackEnd {
 
         double totalOutstanding = 0.0;
         for (final t in activeRows) {
-          final principal = t.amount;
-          final rate = t.interestRate;
-          final takenDate = t.transactionDate;
           final l = LoanCalculator(
-            takenAmount: principal,
-            rateOfInterest: rate,
-            takenDate: takenDate,
+            takenAmount: t.amount,
+            rateOfInterest: t.interestRate,
+            takenDate: t.transactionDate,
           );
           totalOutstanding += l.totalAmount;
         }
@@ -1374,8 +1582,6 @@ class BackEnd {
     });
   }
 
-  /// Reactive version of [fetchMonthlyChartData] (last 6 months).
-  /// Recomputes when Transactions or Payments change.
   static Stream<List<Map<String, dynamic>>> watchMonthlyChartData() {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final txns = (d.select(d.transactionsTable)).watch();
@@ -1386,6 +1592,10 @@ class BackEnd {
       });
     });
   }
+
+  // ===========================================================================
+  // DB management
+  // ===========================================================================
 
   static Future<void> close() async {
     final d = _db;
@@ -1426,7 +1636,9 @@ class BackEnd {
     return rows.isNotEmpty && rows.first.data['integrity_check'] == 'ok';
   }
 
-  //// A N A L Y T I C S
+  // ===========================================================================
+  // ANALYTICS (future)
+  // ===========================================================================
 
   static Future<Map<String, num>> fetchAnalyticsData() async {
     final d = await db();
@@ -1460,20 +1672,16 @@ class BackEnd {
 
     final row = rows.first.data;
 
-    // Outstanding amount uses your existing LoanCalculator logic.
     final activeTxns = await (d.select(
       d.transactionsTable,
     )..where((t) => t.transactionType.equals('Active'))).get();
 
     double totalOutstanding = 0.0;
     for (final t in activeTxns) {
-      final principal = t.amount;
-      final rate = t.interestRate;
-      final takenDate = t.transactionDate;
       final l = LoanCalculator(
-        takenAmount: principal,
-        rateOfInterest: rate,
-        takenDate: takenDate,
+        takenAmount: t.amount,
+        rateOfInterest: t.interestRate,
+        takenDate: t.transactionDate,
       );
       totalOutstanding += l.totalAmount;
     }
@@ -1488,47 +1696,27 @@ class BackEnd {
     };
   }
 
+  // ===========================================================================
+  // CHARTS (future) - ✅ DateTime ranges
+  // ===========================================================================
+
   static Future<List<Map<String, dynamic>>> fetchMonthlyChartData() async {
     final d = await db();
     final now = DateTime.now();
-    final List<Map<String, dynamic>> results = [];
+    final results = <Map<String, dynamic>>[];
 
     for (int i = 5; i >= 0; i--) {
-      final DateTime date = DateTime(now.year, now.month - i, 1);
-      final String monthStr = DateFormat('MMM').format(date);
-      final int year = date.year;
-      final String month = date.month.toString().padLeft(2, '0');
+      final monthDate = DateTime(now.year, now.month - i, 1);
+      final start = _monthStart(monthDate);
+      final end = _monthEnd(monthDate);
 
-      final List<QueryRow> disbursedRows = await d
-          .customSelect(
-            '''
-        SELECT COALESCE(SUM(Amount), 0) as total
-        FROM Transactions
-        WHERE substr(Transaction_Date, 4, 2) = ?
-          AND substr(Transaction_Date, 7, 4) = ?
-        ''',
-            variables: [
-              Variable<String>(month),
-              Variable<String>(year.toString()),
-            ],
-          )
-          .get();
-
-      final receivedRows = await d
-          .customSelect(
-            '''
-        SELECT COALESCE(SUM(Amount_Paid), 0) as total
-        FROM Payments
-        WHERE substr(Payment_Date, 1, 7) = ?
-        ''',
-            variables: [Variable<String>('$year-$month')],
-          )
-          .get();
+      final disbursed = await _sumTransactionsInRange(d, start, end);
+      final received = await _sumPaymentsInRange(d, start, end);
 
       results.add({
-        'month': monthStr,
-        'disbursed': (disbursedRows.first.data['total'] as num).toDouble(),
-        'received': (receivedRows.first.data['total'] as num).toDouble(),
+        'month': DateFormat('MMM').format(monthDate),
+        'disbursed': disbursed,
+        'received': received,
       });
     }
 
@@ -1548,4 +1736,264 @@ class BackEnd {
     signature: r.signature,
     createdDate: r.createdDate,
   );
+
+  // ===========================================================================
+  // YEARLY / WEEKLY / TODAY (streams + futures) - ✅ DateTime ranges
+  // ===========================================================================
+
+  static Stream<List<Map<String, dynamic>>> watchYearlyChartData() {
+    return Stream.fromFuture(db()).asyncExpand((d) {
+      return d
+          .customSelect(
+            'SELECT 1',
+            readsFrom: {d.transactionsTable, d.paymentsTable},
+          )
+          .watch()
+          .asyncMap((_) => fetchYearlyChartData());
+    });
+  }
+
+  static Future<List<Map<String, dynamic>>> fetchYearlyChartData() async {
+    final d = await db();
+    final now = DateTime.now();
+    final results = <Map<String, dynamic>>[];
+
+    for (int i = 11; i >= 0; i--) {
+      final monthDate = DateTime(now.year, now.month - i, 1);
+      final start = _monthStart(monthDate);
+      final end = _monthEnd(monthDate);
+
+      final disbursed = await _sumTransactionsInRange(d, start, end);
+      final received = await _sumPaymentsInRange(d, start, end);
+
+      results.add({
+        'month': DateFormat('MMM').format(monthDate),
+        'disbursed': disbursed,
+        'received': received,
+        '_monthNum': monthDate.month,
+        '_year': monthDate.year,
+      });
+    }
+
+    return results;
+  }
+
+  static Stream<List<Map<String, dynamic>>> watchWeeklyChartData() {
+    return Stream.fromFuture(db()).asyncExpand((d) {
+      return d
+          .customSelect(
+            'SELECT 1',
+            readsFrom: {d.transactionsTable, d.paymentsTable},
+          )
+          .watch()
+          .asyncMap((_) => fetchWeeklyChartData());
+    });
+  }
+
+  static Future<List<Map<String, dynamic>>> fetchWeeklyChartData() async {
+    final d = await db();
+    final now = DateTime.now();
+    final results = <Map<String, dynamic>>[];
+
+    for (int i = 6; i >= 0; i--) {
+      final day = now.subtract(Duration(days: i));
+      final start = _dayStart(day);
+      final end = _dayEnd(day);
+
+      final disbursed = await _sumTransactionsInRange(d, start, end);
+      final received = await _sumPaymentsInRange(d, start, end);
+
+      results.add({
+        'month': DateFormat('EEE').format(day),
+        'disbursed': disbursed,
+        'received': received,
+        // keep for your drill-down UI compatibility
+        '_txnDate': DateFormat('dd/MM/yyyy').format(day),
+        '_payDate': DateFormat('yyyy-MM-dd').format(day),
+      });
+    }
+
+    return results;
+  }
+
+  static Stream<Map<String, dynamic>> watchTodayChartData() {
+    return Stream.fromFuture(db()).asyncExpand((d) {
+      return d
+          .customSelect(
+            'SELECT 1',
+            readsFrom: {d.transactionsTable, d.paymentsTable},
+          )
+          .watch()
+          .asyncMap((_) => fetchTodayChartData());
+    });
+  }
+
+  static Future<Map<String, dynamic>> fetchTodayChartData() async {
+    final d = await db();
+    final now = DateTime.now();
+    final start = _dayStart(now);
+    final end = _dayEnd(now);
+
+    final txnSumExpr = d.transactionsTable.amount.sum();
+    final txnCountExpr = d.transactionsTable.transactionId.count();
+
+    final paySumExpr = d.paymentsTable.amountPaid.sum();
+    final payCountExpr = d.paymentsTable.paymentId.count();
+
+    final txnRow =
+        await (d.selectOnly(d.transactionsTable)
+              ..addColumns([txnSumExpr, txnCountExpr])
+              ..where(
+                d.transactionsTable.transactionDate.isBiggerOrEqualValue(
+                      start,
+                    ) &
+                    d.transactionsTable.transactionDate.isSmallerThanValue(end),
+              ))
+            .getSingle();
+
+    final payRow =
+        await (d.selectOnly(d.paymentsTable)
+              ..addColumns([paySumExpr, payCountExpr])
+              ..where(
+                d.paymentsTable.paymentDate.isBiggerOrEqualValue(start) &
+                    d.paymentsTable.paymentDate.isSmallerThanValue(end),
+              ))
+            .getSingle();
+
+    final disbTotal = (txnRow.read(txnSumExpr) ?? 0).toDouble();
+    final disbCount = (txnRow.read(txnCountExpr) ?? 0);
+
+    final recTotal = (payRow.read(paySumExpr) ?? 0).toDouble();
+    final recCount = (payRow.read(payCountExpr) ?? 0);
+
+    return {
+      'disbursed': disbTotal,
+      'disbursedCount': disbCount,
+      'received': recTotal,
+      'receivedCount': recCount,
+      'net': recTotal - disbTotal,
+    };
+  }
+
+  // ===========================================================================
+  // DRILL DOWN (month / day) - ✅ DateTime ranges
+  // ===========================================================================
+
+  static Future<List<Map<String, dynamic>>> fetchDrillDownForMonth({
+    required int month,
+    required int year,
+  }) async {
+    final d = await db();
+
+    final start = DateTime(year, month, 1);
+    final end = DateTime(year, month + 1, 1);
+
+    final txns =
+        await (d.select(d.transactionsTable)
+              ..where(
+                (t) =>
+                    t.transactionDate.isBiggerOrEqualValue(start) &
+                    t.transactionDate.isSmallerThanValue(end),
+              )
+              ..orderBy([(t) => OrderingTerm.desc(t.transactionDate)]))
+            .get();
+
+    final pays =
+        await (d.select(d.paymentsTable)
+              ..where(
+                (p) =>
+                    p.paymentDate.isBiggerOrEqualValue(start) &
+                    p.paymentDate.isSmallerThanValue(end),
+              )
+              ..orderBy([(p) => OrderingTerm.desc(p.paymentDate)]))
+            .get();
+
+    final all = <Map<String, dynamic>>[
+      ...txns.map(
+        (t) => {
+          'id': t.transactionId,
+          'amount': t.amount,
+          'date': DateFormat('dd-MM-yyyy').format(t.transactionDate),
+          'type': t.transactionType,
+          'kind': 'disbursed',
+          '_ts': t.transactionDate.millisecondsSinceEpoch,
+        },
+      ),
+      ...pays.map(
+        (p) => {
+          'id': p.transactionId,
+          'amount': p.amountPaid,
+          'date': DateFormat('dd-MM-yyyy').format(p.paymentDate),
+          'type': p.paymentType,
+          'kind': 'received',
+          '_ts': p.paymentDate.millisecondsSinceEpoch,
+        },
+      ),
+    ]..sort((a, b) => (b['_ts'] as int).compareTo(a['_ts'] as int));
+
+    for (final m in all) {
+      m.remove('_ts');
+    }
+    return all;
+  }
+
+  /// Signature kept for your existing UI:
+  /// txnDate = dd/MM/yyyy, payDate = yyyy-MM-dd
+  static Future<List<Map<String, dynamic>>> fetchDrillDownForDay({
+    required String txnDate,
+    required String payDate,
+  }) async {
+    final d = await db();
+
+    DateTime day;
+    try {
+      day = DateFormat('dd/MM/yyyy').parseStrict(txnDate);
+    } catch (_) {
+      day = DateFormat('yyyy-MM-dd').parseStrict(payDate);
+    }
+
+    final start = _dayStart(day);
+    final end = _dayEnd(day);
+
+    final txns =
+        await (d.select(d.transactionsTable)
+              ..where(
+                (t) =>
+                    t.transactionDate.isBiggerOrEqualValue(start) &
+                    t.transactionDate.isSmallerThanValue(end),
+              )
+              ..orderBy([(t) => OrderingTerm.desc(t.createdDate)]))
+            .get();
+
+    final pays =
+        await (d.select(d.paymentsTable)
+              ..where(
+                (p) =>
+                    p.paymentDate.isBiggerOrEqualValue(start) &
+                    p.paymentDate.isSmallerThanValue(end),
+              )
+              ..orderBy([(p) => OrderingTerm.desc(p.createdDate)]))
+            .get();
+
+    return [
+      ...txns.map(
+        (t) => {
+          'id': t.transactionId,
+          'amount': t.amount,
+          'date': DateFormat('yyyy-MM-dd').format(t.transactionDate),
+          'type': t.transactionType,
+          'kind': 'disbursed',
+        },
+      ),
+      ...pays.map(
+        (p) => {
+          'id': p.transactionId,
+          'amount': p.amountPaid,
+          'date': DateFormat('yyyy-MM-dd').format(p.paymentDate),
+          'type': p.paymentType,
+          'kind': 'received',
+        },
+      ),
+    ];
+  }
 }

@@ -9,7 +9,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const SingleChildScrollView(
       child: Column(
-        children: <Widget>[MonthlyChartWidget(), AnalaticsGridWidget()],
+        children: <Widget>[MonthlyChartSection(), AnalaticsGridWidget()],
       ),
     );
   }

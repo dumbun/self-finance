@@ -21,7 +21,7 @@ class CustomerNotifier extends _$CustomerNotifier {
       newContactNumber: customer.number,
       newCustomerPhoto: customer.photo,
       newProofPhoto: customer.proof,
-      newCreatedDate: DateTime.now().toIso8601String(),
+      newCreatedDate: DateTime.now(),
     );
   }
 }

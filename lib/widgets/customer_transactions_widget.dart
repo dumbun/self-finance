@@ -69,7 +69,7 @@ class CustomerTransactionsWidget extends ConsumerWidget {
                                         ),
                                         BodyOneDefaultText(
                                           text:
-                                              "${Constant.takenDateSmall}: ${transaction.transacrtionDate}",
+                                              "${Constant.takenDateSmall}: ${Utility.formatDate(date: transaction.transacrtionDate)}",
                                         ),
                                         BodyOneDefaultText(
                                           text:

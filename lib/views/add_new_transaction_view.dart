@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
+import 'package:self_finance/providers/date_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/providers/image_providers.dart';
 import 'package:self_finance/widgets/signature_widget.dart';
@@ -16,9 +18,16 @@ import 'package:self_finance/widgets/round_corner_button.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
 
 class AddNewTransactionView extends ConsumerStatefulWidget {
-  const AddNewTransactionView({super.key, required this.customerID});
+  const AddNewTransactionView({
+    super.key,
+    required this.customerID,
+    required this.customerName,
+    required this.customerNumber,
+  });
 
   final int customerID;
+  final String customerName;
+  final String customerNumber;
 
   @override
   ConsumerState<AddNewTransactionView> createState() =>
@@ -32,9 +41,9 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   final TextEditingController _description = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final SignatureController _signatureController = SignatureController(
-    penColor: Colors.black,
-    exportPenColor: Colors.black,
-    exportBackgroundColor: Colors.white,
+    penColor: AppColors.contentColorBlack,
+    exportPenColor: AppColors.contentColorBlack,
+    exportBackgroundColor: AppColors.getBackgroundColor,
     penStrokeWidth: 5,
   );
 
@@ -159,14 +168,18 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   }
 
   void _save() async {
-    if (_validateAndSave()) {
+    final DateTime? userPickedDate = ref.read(dateProvider);
+
+    if (_validateAndSave() && userPickedDate != null) {
       _isloading = true;
       final bool res = await ref
           .read(transactionsProvider.notifier)
           .addNewTransactoion(
+            customerName: widget.customerName,
+            customerNumber: widget.customerNumber,
             customerId: widget.customerID,
             discription: _description.text,
-            pawnedDate: _transacrtionDate.text,
+            userInputDate: userPickedDate,
             pawnAmount: _doubleCheck(_amount.text),
             rateOfIntrest: _doubleCheck(_rateOfIntrest.text),
             signatureController: _signatureController,

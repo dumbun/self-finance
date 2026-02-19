@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/user_history_model.dart';
@@ -84,12 +85,21 @@ class Routes {
   static void navigateToAddNewTransactionToCustomerView({
     required BuildContext context,
     required int customerID,
-  }) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => AddNewTransactionView(customerID: customerID),
-      ),
+  }) async {
+    final List<Customer> res = await BackEnd.fetchSingleContactDetails(
+      id: customerID,
     );
+    if (context.mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => AddNewTransactionView(
+            customerName: res.first.name,
+            customerNumber: res.first.name,
+            customerID: customerID,
+          ),
+        ),
+      );
+    }
   }
 
   static void navigateToContactEditingView({

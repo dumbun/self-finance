@@ -17,11 +17,13 @@ Future<File> legacySqfliteDbFile(String dbName) async {
     final appRoot = docs.parent; // .../<package>
     final dbDir = Directory(p.join(appRoot.path, 'databases'));
     await dbDir.create(recursive: true);
+    print(p.join(dbDir.path, dbName));
     return File(p.join(dbDir.path, dbName));
   }
 
   // iOS / macOS (and a sensible fallback for other platforms)
   final dbDir = Directory(p.join(docs.path, 'databases'));
   await dbDir.create(recursive: true);
+  print(p.join(dbDir.path, dbName));
   return File(p.join(dbDir.path, dbName));
 }

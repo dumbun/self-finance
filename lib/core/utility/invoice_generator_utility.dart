@@ -126,11 +126,13 @@ class InvoiceGenerator {
               takenAmount: transaction.amount,
               rateOfInterest: transaction.intrestRate,
               takenDate: transaction.transacrtionDate,
-              tenureDate: DateTime.parse(payments.first.paymentDate),
+              tenureDate: payments.first.paymentDate,
             );
 
       // Format dates
-      final transactionDate = _formatDate(transaction.transacrtionDate);
+      final transactionDate = _formatDate(
+        transaction.transacrtionDate.toIso8601String(),
+      );
       final generatedDate = DateFormat(
         'dd-MM-yyyy HH:mm',
       ).format(DateTime.now());
@@ -411,7 +413,10 @@ class InvoiceGenerator {
           'Interest Rate',
           '${transaction.intrestRate}% per month',
         ),
-        _buildTableRow('Transaction Date', transaction.transacrtionDate),
+        _buildTableRow(
+          'Transaction Date',
+          _formatDate(transaction.transacrtionDate.toIso8601String()),
+        ),
         if (transaction.transacrtionType == Constant.inactive)
           _buildTableRow(
             'Payment Date',

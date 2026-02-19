@@ -29,8 +29,7 @@ class HistoryDetailedView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final DateTime eventDate = DateTime.parse(history.eventDate);
-    final String formattedDate = _formatDate(eventDate);
+    final String formattedDate = _formatDate(history.eventDate);
     final bool isDebit = history.eventType == Constant.debited;
 
     return Scaffold(
