@@ -16,9 +16,12 @@ import 'package:self_finance/widgets/status_chip_widget.dart';
 
 class BuildTransactionsListWidget extends ConsumerWidget {
   const BuildTransactionsListWidget({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final double size = 28.sp;
+    final size = 28.sp;
+    final height = 16.sp;
+
     final int cacheSize = (size * MediaQuery.of(context).devicePixelRatio)
         .round();
 
@@ -32,16 +35,16 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                 itemCount: data.length, // ← important
                 itemBuilder: (BuildContext context, int index) {
                   final Trx txn = data[index];
-                  return SlidableWidget(
-                    customerId: txn.customerId,
-                    transactionId: txn.id!,
-                    child: InkWell(
-                      onTap: () => Routes.navigateToTransactionDetailsView(
-                        transacrtionId: txn.id!,
-                        customerId: txn.customerId,
-                        context: context,
-                      ),
+                  return InkWell(
+                    onTap: () => Routes.navigateToTransactionDetailsView(
+                      transacrtionId: txn.id!,
+                      customerId: txn.customerId,
+                      context: context,
+                    ),
 
+                    child: SlidableWidget(
+                      customerId: txn.customerId,
+                      transactionId: txn.id!,
                       child: Padding(
                         padding: EdgeInsets.all(14.sp),
                         child: Row(
@@ -55,9 +58,9 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                                 CustomerImageWidget(
                                   cache: cacheSize,
                                   customerId: txn.customerId,
-                                  size: 28.sp,
+                                  size: size,
                                 ),
-                                SizedBox(width: 16.sp),
+                                SizedBox(width: height),
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,

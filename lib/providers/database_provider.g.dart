@@ -34,7 +34,7 @@ final class ItDataDatabaseProvider
         argument: null,
         retry: null,
         name: r'itDataDatabaseProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -61,4 +61,45 @@ final class ItDataDatabaseProvider
   }
 }
 
-String _$itDataDatabaseHash() => r'10d09d61e0ad2b8ca205cf6f715b938d2d528a27';
+String _$itDataDatabaseHash() => r'1e3779290afc4687e85e71a937a1ce1f1dc503ad';
+
+@ProviderFor(userDatabase)
+final userDatabaseProvider = UserDatabaseProvider._();
+
+final class UserDatabaseProvider
+    extends $FunctionalProvider<UserDatabase, UserDatabase, UserDatabase>
+    with $Provider<UserDatabase> {
+  UserDatabaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'userDatabaseProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$userDatabaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<UserDatabase> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  UserDatabase create(Ref ref) {
+    return userDatabase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(UserDatabase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<UserDatabase>(value),
+    );
+  }
+}
+
+String _$userDatabaseHash() => r'18d04895fb15ae14c37bee83294e425a3aea522c';

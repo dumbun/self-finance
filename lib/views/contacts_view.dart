@@ -6,25 +6,43 @@ import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/providers/contacts_provider.dart';
 import 'package:self_finance/widgets/build_customers_list.dart';
 
-class ContactsView extends ConsumerWidget {
+class ContactsView extends ConsumerStatefulWidget {
   const ContactsView({super.key});
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _ContactsViewState();
+}
+
+class _ContactsViewState extends ConsumerState<ContactsView> {
+  final SearchController _searchController = SearchController();
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
         title: const BodyTwoDefaultText(text: Constant.contact, bold: true),
       ),
-      body: RefreshIndicator.adaptive(
-        onRefresh: () => ref.refresh(contactsProvider.future),
-        child: SafeArea(
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () async {
+            ref.read(contactsSearchQueryProvider.notifier).clear();
+            ref.refresh(contactsProvider.future).ignore();
+            _searchController.clear();
+          },
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 20.sp, horizontal: 16.sp),
+            padding: EdgeInsets.symmetric(horizontal: 16.sp),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SearchBar(
+                  controller: _searchController,
                   onChanged: (String value) =>
                       ref.read(contactsProvider.notifier).doSearch(value),
                   padding: WidgetStateProperty.all(

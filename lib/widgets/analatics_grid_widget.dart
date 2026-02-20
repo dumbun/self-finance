@@ -173,12 +173,12 @@ class StatCardWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.all(0.2.dp),
+              padding: EdgeInsets.all(12.sp),
               decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12.sp),
               ),
-              child: Icon(icon, color: iconColor, size: 0.3.dp),
+              child: Icon(icon, color: iconColor, size: 18.sp),
             ),
 
             const Spacer(),

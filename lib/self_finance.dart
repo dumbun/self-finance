@@ -53,13 +53,16 @@ class SelfFinance extends ConsumerWidget {
                         primary: AppColors.getPrimaryColor,
                         onPrimary: Colors.white,
                       ),
+                      brightness: Brightness.light,
                     ),
                     darkTheme: ThemeData(
                       primaryColor: AppColors.getPrimaryColor,
-                      useMaterial3: true,
                       cardTheme: const CardThemeData(elevation: 2),
-                      canvasColor: AppColors.getPrimaryTextColor,
+                      brightness: Brightness.dark,
                       scaffoldBackgroundColor: AppColors.getPrimaryTextColor,
+                      navigationBarTheme: const NavigationBarThemeData(
+                        backgroundColor: AppColors.getPrimaryTextColor,
+                      ),
                       fontFamily: Constant.appFont,
                       primarySwatch: Colors.blue,
                       colorScheme: ColorScheme.fromSeed(
@@ -76,9 +79,13 @@ class SelfFinance extends ConsumerWidget {
                   ),
             );
           },
-          error: (error, stackTrace) => const Center(
-            child: BodyTwoDefaultText(
-              text: "Error happend! Please restart the application",
+          error: (_, _) => const MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: BodyTwoDefaultText(
+                  text: "Error happend! Please restart the application",
+                ),
+              ),
             ),
           ),
           loading: () =>

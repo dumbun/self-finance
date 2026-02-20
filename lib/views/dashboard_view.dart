@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
@@ -9,6 +10,7 @@ import 'package:self_finance/views/transactions_view.dart';
 import 'package:self_finance/widgets/drawer_widget.dart';
 import 'package:self_finance/widgets/expandable_fab.dart';
 import 'package:self_finance/core/fonts/title_widget.dart';
+import 'package:self_finance/widgets/theme_toggle_icon_button.dart';
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
@@ -39,6 +41,8 @@ class _DashboardViewState extends State<DashboardView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actionsPadding: EdgeInsets.only(right: 12.sp),
+        actions: [ThemeToggleIconButton(size: 22.sp)],
         forceMaterialTransparency: true,
         title: ValueListenableBuilder<int>(
           valueListenable: _selectedIndex,
@@ -78,54 +82,44 @@ class _DashboardViewState extends State<DashboardView> {
       bottomNavigationBar: ValueListenableBuilder<int>(
         valueListenable: _selectedIndex,
         builder: (_, int index, _) {
-          return BottomNavigationBar(
-            enableFeedback: true,
-            showUnselectedLabels: false,
-            elevation: 0,
-            unselectedLabelStyle: const TextStyle(
-              color: AppColors.getLigthGreyColor,
-            ),
-            unselectedItemColor: AppColors.getLigthGreyColor,
-            unselectedIconTheme: const IconThemeData(
-              color: AppColors.getLigthGreyColor,
-            ),
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                activeIcon: Icon(Icons.home_rounded),
-                label: Constant.home,
-                tooltip: Constant.homeScreen,
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.transform_outlined),
-                activeIcon: Icon(Icons.transform_rounded),
-                label: Constant.transacrtions,
-                tooltip: Constant.historyToolTip,
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.calculate_outlined),
-                activeIcon: Icon(Icons.calculate_rounded),
-                label: Constant.emiCalculatorTitle,
-                tooltip: Constant.emiCalculatorToolTip,
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.history_toggle_off),
-                activeIcon: Icon(Icons.history_rounded),
-                label: Constant.history,
-                tooltip: Constant.historyToolTip,
-              ),
-            ],
-            selectedItemColor: AppColors.getPrimaryColor,
-            currentIndex: index,
-            landscapeLayout: BottomNavigationBarLandscapeLayout.linear,
-            type: BottomNavigationBarType.shifting,
-            onTap: (int tappedIndex) {
+          return NavigationBar(
+            key: const ValueKey(0),
+            maintainBottomViewPadding: true,
+            selectedIndex: index,
+            onDestinationSelected: (int tappedIndex) {
               _pageController.animateToPage(
                 tappedIndex,
                 duration: const Duration(milliseconds: 450),
                 curve: Curves.easeInOut,
               );
             },
+            indicatorColor: AppColors.getPrimaryColor,
+            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+            labelTextStyle: const WidgetStatePropertyAll(
+              TextStyle(fontWeight: FontWeight.bold),
+            ),
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.home_outlined),
+                label: Constant.home,
+                tooltip: Constant.homeScreen,
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.transform_outlined),
+                label: Constant.transacrtions,
+                tooltip: Constant.historyToolTip,
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.calculate_outlined),
+                label: Constant.emiCalculatorTitle,
+                tooltip: Constant.emiCalculatorToolTip,
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.history_toggle_off),
+                label: Constant.history,
+                tooltip: Constant.historyToolTip,
+              ),
+            ],
           );
         },
       ),

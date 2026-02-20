@@ -33,25 +33,17 @@ class BuildHistoryListWidget extends ConsumerWidget {
     );
   }
 
-  SizedBox _buildIcon({required String type}) {
+  Icon _buildIcon({required String type}) {
     return type == Constant.debited
-        ? SizedBox(
-            height: 26.sp,
-            width: 26.sp,
-            child: Icon(
-              color: AppColors.getErrorColor,
-              Icons.arrow_upward_rounded,
-              size: 22.sp,
-            ),
+        ? Icon(
+            color: AppColors.getErrorColor,
+            Icons.arrow_upward_rounded,
+            size: 22.sp,
           )
-        : SizedBox(
-            height: 26.sp,
-            width: 26.sp,
-            child: Icon(
-              color: AppColors.getGreenColor,
-              Icons.arrow_downward_rounded,
-              size: 22.sp,
-            ),
+        : Icon(
+            color: AppColors.getGreenColor,
+            Icons.arrow_downward_rounded,
+            size: 22.sp,
           );
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
+import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 
@@ -12,10 +13,12 @@ class SlidableWidget extends ConsumerWidget {
     required this.transactionId,
     required this.customerId,
     required this.child,
+    this.phoneNumber,
   });
 
   final int transactionId;
   final int customerId;
+  final String? phoneNumber;
   final Widget child;
 
   Future<void> _confirmAndDelete(BuildContext context, WidgetRef ref) async {
@@ -47,6 +50,20 @@ class SlidableWidget extends ConsumerWidget {
         direction: Axis.horizontal,
         key: ValueKey<int>(transactionId),
         closeOnScroll: true,
+        startActionPane: phoneNumber != null
+            ? ActionPane(
+                motion: const StretchMotion(),
+                dragDismissible: false,
+                children: [
+                  _RoundedAction(
+                    color: AppColors.getPrimaryColor,
+                    icon: Icons.phone,
+                    iconSize: iconSize,
+                    onTap: () => Utility.makeCall(phoneNumber: phoneNumber!),
+                  ),
+                ],
+              )
+            : null,
         endActionPane: ActionPane(
           dragDismissible: false,
           key: ValueKey<int>(transactionId),
@@ -54,7 +71,7 @@ class SlidableWidget extends ConsumerWidget {
           extentRatio: 0.45,
           children: [
             _RoundedAction(
-              color: AppColors.contentColorCyan,
+              color: AppColors.getPrimaryColor,
               icon: Icons.share_rounded,
               iconSize: iconSize,
               onTap: () {
@@ -100,7 +117,7 @@ class _RoundedAction extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 10.sp, horizontal: 6.sp),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(9.sp),
           child: ColoredBox(
             color: color,
             child: SizedBox.expand(

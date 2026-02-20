@@ -25,7 +25,7 @@ class AccountSettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Future<void> doBackUp() async {
-      return await showAdaptiveDialog(
+      return await showAdaptiveDialog<void>(
         useSafeArea: true,
         barrierDismissible: false,
         useRootNavigator: true,
@@ -35,6 +35,8 @@ class AccountSettingsView extends StatelessWidget {
         },
       );
     }
+
+    final double height = 12.sp;
 
     return Scaffold(
       appBar: AppBar(
@@ -50,17 +52,17 @@ class AccountSettingsView extends StatelessWidget {
           child: Consumer(
             builder: (BuildContext context, WidgetRef ref, Widget? child) {
               return ref
-                  .watch(userProvider)
-                  .when(
+                  .watch<AsyncValue<User?>>(userProvider)
+                  .when<Widget>(
                     data: (User? data) {
                       if (data != null) {
-                        return RefreshIndicator.adaptive(
+                        return RefreshIndicator(
                           onRefresh: () async =>
-                              await ref.refresh(userProvider),
+                              ref.refresh(userProvider.future).ignore(),
                           child: ListView(
-                            children: [
+                            children: <Widget>[
                               // user profile pic
-                              SizedBox(height: 20.sp),
+                              SizedBox(height: height),
                               Hero(
                                 tag: Constant.userProfileTag,
                                 child: UserImageUpdateWidget(
@@ -69,7 +71,7 @@ class AccountSettingsView extends StatelessWidget {
                               ),
 
                               // user name
-                              SizedBox(height: 20.sp),
+                              SizedBox(height: height),
                               _buildNameUpdateButton(
                                 context: context,
                                 userId: data.id!,
@@ -77,7 +79,7 @@ class AccountSettingsView extends StatelessWidget {
                               ),
 
                               // user pin update button
-                              SizedBox(height: 12.sp),
+                              SizedBox(height: height),
                               _buildPinUpdateButton(
                                 context: context,
                                 id: data.id!,
@@ -85,7 +87,7 @@ class AccountSettingsView extends StatelessWidget {
                               ),
 
                               // user Currency update button
-                              SizedBox(height: 12.sp),
+                              SizedBox(height: height),
                               _buildCurrencyUpdateButton(
                                 context: context,
                                 id: data.id!,
@@ -94,15 +96,15 @@ class AccountSettingsView extends StatelessWidget {
                               ),
 
                               // user terms and condition button
-                              SizedBox(height: 12.sp),
+                              SizedBox(height: height),
                               _buildTermsAndConditionButton(),
 
                               // user privacy Policy button
-                              SizedBox(height: 12.sp),
+                              SizedBox(height: height),
                               _buildPrivacyPolicyButton(),
 
                               // BackUp button
-                              SizedBox(height: 12.sp),
+                              SizedBox(height: height),
                               _buildListTile(
                                 title: "Backup",
                                 onPressed: doBackUp,
@@ -112,22 +114,22 @@ class AccountSettingsView extends StatelessWidget {
                                 ),
                               ),
 
-                              SizedBox(height: 12.sp),
+                              SizedBox(height: height),
                               _buildLogoutButton(
                                 context: context,
                                 userData: data,
                               ),
 
-                              SizedBox(height: 12.sp),
+                              SizedBox(height: height),
                               const ThemeSwitchWidget(),
 
-                              SizedBox(height: 12.sp),
+                              SizedBox(height: height),
                               const NotificationSwitchWidget(),
 
-                              SizedBox(height: 12.sp),
+                              SizedBox(height: height),
                               const BiometricSwitchWidget(),
 
-                              SizedBox(height: 32.sp),
+                              SizedBox(height: height),
                             ],
                           ),
                         );
@@ -137,12 +139,9 @@ class AccountSettingsView extends StatelessWidget {
                         );
                       }
                     },
-                    error: (Object error, StackTrace stackTrace) =>
-                        const Center(
-                          child: BodyOneDefaultText(
-                            text: Constant.errorUserFetch,
-                          ),
-                        ),
+                    error: (_, _) => const Center(
+                      child: BodyOneDefaultText(text: Constant.errorUserFetch),
+                    ),
                     loading: () => const Center(
                       child: CircularProgressIndicator.adaptive(),
                     ),

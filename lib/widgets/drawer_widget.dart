@@ -69,59 +69,70 @@ class DrawerWidget extends StatelessWidget {
     return Drawer(
       child: Padding(
         padding: EdgeInsets.all(16.sp),
-        child: Consumer(
-          builder: (BuildContext context, WidgetRef ref, Widget? child) {
-            return ref
-                .watch(userProvider)
-                .when(
-                  data: (User? user) {
-                    if (user != null) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          user.profilePicture.isNotEmpty
-                              ? CircularImageWidget(
-                                  imageData: user.profilePicture,
-                                  titile: 'Account Profile Image',
-                                )
-                              : DefaultUserImage(height: 45.sp, width: 45.sp),
-                          SizedBox(height: 16.sp),
-                          _buildDrawerButtons(
-                            text: Constant.account,
-                            icon: Icons.vpn_key_rounded,
-                            onTap: () => Routes.navigateToAccountSettingsView(
-                              context: context,
-                            ),
-                          ),
-                          _buildDrawerButtons(
-                            text: "Feedback",
-                            icon: Icons.feedback,
-                            onTap: () => Utility.sendFeedbackEmail(context),
-                          ),
-                          _buildDrawerButtons(
-                            text: Constant.logout,
-                            icon: Icons.login_rounded,
-                            color: AppColors.getErrorColor,
-                            onTap: () => _logout(user, context),
-                          ),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Consumer(
+              builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                return ref
+                    .watch(userProvider)
+                    .when(
+                      data: (User? user) {
+                        if (user != null) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              user.profilePicture.isNotEmpty
+                                  ? CircularImageWidget(
+                                      imageData: user.profilePicture,
+                                      titile: 'Account Profile Image',
+                                    )
+                                  : DefaultUserImage(
+                                      height: 45.sp,
+                                      width: 45.sp,
+                                    ),
+                              SizedBox(height: 16.sp),
+                              _buildDrawerButtons(
+                                text: Constant.account,
+                                icon: Icons.vpn_key_rounded,
+                                onTap: () =>
+                                    Routes.navigateToAccountSettingsView(
+                                      context: context,
+                                    ),
+                              ),
+                              _buildDrawerButtons(
+                                text: "Feedback",
+                                icon: Icons.feedback,
+                                onTap: () => Utility.sendFeedbackEmail(context),
+                              ),
+                              _buildDrawerButtons(
+                                text: Constant.logout,
+                                icon: Icons.login_rounded,
+                                color: AppColors.getErrorColor,
+                                onTap: () => _logout(user, context),
+                              ),
 
-                          SizedBox(height: 32.sp),
-                          _getAppVersion(),
-                        ],
-                      );
-                    } else {
-                      return const BodyTwoDefaultText(
-                        text: Constant.errorUserFetch,
-                      );
-                    }
-                  },
-                  error: (Object error, StackTrace stackTrace) =>
-                      const BodyTwoDefaultText(text: Constant.errorUserFetch),
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator.adaptive()),
-                );
-          },
+                              SizedBox(height: 32.sp),
+                              _getAppVersion(),
+                            ],
+                          );
+                        } else {
+                          return const BodyTwoDefaultText(
+                            text: Constant.errorUserFetch,
+                          );
+                        }
+                      },
+                      error: (Object error, StackTrace stackTrace) =>
+                          const BodyTwoDefaultText(
+                            text: Constant.errorUserFetch,
+                          ),
+                      loading: () => const Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      ),
+                    );
+              },
+            ),
+          ),
         ),
       ),
     );

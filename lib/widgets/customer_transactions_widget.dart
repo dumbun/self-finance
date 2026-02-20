@@ -32,14 +32,14 @@ class CustomerTransactionsWidget extends ConsumerWidget {
                         return SlidableWidget(
                           transactionId: transaction.id!,
                           customerId: transaction.customerId,
-                          child: Card(
-                            child: GestureDetector(
-                              onTap: () =>
-                                  Routes.navigateToTransactionDetailsView(
-                                    transacrtionId: transaction.id!,
-                                    customerId: customerId,
-                                    context: context,
-                                  ),
+                          child: GestureDetector(
+                            onTap: () =>
+                                Routes.navigateToTransactionDetailsView(
+                                  transacrtionId: transaction.id!,
+                                  customerId: customerId,
+                                  context: context,
+                                ),
+                            child: Card(
                               child: Padding(
                                 padding: EdgeInsets.all(16.sp),
                                 child: Row(

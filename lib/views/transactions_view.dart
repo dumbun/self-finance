@@ -25,8 +25,9 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator.adaptive(
+    return RefreshIndicator(
       onRefresh: () async {
+        _searchTextController.clear();
         ref.refresh(transactionsProvider.future).ignore();
         ref.read(filterProvider.notifier).clear();
         ref.read(transactionsDateSearchQueryProvider.notifier).clear();
