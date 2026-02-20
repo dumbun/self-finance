@@ -16,14 +16,14 @@ class Trx {
   int? id;
   final int customerId;
   final int itemId;
-  final String transacrtionDate;
+  final DateTime transacrtionDate;
   final String transacrtionType;
   final double amount;
   final double intrestRate;
   final double intrestAmount;
   final double remainingAmount;
   final String signature;
-  final String createdDate;
+  final DateTime createdDate;
 
   /// [Trx] is a shortform of Transaction class
   /// using this class we can create a [Transaction] which contains the
@@ -63,7 +63,7 @@ class Trx {
     int? id,
     int? customerId,
     int? itemId,
-    String? transacrtionDate,
+    DateTime? transacrtionDate,
     String? transacrtionType,
     double? amount,
     double? intrestRate,
@@ -71,7 +71,7 @@ class Trx {
     double? remainingAmount,
     String? proofPhoto,
     String? signature,
-    String? createdDate,
+    DateTime? createdDate,
   }) {
     return Trx(
       id: id ?? this.id,
@@ -108,14 +108,14 @@ class Trx {
       id: map['id'] != null ? map['id'] as int : null,
       customerId: map['customerId'] as int,
       itemId: map['itemId'] as int,
-      transacrtionDate: map['transacrtionDate'] as String,
+      transacrtionDate: map['transacrtionDate'] as DateTime,
       transacrtionType: map['transacrtionType'] as String,
       amount: map['amount'] as double,
       intrestRate: map['intrestRate'] as double,
       intrestAmount: map['intrestAmount'] as double,
       remainingAmount: map['remainingAmount'] as double,
       signature: map['signature'] as String,
-      createdDate: map['createdDate'] as String,
+      createdDate: map['createdDate'] as DateTime,
     );
   }
 

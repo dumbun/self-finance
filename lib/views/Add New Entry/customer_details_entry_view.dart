@@ -4,6 +4,7 @@ import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
+import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/drop_down_gardian_selection.dart';
 import 'package:self_finance/widgets/fab.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
@@ -24,7 +25,7 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
   final TextEditingController _address = TextEditingController();
   final TextEditingController _mobileNumber = TextEditingController();
   final TextEditingController _gaurdianAlias = TextEditingController();
-
+  bool _isLoading = false;
   @override
   void dispose() {
     _customerName.dispose();
@@ -48,22 +49,49 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: BodySmallText(text: "Customer Details", bold: true),
+        title: const BodySmallText(text: "Customer Details", bold: true),
         forceMaterialTransparency: true,
       ),
-      floatingActionButton: Fab(
-        icon: Icons.navigate_next_rounded,
-        onPressed: () {
-          if (_validateAndSave()) {
-            Routes.navigateToCustomerLoneEntryView(
-              context: context,
-              customerName: _customerName.text,
-              mobileNumber: _mobileNumber.text,
-              gaurdianName: "${_gaurdianAlias.text}  ${_gaurdianName.text}",
-              address: _address.text,
-            );
-          }
-        },
+      floatingActionButton: Visibility(
+        replacement: const CircularProgressIndicator.adaptive(),
+        visible: !_isLoading,
+        child: Fab(
+          icon: Icons.navigate_next_rounded,
+          onPressed: () async {
+            setState(() {
+              _isLoading = !_isLoading;
+            });
+            if (_validateAndSave()) {
+              if (await Utility.isNumberPresent(_mobileNumber.text) &&
+                  context.mounted) {
+                setState(() {
+                  _isLoading = !_isLoading;
+                });
+
+                await AlertDilogs.alertDialogWithOneAction(
+                  context,
+                  "Sorry",
+                  Constant.contactAlreadyExistMessage,
+                );
+                return;
+              }
+              setState(() {
+                _isLoading = !_isLoading;
+              });
+              Routes.navigateToCustomerLoneEntryView(
+                context: context,
+                customerName: _customerName.text,
+                mobileNumber: _mobileNumber.text,
+                gaurdianName: "${_gaurdianAlias.text}  ${_gaurdianName.text}",
+                address: _address.text,
+              );
+            } else {
+              setState(() {
+                _isLoading = false;
+              });
+            }
+          },
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(

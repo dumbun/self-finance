@@ -4,10 +4,11 @@ import 'package:archive/archive_io.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:self_finance/widgets/dilogbox_widget.dart';
 
 typedef RestoreProgressCallback =
     void Function(double progress, String currentFile);
@@ -99,7 +100,9 @@ class RestoreUtility {
         dbPath = p.join(appDocPath, 'databases');
       } else {
         // Android: databases are in standard location
-        dbPath = await getDatabasesPath();
+        final a = await getApplicationDocumentsDirectory();
+        final dbDir = p.join(a.parent.path, 'databases');
+        dbPath = dbDir;
       }
       final Directory dbDir = Directory(dbPath);
       await dbDir.create(recursive: true);
@@ -110,7 +113,7 @@ class RestoreUtility {
 
       // 4) Extract ZIP file
       zipInputStream = InputFileStream(zipFile.path);
-      final Archive archive = ZipDecoder().decodeBuffer(
+      final Archive archive = ZipDecoder().decodeStream(
         zipInputStream,
         password: dotenv.env['BACKUP_PASSWORD'],
       );
@@ -216,15 +219,10 @@ class RestoreUtility {
     } catch (e, st) {
       debugPrint('❌ Restore failed: $e\n$st');
       if (context!.mounted) {
-        showDialog<void>(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('✅ Restore Error'),
-              content: Text(e.toString()),
-            );
-          },
+        AlertDilogs.alertDialogWithOneAction(
+          context,
+          'Restore Error',
+          e.toString(),
         );
       }
 
@@ -237,50 +235,20 @@ class RestoreUtility {
   /// Restart the app or show dialog for iOS
   static Future<void> _restartOrCloseApp({BuildContext? context}) async {
     try {
-      if (Platform.isAndroid) {
-        final a = await Restart.restartApp();
-        if (!a && context != null && context.mounted) {
-          await _showRestartDialog(context);
-        }
-      } else if (Platform.isIOS) {
-        if (context != null && context.mounted) {
-          await _showRestartDialog(context);
+      if (context != null && context.mounted) {
+        if (Platform.isAndroid) {
+          await Restart.restartApp();
         } else {
-          debugPrint(
-            'ℹ️ Please manually close and reopen the app to complete restoration',
-          );
+          await FlutterExitApp.exitApp();
         }
       } else {
-        exit(0);
+        debugPrint(
+          'ℹ️ Please manually close and reopen the app to complete restoration',
+        );
       }
     } catch (e) {
       debugPrint('⚠️ Restart action: $e');
     }
-  }
-
-  /// Show dialog for iOS users
-  static Future<void> _showRestartDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('✅ Restore Complete'),
-          content: const Text(
-            'Your backup has been restored successfully!\n\n'
-            'Please close and reopen the app to apply the changes.',
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   /// Validate backup ZIP file before restoration
@@ -309,7 +277,7 @@ class RestoreUtility {
 
       // Validate ZIP structure
       inputStream = InputFileStream(zipPath);
-      final Archive archive = ZipDecoder().decodeBuffer(
+      final Archive archive = ZipDecoder().decodeStream(
         inputStream,
         password: dotenv.env['BACKUP_PASSWORD'],
       );

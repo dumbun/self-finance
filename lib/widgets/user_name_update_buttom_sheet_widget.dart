@@ -75,10 +75,10 @@ class _UserNameUpdateButtomSheetWidgetState
                         Navigator.pop(context);
                       } else if (validateAndSave()) {
                         ref
-                            .read(asyncUserProvider.notifier)
-                            .updateUserName(
-                              userId: widget.userId,
-                              updateUserName: _newUserName.text,
+                            .read(userProvider.notifier)
+                            .changeUserName(
+                              id: widget.userId,
+                              newUserName: _newUserName.text,
                             );
                         Navigator.pop(context);
                       }

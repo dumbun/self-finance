@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/utility/image_saving_utility.dart';
@@ -74,7 +74,7 @@ class ImagePickerWidget extends ConsumerWidget {
     final XFile? image = ref.watch(imageProvider);
 
     if (image == null) {
-      return SvgPicture.asset(defaultImage, height: 28.sp, width: 28.sp);
+      return Image.asset(defaultImage, height: 28.sp, width: 28.sp);
     }
 
     return Image.file(

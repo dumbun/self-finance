@@ -3,12 +3,12 @@ class Items {
   final int customerid;
   final String name;
   final String description;
-  final String pawnedDate;
-  final String expiryDate;
+  final DateTime pawnedDate;
+  final DateTime expiryDate;
   final double pawnAmount;
   final String status;
   final String photo;
-  final String createdDate;
+  final DateTime createdDate;
 
   Items({
     this.id,
@@ -33,12 +33,12 @@ class Items {
         customerid: e["Customer_ID"] as int,
         name: e["Item_Name"] as String,
         description: e["Item_Description"] as String,
-        pawnedDate: e["Pawned_Date"] as String,
-        expiryDate: e["Expiry_Date"] as String,
+        pawnedDate: e["Pawned_Date"] as DateTime,
+        expiryDate: e["Expiry_Date"] as DateTime,
         pawnAmount: e["Pawn_Amount"] as double,
         status: e["Item_Status"] as String,
         photo: e["Item_Photo"] as String,
-        createdDate: e["Created_Date"] as String,
+        createdDate: e["Created_Date"] as DateTime,
       );
     }).toList();
   }
@@ -48,12 +48,12 @@ class Items {
     int? customerid,
     String? name,
     String? description,
-    String? pawnedDate,
-    String? expiryDate,
+    DateTime? pawnedDate,
+    DateTime? expiryDate,
     double? pawnAmount,
     String? status,
     String? photo,
-    String? createdDate,
+    DateTime? createdDate,
   }) {
     return Items(
       id: id ?? this.id,
@@ -90,12 +90,12 @@ class Items {
       customerid: map['customerid'] as int,
       name: map['name'] as String,
       description: map['description'] as String,
-      pawnedDate: map['pawnedDate'] as String,
-      expiryDate: map['expiryDate'] as String,
+      pawnedDate: map['pawnedDate'] as DateTime,
+      expiryDate: map['expiryDate'] as DateTime,
       pawnAmount: map['pawnAmount'] as double,
       status: map['status'] as String,
       photo: map['photo'] as String,
-      createdDate: map['createdDate'] as String,
+      createdDate: map['createdDate'] as DateTime,
     );
   }
 

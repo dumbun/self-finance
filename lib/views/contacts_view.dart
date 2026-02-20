@@ -3,32 +3,48 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
-import 'package:self_finance/providers/customer_contacts_provider.dart';
+import 'package:self_finance/providers/contacts_provider.dart';
 import 'package:self_finance/widgets/build_customers_list.dart';
-import 'package:self_finance/widgets/refresh_widget.dart';
 
-class ContactsView extends ConsumerWidget {
+class ContactsView extends ConsumerStatefulWidget {
   const ContactsView({super.key});
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _ContactsViewState();
+}
+
+class _ContactsViewState extends ConsumerState<ContactsView> {
+  final SearchController _searchController = SearchController();
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
         title: const BodyTwoDefaultText(text: Constant.contact, bold: true),
       ),
-      body: RefreshWidget(
-        onRefresh: () => ref.refresh(asyncCustomersContactsProvider.future),
-        child: SafeArea(
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () async {
+            ref.read(contactsSearchQueryProvider.notifier).clear();
+            ref.refresh(contactsProvider.future).ignore();
+            _searchController.clear();
+          },
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 20.sp, horizontal: 16.sp),
+            padding: EdgeInsets.symmetric(horizontal: 16.sp),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SearchBar(
-                  onChanged: (String value) => ref
-                      .read(asyncCustomersContactsProvider.notifier)
-                      .searchCustomer(givenInput: value),
+                  controller: _searchController,
+                  onChanged: (String value) =>
+                      ref.read(contactsProvider.notifier).doSearch(value),
                   padding: WidgetStateProperty.all(
                     EdgeInsets.symmetric(horizontal: 12.sp),
                   ),
@@ -41,7 +57,7 @@ class ContactsView extends ConsumerWidget {
                     ),
                   ),
                   leading: const Icon(Icons.search),
-                  elevation: WidgetStatePropertyAll(0),
+                  elevation: const WidgetStatePropertyAll(0),
                   hintText: "phone no. or name",
                 ),
                 SizedBox(height: 12.sp),

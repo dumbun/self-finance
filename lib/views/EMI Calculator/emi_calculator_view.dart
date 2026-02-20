@@ -96,7 +96,7 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
                   )
                 : Padding(
                     padding: EdgeInsets.only(top: 20.sp),
-                    child: BodyTwoDefaultText(
+                    child: const BodyTwoDefaultText(
                       error: true,
                       text: Constant.pleaseFillAllFields,
                     ),
@@ -113,12 +113,12 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
         _takenDataInput.text.isNotEmpty &&
         _tenureDataInput.text.isNotEmpty) {
       String tenureDate = _tenureDataInput.text;
-      final DateFormat format = DateFormat("dd-MM-yyyy");
+      final DateFormat format = DateFormat('dd-MM-yyyy');
       setState(() {
         _loanCalculator = LoanCalculator(
           takenAmount: Utility.textToDouble(_amountGivenInput.text),
           rateOfInterest: Utility.textToDouble(_rateOfIntrestInput.text),
-          takenDate: _takenDataInput.text,
+          takenDate: format.parseStrict(_takenDataInput.text),
           tenureDate: format.parseStrict(tenureDate),
         );
       });

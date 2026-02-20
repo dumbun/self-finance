@@ -6,52 +6,158 @@ part of 'image_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(ImageFile)
+final imageFileProvider = ImageFileProvider._();
+
+final class ImageFileProvider extends $NotifierProvider<ImageFile, XFile?> {
+  ImageFileProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'imageFileProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$imageFileHash();
+
+  @$internal
+  @override
+  ImageFile create() => ImageFile();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(XFile? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<XFile?>(value),
+    );
+  }
+}
+
 String _$imageFileHash() => r'3be77a20999ab89d1479ae2c48d5ab7ba9bf3712';
 
-/// See also [ImageFile].
-@ProviderFor(ImageFile)
-final imageFileProvider =
-    AutoDisposeNotifierProvider<ImageFile, XFile?>.internal(
-      ImageFile.new,
-      name: r'imageFileProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$imageFileHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+abstract class _$ImageFile extends $Notifier<XFile?> {
+  XFile? build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<XFile?, XFile?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<XFile?, XFile?>,
+              XFile?,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
 
-typedef _$ImageFile = AutoDisposeNotifier<XFile?>;
+@ProviderFor(ProofFile)
+final proofFileProvider = ProofFileProvider._();
+
+final class ProofFileProvider extends $NotifierProvider<ProofFile, XFile?> {
+  ProofFileProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'proofFileProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$proofFileHash();
+
+  @$internal
+  @override
+  ProofFile create() => ProofFile();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(XFile? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<XFile?>(value),
+    );
+  }
+}
+
 String _$proofFileHash() => r'd99079d63f94cac85785d701273a90be77464f7c';
 
-/// See also [ProofFile].
-@ProviderFor(ProofFile)
-final proofFileProvider =
-    AutoDisposeNotifierProvider<ProofFile, XFile?>.internal(
-      ProofFile.new,
-      name: r'proofFileProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$proofFileHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+abstract class _$ProofFile extends $Notifier<XFile?> {
+  XFile? build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<XFile?, XFile?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<XFile?, XFile?>,
+              XFile?,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
 
-typedef _$ProofFile = AutoDisposeNotifier<XFile?>;
+@ProviderFor(ItemFile)
+final itemFileProvider = ItemFileProvider._();
+
+final class ItemFileProvider extends $NotifierProvider<ItemFile, XFile?> {
+  ItemFileProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'itemFileProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$itemFileHash();
+
+  @$internal
+  @override
+  ItemFile create() => ItemFile();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(XFile? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<XFile?>(value),
+    );
+  }
+}
+
 String _$itemFileHash() => r'af9a56d0d59bfb56acd5a53b521c78f9f2594afd';
 
-/// See also [ItemFile].
-@ProviderFor(ItemFile)
-final itemFileProvider = AutoDisposeNotifierProvider<ItemFile, XFile?>.internal(
-  ItemFile.new,
-  name: r'itemFileProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$itemFileHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$ItemFile = AutoDisposeNotifier<XFile?>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$ItemFile extends $Notifier<XFile?> {
+  XFile? build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<XFile?, XFile?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<XFile?, XFile?>,
+              XFile?,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

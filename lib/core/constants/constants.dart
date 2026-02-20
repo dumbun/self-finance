@@ -121,9 +121,9 @@ abstract class Constant {
   static const String emiCalculatorToolTip =
       "EMI calculator page where you can calculate interest.";
 
-  static const String defaultProfileImagePath = "assets/icon/defaultImage.svg";
-  static const String defaultProofImagePath = "assets/icon/id_proof_icon.svg";
-  static const String defaultItemImagePath = "assets/icon/item_icon.svg";
+  static const String defaultProfileImagePath = "assets/icon/defaultImage.png";
+  static const String defaultProofImagePath = "assets/icon/id_proof_icon.png";
+  static const String defaultItemImagePath = "assets/icon/item_icon.png";
 
   static const String searchMobile = "Search by mobile number";
   static const String searchName = "Search by customer name";
@@ -201,4 +201,31 @@ abstract class Constant {
   static const String totalIntrestAmount = "Total intrest amount";
   static const String totalAmount = "Total amount";
   static const String signature = "Signature";
+
+  static const List<String> dailyQuotes = [
+    // Motivational
+    "Track every penny today.\nYour future self is watching.\nMake them proud. 💪",
+    "A budget isn't a restriction.\nIt's permission to spend without guilt.\nTake control today. ✅",
+    "Small savings seem insignificant today.\nBut compounded over years,\nthey become life-changing. 🚀",
+    "You work hard for your money.\nMake sure your money\nworks just as hard for you. 💼",
+    "Financial freedom isn't a dream.\nIt's a plan with a deadline.\nStart planning today. 🎯",
+
+    // Daily awareness
+    "Did you log today's expenses?\nEvery entry counts.\nYour future budget will thank you. 📊",
+    "One small check-in today\nkeeps financial stress away.\nOpen the app and stay on track. 📱",
+    "Money untracked is money lost.\nTake 2 minutes today\nto review your spending. ⏱️",
+    "Your morning coffee, your lunch, your commute.\nEvery expense tells a story.\nMake yours a good one. ☕",
+    "Awareness is the first step to wealth.\nYou can't improve\nwhat you don't measure. 📈",
+
+    // Mindset
+    "Wealth is not about earning more.\nIt's about wasting less\nand saving intentionally. 🧠",
+    "The rich don't worry about money.\nNot because they have a lot,\nbut because they manage it well. 💎",
+    "A small leak sinks a great ship.\nCheck your subscriptions, your habits.\nPlug the leaks today. 🚢",
+    "Don't just earn and spend.\nEarn, track, save, invest.\nThen watch your life change. 🌱",
+    "Financial stress is real.\nBut so is financial peace.\nChoose the path of discipline today. 🧘",
+
+    // Weekend specials
+    "It's a new day, a fresh start.\nReview last week's spending\nand set this week's intention. 🌅",
+    "Weekends are for rest and reflection.\nTake a moment to check your goals.\nYou're closer than you think. 🌟",
+  ];
 }

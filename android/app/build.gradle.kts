@@ -17,7 +17,7 @@ if (keystorePropertiesFile.exists()) {
 
 kotlin {
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_11
+        jvmTarget = JvmTarget.JVM_17
         // (alt) jvmTarget = JvmTarget.fromTarget("11")
     }
 }
@@ -30,8 +30,9 @@ android {
     // ndkVersion = "28.2.13676358"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
 
 
@@ -47,6 +48,7 @@ android {
     dependencies {
     implementation("androidx.multidex:multidex:2.0.1")
     implementation("com.google.android.material:material:1.13.0")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
     }
 
     signingConfigs {

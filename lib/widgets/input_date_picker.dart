@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
+import 'package:self_finance/providers/date_provider.dart';
 
-class InputDatePicker extends StatefulWidget {
+class InputDatePicker extends ConsumerStatefulWidget {
   const InputDatePicker({
     super.key,
     required this.controller,
@@ -20,13 +22,16 @@ class InputDatePicker extends StatefulWidget {
   final String labelText;
   final Function? onChanged;
   final Function? onTap;
+
   @override
-  State<InputDatePicker> createState() => _InputDatePickerState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _InputDatePickerState();
 }
 
-class _InputDatePickerState extends State<InputDatePicker> {
+class _InputDatePickerState extends ConsumerState<InputDatePicker> {
   @override
   Widget build(BuildContext context) {
+    ref.watch(dateProvider);
     return TextFormField(
       validator: (String? value) {
         if (value == null || value.isEmpty) {
@@ -104,12 +109,15 @@ class _InputDatePickerState extends State<InputDatePicker> {
         );
         if (pickedDate != null) {
           //pickedDate output format => 2021-03-10 00:00:00.000
-          String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
+          final String formattedDate = DateFormat(
+            'dd-MM-yyyy',
+          ).format(pickedDate);
           //formatted date output using intl package =>  2021-03-16
           setState(() {
             widget.controller.text =
                 formattedDate; //set output date to InputTextField value.
           });
+          ref.read(dateProvider.notifier).set(pickedDate);
         } else {}
       },
     );

@@ -6,123 +6,295 @@ part of 'analytics_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$totalCustomersHash() => r'2b81a3c6331f32d3876dd62baf0c13aee12ffdc0';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Live dashboard analytics driven by drift streams.
+/// No manual refresh needed - this updates automatically on DB changes.
 
-/// See also [totalCustomers].
+@ProviderFor(analytics)
+final analyticsProvider = AnalyticsProvider._();
+
+/// Live dashboard analytics driven by drift streams.
+/// No manual refresh needed - this updates automatically on DB changes.
+
+final class AnalyticsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<AnalyticsState>,
+          AnalyticsState,
+          Stream<AnalyticsState>
+        >
+    with $FutureModifier<AnalyticsState>, $StreamProvider<AnalyticsState> {
+  /// Live dashboard analytics driven by drift streams.
+  /// No manual refresh needed - this updates automatically on DB changes.
+  AnalyticsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'analyticsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$analyticsHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<AnalyticsState> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<AnalyticsState> create(Ref ref) {
+    return analytics(ref);
+  }
+}
+
+String _$analyticsHash() => r'f7fb86b2adde9db1bb24f85d963d4e11faf0568e';
+
 @ProviderFor(totalCustomers)
-final totalCustomersProvider = AutoDisposeProvider<int>.internal(
-  totalCustomers,
-  name: r'totalCustomersProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$totalCustomersHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final totalCustomersProvider = TotalCustomersProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef TotalCustomersRef = AutoDisposeProviderRef<int>;
-String _$activeLoansHash() => r'd6e4c30f290e26dcff7fb222bea21820937b525d';
+final class TotalCustomersProvider extends $FunctionalProvider<int, int, int>
+    with $Provider<int> {
+  TotalCustomersProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'totalCustomersProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
-/// See also [activeLoans].
-@ProviderFor(activeLoans)
-final activeLoansProvider = AutoDisposeProvider<int>.internal(
-  activeLoans,
-  name: r'activeLoansProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$activeLoansHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+  @override
+  String debugGetCreateSourceHash() => _$totalCustomersHash();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef ActiveLoansRef = AutoDisposeProviderRef<int>;
-String _$outstandingAmountHash() => r'23e4b0fa2ceb8967d594c1ff6f782a636ccfc37f';
+  @$internal
+  @override
+  $ProviderElement<int> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
-/// See also [outstandingAmount].
-@ProviderFor(outstandingAmount)
-final outstandingAmountProvider = AutoDisposeProvider<double>.internal(
-  outstandingAmount,
-  name: r'outstandingAmountProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$outstandingAmountHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+  @override
+  int create(Ref ref) {
+    return totalCustomers(ref);
+  }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef OutstandingAmountRef = AutoDisposeProviderRef<double>;
-String _$interestEarnedHash() => r'1366dfac12aacf20cfd7b10746dbc96c005d7686';
-
-/// See also [interestEarned].
-@ProviderFor(interestEarned)
-final interestEarnedProvider = AutoDisposeProvider<double>.internal(
-  interestEarned,
-  name: r'interestEarnedProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$interestEarnedHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef InterestEarnedRef = AutoDisposeProviderRef<double>;
-String _$totalDisbursedHash() => r'7fef2694e289770b336ce3285b723df300e98e52';
-
-/// See also [totalDisbursed].
-@ProviderFor(totalDisbursed)
-final totalDisbursedProvider = AutoDisposeProvider<double>.internal(
-  totalDisbursed,
-  name: r'totalDisbursedProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$totalDisbursedHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef TotalDisbursedRef = AutoDisposeProviderRef<double>;
-String _$paymentsReceivedHash() => r'fc7a692601c942c77a62a1ea1883cc2368cdb7ee';
-
-/// See also [paymentsReceived].
-@ProviderFor(paymentsReceived)
-final paymentsReceivedProvider = AutoDisposeProvider<double>.internal(
-  paymentsReceived,
-  name: r'paymentsReceivedProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$paymentsReceivedHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef PaymentsReceivedRef = AutoDisposeProviderRef<double>;
-String _$analyticsHash() => r'8fb695205e9a463851a1a540849a4e6eecda9cfc';
-
-/// See also [Analytics].
-@ProviderFor(Analytics)
-final analyticsProvider =
-    AutoDisposeNotifierProvider<Analytics, AnalyticsState>.internal(
-      Analytics.new,
-      name: r'analyticsProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$analyticsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(int value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<int>(value),
     );
+  }
+}
 
-typedef _$Analytics = AutoDisposeNotifier<AnalyticsState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+String _$totalCustomersHash() => r'd2f1b541fea06d4374a037ea06634bfbc92fca84';
+
+@ProviderFor(activeLoans)
+final activeLoansProvider = ActiveLoansProvider._();
+
+final class ActiveLoansProvider extends $FunctionalProvider<int, int, int>
+    with $Provider<int> {
+  ActiveLoansProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'activeLoansProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$activeLoansHash();
+
+  @$internal
+  @override
+  $ProviderElement<int> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  int create(Ref ref) {
+    return activeLoans(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(int value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<int>(value),
+    );
+  }
+}
+
+String _$activeLoansHash() => r'ddc87a1edba0e6e8aa1b162ba9e755e6816475c2';
+
+@ProviderFor(outstandingAmount)
+final outstandingAmountProvider = OutstandingAmountProvider._();
+
+final class OutstandingAmountProvider
+    extends $FunctionalProvider<double, double, double>
+    with $Provider<double> {
+  OutstandingAmountProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'outstandingAmountProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$outstandingAmountHash();
+
+  @$internal
+  @override
+  $ProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  double create(Ref ref) {
+    return outstandingAmount(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double>(value),
+    );
+  }
+}
+
+String _$outstandingAmountHash() => r'8c9e5c47bbafda1308066b9c209469b34210c3a9';
+
+@ProviderFor(interestEarned)
+final interestEarnedProvider = InterestEarnedProvider._();
+
+final class InterestEarnedProvider
+    extends $FunctionalProvider<double, double, double>
+    with $Provider<double> {
+  InterestEarnedProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'interestEarnedProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$interestEarnedHash();
+
+  @$internal
+  @override
+  $ProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  double create(Ref ref) {
+    return interestEarned(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double>(value),
+    );
+  }
+}
+
+String _$interestEarnedHash() => r'0fdb59ba6a08f10c366f5752e8e47920d4c26c36';
+
+@ProviderFor(totalDisbursed)
+final totalDisbursedProvider = TotalDisbursedProvider._();
+
+final class TotalDisbursedProvider
+    extends $FunctionalProvider<double, double, double>
+    with $Provider<double> {
+  TotalDisbursedProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'totalDisbursedProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$totalDisbursedHash();
+
+  @$internal
+  @override
+  $ProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  double create(Ref ref) {
+    return totalDisbursed(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double>(value),
+    );
+  }
+}
+
+String _$totalDisbursedHash() => r'a8f799b2da831b289ecd9af2bc5530ebeccde06c';
+
+@ProviderFor(paymentsReceived)
+final paymentsReceivedProvider = PaymentsReceivedProvider._();
+
+final class PaymentsReceivedProvider
+    extends $FunctionalProvider<double, double, double>
+    with $Provider<double> {
+  PaymentsReceivedProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'paymentsReceivedProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$paymentsReceivedHash();
+
+  @$internal
+  @override
+  $ProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  double create(Ref ref) {
+    return paymentsReceived(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(double value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<double>(value),
+    );
+  }
+}
+
+String _$paymentsReceivedHash() => r'7ba265d43d30b48f3b75e6dc2422824479d4ecf0';

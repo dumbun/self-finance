@@ -5,19 +5,9 @@ import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
-import 'package:self_finance/models/customer_model.dart';
-import 'package:self_finance/models/items_model.dart';
-import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/models/user_history_model.dart';
-import 'package:self_finance/providers/customer_contacts_provider.dart';
-import 'package:self_finance/providers/customer_provider.dart';
-import 'package:self_finance/providers/history_provider.dart';
+import 'package:self_finance/providers/contacts_provider.dart';
 import 'package:self_finance/providers/image_providers.dart';
-import 'package:self_finance/providers/items_provider.dart';
-import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
-import 'package:self_finance/core/utility/image_saving_utility.dart';
-import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/signature_widget.dart';
@@ -76,7 +66,7 @@ class _CustomerConformationViewState
       contentPadding: EdgeInsets.all(4.sp),
       subtitle: currency
           ? CurrencyWidget(amount: data)
-          : BodyOneDefaultText(bold: true, text: data),
+          : BodyOneDefaultText(bold: true, text: data.toString()),
       title: BodySmallText(text: title),
     );
   }
@@ -152,142 +142,36 @@ class _CustomerConformationViewState
     Navigator.pop(context);
   }
 
-  void _containsSameNumberInDB() {
-    setState(() {
-      _isloading = false;
-    });
-
-    _alertDilog(title: "Error", content: Constant.contactAlreadyExistMessage);
-  }
-
-  void _save() async {
+  Future<void> _save() async {
     setState(() => _isloading = true);
 
-    /// already Existing mobile number present check [error]
-    final List<String> customerNumbers = await ref
-        .read(asyncCustomersProvider.notifier)
-        .fetchAllCustomersNumbers();
-    if (customerNumbers.contains(widget.mobileNumber) == false) {
-      final String presentDateTime = DateTime.now().toString();
-      final takenAmount = widget.takenAmount;
-
-      // saving image to storage
-      final String imagePath = await ImageSavingUtility.saveImage(
-        location: 'customers',
-        image: ref.read(imageFileProvider),
-      );
-
-      final String proofPath = await ImageSavingUtility.saveImage(
-        location: 'proofs',
-        image: ref.read(proofFileProvider),
-      );
-
-      // creating the new customer
-
-      final int customerCreatedResponse = await ref
-          .read(asyncCustomersContactsProvider.notifier)
-          .addCustomer(
-            customer: Customer(
-              userID: 1, //? later updates if there are more users
-              name: widget.customerName,
-              guardianName: widget.gaurdianName,
-              address: widget.address,
-              number: widget.mobileNumber,
-              photo: imagePath,
-              proof: proofPath,
-              createdDate: presentDateTime,
-            ),
-          );
-      if (customerCreatedResponse != 0) {
-        // Do image save
-        // creating new item becacuse every new transaction will have a proof item
-        final String itemImagePath = await ImageSavingUtility.saveImage(
-          location: 'items',
-          image: ref.read(itemFileProvider),
+    final bool res = await ref
+        .read(contactsProvider.notifier)
+        .createNewCustomer(
+          customerName: widget.customerName,
+          guardianName: widget.gaurdianName,
+          address: widget.address,
+          number: widget.mobileNumber,
+          discription: widget.itemDescription,
+          takenAmount: widget.takenAmount,
+          rateOfIntrest: widget.rateOfIntrest,
+          signatureController: _signatureGlobalKey,
         );
-        final int itemCreatedResponse = await ref
-            .read(asyncItemsProvider.notifier)
-            .addItem(
-              item: Items(
-                customerid: customerCreatedResponse,
-                name: widget.itemDescription,
-                description: widget.itemDescription,
-                pawnedDate: widget.takenDate,
-                expiryDate: presentDateTime,
-                pawnAmount: takenAmount,
-                status: Constant.active,
-                photo: itemImagePath,
-                createdDate: presentDateTime,
-              ),
-            );
-        if (itemCreatedResponse != 0) {
-          final String signatureResponse =
-              await Utility.saveSignaturesInStorage(
-                signatureController: _signatureGlobalKey,
-                imageName: itemCreatedResponse.toString(),
-              );
-
-          // creating new transaction
-          final int transactionCreatedResponse = await ref
-              .read(asyncTransactionsProvider.notifier)
-              .addTransaction(
-                transaction: Trx(
-                  customerId: customerCreatedResponse,
-                  itemId: itemCreatedResponse,
-                  transacrtionDate: widget.takenDate,
-                  transacrtionType: Constant.active,
-                  amount: takenAmount,
-                  intrestRate: widget.rateOfIntrest,
-                  intrestAmount: 0.0,
-                  remainingAmount: 0,
-                  signature: signatureResponse,
-                  createdDate: presentDateTime,
-                ),
-              );
-          if (transactionCreatedResponse != 0) {
-            // creating history
-            final int historyResponse = await ref
-                .read(asyncHistoryProvider.notifier)
-                .addHistory(
-                  history: UserHistory(
-                    userID: 1,
-                    customerID: customerCreatedResponse,
-                    itemID: itemCreatedResponse,
-                    customerName: widget.customerName,
-                    customerNumber: widget.mobileNumber,
-                    transactionID: transactionCreatedResponse,
-                    eventDate: presentDateTime,
-                    eventType: Constant.debited,
-                    amount: takenAmount,
-                  ),
-                );
-            // final response
-            (customerCreatedResponse != 0 &&
-                    itemCreatedResponse != 0 &&
-                    transactionCreatedResponse != 0 &&
-                    historyResponse != 0)
-                ? _afterSuccess()
-                : _afterFail();
-          }
-        }
-      }
-    } else {
-      _containsSameNumberInDB();
-    }
+    res ? _afterSuccess() : _afterFail();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: BodySmallText(text: "Customer conformation", bold: true),
+        title: const BodySmallText(text: "Customer conformation", bold: true),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.getPrimaryColor,
         onPressed: _save,
         child: Visibility(
           visible: _isloading,
-          replacement: Icon(Icons.volunteer_activism),
+          replacement: const Icon(Icons.volunteer_activism),
           child: const Center(child: CircularProgressIndicator.adaptive()),
         ),
       ),

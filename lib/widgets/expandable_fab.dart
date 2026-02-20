@@ -14,7 +14,6 @@ class ExpandableFab extends StatelessWidget {
     String title,
   ) {
     return Card(
-      elevation: 0,
       color: AppColors.getPrimaryColor,
       child: ListTile(
         onTap: onTap,
@@ -81,7 +80,7 @@ class ExpandableFab extends StatelessWidget {
           },
         );
       },
-      child: const Icon(Icons.edit),
+      child: const Icon(Icons.edit, color: AppColors.getBackgroundColor),
     );
   }
 }

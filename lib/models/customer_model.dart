@@ -7,7 +7,7 @@ class Customer {
   final String number;
   final String photo;
   final String proof;
-  final String createdDate;
+  final DateTime createdDate;
 
   Customer({
     this.id,
@@ -35,7 +35,7 @@ class Customer {
         number: e["Contact_Number"] as String,
         photo: e["Customer_Photo"] as String,
         proof: e["Proof_Photo"] as String,
-        createdDate: e["Created_Date"] as String,
+        createdDate: e["Created_Date"] as DateTime,
       );
     }).toList();
   }
@@ -49,7 +49,7 @@ class Customer {
     String? number,
     String? photo,
     String? proof,
-    String? createdDate,
+    DateTime? createdDate,
   }) {
     return Customer(
       id: id ?? this.id,
@@ -86,7 +86,7 @@ class Customer {
       number: map['number'] as String,
       photo: map['photo'] as String,
       proof: map['proof'] as String,
-      createdDate: map['createdDate'] as String,
+      createdDate: map['createdDate'] as DateTime,
       userID: map['userID'] as int,
     );
   }

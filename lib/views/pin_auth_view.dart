@@ -4,40 +4,35 @@ import 'package:self_finance/core/auth/auth.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/strong_heading_one_text.dart';
+import 'package:self_finance/core/utility/preferences_helper.dart';
 import 'package:self_finance/models/user_model.dart';
-import 'package:self_finance/core/theme/app_colors.dart';
+import 'package:self_finance/widgets/biometric_button_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
 class PinAuthView extends StatefulWidget {
-  final List<User> userDate;
   const PinAuthView({super.key, required this.userDate});
-
+  final User userDate;
   @override
   State<PinAuthView> createState() => _PinAuthViewState();
 }
 
 class _PinAuthViewState extends State<PinAuthView> {
   final TextEditingController _pinController = TextEditingController();
-
-  // Small cache: avoid repeated widget.userDate.first lookups + string checks
-  late final User _user;
-
-  // Avoid double navigation / repeated submit
   bool _isSubmitting = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _user = widget.userDate.first;
-  }
 
   @override
   void dispose() {
     _pinController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    _handleBiometric();
+    super.initState();
   }
 
   void _goToDashboard() {
@@ -50,7 +45,7 @@ class _PinAuthViewState extends State<PinAuthView> {
     _pinController.clear();
   }
 
-  void _handlePinSubmit() {
+  void _handlePinSubmit({required String expectedPin}) {
     if (_isSubmitting) return;
 
     final entered = _pinController.text.trim();
@@ -58,7 +53,7 @@ class _PinAuthViewState extends State<PinAuthView> {
 
     _isSubmitting = true;
     try {
-      if (entered == _user.userPin) {
+      if (entered == expectedPin) {
         _goToDashboard();
       } else {
         _clearPin();
@@ -73,8 +68,11 @@ class _PinAuthViewState extends State<PinAuthView> {
 
     _isSubmitting = true;
     try {
-      final bool ok = await LocalAuthenticator.authenticate();
-      if (ok) _goToDashboard();
+      final bool res = await PreferencesHelper.isBiometrics();
+      if (res) {
+        final bool ok = await LocalAuthenticator.authenticate();
+        if (ok) _goToDashboard();
+      }
     } finally {
       _isSubmitting = false;
     }
@@ -82,23 +80,21 @@ class _PinAuthViewState extends State<PinAuthView> {
 
   @override
   Widget build(BuildContext context) {
-    final String profilePic = _user.profilePicture.trim();
+    final User user = widget.userDate;
+    final String profilePic = user.profilePicture.trim();
     final bool hasProfilePic = profilePic.isNotEmpty;
-
     return Scaffold(
       body: SafeArea(
         child: Center(
-          // Center avoids Stack/Align overhead; simpler tree
           child: SingleChildScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: EdgeInsets.all(12.sp),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: [
+              children: <Widget>[
                 if (hasProfilePic)
                   CircularImageWidget(
                     imageData: profilePic,
-                    titile: Constant.userProfileTag,
+                    titile: user.userName,
                   )
                 else
                   DefaultUserImage(height: 42.sp),
@@ -112,35 +108,31 @@ class _PinAuthViewState extends State<PinAuthView> {
 
                 SizedBox(height: 20.sp),
 
-                // Keep validator cheap: no navigation inside validator
                 PinInputWidget(
                   pinController: _pinController,
                   obscureText: true,
                   validator: (String? value) {
                     final v = value?.trim() ?? '';
                     if (v.isEmpty) return Constant.enterYourAppPin;
-                    if (v != _user.userPin) return Constant.enterCorrectPin;
+                    if (v != user.userPin) return Constant.enterCorrectPin;
                     return null;
                   },
                 ),
 
                 SizedBox(height: 20.sp),
 
-                RoundedCornerButton(
-                  text: Constant.login,
-                  onPressed: _handlePinSubmit,
+                Padding(
+                  padding: EdgeInsetsGeometry.only(left: 22.sp, right: 22.sp),
+                  child: RoundedCornerButton(
+                    text: Constant.login,
+                    onPressed: () =>
+                        _handlePinSubmit(expectedPin: user.userPin),
+                  ),
                 ),
 
                 SizedBox(height: 20.sp),
 
-                IconButton(
-                  onPressed: _handleBiometric,
-                  icon: Icon(
-                    Icons.fingerprint,
-                    color: AppColors.getPrimaryColor,
-                    size: 32.sp,
-                  ),
-                ),
+                BiometricButtonWidget(onPressed: _handleBiometric),
               ],
             ),
           ),

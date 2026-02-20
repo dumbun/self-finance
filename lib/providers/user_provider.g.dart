@@ -6,20 +6,49 @@ part of 'user_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$asyncUserHash() => r'49cf5fc0cd84c6b76db3affc128d6527a423d25e';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [AsyncUser].
-@ProviderFor(AsyncUser)
-final asyncUserProvider = AsyncNotifierProvider<AsyncUser, List<User>>.internal(
-  AsyncUser.new,
-  name: r'asyncUserProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$asyncUserHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+@ProviderFor(UserNotifier)
+final userProvider = UserNotifierProvider._();
 
-typedef _$AsyncUser = AsyncNotifier<List<User>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class UserNotifierProvider
+    extends $StreamNotifierProvider<UserNotifier, User?> {
+  UserNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'userProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$userNotifierHash();
+
+  @$internal
+  @override
+  UserNotifier create() => UserNotifier();
+}
+
+String _$userNotifierHash() => r'1391cc84504f6f4114b9523a159bcf2a02bc4808';
+
+abstract class _$UserNotifier extends $StreamNotifier<User?> {
+  Stream<User?> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<User?>, User?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<User?>, User?>,
+              AsyncValue<User?>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

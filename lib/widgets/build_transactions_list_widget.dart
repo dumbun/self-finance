@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -8,13 +6,11 @@ import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
-import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
-import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
+import 'package:self_finance/widgets/customer_image_widget.dart';
 import 'package:self_finance/widgets/customer_name_build_widget.dart';
-import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/slidable_widget.dart';
 import 'package:self_finance/widgets/status_chip_widget.dart';
 
@@ -23,8 +19,14 @@ class BuildTransactionsListWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final size = 28.sp;
+    final height = 16.sp;
+
+    final int cacheSize = (size * MediaQuery.of(context).devicePixelRatio)
+        .round();
+
     return ref
-        .watch(asyncTransactionsProvider)
+        .watch(transactionsProvider)
         .when(
           data: (List<Trx> data) {
             if (data.isNotEmpty) {
@@ -33,18 +35,17 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                 itemCount: data.length, // ← important
                 itemBuilder: (BuildContext context, int index) {
                   final Trx txn = data[index];
-                  return SlidableWidget(
-                    customerId: txn.customerId,
-                    transactionId: txn.id!,
-                    child: InkWell(
-                      onTap: () => Routes.navigateToTransactionDetailsView(
-                        transacrtionId: txn.id!,
-                        customerId: txn.customerId,
-                        context: context,
-                      ),
+                  return InkWell(
+                    onTap: () => Routes.navigateToTransactionDetailsView(
+                      transacrtionId: txn.id!,
+                      customerId: txn.customerId,
+                      context: context,
+                    ),
 
-                      child: Container(
-                        alignment: Alignment.center,
+                    child: SlidableWidget(
+                      customerId: txn.customerId,
+                      transactionId: txn.id!,
+                      child: Padding(
                         padding: EdgeInsets.all(14.sp),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -54,69 +55,12 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Consumer(
-                                  builder:
-                                      (
-                                        BuildContext context,
-                                        WidgetRef ref,
-                                        Widget? child,
-                                      ) {
-                                        final double size = 28.sp;
-                                        final int cacheSize =
-                                            (size *
-                                                    MediaQuery.of(
-                                                      context,
-                                                    ).devicePixelRatio)
-                                                .round();
-
-                                        return ref
-                                            .watch(
-                                              customerByIdProvider(
-                                                txn.customerId,
-                                              ),
-                                            )
-                                            .when(
-                                              data: (Customer? data) {
-                                                if (data == null ||
-                                                    data.photo.isEmpty) {
-                                                  return DefaultUserImage(
-                                                    height: size,
-                                                    width: size,
-                                                  );
-                                                }
-
-                                                final file = File(data.photo);
-                                                if (!file.existsSync()) {
-                                                  return DefaultUserImage(
-                                                    height: size,
-                                                    width: size,
-                                                  );
-                                                }
-
-                                                return ClipOval(
-                                                  child: Image.file(
-                                                    file,
-                                                    height: size,
-                                                    width: size,
-                                                    cacheWidth: cacheSize,
-                                                    cacheHeight: cacheSize,
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                );
-                                              },
-                                              loading: () => DefaultUserImage(
-                                                height: size,
-                                                width: size,
-                                              ),
-                                              error: (_, __) =>
-                                                  DefaultUserImage(
-                                                    height: size,
-                                                    width: size,
-                                                  ),
-                                            );
-                                      },
+                                CustomerImageWidget(
+                                  cache: cacheSize,
+                                  customerId: txn.customerId,
+                                  size: size,
                                 ),
-                                SizedBox(width: 16.sp),
+                                SizedBox(width: height),
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,7 +80,9 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 BodyTwoDefaultText(
-                                  text: txn.transacrtionDate,
+                                  text: Utility.formatDate(
+                                    date: txn.transacrtionDate,
+                                  ),
                                   bold: true,
                                   color: AppColors.getLigthGreyColor,
                                 ),
@@ -156,8 +102,8 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                 },
               );
             } else {
-              return Center(
-                child: const BodyOneDefaultText(
+              return const Center(
+                child: BodyOneDefaultText(
                   bold: true,
                   text: "No Transactons to view",
                 ),
@@ -165,7 +111,7 @@ class BuildTransactionsListWidget extends ConsumerWidget {
             }
           },
           error: (Object error, StackTrace stackTrace) =>
-              Text(error.toString()),
+              BodyTwoDefaultText(text: error.toString()),
           loading: () => const CircularProgressIndicator(),
         );
   }

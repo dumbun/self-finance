@@ -1,13 +1,11 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/backup_utility.dart';
-
-/// Assumes backupImagesAndSqliteToDownloads is available in scope and
-/// has signature:
-/// Future->String backupImagesAndSqliteToDownloads({ BackupProgressCallback? onProgress })
-///
-/// Where BackupProgressCallback = void Function(double progress, String currentFile);
+import 'package:self_finance/models/backup_model.dart';
+import 'package:self_finance/models/eta_model.dart';
 
 class BackupWithProgressWidget extends StatefulWidget {
   const BackupWithProgressWidget({super.key});
@@ -18,232 +16,201 @@ class BackupWithProgressWidget extends StatefulWidget {
 }
 
 class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
-  double _progress = 0.0; // 0.0 - 1.0
-  String _currentFile = '';
-  bool _running = false;
-  DateTime? _startTime;
-  String? _zipPath;
-  Timer? _etaTimer;
-
-  // For smoothing ETA we keep last few samples (time, progress)
-  final List<_Sample> _samples = [];
+  final ValueNotifier<BackupState> _state = ValueNotifier(BackupState.idle());
+  final EtaEstimator _eta = EtaEstimator();
 
   @override
   void dispose() {
-    _etaTimer?.cancel();
+    _state.dispose();
     super.dispose();
   }
 
   Future<void> _startBackup() async {
-    if (_running) return;
+    if (_state.value.isRunning) return;
 
-    setState(() {
-      _running = true;
-      _progress = 0.0;
-      _currentFile = '';
-      _zipPath = null;
-      _startTime = DateTime.now();
-      _samples.clear();
-    });
-
-    // Small timer to refresh ETA even if progress callbacks are sparse
-    _etaTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted) return;
-      setState(() {}); // re-draw ETA
-    });
+    _eta.reset();
+    _state.value = BackupState.running(progress: 0, currentFile: '');
 
     try {
       final zipPath = await BackupUtility.startBackup(
         onProgress: (progress, currentFile) {
-          if (!mounted) return;
-
-          final now = DateTime.now();
-          // Save sample for smoothing / ETA
-          _samples.add(_Sample(time: now, progress: progress));
-          // Keep last few samples only
-          if (_samples.length > 6) _samples.removeAt(0);
-
-          setState(() {
-            _progress = progress.clamp(0.0, 1.0);
-            _currentFile = currentFile;
-          });
+          final eta = _eta.update(progress);
+          _state.value = BackupState.running(
+            progress: progress.clamp(0.0, 1.0),
+            currentFile: currentFile,
+            eta: eta,
+          );
         },
       );
 
-      if (!mounted) return;
-      setState(() {
-        _running = false;
-        _zipPath = zipPath;
-        _progress = 1.0;
-      });
+      _state.value = BackupState.success(zipPath: zipPath);
     } catch (e) {
-      debugPrint('Backup failed: $e');
-      if (!mounted) return;
-      setState(() {
-        _running = false;
-      });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Backup failed: ${e.toString()}')));
-    } finally {
-      _etaTimer?.cancel();
-      _etaTimer = null;
-    }
-  }
-
-  /// Estimate ETA using linear extrapolation on recent samples.
-  /// Returns null if ETA cannot be calculated yet.
-  Duration? _estimateRemaining() {
-    if (_progress >= 1.0) return Duration.zero;
-    // Use the earliest and latest sample to estimate speed
-    if (_samples.length < 2) {
-      // fallback to startTime if available and progress > 0
-      if (_startTime != null && _progress > 0.0) {
-        final elapsed = DateTime.now().difference(_startTime!);
-        final estimatedTotal = Duration(
-          milliseconds: (elapsed.inMilliseconds / _progress).round(),
-        );
-        final remainingMs =
-            estimatedTotal.inMilliseconds - elapsed.inMilliseconds;
-        return remainingMs > 0
-            ? Duration(milliseconds: remainingMs)
-            : Duration.zero;
+      _state.value = BackupState.error(message: e.toString());
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Backup failed: $e')));
       }
-      return null;
     }
-
-    final first = _samples.first;
-    final last = _samples.last;
-
-    final deltaProgress = (last.progress - first.progress);
-    final deltaTimeMs = last.time.difference(first.time).inMilliseconds;
-
-    if (deltaProgress <= 0 || deltaTimeMs <= 0) return null;
-
-    final msPerProgress = deltaTimeMs / deltaProgress; // ms for 1.0 progress
-    final remainingMs = msPerProgress * (1.0 - last.progress);
-    if (remainingMs.isFinite && remainingMs > 0) {
-      return Duration(milliseconds: remainingMs.round());
-    }
-    return null;
-  }
-
-  String _formatDurationShort(Duration d) {
-    if (d.inHours > 0) {
-      final h = d.inHours;
-      final m = d.inMinutes.remainder(60);
-      return '${h}h ${m}m';
-    } else if (d.inMinutes > 0) {
-      return '${d.inMinutes}m ${d.inSeconds.remainder(60)}s';
-    } else {
-      return '${d.inSeconds}s';
-    }
-  }
-
-  String _truncateFilename(String path, {int max = 50}) {
-    if (path.length <= max) return path;
-    final start = path.substring(0, (max / 2).floor());
-    final end = path.substring(path.length - (max / 2).floor());
-    return '$start…$end';
   }
 
   @override
   Widget build(BuildContext context) {
-    final eta = _estimateRemaining();
+    return ValueListenableBuilder<BackupState>(
+      valueListenable: _state,
+      builder: (context, s, _) {
+        return Card(
+          margin: EdgeInsets.all(12.sp),
+          child: Padding(
+            padding: EdgeInsets.all(16.sp),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const BodyOneDefaultText(text: 'Backup', bold: true),
+                SizedBox(height: 12.sp),
 
-    return Card(
-      margin: const EdgeInsets.all(12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const BodyOneDefaultText(text: 'Backup', bold: true),
-            const SizedBox(height: 12),
+                _HeaderLine(state: s),
 
-            // Progress indicator area
-            if (!_running && _progress == 0.0) ...[
-              ElevatedButton.icon(
-                icon: const Icon(Icons.cloud_upload, size: 32),
-                label: const BodyOneDefaultText(
-                  text: 'Start Backup',
-                  bold: true,
-                ),
-                onPressed: _startBackup,
-              ),
-            ] else ...[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Linear progress
+                SizedBox(height: 10.sp),
+
+                if (s.isRunning) ...[
                   LinearProgressIndicator(
-                    value: _progress > 0 ? _progress : null,
+                    value: s.progress == 0 ? null : s.progress,
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.sp),
                   Row(
                     children: [
                       Expanded(
-                        child: Text(
-                          _running
-                              ? 'Backing up: ${_truncateFilename(_currentFile)}'
-                              : (_zipPath != null ? 'Backup saved' : 'Idle'),
+                        child: BodyTwoDefaultText(
+                          text: 'Backing up: ${_truncate(s.currentFile)}',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      if (_running) ...[
-                        if (eta != null)
-                          Text(
-                            'ETA: ${_formatDurationShort(eta)}',
-                            style: const TextStyle(fontSize: 12),
-                          )
-                        else
-                          const Text(
-                            'Estimating...',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                      ] else if (_zipPath != null) ...[
-                        Text(
-                          'Saved',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                      SizedBox(width: 8.sp),
+                      BodyTwoDefaultText(
+                        text: s.eta == null
+                            ? 'Estimating…'
+                            : 'ETA: ${_fmt(s.eta!)}',
+                      ),
+                    ],
+                  ),
+                ] else if (s.isSuccess) ...[
+                  Row(
+                    children: [
+                      const Icon(Icons.check_circle, size: 18),
+                      SizedBox(width: 8.sp),
+                      Expanded(
+                        child: BodyTwoDefaultText(
+                          text: 'Backup saved: ${_truncate(s.zipPath!)}',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+                ] else if (s.isError) ...[
+                  Row(
+                    children: [
+                      const Icon(Icons.error, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: BodyTwoDefaultText(
+                          text: 'Error: ${s.errorMessage}',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                 ],
-              ),
-              const SizedBox(height: 12),
 
-              // Action buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton.icon(
+                SizedBox(height: 14.sp),
+
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton.icon(
                     icon: Icon(
-                      _running ? Icons.pause_circle_filled : Icons.cloud_upload,
+                      s.isRunning
+                          ? Icons.cloud_upload
+                          : Icons.cloud_upload_outlined,
                     ),
-                    label: Text(
-                      _running
-                          ? 'Backing...'
-                          : (_zipPath == null ? 'Start Backup' : 'Run Again'),
+                    label: BodyTwoDefaultText(
+                      text: s.isRunning
+                          ? 'Backing up…'
+                          : (s.isSuccess ? 'Run Again' : 'Start Backup'),
                     ),
-                    onPressed: _running ? null : _startBackup,
+                    onPressed: s.isRunning ? null : _startBackup,
                   ),
-                ],
-              ),
-            ],
-          ],
-        ),
-      ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
+  }
+
+  static String _fmt(Duration d) {
+    if (d.inHours > 0) {
+      final h = d.inHours;
+      final m = d.inMinutes.remainder(60);
+      return '${h}h ${m}m';
+    }
+    if (d.inMinutes > 0) {
+      return '${d.inMinutes}m ${d.inSeconds.remainder(60)}s';
+    }
+    return '${d.inSeconds}s';
+  }
+
+  static String _truncate(String s, {int max = 55}) {
+    if (s.isEmpty) return '';
+    if (s.length <= max) return s;
+    final head = s.substring(0, (max * 0.55).floor());
+    final tail = s.substring(s.length - (max * 0.35).floor());
+    return '$head…$tail';
   }
 }
 
-class _Sample {
-  final DateTime time;
-  final double progress;
-  _Sample({required this.time, required this.progress});
+class _HeaderLine extends StatelessWidget {
+  const _HeaderLine({required this.state});
+  final BackupState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = switch (state.status) {
+      BackupStatus.idle => AppColors.getLigthGreyColor,
+      BackupStatus.running => AppColors.getPrimaryColor,
+      BackupStatus.success => AppColors.getGreenColor,
+      BackupStatus.error => AppColors.getErrorColor,
+    };
+
+    final text = switch (state.status) {
+      BackupStatus.idle => 'Ready to create a backup.',
+      BackupStatus.running =>
+        'Creating backup… ${(state.progress * 100).toStringAsFixed(0)}%',
+      BackupStatus.success => 'Backup completed.',
+      BackupStatus.error => 'Backup failed.',
+    };
+
+    return Row(
+      children: [
+        Icon(
+          switch (state.status) {
+            BackupStatus.idle => Icons.info_outline,
+            BackupStatus.running => Icons.sync,
+            BackupStatus.success => Icons.check_circle_outline,
+            BackupStatus.error => Icons.error_outline,
+          },
+          color: color,
+          size: 18,
+        ),
+        SizedBox(width: 8.sp),
+        Expanded(
+          child: BodyTwoDefaultText(text: text, color: color),
+        ),
+      ],
+    );
+  }
 }

@@ -2,14 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/utility/image_saving_utility.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/customer_model.dart';
-import 'package:self_finance/providers/customer_contacts_provider.dart';
+import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
@@ -32,6 +31,8 @@ class _ContactEditingViewState extends State<ContactEditingView> {
   late String proofPath = widget.contact.proof;
   @override
   void initState() {
+    imagePath = widget.contact.photo;
+    proofPath = widget.contact.proof;
     _customerName.text = widget.contact.name;
     _gaurdianName.text = widget.contact.guardianName;
     _address.text = widget.contact.address;
@@ -62,7 +63,7 @@ class _ContactEditingViewState extends State<ContactEditingView> {
           keyboardType: TextInputType.phone,
           controller: _mobileNumber,
           hintText: Constant.mobileNumber,
-          validator: (value) {
+          validator: (String? value) {
             if (Utility.isValidPhoneNumber(value)) {
               return null;
             } else {
@@ -88,7 +89,6 @@ class _ContactEditingViewState extends State<ContactEditingView> {
 
   void _navigateToContactsView() {
     Navigator.of(context).pop();
-    // Navigator.of(context).popUntil(ModalRoute.withName('/contactsView/'));
     SnackBarWidget.snackBarWidget(
       context: context,
       message: Constant.contactUpdatedSuccessfully,
@@ -135,11 +135,7 @@ class _ContactEditingViewState extends State<ContactEditingView> {
                       width: 42.sp,
                       fit: BoxFit.fill,
                     )
-                  : SvgPicture.asset(
-                      defaultImages,
-                      height: 42.sp,
-                      width: 42.sp,
-                    ),
+                  : Image.asset(defaultImages, height: 42.sp, width: 42.sp),
             ),
           ),
           BodyTwoDefaultText(text: titile, bold: true),
@@ -186,7 +182,7 @@ class _ContactEditingViewState extends State<ContactEditingView> {
                       _buidImages(
                         onTap: () async {
                           final String newProofPath =
-                              await ImageSavingUtility.updateCustomerImage(
+                              await ImageSavingUtility.updateCustomerProof(
                                 camera: true,
                                 customer: widget.contact,
                               );
@@ -212,18 +208,26 @@ class _ContactEditingViewState extends State<ContactEditingView> {
                           text: Constant.update,
                           onPressed: () async {
                             if (_validateAndSave()) {
+                              final Customer newCustomer = Customer(
+                                userID: 1,
+                                id: widget.contact.id,
+                                name: _customerName.text,
+                                guardianName: _gaurdianName.text,
+                                address: _address.text,
+                                number: _mobileNumber.text,
+                                photo: imagePath,
+                                proof: proofPath,
+                                createdDate: widget.contact.createdDate,
+                              );
+
                               final int response = await ref
-                                  .read(asyncCustomersContactsProvider.notifier)
-                                  .updateCustomer(
-                                    customerId: widget.contact.id!,
-                                    newCustomerName: _customerName.text,
-                                    newGuardianName: _gaurdianName.text,
-                                    newCustomerAddress: _address.text,
-                                    newContactNumber: _mobileNumber.text,
-                                    newCustomerPhoto: imagePath,
-                                    newProofPhoto: proofPath,
-                                    newCreatedDate: DateTime.now().toString(),
-                                  );
+                                  .read(
+                                    customerProvider(
+                                      widget.contact.id!,
+                                    ).notifier,
+                                  )
+                                  .updateCustomer(customer: newCustomer);
+
                               if (response != 0) {
                                 _navigateToContactsView();
                               }

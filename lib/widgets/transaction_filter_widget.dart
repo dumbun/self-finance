@@ -1,10 +1,7 @@
-// Provider
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
-import 'package:self_finance/providers/filter_provider.dart'
-    show filterProvider;
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 
@@ -54,25 +51,11 @@ class TransactionFilterWidget extends ConsumerWidget {
               selected: filters.contains(filter),
               label: BodyTwoDefaultText(text: filter.label),
               onSelected: (bool selected) =>
-                  _toggleFilter(ref, filter, selected),
+                  ref.read(filterProvider.notifier).setFilter(filter, selected),
             ),
           );
         }).toList(),
       ),
     );
-  }
-
-  void _toggleFilter(WidgetRef ref, TransactionsFilters filter, bool selected) {
-    // Toggle filter - only one at a time
-    ref.read(filterProvider.notifier).setFilter(filter, selected);
-
-    // Fetch based on selection
-    if (selected) {
-      ref
-          .read(asyncTransactionsProvider.notifier)
-          .fetchTransactionsByAge(filter.months);
-    } else {
-      ref.refresh(asyncTransactionsProvider.future).ignore();
-    }
   }
 }

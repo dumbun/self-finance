@@ -7,9 +7,9 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: const Column(
-        children: <Widget>[MonthlyChartWidget(), AnalaticsGridWidget()],
+    return const SingleChildScrollView(
+      child: Column(
+        children: <Widget>[MonthlyChartSection(), AnalaticsGridWidget()],
       ),
     );
   }

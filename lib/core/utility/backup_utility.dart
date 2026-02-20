@@ -6,7 +6,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sqflite/sqflite.dart';
 
 typedef BackupProgressCallback =
     void Function(double progress, String currentFile);
@@ -111,7 +110,9 @@ class BackupUtility {
         dbPath = p.join(appDocPath, 'databases');
       } else {
         // Android: databases are in standard location
-        dbPath = await getDatabasesPath();
+        final a = await getApplicationDocumentsDirectory();
+        final dbDir = p.join(a.parent.path, 'databases');
+        dbPath = dbDir;
       }
       final Directory dbDir = Directory(dbPath);
 

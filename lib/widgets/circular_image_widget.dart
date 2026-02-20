@@ -10,28 +10,18 @@ class CircularImageWidget extends StatelessWidget {
     super.key,
     required this.imageData,
     required this.titile,
+    this.customeSize,
+    this.cache,
   });
 
   final String imageData;
   final String titile;
+  final double? customeSize;
+  final int? cache;
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildImage(int cache, double size, BuildContext context) {
     final File file = File(imageData);
-    final double size = 44.sp;
-    final int cacheSize = (size * MediaQuery.of(context).devicePixelRatio)
-        .round();
-
     if (imageData.isNotEmpty && file.existsSync()) {
-      final Image imageWidget = Image.file(
-        file,
-        height: size,
-        width: size,
-        cacheWidth: cacheSize,
-        cacheHeight: cacheSize,
-        fit: BoxFit.cover,
-      );
-
       return GestureDetector(
         onTap: () {
           Routes.navigateToImageView(
@@ -45,12 +35,32 @@ class CircularImageWidget extends StatelessWidget {
           child: SizedBox(
             height: size,
             width: size,
-            child: ClipOval(child: imageWidget),
+            child: ClipOval(
+              child: Image.file(
+                file,
+                height: size,
+                width: size,
+                cacheWidth: cache,
+                cacheHeight: cache,
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
         ),
       );
     }
+    return DefaultUserImage(height: size, width: size, cache: cache);
+  }
 
-    return DefaultUserImage(height: size, width: size);
+  @override
+  Widget build(BuildContext context) {
+    final double size = customeSize ?? 44.sp;
+    if (cache != null) {
+      return _buildImage(cache!, size, context);
+    }
+
+    final int cacheSize = (size * MediaQuery.of(context).devicePixelRatio)
+        .round();
+    return _buildImage(cacheSize, size, context);
   }
 }

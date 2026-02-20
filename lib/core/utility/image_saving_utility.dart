@@ -41,7 +41,7 @@ class ImageSavingUtility {
     if (!await locationPath.exists()) {
       await locationPath.create(recursive: true);
     }
-    var uuid = Uuid();
+    const uuid = Uuid();
     final String filePath =
         '${locationPath.path}/photo_${DateTime.now().millisecondsSinceEpoch}_${uuid.v1()}_${DateTime.now()}.jpg';
     final File savedImage = await File(image.path).copy(filePath);
@@ -72,7 +72,7 @@ class ImageSavingUtility {
     }
 
     /// 💾 Save new image
-    var uuid = Uuid();
+    const uuid = Uuid();
     final String newPath =
         '${customerDir.path}/photo_${DateTime.now().millisecondsSinceEpoch}_${uuid.v1()}_${DateTime.now()}.jpg';
     await File(newImage.path).copy(newPath);
@@ -103,7 +103,7 @@ class ImageSavingUtility {
     }
 
     /// 💾 Save new image
-    Uuid uuid = Uuid();
+    const Uuid uuid = Uuid();
     final String newPath =
         '${customerDir.path}/photo_${DateTime.now().millisecondsSinceEpoch}_${uuid.v1()}_${DateTime.now()}.jpg';
     await File(newImage.path).copy(newPath);
