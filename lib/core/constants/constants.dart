@@ -204,6 +204,15 @@ abstract class Constant {
 
   static const List<String> dailyQuotes = [
     // Motivational
+    "You’re stronger than impulses 💪\nSmall choices today\nbuild big results tomorrow.",
+    "Discipline is the real flex 😎\nStay consistent.\nYou’re leveling up.",
+    "One day at a time 🌱\nFocus on progress,\nnot perfection.",
+    "Your goals are valid 🎯\nSpend with purpose.\nSave with pride.",
+    "You control the money.\nMoney doesn’t control you. 🔥",
+    "Tiny wins matter 🏆\nEven a small save today\ncounts.",
+    "Don’t break the streak ✅\nTrack it now.\nFuture-you will smile.",
+    "You’re building a better life 🌟\nGood habits compound\njust like savings.",
+    "Stay focused 🔒\nYour future is worth more\nthan a quick impulse.",
     "Track every penny today.\nYour future self is watching.\nMake them proud. 💪",
     "A budget isn't a restriction.\nIt's permission to spend without guilt.\nTake control today. ✅",
     "Small savings seem insignificant today.\nBut compounded over years,\nthey become life-changing. 🚀",
@@ -211,6 +220,16 @@ abstract class Constant {
     "Financial freedom isn't a dream.\nIt's a plan with a deadline.\nStart planning today. 🎯",
 
     // Daily awareness
+    "Small steps add up.\nLog today’s expenses\nand stay in control. ✅",
+    "Quick money check-in 💸\nDid you stick to your budget today?\nAdjust early, stress less.",
+    "Payday plan time 🎉\nSave first, spend second.\nFuture-you will thank you.",
+    "Midweek reset 🌿\nReview your top spending category.\nOne tiny tweak can help a lot.",
+    "Before you buy 🛒\nAsk: need or want?\nYour goals come first.",
+    "Savings streak reminder 🔥\nTransfer a little today.\nConsistency beats perfection.",
+    "Bills check 🧾\nAny payments due soon?\nClear them early, stay relaxed.",
+    "You’re doing better than you think 🌟\nTake 30 seconds to track today.\nThat’s progress.",
+    "Weekend money moment ☕\nReview this week’s spending.\nPick one goal for next week.",
+    "New week, new choices 🌅\nSet a spending limit for one category.\nMake it easy to win.",
     "Did you log today's expenses?\nEvery entry counts.\nYour future budget will thank you. 📊",
     "One small check-in today\nkeeps financial stress away.\nOpen the app and stay on track. 📱",
     "Money untracked is money lost.\nTake 2 minutes today\nto review your spending. ⏱️",
@@ -218,6 +237,16 @@ abstract class Constant {
     "Awareness is the first step to wealth.\nYou can't improve\nwhat you don't measure. 📈",
 
     // Mindset
+    "You don’t need more money.\nYou need a clear plan.\nYou’ve got this. 🧠✅",
+    "Progress > perfection.\nOne good decision today\nis enough. 🌱",
+    "Your money is a tool.\nNot a stress meter.\nBreathe. Plan. Move. 🧘‍♂️",
+    "You’re building discipline.\nThat’s real wealth.\nKeep going. 💪✨",
+    "Spend with intention.\nSave with pride.\nRepeat. 🔁🌟",
+    "Don’t compare.\nYour journey is yours.\nStay focused. 🎯",
+    "Little wins matter.\nEven ₹50 saved\nis a win. 🪙🏆",
+    "Pause before purchase.\nConfidence comes from control.\nNot impulse. ✋🛍️",
+    "You’re not “bad with money”.\nYou’re learning.\nAnd learning is power. 📚⚡",
+    "Future-you is watching.\nDo one small thing today\nto help them. 🌅",
     "Wealth is not about earning more.\nIt's about wasting less\nand saving intentionally. 🧠",
     "The rich don't worry about money.\nNot because they have a lot,\nbut because they manage it well. 💎",
     "A small leak sinks a great ship.\nCheck your subscriptions, your habits.\nPlug the leaks today. 🚢",
@@ -225,6 +254,16 @@ abstract class Constant {
     "Financial stress is real.\nBut so is financial peace.\nChoose the path of discipline today. 🧘",
 
     // Weekend specials
+    "Weekend special 🌤️\nQuick review of this week’s spending.\nReset with clarity.",
+    "Saturday money check ☕\nSee where your money went.\nPlan smarter for next week.",
+    "Sunday reset 🌿\nTrack leftover expenses.\nStart Monday feeling ready.",
+    "Weekend reflection 🌙\nDid your spending match your goals?\nAdjust gently.",
+    "Treat yourself — wisely 😄\nSet a fun budget.\nEnjoy without guilt.",
+    "Weekend goal time 🎯\nPick one money habit\nto improve next week.",
+    "Mini audit 🧾\nTop 3 spends this week?\nAwareness = power.",
+    "Savings boost weekend 💰\nMove a small amount to savings.\nEven ₹10 counts.",
+    "Weekend calm 🧘\nClear any pending bills.\nPeace feels good.",
+    "Fresh week loading… 🔄\nPlan your week’s budget today.\nMake it easier to win.",
     "It's a new day, a fresh start.\nReview last week's spending\nand set this week's intention. 🌅",
     "Weekends are for rest and reflection.\nTake a moment to check your goals.\nYou're closer than you think. 🌟",
   ];

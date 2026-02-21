@@ -1,9 +1,6 @@
 import 'dart:math';
-
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/constants.dart';
-import 'package:self_finance/core/utility/preferences_helper.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -15,26 +12,24 @@ class NotificationService {
   bool _isInitialized = false;
 
   Future<void> initNotification() async {
-    final bool a = await PreferencesHelper.areNotificationsEnabled();
-    if (_isInitialized || a) return;
+    if (_isInitialized) return;
     // timezone initalization
     tz.initializeTimeZones();
 
-    final currentTimeZone = await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(currentTimeZone.identifier.toString()));
+    final TimezoneInfo currentTimeZone =
+        await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(currentTimeZone.identifier));
 
     const androidInit = AndroidInitializationSettings(
       '@drawable/ic_launcher_foreground',
     );
-    const iosInit = DarwinInitializationSettings(
+    const DarwinInitializationSettings iosInit = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
 
     const settings = InitializationSettings(android: androidInit, iOS: iosInit);
-
-    await notificationPlugin.initialize(settings: settings);
 
     // Android 13+ permission (recommended)
     final AndroidFlutterLocalNotificationsPlugin? androidPlugin =
@@ -44,42 +39,52 @@ class NotificationService {
             >();
     await androidPlugin?.requestNotificationsPermission();
 
-    //At 9am
-    await scheduleNotification(
-      id: 1,
-      title: "Analatics",
-      body: "Do you want to check how much you made it today ",
-      hr: 09,
-      min: 00,
-    );
-
-    // At 8pm
-    await scheduleNotification(
-      id: 2,
-      title: "Analatics",
-      body: "Do you want to check how much you made it today ",
-      hr: 20,
-      min: 00,
-    );
-
-    //At 6pm
-    await scheduleNotification(
-      id: 101,
-      title: "💰 Daily Finance Reminder",
-      body: getTodaysQuote(),
-      hr: 18,
-      min: 0,
-    );
+    await notificationPlugin.initialize(settings: settings);
 
     //At 6am
     await scheduleNotification(
-      id: 102,
+      id: 101,
       title: "💰 Daily Finance Reminder",
       body: getTodaysQuote(),
       hr: 06,
       min: 00,
     );
 
+    //At 9am
+    await scheduleNotification(
+      id: 102,
+      title: "Analatics",
+      body: "Do you want to check how much you made it Yesterday 💸",
+      hr: 09,
+      min: 00,
+    );
+
+    //At 2pm
+    await scheduleNotification(
+      id: 103,
+      title: "💰 Daily Finance Reminder",
+      body: getTodaysQuote(),
+      hr: 14,
+      min: 0,
+    );
+
+    //At 6pm
+    await scheduleNotification(
+      id: 104,
+      title: "💰 Daily Finance Reminder",
+      body: getTodaysQuote(),
+      hr: 18,
+      min: 0,
+    );
+
+    // At 8pm
+    await scheduleNotification(
+      id: 105,
+      title: "Analatics",
+      body: "Do you want to check how much you made it today 🏆",
+      hr: 20,
+      min: 00,
+    );
     _isInitialized = true;
   }
 
@@ -134,40 +139,24 @@ class NotificationService {
       hr,
       min,
     );
-
     if (scheduledDate.isBefore(now)) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
-    final bool isEnabled = await PreferencesHelper.areNotificationsEnabled();
-    if (isEnabled) {
-      await notificationPlugin.zonedSchedule(
-        title: title,
-        body: body,
-        id: id,
-        scheduledDate: scheduledDate,
-        notificationDetails: _notificationDetails(),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.time,
-      );
-    }
+
+    await notificationPlugin.zonedSchedule(
+      title: title,
+      body: body,
+      id: id,
+      scheduledDate: scheduledDate,
+      notificationDetails: _notificationDetails(),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
   }
 
   // cancel all notifications
   Future<void> cancelAllNotifications() async {
     await notificationPlugin.cancelAll();
-  }
-
-  Future<int> fetchActiveTransactions() async {
-    int counter = 0;
-
-    final a = await BackEnd.fetchTransactionsByAge(months: 6);
-
-    for (var element in a) {
-      if (element.transacrtionType == Constant.active) {
-        counter += 1;
-      }
-    }
-
-    return counter;
+    _isInitialized = false;
   }
 }
