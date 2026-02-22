@@ -59,6 +59,7 @@ class BuildHistoryListWidget extends ConsumerWidget {
                 itemBuilder: (BuildContext context, int index) {
                   final UserHistory curr = data[index];
                   return ListTile(
+                    key: ValueKey(curr.id),
                     onTap: () => Routes.navigateToHistoryDetailedView(
                       context: context,
                       history: curr,
