@@ -17,7 +17,6 @@ class UserImageUpdateWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Center(
-      key: ValueKey(userImageString),
       child: GestureDetector(
         onTap: () async {
           await showModalBottomSheet(

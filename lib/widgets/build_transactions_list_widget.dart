@@ -31,18 +31,17 @@ class BuildTransactionsListWidget extends ConsumerWidget {
           data: (List<Trx> data) {
             if (data.isNotEmpty) {
               return ListView.builder(
-                shrinkWrap: true, // ← important
                 itemCount: data.length, // ← important
                 itemBuilder: (BuildContext context, int index) {
                   final Trx txn = data[index];
                   return InkWell(
-                    key: ValueKey(txn.id),
                     onTap: () => Routes.navigateToTransactionDetailsView(
                       transacrtionId: txn.id!,
                       customerId: txn.customerId,
                       context: context,
                     ),
                     child: SlidableWidget(
+                      key: ValueKey<int>(txn.id!),
                       customerId: txn.customerId,
                       transactionId: txn.id!,
                       child: Padding(

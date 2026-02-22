@@ -13,7 +13,6 @@ class StatusChipWidget extends StatelessWidget {
     final bool isActive = status == Constant.active;
 
     return Container(
-      key: UniqueKey(),
       padding: EdgeInsets.symmetric(horizontal: 10.sp, vertical: 4.sp),
       decoration: BoxDecoration(
         color: isActive

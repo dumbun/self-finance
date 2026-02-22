@@ -45,7 +45,6 @@ class SlidableWidget extends ConsumerWidget {
     final double iconSize = 22.sp;
 
     return ClipRRect(
-      key: UniqueKey(),
       borderRadius: BorderRadius.circular(16),
       child: Slidable(
         direction: Axis.horizontal,

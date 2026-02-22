@@ -23,7 +23,6 @@ class CircularImageWidget extends StatelessWidget {
     final File file = File(imageData);
     if (imageData.isNotEmpty && file.existsSync()) {
       return GestureDetector(
-        key: ValueKey(imageData),
         onTap: () {
           Routes.navigateToImageView(
             context: context,

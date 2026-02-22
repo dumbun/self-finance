@@ -13,7 +13,6 @@ class CustomerCardWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
-      key: ValueKey(customerId),
       onTap: () =>
           Routes.navigateToContactDetailsView(context, customerID: customerId),
       child: Card(
@@ -67,8 +66,7 @@ class CustomerCardWidget extends ConsumerWidget {
                 error: (error, stackTrace) => const BodyTwoDefaultText(
                   text: Constant.errorFetchingContactMessage,
                 ),
-                loading: () =>
-                    const Center(child: CircularProgressIndicator.adaptive()),
+                loading: () => const BodyTwoDefaultText(text: "Loading..."),
               ),
         ),
       ),

@@ -27,7 +27,6 @@ class ThemeToggleIconButton extends ConsumerWidget {
         .watch(themeProvider)
         .when(
           data: (bool isDark) => Semantics(
-            key: UniqueKey(),
             button: true,
             toggled: isDark,
             child: IconButton(

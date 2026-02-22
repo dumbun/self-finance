@@ -41,7 +41,6 @@ class TransactionFilterWidget extends ConsumerWidget {
     final filters = ref.watch(filterProvider);
 
     return SingleChildScrollView(
-      key: UniqueKey(),
       scrollDirection: Axis.horizontal,
       child: Row(
         children: TransactionsFilters.values.map((TransactionsFilters filter) {

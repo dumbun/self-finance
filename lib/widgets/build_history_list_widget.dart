@@ -16,23 +16,6 @@ import 'package:self_finance/widgets/currency_widget.dart';
 class BuildHistoryListWidget extends ConsumerWidget {
   const BuildHistoryListWidget({super.key});
 
-  Column _buildDate(String eventDate) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        BodySmallText(
-          text: DateFormat.yMMMd().format(DateTime.parse(eventDate)),
-          color: AppColors.getLigthGreyColor,
-        ),
-        BodySmallText(
-          text: DateFormat.Hm().format(DateTime.parse(eventDate)),
-          color: AppColors.getLigthGreyColor,
-        ),
-      ],
-    );
-  }
-
   Icon _buildIcon({required String type}) {
     return type == Constant.debited
         ? Icon(
@@ -47,6 +30,26 @@ class BuildHistoryListWidget extends ConsumerWidget {
           );
   }
 
+  static final _dateFmt = DateFormat.yMMMd();
+  static final _timeFmt = DateFormat.Hm();
+
+  Widget _buildDate(DateTime dt) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        BodySmallText(
+          text: _dateFmt.format(dt),
+          color: AppColors.getLigthGreyColor,
+        ),
+        BodySmallText(
+          text: _timeFmt.format(dt),
+          color: AppColors.getLigthGreyColor,
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ref
@@ -55,7 +58,6 @@ class BuildHistoryListWidget extends ConsumerWidget {
           data: (List<UserHistory> data) {
             if (data.isNotEmpty) {
               return ListView.builder(
-                shrinkWrap: true, // ← important
                 itemBuilder: (BuildContext context, int index) {
                   final UserHistory curr = data[index];
                   return ListTile(
@@ -73,7 +75,7 @@ class BuildHistoryListWidget extends ConsumerWidget {
                       color: AppColors.getLigthGreyColor,
                       bold: true,
                     ),
-                    trailing: _buildDate(curr.eventDate.toString()),
+                    trailing: _buildDate(curr.eventDate),
                   );
                 },
                 itemCount: data.length,

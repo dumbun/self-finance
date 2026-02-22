@@ -22,40 +22,43 @@ class BuildCustomersListWidget extends ConsumerWidget {
             return data.isNotEmpty
                 ? ListView.builder(
                     itemCount: data.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final Contact curr = data[index];
-                      return Card(
-                        key: ValueKey(curr.id),
-                        margin: EdgeInsets.only(top: 16.sp),
-                        elevation: 0,
+                    itemBuilder: (context, index) {
+                      final curr = data[index];
+
+                      return Padding(
+                        padding: EdgeInsets.only(top: 16.sp),
                         child: Dismissible(
-                          key: ValueKey<int>(index),
+                          key: ValueKey(curr.id),
                           direction: DismissDirection.endToStart,
                           background: Container(
                             color: AppColors.contentColorBlue,
+                            alignment: Alignment.centerRight,
+                            padding: EdgeInsets.only(right: 16.sp),
                             child: const Icon(Icons.phone_enabled_rounded),
                           ),
-                          confirmDismiss: (direction) async {
+                          confirmDismiss: (_) async {
                             Utility.makeCall(phoneNumber: curr.number);
-                            return false;
+                            return false; // not actually dismissing
                           },
-                          child: ListTile(
-                            onTap: () => Routes.navigateToContactDetailsView(
-                              context,
-                              customerID: curr.id,
-                            ),
-                            key: ValueKey(curr.number),
-                            trailing: const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              color: AppColors.getLigthGreyColor,
-                            ),
-                            title: BodyTwoDefaultText(
-                              text: curr.name,
-                              bold: true,
-                            ),
-                            subtitle: BodyTwoDefaultText(
-                              text: curr.number,
-                              color: AppColors.getLigthGreyColor,
+                          child: Card(
+                            elevation: 0,
+                            child: ListTile(
+                              onTap: () => Routes.navigateToContactDetailsView(
+                                context,
+                                customerID: curr.id,
+                              ),
+                              trailing: const Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                color: AppColors.getLigthGreyColor,
+                              ),
+                              title: BodyTwoDefaultText(
+                                text: curr.name,
+                                bold: true,
+                              ),
+                              subtitle: BodyTwoDefaultText(
+                                text: curr.number,
+                                color: AppColors.getLigthGreyColor,
+                              ),
                             ),
                           ),
                         ),

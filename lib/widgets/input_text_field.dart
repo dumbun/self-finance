@@ -28,7 +28,6 @@ class InputTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      key: UniqueKey(),
       initialValue: initialValue,
       onChanged: onChanged as void Function(String)?,
       validator:

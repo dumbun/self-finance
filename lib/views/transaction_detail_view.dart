@@ -138,6 +138,9 @@ class TransactionDetailView extends ConsumerWidget {
                                               bold: true,
                                             ),
                                             CustomerCardWidget(
+                                              key: ValueKey(
+                                                transaction.customerId,
+                                              ),
                                               customerId:
                                                   transaction.customerId,
                                             ),

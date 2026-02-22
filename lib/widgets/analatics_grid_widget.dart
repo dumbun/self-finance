@@ -21,7 +21,6 @@ class AnalaticsGridWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return LayoutBuilder(
-      key: UniqueKey(),
       builder: (BuildContext context, BoxConstraints constraints) {
         final columns = _columnsForWidth(constraints.maxWidth);
 

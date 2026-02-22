@@ -30,6 +30,7 @@ class CustomerTransactionsWidget extends ConsumerWidget {
                       itemBuilder: (BuildContext context, int index) {
                         final Trx transaction = transactions[index]!;
                         return SlidableWidget(
+                          key: ValueKey(transaction.id),
                           transactionId: transaction.id!,
                           customerId: transaction.customerId,
                           child: GestureDetector(

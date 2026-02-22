@@ -67,7 +67,6 @@ class DrawerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      key: UniqueKey(),
       child: Padding(
         padding: EdgeInsets.all(16.sp),
         child: Center(

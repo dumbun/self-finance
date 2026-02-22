@@ -17,7 +17,6 @@ class ImageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      key: UniqueKey(),
       width: width,
       height: height,
       decoration: BoxDecoration(shape: shape),

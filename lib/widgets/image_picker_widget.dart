@@ -28,7 +28,6 @@ class ImagePickerWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
-      key: UniqueKey(),
       onTap: () {
         showModalBottomSheet(
           enableDrag: true,

@@ -22,21 +22,16 @@ class _ClipbordWidgetState extends State<ClipbordWidget> {
       visible: _isdone,
       replacement: IconButton(
         onPressed: () async {
-          setState(() {
-            _isdone = !_isdone;
-          });
-          await Clipboard.setData(ClipboardData(text: widget.value)).then((
-            value,
-          ) {
-            setState(() {
-              _isdone = !_isdone;
-            });
-          });
-          if (context.mounted) {
+          setState(() => _isdone = true);
+          try {
+            await Clipboard.setData(ClipboardData(text: widget.value));
+            if (!context.mounted) return;
             SnackBarWidget.snackBarWidget(
               context: context,
               message: "ID copied ✅",
             );
+          } finally {
+            if (mounted) setState(() => _isdone = false);
           }
         },
         icon: Icon(

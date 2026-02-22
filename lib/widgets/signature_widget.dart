@@ -15,7 +15,6 @@ class SignatureWidgetState extends State<SignatureWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      key: UniqueKey(),
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [

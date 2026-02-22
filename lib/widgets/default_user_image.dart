@@ -13,7 +13,6 @@ class DefaultUserImage extends StatelessWidget {
   Widget build(BuildContext context) {
     if (cache != null) {
       return Image.asset(
-        key: UniqueKey(),
         cacheHeight: cache,
         cacheWidth: cache,
         height: height,

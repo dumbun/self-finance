@@ -49,7 +49,6 @@ class _UserNameUpdateButtomSheetWidgetState
   @override
   Widget build(BuildContext context) {
     return Container(
-      key: UniqueKey(),
       height: 60.sp,
       padding: EdgeInsets.all(16.sp),
       child: Form(

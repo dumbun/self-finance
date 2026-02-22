@@ -9,7 +9,6 @@ class SelectableTextWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SelectableText(
-      key: UniqueKey(),
       data,
       style: TextStyle(
         fontWeight: FontWeight.w400,
