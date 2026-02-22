@@ -23,8 +23,14 @@ class AuthView extends ConsumerWidget {
               return PinAuthView(userDate: user);
             }
           },
-          error: (error, stackTrace) =>
-              const BodyTwoDefaultText(text: Constant.errorUserFetch),
+          error: (error, stackTrace) => const Scaffold(
+            body: Center(
+              child: BodyTwoDefaultText(
+                text: Constant.errorUserFetch,
+                error: true,
+              ),
+            ),
+          ),
           loading: () =>
               const Center(child: CircularProgressIndicator.adaptive()),
         );
