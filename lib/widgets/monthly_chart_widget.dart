@@ -45,8 +45,10 @@ class _MonthlyChartSection extends State<MonthlyChartSection>
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
+      key: UniqueKey(),
       opacity: _anim,
       child: SlideTransition(
+        key: UniqueKey(),
         position: Tween<Offset>(
           begin: const Offset(0, 0.06),
           end: Offset.zero,
@@ -69,6 +71,7 @@ class _Content extends ConsumerWidget {
     final tab = ref.watch(activeChartTabProvider);
 
     return Column(
+      key: UniqueKey(),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ── Header ─────────────────────────────────────────────────────────

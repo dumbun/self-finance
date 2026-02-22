@@ -21,6 +21,7 @@ class SelfFinance extends ConsumerWidget {
         .when(
           data: (bool data) {
             return ResponsiveSizer(
+              key: UniqueKey(),
               builder:
                   (
                     BuildContext context,

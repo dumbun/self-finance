@@ -20,6 +20,7 @@ class TimelineWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      key: const ValueKey("TimeLineWidget"),
       children: <Widget>[
         SizedBox(
           width: double.infinity,

@@ -24,6 +24,7 @@ class _DropDownGardianSelectionState extends State<DropDownGardianSelection> {
   @override
   Widget build(BuildContext context) {
     return DropdownMenu<String>(
+      key: UniqueKey(),
       controller: widget.controller,
       initialSelection: Constant.guardianList.first,
       onSelected: (String? value) {

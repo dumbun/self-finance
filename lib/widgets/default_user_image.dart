@@ -13,6 +13,7 @@ class DefaultUserImage extends StatelessWidget {
   Widget build(BuildContext context) {
     if (cache != null) {
       return Image.asset(
+        key: UniqueKey(),
         cacheHeight: cache,
         cacheWidth: cache,
         height: height,
@@ -24,6 +25,7 @@ class DefaultUserImage extends StatelessWidget {
     final int cacheSize = (size * MediaQuery.of(context).devicePixelRatio)
         .round();
     return Image.asset(
+      key: UniqueKey(),
       cacheHeight: cacheSize,
       cacheWidth: cacheSize,
       height: height,

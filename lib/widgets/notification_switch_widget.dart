@@ -15,6 +15,7 @@ class NotificationSwitchWidget extends ConsumerWidget {
           .watch(notificationsProvider)
           .when(
             data: (bool data) => SwitchListTile.adaptive(
+              key: UniqueKey(),
               title: const BodyOneDefaultText(
                 text: "Notifications",
                 bold: true,

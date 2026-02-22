@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
@@ -13,6 +12,7 @@ import 'package:self_finance/models/payment_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/providers/payment_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
+import 'package:self_finance/widgets/clipbord_widget.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/customer_card_widget.dart';
 import 'package:self_finance/widgets/item_image_widget.dart';
@@ -113,20 +113,9 @@ class TransactionDetailView extends ConsumerWidget {
                                             text: transactionId.toString(),
                                             bold: true,
                                           ),
-                                          IconButton(
-                                            onPressed: () async =>
-                                                await Clipboard.setData(
-                                                  ClipboardData(
-                                                    text: transaction.id
-                                                        .toString(),
-                                                  ),
-                                                ),
-                                            icon: Icon(
-                                              Icons.copy_outlined,
-                                              size: 0.28.dp,
-                                              color:
-                                                  AppColors.contentColorYellow,
-                                            ),
+                                          ClipbordWidget(
+                                            key: ValueKey(transactionId),
+                                            value: transactionId.toString(),
                                           ),
                                         ],
                                       ),

@@ -111,7 +111,7 @@ class _DashboardViewState extends State<DashboardView> {
               ),
               NavigationDestination(
                 icon: Icon(Icons.calculate_outlined),
-                label: Constant.emiCalculatorTitle,
+                label: Constant.calculator,
                 tooltip: Constant.emiCalculatorToolTip,
               ),
               NavigationDestination(

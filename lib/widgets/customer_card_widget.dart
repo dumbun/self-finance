@@ -13,6 +13,7 @@ class CustomerCardWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
+      key: ValueKey(customerId),
       onTap: () =>
           Routes.navigateToContactDetailsView(context, customerID: customerId),
       child: Card(

@@ -11,6 +11,7 @@ class ThemeSwitchWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
+      key: UniqueKey(),
       child: ref
           .watch(themeProvider)
           .when(

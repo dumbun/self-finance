@@ -26,6 +26,7 @@ class TitleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
+      key: UniqueKey(),
       textAlign: textAlign,
       maxLines: maxLines,
       overflow: overflow,

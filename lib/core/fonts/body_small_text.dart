@@ -31,6 +31,7 @@ class BodySmallText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
+      key: UniqueKey(),
       text,
       textAlign: textAlign,
       maxLines: maxLines,

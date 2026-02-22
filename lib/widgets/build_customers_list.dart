@@ -24,56 +24,38 @@ class BuildCustomersListWidget extends ConsumerWidget {
                     itemCount: data.length,
                     itemBuilder: (BuildContext context, int index) {
                       final Contact curr = data[index];
-                      return GestureDetector(
-                        onTap: () => Routes.navigateToContactDetailsView(
-                          context,
-                          customerID: curr.id,
-                        ),
-                        child: Card(
-                          margin: EdgeInsets.only(top: 16.sp),
-                          elevation: 0,
-                          child: Dismissible(
-                            key: ValueKey<int>(index),
-                            direction: DismissDirection.endToStart,
-                            background: Container(
-                              color: AppColors.contentColorBlue,
-                              child: const Icon(Icons.phone_enabled_rounded),
+                      return Card(
+                        key: ValueKey(curr.id),
+                        margin: EdgeInsets.only(top: 16.sp),
+                        elevation: 0,
+                        child: Dismissible(
+                          key: ValueKey<int>(index),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            color: AppColors.contentColorBlue,
+                            child: const Icon(Icons.phone_enabled_rounded),
+                          ),
+                          confirmDismiss: (direction) async {
+                            Utility.makeCall(phoneNumber: curr.number);
+                            return false;
+                          },
+                          child: ListTile(
+                            onTap: () => Routes.navigateToContactDetailsView(
+                              context,
+                              customerID: curr.id,
                             ),
-                            confirmDismiss: (direction) async {
-                              Utility.makeCall(phoneNumber: curr.number);
-                              return false;
-                            },
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 16.sp,
-                                vertical: 12.sp,
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      BodyTwoDefaultText(
-                                        text: curr.name,
-                                        bold: true,
-                                      ),
-                                      BodyTwoDefaultText(
-                                        text: curr.number,
-                                        color: AppColors.getLigthGreyColor,
-                                      ),
-                                    ],
-                                  ),
-                                  const Icon(
-                                    Icons.arrow_forward_ios_rounded,
-                                    color: AppColors.getLigthGreyColor,
-                                  ),
-                                ],
-                              ),
+                            key: ValueKey(curr.number),
+                            trailing: const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: AppColors.getLigthGreyColor,
+                            ),
+                            title: BodyTwoDefaultText(
+                              text: curr.name,
+                              bold: true,
+                            ),
+                            subtitle: BodyTwoDefaultText(
+                              text: curr.number,
+                              color: AppColors.getLigthGreyColor,
                             ),
                           ),
                         ),

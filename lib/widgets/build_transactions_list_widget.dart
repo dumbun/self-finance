@@ -36,12 +36,12 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                 itemBuilder: (BuildContext context, int index) {
                   final Trx txn = data[index];
                   return InkWell(
+                    key: ValueKey(txn.id),
                     onTap: () => Routes.navigateToTransactionDetailsView(
                       transacrtionId: txn.id!,
                       customerId: txn.customerId,
                       context: context,
                     ),
-
                     child: SlidableWidget(
                       customerId: txn.customerId,
                       transactionId: txn.id!,
