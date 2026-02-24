@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/routes.dart';
@@ -27,7 +25,7 @@ class PawnedItemImageWidget extends StatelessWidget {
                 if (data.first.photo.isNotEmpty) {
                   Routes.navigateToImageView(
                     context: context,
-                    imageWidget: Image.file(File(data.first.photo)),
+                    imagePath: data.first.photo,
                     titile: data.first.description,
                   );
                 } else {

@@ -1,9 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/widgets.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
+import 'package:self_finance/widgets/image_widget.dart';
 
 class CircularImageWidget extends StatelessWidget {
   const CircularImageWidget({
@@ -20,31 +18,16 @@ class CircularImageWidget extends StatelessWidget {
   final int? cache;
 
   Widget _buildImage(int cache, double size, BuildContext context) {
-    final File file = File(imageData);
-    if (imageData.isNotEmpty && file.existsSync()) {
-      return GestureDetector(
-        onTap: () {
-          Routes.navigateToImageView(
-            context: context,
-            titile: titile,
-            imageWidget: Image.file(file, fit: BoxFit.contain),
-          );
-        },
-        child: Hero(
-          tag: titile,
-          child: SizedBox(
+    if (imageData.isNotEmpty) {
+      return Hero(
+        tag: titile,
+        child: ClipOval(
+          child: ImageWidget(
+            title: titile,
+            imagePath: imageData,
             height: size,
             width: size,
-            child: ClipOval(
-              child: Image.file(
-                file,
-                height: size,
-                width: size,
-                cacheWidth: cache,
-                cacheHeight: cache,
-                fit: BoxFit.cover,
-              ),
-            ),
+            cache: cache,
           ),
         ),
       );

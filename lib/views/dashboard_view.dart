@@ -95,27 +95,31 @@ class _DashboardViewState extends State<DashboardView> {
             },
             indicatorColor: AppColors.getPrimaryColor,
             labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-            labelTextStyle: const WidgetStatePropertyAll(
-              TextStyle(fontWeight: FontWeight.bold),
+            labelTextStyle: WidgetStatePropertyAll(
+              TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
             ),
             destinations: const [
               NavigationDestination(
                 icon: Icon(Icons.home_outlined),
                 label: Constant.home,
+                selectedIcon: Icon(Icons.home_filled),
                 tooltip: Constant.homeScreen,
               ),
               NavigationDestination(
-                icon: Icon(Icons.transform_outlined),
+                icon: Icon(Icons.book_outlined),
+                selectedIcon: Icon(Icons.book_rounded),
                 label: Constant.transacrtions,
                 tooltip: Constant.historyToolTip,
               ),
               NavigationDestination(
                 icon: Icon(Icons.calculate_outlined),
+                selectedIcon: Icon(Icons.calculate_rounded),
                 label: Constant.calculator,
                 tooltip: Constant.emiCalculatorToolTip,
               ),
               NavigationDestination(
                 icon: Icon(Icons.history_toggle_off),
+                selectedIcon: Icon(Icons.history_rounded),
                 label: Constant.history,
                 tooltip: Constant.historyToolTip,
               ),

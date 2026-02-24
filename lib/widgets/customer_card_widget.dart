@@ -38,27 +38,30 @@ class CustomerCardWidget extends ConsumerWidget {
                         titile: "Customer Photo",
                       ),
                       SizedBox(width: 16.sp),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BodyTwoDefaultText(
-                            text: "Name: ${data.name}",
-                            bold: true,
-                          ),
-                          BodyTwoDefaultText(
-                            text: data.guardianName,
-                            bold: true,
-                          ),
-                          BodyTwoDefaultText(
-                            text: "From: ${data.address}",
-                            bold: true,
-                          ),
-                          BodyTwoDefaultText(
-                            text: "Phone: ${data.number}",
-                            bold: true,
-                          ),
-                        ],
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            BodyTwoDefaultText(
+                              overflow: TextOverflow.ellipsis,
+                              text: "Name: ${data.name}",
+                              bold: true,
+                            ),
+                            BodyTwoDefaultText(
+                              text: data.guardianName,
+                              bold: true,
+                            ),
+                            BodyTwoDefaultText(
+                              text: "From: ${data.address}",
+                              bold: true,
+                            ),
+                            BodyTwoDefaultText(
+                              text: "Phone: ${data.number}",
+                              bold: true,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   );

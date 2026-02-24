@@ -26,12 +26,24 @@ class AccountSettingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     Future<void> doBackUp() async {
       return await showAdaptiveDialog<void>(
-        useSafeArea: true,
         barrierDismissible: false,
         useRootNavigator: true,
         context: context,
         builder: (BuildContext context) {
-          return const Center(child: Card(child: BackupWithProgressWidget()));
+          return Container(
+            padding: EdgeInsets.all(12.sp),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                IconButton.filled(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.close, color: AppColors.getErrorColor),
+                ),
+                const BackupWithProgressWidget(),
+              ],
+            ),
+          );
         },
       );
     }
@@ -63,13 +75,9 @@ class AccountSettingsView extends StatelessWidget {
                             children: <Widget>[
                               // user profile pic
                               SizedBox(height: height),
-                              Hero(
-                                tag: Constant.userProfileTag,
-                                child: UserImageUpdateWidget(
-                                  userImageString: data.profilePicture,
-                                ),
+                              UserImageUpdateWidget(
+                                userImageString: data.profilePicture,
                               ),
-
                               // user name
                               SizedBox(height: height),
                               _buildNameUpdateButton(

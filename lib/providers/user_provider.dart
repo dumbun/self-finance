@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/user_database.dart';
+import 'package:self_finance/core/utility/image_saving_utility.dart';
 import 'package:self_finance/models/user_model.dart';
 part 'user_provider.g.dart';
 
@@ -48,9 +49,16 @@ class UserNotifier extends _$UserNotifier {
   Future<void> updateProfilePicture({
     required int id,
     required String photoPath,
+    required bool camera,
   }) async {
     try {
-      await UserBackEnd.updateProfilePicture(id: id, photoPath: photoPath);
+      final String newImagePath = await ImageSavingUtility.updateUserImage(
+        userImage: photoPath,
+        camera: camera,
+      );
+      if (newImagePath.isNotEmpty) {
+        await UserBackEnd.updateProfilePicture(id: id, photoPath: newImagePath);
+      }
     } catch (e) {
       debugPrint(e.toString());
     }

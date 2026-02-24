@@ -8,6 +8,7 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/constants.dart';
@@ -179,11 +180,12 @@ class Utility {
           String path = applicationDocumentDirectory.path;
           // create directory on external storage
           await Directory('$path/Images/signatures').create(recursive: true);
-          String fullPath =
-              '$path/Images/signatures/signature_itemid_${imageName}_${DateTime.now().millisecondsSinceEpoch}_${DateTime.now()}.png';
+          final String fullImageName =
+              "signature_itemid_${imageName}_${DateTime.now().millisecondsSinceEpoch}_${DateTime.now()}.png";
+          String fullPath = '$path/Images/signatures/$fullImageName';
           final File file = File(fullPath);
           await file.writeAsBytes(bytes, flush: true);
-          return fullPath;
+          return p.join("Images", "signatures", fullImageName);
         }
       }
       return "";

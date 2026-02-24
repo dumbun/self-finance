@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -18,6 +16,7 @@ import 'package:self_finance/widgets/customer_card_widget.dart';
 import 'package:self_finance/widgets/item_image_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 import 'package:self_finance/widgets/status_chip_widget.dart';
+import 'package:self_finance/widgets/image_widget.dart';
 import 'package:self_finance/widgets/timeline_widget.dart';
 
 class TransactionDetailView extends ConsumerWidget {
@@ -138,9 +137,6 @@ class TransactionDetailView extends ConsumerWidget {
                                               bold: true,
                                             ),
                                             CustomerCardWidget(
-                                              key: ValueKey(
-                                                transaction.customerId,
-                                              ),
                                               customerId:
                                                   transaction.customerId,
                                             ),
@@ -317,11 +313,13 @@ class TransactionDetailView extends ConsumerWidget {
                                               SizedBox(
                                                 width: double.infinity,
                                                 child: Card(
-                                                  elevation: 2,
-                                                  child: Image.file(
+                                                  child: ImageWidget(
+                                                    title: "Signature",
+                                                    fit: BoxFit.scaleDown,
+                                                    imagePath:
+                                                        transaction.signature,
                                                     height: 52.sp,
                                                     width: 42.sp,
-                                                    File(transaction.signature),
                                                   ),
                                                 ),
                                               ),

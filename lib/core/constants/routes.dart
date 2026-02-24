@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
@@ -158,14 +162,26 @@ class Routes {
   static void navigateToImageView({
     required BuildContext context,
     required String titile,
-    required Image imageWidget,
-  }) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (BuildContext context) =>
-            ImageView(titile: titile, imageWidget: imageWidget),
-      ),
-    );
+    required String imagePath,
+  }) async {
+    final a = await getApplicationDocumentsDirectory();
+    if (context.mounted &&
+        a.path.contains(imagePath) &&
+        File(imagePath).existsSync()) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (BuildContext context) =>
+              ImageView(titile: titile, imagePath: imagePath),
+        ),
+      );
+    } else if (context.mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (BuildContext context) =>
+              ImageView(titile: titile, imagePath: p.join(a.path, imagePath)),
+        ),
+      );
+    }
   }
 
   static void navigateToHistoryDetailedView({

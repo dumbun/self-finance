@@ -10,7 +10,6 @@ import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
-import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 
 class DrawerWidget extends StatelessWidget {
@@ -82,15 +81,10 @@ class DrawerWidget extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              user.profilePicture.isNotEmpty
-                                  ? CircularImageWidget(
-                                      imageData: user.profilePicture,
-                                      titile: 'Account Profile Image',
-                                    )
-                                  : DefaultUserImage(
-                                      height: 45.sp,
-                                      width: 45.sp,
-                                    ),
+                              CircularImageWidget(
+                                imageData: user.profilePicture,
+                                titile: 'Account Profile Image',
+                              ),
                               SizedBox(height: 16.sp),
                               _buildDrawerButtons(
                                 text: Constant.account,

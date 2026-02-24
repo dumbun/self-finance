@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -13,6 +11,7 @@ import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
+import 'package:self_finance/widgets/image_widget.dart';
 
 class ContactEditingView extends StatefulWidget {
   const ContactEditingView({super.key, required this.contact});
@@ -129,11 +128,11 @@ class _ContactEditingViewState extends State<ContactEditingView> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8.sp),
               child: imagePath.isNotEmpty
-                  ? Image.file(
-                      File(imagePath),
+                  ? ImageWidget(
+                      title: titile,
+                      imagePath: imagePath,
                       height: 42.sp,
                       width: 42.sp,
-                      fit: BoxFit.fill,
                     )
                   : Image.asset(defaultImages, height: 42.sp, width: 42.sp),
             ),

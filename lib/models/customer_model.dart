@@ -21,7 +21,7 @@ class Customer {
     required this.createdDate,
   });
 
-  static List<Customer> toList(List<Map<String, Object?>> data) {
+  static Future<List<Customer>> toList(List<Map<String, Object?>> data) async {
     if (data.isEmpty) {
       return []; // If data is empty, return an empty list directly
     }
@@ -34,7 +34,7 @@ class Customer {
         address: e["Customer_Address"] as String,
         number: e["Contact_Number"] as String,
         photo: e["Customer_Photo"] as String,
-        proof: e["Proof_Photo"] as String,
+        proof: (e["Proof_Photo"] as String),
         createdDate: e["Created_Date"] as DateTime,
       );
     }).toList();

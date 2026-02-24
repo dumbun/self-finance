@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -8,6 +6,7 @@ import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/providers/item_provider.dart';
+import 'package:self_finance/widgets/image_widget.dart';
 
 class ItemImageWidget extends ConsumerWidget {
   const ItemImageWidget({super.key, required this.transactionId});
@@ -61,12 +60,14 @@ class ItemImageWidget extends ConsumerWidget {
                               onTap: () => Routes.navigateToImageView(
                                 context: context,
                                 titile: item.description,
-                                imageWidget: Image.file(File(item.photo)),
+                                imagePath: item.photo,
                               ),
-                              child: Image.file(
+                              child: ImageWidget(
+                                title: item.description,
                                 height: 52.sp,
                                 width: 42.sp,
-                                File(item.photo),
+                                imagePath: item.photo,
+                                fit: BoxFit.scaleDown,
                               ),
                             ),
                             BodyTwoDefaultText(

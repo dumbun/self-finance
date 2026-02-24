@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -9,6 +7,7 @@ import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/utility/image_saving_utility.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
+import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/currency_type_input_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
@@ -102,11 +101,11 @@ class _UserCreatingViewState extends State<UserCreatingView> {
                 borderRadius: BorderRadius.circular(100.sp),
                 child: pickedImageFile == null
                     ? DefaultUserImage(height: height, width: width)
-                    : Image.file(
-                        File(pickedImageFile!.path),
-                        height: height,
-                        width: width,
-                        fit: BoxFit.fill,
+                    : CircularImageWidget(
+                        imageData: pickedImageFile!.path,
+                        titile: "User image",
+                        customeSize: height,
+                        cache: width.toInt(),
                       ),
               ),
             ),

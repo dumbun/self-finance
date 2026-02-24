@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -150,7 +148,7 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                       GestureDetector(
                         onTap: () => Routes.navigateToImageView(
                           context: context,
-                          imageWidget: Image.file(File(customer.proof)),
+                          imagePath: customer.proof,
                           titile: "${customer.name} proof",
                         ),
                         child: Card(

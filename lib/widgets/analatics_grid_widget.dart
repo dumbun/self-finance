@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
-import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/providers/analytics_provider.dart';
@@ -191,7 +191,7 @@ class StatCardWidget extends StatelessWidget {
             SizedBox(height: 8.sp),
 
             // Title / description
-            BodyTwoDefaultText(text: title),
+            BodySmallText(text: title, overflow: TextOverflow.ellipsis),
           ],
         ),
       ),

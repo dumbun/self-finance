@@ -6,6 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:share_plus/share_plus.dart';
 
 typedef BackupProgressCallback =
     void Function(double progress, String currentFile);
@@ -254,6 +255,8 @@ class BackupUtility {
       }
 
       final File tempFile = File(tempZipPath);
+      ShareParams s = ShareParams(files: [XFile(tempFile.path)]);
+      SharePlus.instance.share(s);
       await tempFile.copy(destPath);
       await tempFile.delete();
 
