@@ -2,7 +2,7 @@ name: self_finance
 description: "The Self-finance app is a mobile application designed to streamline financial operations for shopkeepers and small finance companies. This solution empowers users with tools to manage their daily transactions and customer accounts efficiently."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 2.6.3+0
+version: 2.6.4+0
 
 environment:
   sdk: ^3.8.1
