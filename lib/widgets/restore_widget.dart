@@ -52,9 +52,9 @@ class _RestoreWithProgressWidgetState extends State<RestoreWithProgressWidget> {
     } catch (e) {
       _state.value = RestoreUiState.error(e.toString());
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Restore failed: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: BodyTwoDefaultText(text: 'Restore failed: $e')),
+      );
     }
   }
 

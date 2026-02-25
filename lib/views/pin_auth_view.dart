@@ -13,8 +13,13 @@ import 'package:self_finance/widgets/pin_input_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
 class PinAuthView extends StatefulWidget {
-  const PinAuthView({super.key, required this.userDate});
+  const PinAuthView({
+    super.key,
+    required this.userDate,
+    this.scanBioMetrics = true,
+  });
   final User userDate;
+  final bool scanBioMetrics;
   @override
   State<PinAuthView> createState() => _PinAuthViewState();
 }
@@ -31,7 +36,7 @@ class _PinAuthViewState extends State<PinAuthView> {
 
   @override
   void initState() {
-    _handleBiometric();
+    if (widget.scanBioMetrics) _handleBiometric();
     super.initState();
   }
 

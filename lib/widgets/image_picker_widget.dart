@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/utility/image_saving_utility.dart';
+import 'package:self_finance/widgets/image_widget.dart';
 
 class ImagePickerWidget extends ConsumerWidget {
   const ImagePickerWidget({
@@ -76,14 +75,13 @@ class ImagePickerWidget extends ConsumerWidget {
     if (image == null) {
       return Image.asset(defaultImage, height: 28.sp, width: 28.sp);
     }
-
-    return Image.file(
-      File(image.path),
+    return ImageWidget(
+      imagePath: image.path,
       height: 42.sp,
       width: 42.sp,
-      fit: BoxFit.cover,
-      cacheWidth: 500,
-      cacheHeight: 500,
+      title: title,
+      cache: 500,
+      showImage: false,
     );
   }
 

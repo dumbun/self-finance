@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -82,6 +83,11 @@ class InvoiceGenerator {
     required Customer customer,
     String? userCurrency,
   }) async {
+    // Fetch App directory for images
+    final Directory appDir = await getApplicationDocumentsDirectory();
+    final customerImagePath = p.join(appDir.path, customer.photo);
+    final signaturePath = p.join(appDir.path, transaction.signature);
+
     // Fetch user data
     final User user = await _getCurrentUser();
     final List<Payment> payments =
@@ -130,9 +136,7 @@ class InvoiceGenerator {
             );
 
       // Format dates
-      final transactionDate = _formatDate(
-        transaction.transacrtionDate.toIso8601String(),
-      );
+
       final generatedDate = DateFormat(
         'dd-MM-yyyy HH:mm',
       ).format(DateTime.now());
@@ -152,14 +156,16 @@ class InvoiceGenerator {
               // Invoice Title and Info
               _buildInvoiceInfo(
                 transactionId: transaction.id!,
-                transactionDate: transactionDate,
+                transactionDate: Utility.formatDate(
+                  date: transaction.transacrtionDate,
+                ),
                 generatedDate: generatedDate,
               ),
 
               pw.SizedBox(height: 20),
 
               // Customer Details
-              _buildCustomerDetails(customer),
+              _buildCustomerDetails(customer, customerImagePath),
 
               pw.SizedBox(height: 20),
 
@@ -178,7 +184,7 @@ class InvoiceGenerator {
               pw.SizedBox(height: 30),
 
               // Terms and Conditions
-              _buildTermsAndConditions(transaction.signature),
+              _buildTermsAndConditions(signaturePath),
 
               pw.SizedBox(height: 20),
 
@@ -329,11 +335,14 @@ class InvoiceGenerator {
     );
   }
 
-  static pw.Widget _buildCustomerDetails(Customer customer) {
+  static pw.Widget _buildCustomerDetails(
+    Customer customer,
+    String customerPhotoPath,
+  ) {
     late Uint8List imageBytes;
     late pw.MemoryImage pdfImage;
     if (customer.photo.isNotEmpty) {
-      imageBytes = File(customer.photo).readAsBytesSync();
+      imageBytes = File(customerPhotoPath).readAsBytesSync();
       pdfImage = pw.MemoryImage(imageBytes);
     }
     return pw.Container(
@@ -415,12 +424,12 @@ class InvoiceGenerator {
         ),
         _buildTableRow(
           'Transaction Date',
-          _formatDate(transaction.transacrtionDate.toIso8601String()),
+          Utility.formatDate(date: transaction.transacrtionDate),
         ),
         if (transaction.transacrtionType == Constant.inactive)
           _buildTableRow(
             'Payment Date',
-            DateFormat('dd-MM-yyyy HH:mm').format(loanCalculator.tenureDate!),
+            Utility.formatDate(date: loanCalculator.tenureDate!),
           ),
         _buildTableRow('Duration', loanCalculator.monthsAndRemainingDays),
         _buildTableRow(
@@ -605,22 +614,6 @@ class InvoiceGenerator {
         ),
       ),
     );
-  }
-
-  // Utility methods
-
-  static String _formatDate(String dateString) {
-    try {
-      // Try parsing as DD-MM-YYYY format
-      final parts = dateString.split('-');
-      if (parts.length == 3) {
-        return dateString;
-      }
-      // If it's already formatted differently, return as is
-      return dateString;
-    } catch (e) {
-      return dateString;
-    }
   }
 
   static Future<String> _savePdfToFile({

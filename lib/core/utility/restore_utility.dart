@@ -4,7 +4,6 @@ import 'package:archive/archive_io.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:restart_app/restart_app.dart';
@@ -236,11 +235,7 @@ class RestoreUtility {
   static Future<void> _restartOrCloseApp({BuildContext? context}) async {
     try {
       if (context != null && context.mounted) {
-        if (Platform.isAndroid) {
-          await Restart.restartApp();
-        } else {
-          await FlutterExitApp.exitApp();
-        }
+        await Restart.restartApp();
       } else {
         debugPrint(
           'ℹ️ Please manually close and reopen the app to complete restoration',

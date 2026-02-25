@@ -5,7 +5,6 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
-import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/fonts/title_widget.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
@@ -14,14 +13,16 @@ import 'package:self_finance/models/chart_model.dart';
 import 'package:self_finance/providers/chart_tab_providers.dart';
 import 'package:self_finance/providers/monthly_chart_provider.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
+import 'package:self_finance/widgets/drill_sheet_widget.dart';
 
 class MonthlyChartSection extends StatefulWidget {
   const MonthlyChartSection({super.key});
+
   @override
-  State<MonthlyChartSection> createState() => _MonthlyChartSection();
+  State<MonthlyChartSection> createState() => _MonthlyChartSectionState();
 }
 
-class _MonthlyChartSection extends State<MonthlyChartSection>
+class _MonthlyChartSectionState extends State<MonthlyChartSection>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
   late final Animation<double> _anim;
@@ -148,6 +149,7 @@ class _Content extends ConsumerWidget {
 
 class _TabBar extends StatelessWidget {
   const _TabBar({required this.active, required this.onChanged});
+
   final ChartTab active;
   final ValueChanged<ChartTab> onChanged;
 
@@ -172,6 +174,7 @@ class _TabBar extends StatelessWidget {
           final isActive = tab == active;
           return Expanded(
             child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () => onChanged(tab),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
@@ -206,9 +209,32 @@ class _TabBar extends StatelessWidget {
 }
 
 // =============================================================================
+// DRILL SHEET OPENER
+// Capture provider container BEFORE bottom sheet so the sheet always has access
+// to the correct Riverpod container.
+// =============================================================================
+
+void _openDrill(
+  BuildContext context,
+  WidgetRef ref,
+  DrillTarget target,
+  String title,
+) {
+  final container = ProviderScope.containerOf(context, listen: false);
+
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => UncontrolledProviderScope(
+      container: container,
+      child: DrillSheet(target: target, title: title),
+    ),
+  );
+}
+
+// =============================================================================
 // TAB BODIES
-// All three line-chart tabs pass MonthlyChartState into the shared
-// _LineChartBody widget — zero duplication.
 // =============================================================================
 
 class _YearlyBody extends ConsumerWidget {
@@ -227,10 +253,10 @@ class _YearlyBody extends ConsumerWidget {
                   int index,
                   List<Map<String, dynamic>>? rawMaps,
                 ) {
-                  // Yearly: derive month + year from the raw map's hidden fields
                   final raw = rawMaps != null && index < rawMaps.length
                       ? rawMaps[index]
                       : null;
+
                   final DateTime now = DateTime.now();
                   final int offset = state.data.length - 1 - index;
                   final DateTime date = DateTime(
@@ -238,8 +264,10 @@ class _YearlyBody extends ConsumerWidget {
                     now.month - offset,
                     1,
                   );
+
                   final int month = raw?['_monthNum'] as int? ?? date.month;
                   final int year = raw?['_year'] as int? ?? date.year;
+
                   _openDrill(
                     context,
                     ref,
@@ -260,7 +288,6 @@ class _MonthlyBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ← uses the EXISTING monthlyChartProvider from monthly_chart_provider.dart
     return ref
         .watch(monthlyChartProvider)
         .when(
@@ -270,6 +297,7 @@ class _MonthlyBody extends ConsumerWidget {
               final now = DateTime.now();
               final offset = state.data.length - 1 - index;
               final date = DateTime(now.year, now.month - offset, 1);
+
               _openDrill(
                 context,
                 ref,
@@ -293,13 +321,14 @@ class _WeeklyBody extends ConsumerWidget {
     return ref
         .watch(weeklyChartProvider)
         .when(
-          data: (state) => _LineChartBody(
+          data: (MonthlyChartState state) => _LineChartBody(
             state: state,
             onPointTapped: (data, index, rawMaps) {
               final raw = rawMaps != null && index < rawMaps.length
                   ? rawMaps[index]
                   : null;
               if (raw == null) return;
+
               _openDrill(
                 context,
                 ref,
@@ -369,12 +398,8 @@ class _TodayBody extends ConsumerWidget {
 
 // =============================================================================
 // SHARED LINE CHART BODY
-// Accepts MonthlyChartState — works for yearly, monthly AND weekly tabs.
-// rawProvider is optional: only needed when the drill-down requires extra
-// fields (_txnDate, _payDate, _monthNum, _year) from the raw backend maps.
 // =============================================================================
 
-// Provider type alias to keep the signature readable
 typedef _RawProvider =
     ProviderListenable<AsyncValue<List<Map<String, dynamic>>>>;
 
@@ -386,7 +411,6 @@ class _LineChartBody extends ConsumerStatefulWidget {
   });
 
   final MonthlyChartState state;
-  // index, raw maps list (null when not needed)
   final void Function(ChartData, int, List<Map<String, dynamic>>?)
   onPointTapped;
   final _RawProvider? rawProvider;
@@ -397,8 +421,9 @@ class _LineChartBody extends ConsumerStatefulWidget {
 
 class _LineChartBodyState extends ConsumerState<_LineChartBody>
     with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-  late Animation<double> _anim;
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+
   int? _sel;
 
   @override
@@ -408,13 +433,14 @@ class _LineChartBodyState extends ConsumerState<_LineChartBody>
       vsync: this,
       duration: const Duration(milliseconds: 850),
     )..forward();
+
     _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutCubic);
   }
 
   @override
-  void didUpdateWidget(_LineChartBody old) {
-    super.didUpdateWidget(old);
-    if (old.state.data != widget.state.data) {
+  void didUpdateWidget(covariant _LineChartBody oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.state.data != widget.state.data) {
       _sel = null;
       _ctrl.forward(from: 0);
     }
@@ -426,19 +452,24 @@ class _LineChartBodyState extends ConsumerState<_LineChartBody>
     super.dispose();
   }
 
-  void _onTap(TapDownDetails d, double width) {
+  void _onTap(
+    TapDownDetails details,
+    double width,
+    List<Map<String, dynamic>>? rawMaps,
+  ) {
     final int n = widget.state.data.length;
-    if (n < 2) return;
-    final int idx = (d.localPosition.dx / (width / (n - 1))).round().clamp(
-      0,
-      n - 1,
-    );
+    if (n == 0) return;
+
+    final int idx = n == 1
+        ? 0
+        : (details.localPosition.dx / (width / (n - 1))).round().clamp(
+            0,
+            n - 1,
+          );
+
     HapticFeedback.lightImpact();
+
     if (_sel == idx) {
-      // Second tap → drill down
-      final List<Map<String, dynamic>>? rawMaps = widget.rawProvider != null
-          ? ref.read(widget.rawProvider!).value
-          : null;
       widget.onPointTapped(widget.state.data[idx], idx, rawMaps);
     } else {
       setState(() => _sel = idx);
@@ -447,7 +478,20 @@ class _LineChartBodyState extends ConsumerState<_LineChartBody>
 
   @override
   Widget build(BuildContext context) {
-    final data = widget.state.data;
+    final List<ChartData> data = widget.state.data;
+
+    // Improvement: watch raw provider once per build (safer than reading on tap)
+    final List<Map<String, dynamic>>? rawMaps = widget.rawProvider != null
+        ? ref.watch(widget.rawProvider!).asData?.value
+        : null;
+
+    // Avoid recreating series twice for painter
+    final List<double> receivedSeries = data
+        .map((d) => d.received)
+        .toList(growable: false);
+    final List<double> disbursedSeries = data
+        .map((d) => d.disbursed)
+        .toList(growable: false);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -464,9 +508,6 @@ class _LineChartBodyState extends ConsumerState<_LineChartBody>
                     received: data[_sel!].received,
                     disbursed: data[_sel!].disbursed,
                     onDetails: () {
-                      final rawMaps = widget.rawProvider != null
-                          ? ref.read(widget.rawProvider!).value
-                          : null;
                       widget.onPointTapped(data[_sel!], _sel!, rawMaps);
                     },
                   )
@@ -487,24 +528,26 @@ class _LineChartBodyState extends ConsumerState<_LineChartBody>
 
           // ── Chart canvas ───────────────────────────────────────────────
           LayoutBuilder(
-            builder: (_, c) {
-              final w = c.maxWidth;
+            builder: (_, constraints) {
+              final w = constraints.maxWidth;
               return GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTapDown: (d) => _onTap(d, w),
+                onTapDown: (d) => _onTap(d, w, rawMaps),
                 child: AnimatedBuilder(
                   animation: _anim,
-                  builder: (_, _) => CustomPaint(
-                    size: Size(w, 180),
-                    painter: _ChartPainter(
-                      received: data.map((d) => d.received).toList(),
-                      disbursed: data.map((d) => d.disbursed).toList(),
-                      maxValue: widget.state.maxValue,
-                      progress: _anim.value,
-                      sel: _sel,
-                      rcvColor: AppColors.getPrimaryColor,
-                      disColor: AppColors.getErrorColor,
-                      gridColor: AppColors.getLigthGreyColor.withAlpha(50),
+                  builder: (_, _) => RepaintBoundary(
+                    child: CustomPaint(
+                      size: Size(w, 180),
+                      painter: _ChartPainter(
+                        received: receivedSeries,
+                        disbursed: disbursedSeries,
+                        maxValue: widget.state.maxValue,
+                        progress: _anim.value,
+                        sel: _sel,
+                        rcvColor: AppColors.getPrimaryColor,
+                        disColor: AppColors.getErrorColor,
+                        gridColor: AppColors.getLigthGreyColor.withAlpha(50),
+                      ),
                     ),
                   ),
                 ),
@@ -532,8 +575,7 @@ class _LineChartBodyState extends ConsumerState<_LineChartBody>
   }
 }
 
-// raw stream providers wired up for yearly + weekly
-// (monthly doesn't need it — month/year are derived from offset)
+// raw stream provider for yearly (weeklyRawProvider assumed to already exist)
 final yearlyChartRawProvider =
     StreamProvider.autoDispose<List<Map<String, dynamic>>>(
       (ref) => BackEnd.watchYearlyChartData(),
@@ -555,40 +597,49 @@ class _ChartPainter extends CustomPainter {
     required this.gridColor,
   });
 
-  final List<double> received, disbursed;
-  final double maxValue, progress;
+  final List<double> received;
+  final List<double> disbursed;
+  final double maxValue;
+  final double progress;
   final int? sel;
-  final Color rcvColor, disColor, gridColor;
+  final Color rcvColor;
+  final Color disColor;
+  final Color gridColor;
 
-  static const _top = 14.0;
-  static const _bot = 4.0;
-  static const _gridLines = 4;
+  static const double _top = 14.0;
+  static const double _bot = 4.0;
+  static const int _gridLines = 4;
 
   @override
   void paint(Canvas canvas, Size size) {
     if (received.isEmpty) return;
 
-    final n = received.length;
-    final dh = size.height - _top - _bot;
-    final eff = maxValue == 0 ? 1.0 : maxValue;
-    final stepX = n > 1 ? size.width / (n - 1) : size.width;
+    final int n = received.length;
+    final double dh = size.height - _top - _bot;
+    final double eff = maxValue == 0 ? 1.0 : maxValue;
+    final double stepX = n > 1 ? size.width / (n - 1) : size.width;
 
     // Grid
-    final gPaint = Paint()
+    final Paint gPaint = Paint()
       ..color = gridColor
       ..strokeWidth = 0.6;
+
     for (int i = 0; i <= _gridLines; i++) {
-      final y = _top + dh * (1 - i / _gridLines);
+      final double y = _top + dh * (1 - i / _gridLines);
       canvas.drawLine(Offset(0, y), Offset(size.width, y), gPaint);
     }
 
     double cy(double v) => _top + dh * (1 - v / eff);
     double cx(int i) => n == 1 ? size.width / 2 : i * stepX;
 
-    final rPts = [for (int i = 0; i < n; i++) Offset(cx(i), cy(received[i]))];
-    final dPts = [for (int i = 0; i < n; i++) Offset(cx(i), cy(disbursed[i]))];
+    final List<Offset> rPts = [
+      for (int i = 0; i < n; i++) Offset(cx(i), cy(received[i])),
+    ];
+    final List<Offset> dPts = [
+      for (int i = 0; i < n; i++) Offset(cx(i), cy(disbursed[i])),
+    ];
 
-    // Clip to animated draw-in progress
+    // Animated reveal
     canvas.save();
     canvas.clipRect(Rect.fromLTWH(0, 0, size.width * progress, size.height));
     _fill(canvas, size, rPts, rcvColor, dh);
@@ -597,9 +648,10 @@ class _ChartPainter extends CustomPainter {
     _line(canvas, dPts, disColor);
     canvas.restore();
 
-    // Selection overlay (drawn outside clip so it always shows)
+    // Selection overlay (always visible)
     if (sel != null && sel! < n) {
-      final x = cx(sel!);
+      final double x = cx(sel!);
+
       canvas.drawLine(
         Offset(x, _top),
         Offset(x, _top + dh),
@@ -607,21 +659,27 @@ class _ChartPainter extends CustomPainter {
           ..color = gridColor
           ..strokeWidth = 1.2,
       );
+
       canvas.drawCircle(
         rPts[sel!],
         16,
         Paint()..color = rcvColor.withAlpha(10),
       );
+
       _dot(canvas, rPts[sel!], rcvColor);
       _dot(canvas, dPts[sel!], disColor);
     }
   }
 
   Path _curve(List<Offset> pts) {
-    if (pts.length == 1) return Path()..moveTo(pts[0].dx, pts[0].dy);
-    final path = Path()..moveTo(pts[0].dx, pts[0].dy);
+    if (pts.length == 1) {
+      return Path()..moveTo(pts[0].dx, pts[0].dy);
+    }
+
+    final Path path = Path()..moveTo(pts[0].dx, pts[0].dy);
+
     for (int i = 0; i < pts.length - 1; i++) {
-      final mx = (pts[i].dx + pts[i + 1].dx) / 2;
+      final double mx = (pts[i].dx + pts[i + 1].dx) / 2;
       path.cubicTo(
         mx,
         pts[i].dy,
@@ -631,15 +689,19 @@ class _ChartPainter extends CustomPainter {
         pts[i + 1].dy,
       );
     }
+
     return path;
   }
 
   void _fill(Canvas c, Size sz, List<Offset> pts, Color col, double dh) {
-    final path = Path()
+    if (pts.isEmpty) return;
+
+    final Path path = Path()
       ..addPath(_curve(pts), Offset.zero)
       ..lineTo(pts.last.dx, _top + dh)
       ..lineTo(pts.first.dx, _top + dh)
       ..close();
+
     c.drawPath(
       path,
       Paint()
@@ -653,6 +715,7 @@ class _ChartPainter extends CustomPainter {
 
   void _line(Canvas c, List<Offset> pts, Color col) {
     if (pts.length < 2) return;
+
     c.drawPath(
       _curve(pts),
       Paint()
@@ -666,6 +729,7 @@ class _ChartPainter extends CustomPainter {
 
   void _dot(Canvas c, Offset pt, Color col) {
     c.drawCircle(pt, 6, Paint()..color = Colors.white);
+
     c.drawCircle(
       pt,
       6,
@@ -674,15 +738,30 @@ class _ChartPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.2,
     );
+
     c.drawCircle(pt, 3, Paint()..color = col);
   }
 
+  bool _sameList(List<double> a, List<double> b) {
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+
   @override
-  bool shouldRepaint(_ChartPainter o) =>
-      o.progress != progress ||
-      o.received != received ||
-      o.sel != sel ||
-      o.maxValue != maxValue;
+  bool shouldRepaint(covariant _ChartPainter oldDelegate) {
+    return oldDelegate.progress != progress ||
+        oldDelegate.sel != sel ||
+        oldDelegate.maxValue != maxValue ||
+        oldDelegate.rcvColor != rcvColor ||
+        oldDelegate.disColor != disColor ||
+        oldDelegate.gridColor != gridColor ||
+        !_sameList(oldDelegate.received, received) ||
+        !_sameList(oldDelegate.disbursed, disbursed);
+  }
 }
 
 // =============================================================================
@@ -699,7 +778,8 @@ class _Tooltip extends StatelessWidget {
   });
 
   final String label;
-  final double received, disbursed;
+  final double received;
+  final double disbursed;
   final VoidCallback onDetails;
 
   @override
@@ -726,6 +806,7 @@ class _Tooltip extends StatelessWidget {
           SizedBox(width: 12.sp),
           const Spacer(),
           GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: onDetails,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -758,6 +839,7 @@ class _Tooltip extends StatelessWidget {
 
 class _TVal extends StatelessWidget {
   const _TVal(this.label, this.value, this.color);
+
   final String label;
   final double value;
   final Color color;
@@ -788,7 +870,9 @@ class _SummaryStrip extends StatelessWidget {
     required this.totalReceived,
     required this.totalDisbursed,
   });
-  final double totalReceived, totalDisbursed;
+
+  final double totalReceived;
+  final double totalDisbursed;
 
   @override
   Widget build(BuildContext context) {
@@ -823,6 +907,7 @@ class _SummaryTile extends StatelessWidget {
     required this.color,
     required this.icon,
   });
+
   final String label;
   final double value;
   final Color color;
@@ -875,6 +960,7 @@ class _SummaryTile extends StatelessWidget {
 
 class _SplitGauge extends StatelessWidget {
   const _SplitGauge({required this.state});
+
   final TodayState state;
 
   @override
@@ -953,6 +1039,7 @@ class _AmountTile extends StatelessWidget {
     required this.color,
     required this.icon,
   });
+
   final String label;
   final double amount;
   final Color color;
@@ -991,6 +1078,7 @@ class _AmountTile extends StatelessWidget {
 
 class _NetBanner extends StatelessWidget {
   const _NetBanner({required this.net});
+
   final double net;
 
   @override
@@ -999,6 +1087,7 @@ class _NetBanner extends StatelessWidget {
     final Color color = isPos
         ? AppColors.getGreenColor
         : AppColors.getErrorColor;
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
@@ -1040,6 +1129,7 @@ class _CountCard extends StatelessWidget {
     required this.color,
     required this.icon,
   });
+
   final String label;
   final int count;
   final double amount;
@@ -1075,6 +1165,7 @@ class _CountCard extends StatelessWidget {
 
 class _LegendDot extends StatelessWidget {
   const _LegendDot({required this.color, required this.label});
+
   final Color color;
   final String label;
 
@@ -1093,239 +1184,19 @@ class _LegendDot extends StatelessWidget {
 }
 
 // =============================================================================
-// DRILL-DOWN SHEET
-// Container captured BEFORE showModalBottomSheet — the sheet's own BuildContext
-// has no ProviderScope ancestor so we must use UncontrolledProviderScope.
-// =============================================================================
-
-void _openDrill(
-  BuildContext context,
-  WidgetRef ref,
-  DrillTarget target,
-  String title,
-) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (_) => _DrillSheet(target: target, title: title),
-  );
-}
-
-class _DrillSheet extends ConsumerWidget {
-  const _DrillSheet({required this.target, required this.title});
-  final DrillTarget target;
-  final String title;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<DrillItem>> dataAsync = ref.watch(
-      drillDownProvider(target),
-    );
-    final ColorScheme cs = Theme.of(context).colorScheme;
-
-    return DraggableScrollableSheet(
-      initialChildSize: 0.55,
-      minChildSize: 0.35,
-      maxChildSize: 0.92,
-      builder: (_, ScrollController sc) => Container(
-        decoration: BoxDecoration(
-          color: cs.surface, //with out this it will became transaparent
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          children: [
-            SizedBox(height: 16.sp),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.sp),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: BodyTwoDefaultText(
-                      text: 'Transactions · $title',
-                      bold: true,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close_rounded),
-                  ),
-                ],
-              ),
-            ),
-            Divider(height: 1.sp),
-            Expanded(
-              child: dataAsync.when(
-                data: (List<DrillItem> items) {
-                  if (items.isEmpty) {
-                    return const Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.inbox_rounded,
-                            size: 44,
-                            color: AppColors.getLigthGreyColor,
-                          ),
-                          SizedBox(height: 8),
-                          BodyOneDefaultText(
-                            text: 'No transactions for this period',
-                            color: AppColors.getLigthGreyColor,
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  final double totalRec = items
-                      .where((e) => e.isReceived)
-                      .fold(0.0, (s, e) => s + e.amount);
-                  final double totalDis = items
-                      .where((e) => !e.isReceived)
-                      .fold(0.0, (s, e) => s + e.amount);
-
-                  return ListView(
-                    controller: sc,
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-                    children: [
-                      // Mini summary
-                      Row(
-                        children: [
-                          _MiniStat('In', totalRec, AppColors.getPrimaryColor),
-                          SizedBox(width: 12.sp),
-                          _MiniStat('Out', totalDis, AppColors.getErrorColor),
-                          SizedBox(width: 12.sp),
-                        ],
-                      ),
-                      SizedBox(height: 14.sp),
-                      ...items.map((item) => _DrillRow(item: item)),
-                    ],
-                  );
-                },
-                loading: () =>
-                    const Center(child: CircularProgressIndicator.adaptive()),
-                error: (e, _) => Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: BodySmallText(
-                      text: 'Failed to load: $e',
-                      color: AppColors.getErrorColor,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MiniStat extends StatelessWidget {
-  const _MiniStat(this.label, this.value, this.color);
-  final String label;
-  final double value;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
-        decoration: BoxDecoration(
-          color: color.withAlpha(20),
-          borderRadius: BorderRadius.circular(10.sp),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BodySmallText(text: label, color: color),
-            CurrencyWidget(
-              amount: Utility.doubleFormate(value),
-              smallText: true,
-              color: color,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _DrillRow extends StatelessWidget {
-  const _DrillRow({required this.item});
-  final DrillItem item;
-
-  @override
-  Widget build(BuildContext context) {
-    final Color color = item.isReceived
-        ? AppColors.getPrimaryColor
-        : AppColors.getErrorColor;
-    final IconData icon = item.isReceived
-        ? Icons.arrow_downward_rounded
-        : Icons.arrow_upward_rounded;
-
-    return Container(
-      margin: EdgeInsets.only(bottom: 14.sp),
-      padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 14.sp),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.getLigthGreyColor.withAlpha(50)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 24.sp,
-            height: 24.sp,
-            decoration: BoxDecoration(
-              color: color.withAlpha(30),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color, size: 16),
-          ),
-          SizedBox(width: 12.sp),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                BodySmallText(
-                  text: item.isReceived ? 'Payment Received' : 'Loan Disbursed',
-                  bold: true,
-                ),
-                BodySmallText(
-                  text: 'ID: ${item.id}  ·  ${item.date}',
-                  color: AppColors.getLigthGreyColor,
-                ),
-              ],
-            ),
-          ),
-          CurrencyWidget(
-            amount:
-                '${item.isReceived ? '+' : '-'}\$${Utility.doubleFormate(item.amount)}',
-            smallText: true,
-            color: color,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// =============================================================================
 // SKELETON + ERROR
 // =============================================================================
 
 class _Skeleton extends StatefulWidget {
   const _Skeleton();
+
   @override
   State<_Skeleton> createState() => _SkeletonState();
 }
 
 class _SkeletonState extends State<_Skeleton>
     with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
+  late final AnimationController _ctrl;
 
   @override
   void initState() {
@@ -1345,6 +1216,7 @@ class _SkeletonState extends State<_Skeleton>
   @override
   Widget build(BuildContext context) {
     final Color base = AppColors.getLigthGreyColor.withAlpha(5);
+
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (_, _) {
@@ -1374,22 +1246,27 @@ class _SkeletonState extends State<_Skeleton>
 
 class _Bone extends StatelessWidget {
   const _Bone(this.h, this.op, this.base);
-  final double h, op;
+
+  final double h;
+  final double op;
   final Color base;
 
   @override
-  Widget build(BuildContext context) => Container(
-    height: h,
-    width: double.infinity,
-    decoration: BoxDecoration(
-      color: base.withAlpha((op * 100).toInt()),
-      borderRadius: BorderRadius.circular(12.sp),
-    ),
-  );
+  Widget build(BuildContext context) {
+    return Container(
+      height: h,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: base.withAlpha((op * 100).toInt()),
+        borderRadius: BorderRadius.circular(12.sp),
+      ),
+    );
+  }
 }
 
 class _Err extends StatelessWidget {
   const _Err();
+
   @override
   Widget build(BuildContext context) {
     return const SizedBox(

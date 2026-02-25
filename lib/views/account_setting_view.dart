@@ -37,6 +37,11 @@ class AccountSettingsView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 IconButton.filled(
+                  style: const ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(
+                      AppColors.borderColor,
+                    ),
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(Icons.close, color: AppColors.getErrorColor),
                 ),

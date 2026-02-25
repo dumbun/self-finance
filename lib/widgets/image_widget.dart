@@ -17,6 +17,7 @@ class ImageWidget extends ConsumerWidget {
     this.fit = BoxFit.fill,
     required this.title,
     this.showImage = true,
+    this.errorBuilder = const SizedBox.shrink(),
   });
 
   final String title;
@@ -26,46 +27,26 @@ class ImageWidget extends ConsumerWidget {
   final int? cache;
   final BoxFit? fit;
   final bool showImage;
+  final Widget errorBuilder;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ref
         .watch(appDirProvider)
         .when(
-          data: (data) {
-            if (data.contains(imagePath)) {
-              if (File(imagePath).existsSync()) {
-                return GestureDetector(
-                  onTap: () => showImage
-                      ? Routes.navigateToImageView(
-                          context: context,
-                          titile: title,
-                          imagePath: imagePath,
-                        )
-                      : null,
-                  child: Image.file(
-                    File(imagePath),
-                    height: height,
-                    width: width,
-                    fit: BoxFit.fill,
-                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                    cacheHeight: cache,
-                    cacheWidth: cache,
-                  ),
-                );
-              }
-            }
+          data: (String data) {
             final String imageWithAppDir = p.join(data, imagePath);
-
             return GestureDetector(
-              onTap: () => Routes.navigateToImageView(
-                context: context,
-                titile: title,
-                imagePath: imageWithAppDir,
-              ),
+              onTap: () => showImage
+                  ? Routes.navigateToImageView(
+                      context: context,
+                      titile: title,
+                      imagePath: imageWithAppDir,
+                    )
+                  : null,
               child: Image.file(
                 File(imageWithAppDir),
-                errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                errorBuilder: (_, _, _) => errorBuilder,
                 height: height,
                 width: width,
                 fit: fit,

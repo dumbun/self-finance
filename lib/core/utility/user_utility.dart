@@ -25,7 +25,7 @@ class Utility {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return PinAuthView(userDate: userData);
+          return PinAuthView(userDate: userData, scanBioMetrics: false);
         },
       ),
       (Route<dynamic> route) => false,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
-import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/providers/item_provider.dart';
@@ -56,19 +55,12 @@ class ItemImageWidget extends ConsumerWidget {
                         padding: EdgeInsetsGeometry.all(12.sp),
                         child: Column(
                           children: [
-                            GestureDetector(
-                              onTap: () => Routes.navigateToImageView(
-                                context: context,
-                                titile: item.description,
-                                imagePath: item.photo,
-                              ),
-                              child: ImageWidget(
-                                title: item.description,
-                                height: 52.sp,
-                                width: 42.sp,
-                                imagePath: item.photo,
-                                fit: BoxFit.scaleDown,
-                              ),
+                            ImageWidget(
+                              title: item.description,
+                              height: 52.sp,
+                              width: 42.sp,
+                              imagePath: item.photo,
+                              fit: BoxFit.scaleDown,
                             ),
                             BodyTwoDefaultText(
                               bold: true,
