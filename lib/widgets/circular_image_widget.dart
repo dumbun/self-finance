@@ -28,7 +28,7 @@ class CircularImageWidget extends StatelessWidget {
         child: ClipOval(
           child: ImageWidget(
             errorBuilder: errorBuilder,
-            title: titile,
+            titile: titile,
             imagePath: imageData,
             height: size,
             width: size,

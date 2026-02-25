@@ -314,7 +314,7 @@ class TransactionDetailView extends ConsumerWidget {
                                                 width: double.infinity,
                                                 child: Card(
                                                   child: ImageWidget(
-                                                    title: "Signature",
+                                                    titile: "Signature",
                                                     fit: BoxFit.scaleDown,
                                                     imagePath:
                                                         transaction.signature,

@@ -15,12 +15,12 @@ class ImageWidget extends ConsumerWidget {
     required this.width,
     this.cache,
     this.fit = BoxFit.fill,
-    required this.title,
+    required this.titile,
     this.showImage = true,
     this.errorBuilder = const SizedBox.shrink(),
   });
 
-  final String title;
+  final String titile;
   final String imagePath;
   final double height;
   final double width;
@@ -36,27 +36,34 @@ class ImageWidget extends ConsumerWidget {
         .when(
           data: (String data) {
             final String imageWithAppDir = p.join(data, imagePath);
-            return GestureDetector(
-              onTap: () => showImage
-                  ? Routes.navigateToImageView(
-                      context: context,
-                      titile: title,
-                      imagePath: imageWithAppDir,
-                    )
-                  : null,
-              child: Image.file(
-                File(imageWithAppDir),
-                errorBuilder: (_, _, _) => errorBuilder,
-                height: height,
-                width: width,
-                fit: fit,
-                cacheHeight: cache,
-                cacheWidth: cache,
+            return RepaintBoundary(
+              child: GestureDetector(
+                onTap: showImage
+                    ? () => Routes.navigateToImageView(
+                        context: context,
+                        titile: titile,
+                        imagePath: imageWithAppDir,
+                      )
+                    : null,
+                child: Image.file(
+                  File(imageWithAppDir),
+                  errorBuilder: (_, _, _) => errorBuilder,
+                  height: height,
+                  width: width,
+                  fit: fit,
+                  cacheHeight: cache,
+                  cacheWidth: cache,
+                  gaplessPlayback: true,
+                ),
               ),
             );
           },
-          error: (error, stackTrace) => const BodyOneDefaultText(text: "text"),
-          loading: () => const CircularProgressIndicator.adaptive(),
+          error: (error, _) => BodyOneDefaultText(text: error.toString()),
+          loading: () => SizedBox(
+            height: height,
+            width: width,
+            child: const CircularProgressIndicator.adaptive(),
+          ),
         );
   }
 }

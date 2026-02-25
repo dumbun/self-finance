@@ -18,7 +18,11 @@ class ImageView extends StatelessWidget {
       ),
       body: Hero(
         tag: titile,
-        child: PhotoView(imageProvider: FileImage(File(imagePath))),
+        child: PhotoView(
+          imageProvider: FileImage(File(imagePath)),
+          errorBuilder: (_, _, _) =>
+              const Center(child: Icon(Icons.broken_image_outlined, size: 48)),
+        ),
       ),
     );
   }
