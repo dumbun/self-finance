@@ -39,7 +39,8 @@ class CustomerImageWidget extends ConsumerWidget {
           },
           loading: () =>
               const Center(child: CircularProgressIndicator.adaptive()),
-          error: (_, _) => DefaultUserImage(height: size, width: size),
+          error: (_, _) =>
+              DefaultUserImage(height: size, width: size, cache: cacheSize),
         );
   }
 }

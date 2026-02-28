@@ -67,7 +67,7 @@ class _Content extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tab = ref.watch(activeChartTabProvider);
+    final ChartTab tab = ref.watch(activeChartTabProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -19,9 +19,8 @@ class BuildTransactionsListWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final size = 28.sp;
-    final height = 16.sp;
-
+    final double size = 28.sp;
+    final double height = 16.sp;
     final int cacheSize = (size * MediaQuery.of(context).devicePixelRatio)
         .round();
 
@@ -41,7 +40,6 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                       context: context,
                     ),
                     child: SlidableWidget(
-                      key: ValueKey<int>(txn.id!),
                       customerId: txn.customerId,
                       transactionId: txn.id!,
                       child: Padding(
