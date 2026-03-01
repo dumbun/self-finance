@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_donation_buttons/donationButtons/buyMeACoffeeButton.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
@@ -105,7 +106,9 @@ class DrawerWidget extends StatelessWidget {
                                 color: AppColors.getErrorColor,
                                 onTap: () => _logout(user, context),
                               ),
-
+                              const BuyMeACoffeeButton(
+                                buyMeACoffeeName: "Dumbun",
+                              ),
                               SizedBox(height: 32.sp),
                               _getAppVersion(),
                             ],

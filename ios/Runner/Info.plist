@@ -26,6 +26,8 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>https</string>
+  	<string>http</string>
 		<string>mailto</string>
 		<string>tel</string>
 		<string>UIBackgroundModes</string>
