@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
 
 class NotificationService {
@@ -18,7 +18,7 @@ class NotificationService {
 
     final TimezoneInfo currentTimeZone =
         await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(currentTimeZone.identifier));
+    tz.setLocalLocation(tz.getLocation((currentTimeZone.identifier)));
 
     const androidInit = AndroidInitializationSettings(
       '@drawable/ic_launcher_foreground',

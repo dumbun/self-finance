@@ -51,7 +51,7 @@ PODS:
     - Flutter
   - permission_handler_apple (9.3.0):
     - Flutter
-  - restart_app (0.0.1):
+  - restart_app (1.7.2):
     - Flutter
   - SDWebImage (5.21.6):
     - SDWebImage/Core (= 5.21.6)
@@ -160,7 +160,7 @@ SPEC CHECKSUMS:
   local_auth_darwin: c3ee6cce0a8d56be34c8ccb66ba31f7f180aaebb
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
-  restart_app: 9cda5378aacc5000e3f66ee76a9201534e7d3ecf
+  restart_app: 98825697952793b5a8e489df3d52ed5ac4fd536d
   SDWebImage: 1bb6a1b84b6fe87b972a102bdc77dd589df33477
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb

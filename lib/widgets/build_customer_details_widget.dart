@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
@@ -13,6 +17,7 @@ import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/widgets/call_button_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/core/fonts/title_widget.dart';
+import 'package:self_finance/widgets/snack_bar_widget.dart';
 
 class BuildCustomerDetailsWidget extends ConsumerWidget {
   const BuildCustomerDetailsWidget({super.key, required this.customerID});
@@ -85,6 +90,7 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
 
   /// [ _buildImage()] method to build the image of the customer
   Center _buildImage(String imageData, String customerName) {
+
     return Center(
       child: CircularImageWidget(
         imageData: imageData,
@@ -145,12 +151,21 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                     ),
                     SizedBox(height: 12.sp),
                     if (customer.proof.isNotEmpty)
+                    
                       GestureDetector(
-                        onTap: () => Routes.navigateToImageView(
+                        onTap: () async {
+                          final Directory a = await getApplicationDocumentsDirectory();
+                          final String b = p.join(a.path,customer.proof);
+                         if(context.mounted && File(b).existsSync()) {
+                           Routes.navigateToImageView(
                           context: context,
-                          imagePath: customer.proof,
+                          imagePath: b ,
                           titile: "${customer.name} proof",
-                        ),
+                        );
+                         }else if (context.mounted){
+                          SnackBarWidget.snackBarWidget(context: context, message: Constant.error);
+                         }
+                        } ,
                         child: Card(
                           elevation: 0,
                           child: Padding(

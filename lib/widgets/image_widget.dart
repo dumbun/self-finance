@@ -36,7 +36,8 @@ class ImageWidget extends ConsumerWidget {
         .when(
           data: (String data) {
             final String imageWithAppDir = p.join(data, imagePath);
-            return RepaintBoundary(
+            if(File(imageWithAppDir).existsSync()) {
+              return RepaintBoundary(
               child: GestureDetector(
                 onTap: showImage
                     ? () => Routes.navigateToImageView(
@@ -57,6 +58,9 @@ class ImageWidget extends ConsumerWidget {
                 ),
               ),
             );
+            }else{
+              return errorBuilder;
+            }
           },
           error: (error, _) => BodyOneDefaultText(text: error.toString()),
           loading: () => SizedBox(

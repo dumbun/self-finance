@@ -107,6 +107,7 @@ class DrawerWidget extends StatelessWidget {
                                 onTap: () => _logout(user, context),
                               ),
                               const BuyMeACoffeeButton(
+                                style: ButtonStyle(maximumSize: WidgetStatePropertyAll(Size.infinite)),
                                 buyMeACoffeeName: "Dumbun",
                               ),
                               SizedBox(height: 32.sp),
