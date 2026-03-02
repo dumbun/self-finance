@@ -21,7 +21,7 @@ final class AppDirProvider
         argument: null,
         retry: null,
         name: r'appDirProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -40,4 +40,4 @@ final class AppDirProvider
   }
 }
 
-String _$appDirHash() => r'52e3d0f40771503bb484ba500b4500f4fd6658a4';
+String _$appDirHash() => r'8d417624e17ada353b68ba92dc3275674a8c0930';

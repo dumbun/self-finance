@@ -85,8 +85,12 @@ class InvoiceGenerator {
   }) async {
     // Fetch App directory for images
     final Directory appDir = await getApplicationDocumentsDirectory();
-    final customerImagePath = p.join(appDir.path, customer.photo);
-    final signaturePath = p.join(appDir.path, transaction.signature);
+    final customerImagePath = customer.photo.isEmpty
+        ? ""
+        : p.join(appDir.path, customer.photo);
+    final signaturePath = transaction.signature.isEmpty
+        ? ""
+        : p.join(appDir.path, transaction.signature);
 
     // Fetch user data
     final User user = await _getCurrentUser();
@@ -341,7 +345,7 @@ class InvoiceGenerator {
   ) {
     late Uint8List imageBytes;
     late pw.MemoryImage pdfImage;
-    if (customer.photo.isNotEmpty) {
+    if (customerPhotoPath.isNotEmpty && File(customerPhotoPath).existsSync()) {
       imageBytes = File(customerPhotoPath).readAsBytesSync();
       pdfImage = pw.MemoryImage(imageBytes);
     }
@@ -386,7 +390,8 @@ class InvoiceGenerator {
                   ],
                 ),
               ),
-              if (customer.photo.isNotEmpty)
+              if (customerPhotoPath.isNotEmpty &&
+                  File(customerPhotoPath).existsSync())
                 pw.Image(pdfImage, height: 80, width: 80),
             ],
           ),
@@ -485,7 +490,7 @@ class InvoiceGenerator {
   static pw.Widget _buildTermsAndConditions(String signaturePath) {
     late Uint8List imageBytes;
     late pw.MemoryImage pdfImage;
-    if (signaturePath.isNotEmpty) {
+    if (signaturePath.isNotEmpty && File(signaturePath).existsSync()) {
       imageBytes = File(signaturePath).readAsBytesSync();
       pdfImage = pw.MemoryImage(imageBytes);
     }
@@ -532,7 +537,7 @@ class InvoiceGenerator {
           ),
           pw.Column(
             children: [
-              if (signaturePath.isNotEmpty)
+              if (signaturePath.isNotEmpty && File(signaturePath).existsSync())
                 pw.Image(pdfImage, height: 48, width: 48),
               pw.Text('Signature'),
             ],

@@ -38,7 +38,7 @@ class TransactionFilterWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final filters = ref.watch(filterProvider);
+    final Set<TransactionsFilters> filters = ref.watch(filterProvider);
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
