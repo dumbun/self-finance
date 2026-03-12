@@ -12,26 +12,31 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/constants.dart';
-import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
+import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:signature/signature.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Utility {
-  static Future<void> closeApp({
-    required BuildContext context,
-    required User userData,
-  }) async {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return PinAuthView(userDate: userData, scanBioMetrics: false);
-        },
-      ),
-      (Route<dynamic> route) => false,
-    );
-    BackEnd.close();
-    await FlutterExitApp.exitApp();
+  static Future<void> closeApp({required BuildContext context}) async {
+    AlertDilogs.alertDialogWithTwoAction(
+      context,
+      Constant.exit,
+      Constant.signOutMessage,
+    ).then((int value) async {
+      if (value == 1 && context.mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const PinAuthView(scanBioMetrics: false);
+            },
+          ),
+          (Route<dynamic> route) => false,
+        );
+        await BackEnd.close();
+        await FlutterExitApp.exitApp();
+      }
+    });
   }
 
   static String formatDate({required DateTime date}) {

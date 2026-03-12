@@ -41,11 +41,9 @@ class SelfFinance extends ConsumerWidget {
                     title: Constant.appTitle,
                     debugShowCheckedModeBanner: false,
                     theme: ThemeData(
-                      useMaterial3: true,
                       fontFamily: Constant.appFont,
                       primaryColor: AppColors.getPrimaryColor,
                       cardTheme: const CardThemeData(elevation: 2),
-                      primarySwatch: Colors.blue,
                       colorScheme: ColorScheme.fromSeed(
                         seedColor: AppColors.getPrimaryColor,
                         error: AppColors.getErrorColor,
@@ -64,7 +62,6 @@ class SelfFinance extends ConsumerWidget {
                         backgroundColor: AppColors.getPrimaryTextColor,
                       ),
                       fontFamily: Constant.appFont,
-                      primarySwatch: Colors.blue,
                       colorScheme: ColorScheme.fromSeed(
                         seedColor: AppColors.getPrimaryColor,
                         error: AppColors.getErrorColor,

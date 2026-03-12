@@ -274,17 +274,7 @@ class AccountSettingsView extends StatelessWidget {
   }) {
     return _buildListTile(
       icon: const Icon(Icons.logout, color: AppColors.getErrorColor),
-      onPressed: () {
-        AlertDilogs.alertDialogWithTwoAction(
-          context,
-          Constant.exit,
-          Constant.signOutMessage,
-        ).then((int value) async {
-          if (value == 1 && context.mounted) {
-            await Utility.closeApp(context: context, userData: userData);
-          }
-        });
-      },
+      onPressed: () async => await Utility.closeApp(context: context),
       title: Constant.logout,
     );
   }

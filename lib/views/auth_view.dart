@@ -20,7 +20,7 @@ class AuthView extends ConsumerWidget {
             if (user == null) {
               return const TermsAndConditons();
             } else {
-              return PinAuthView(userDate: user);
+              return const PinAuthView();
             }
           },
           error: (error, stackTrace) => const Scaffold(

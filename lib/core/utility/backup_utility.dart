@@ -1,11 +1,10 @@
 import 'dart:io';
 import 'package:archive/archive_io.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 typedef BackupProgressCallback =
     void Function(double progress, String currentFile);
@@ -19,28 +18,6 @@ typedef BackupProgressCallback =
 /// 4. Proper validation and security
 class BackupUtility {
   static const int _maxFileSize = 100 * 1024 * 1024; // 100MB per file
-
-  /// Request storage permissions
-  static Future<bool> _requestStoragePermission() async {
-    try {
-      if (Platform.isAndroid) {
-        final PermissionStatus status = await Permission.storage.request();
-        if (status.isGranted) return true;
-
-        final PermissionStatus manageStatus = await Permission
-            .manageExternalStorage
-            .request();
-        return manageStatus.isGranted;
-      } else if (Platform.isIOS) {
-        return true;
-      } else {
-        return true;
-      }
-    } catch (e) {
-      debugPrint('Permission request error: $e');
-      return false;
-    }
-  }
 
   /// Recursively list files under directory
   static Future<List<File>> _listFilesRecursive(Directory dir) async {
@@ -90,12 +67,6 @@ class BackupUtility {
     Directory? tempDir;
 
     try {
-      // 1) Request storage permission
-      final bool granted = await _requestStoragePermission();
-      if (!granted) {
-        throw Exception('Storage permission not granted.');
-      }
-
       // 2) Get app directories
       final Directory appDocDir = await getApplicationDocumentsDirectory();
       final String appDocPath = appDocDir.path;
@@ -225,43 +196,26 @@ class BackupUtility {
       encoder.close();
       debugPrint('✅ ZIP created: $tempZipPath');
 
-      // 6) Let user choose save location
-      final String? targetDir = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: 'Select folder to save backup',
+      // 6) Let user choose save location (SAF) and SAVE the file
+      final params = SaveFileDialogParams(
+        sourceFilePath:
+            tempZipPath, // plugin copies this to user chosen location
+        fileName: zipFileName, // IMPORTANT (helps the picker name the file)
       );
 
-      if (targetDir == null || targetDir.isEmpty) {
-        // Clean up temp file
+      final savedPathOrUri = await FlutterFileDialog.saveFile(params: params);
+
+      if (savedPathOrUri == null || savedPathOrUri.isEmpty) {
+        // user cancelled
         await File(tempZipPath).delete();
-        if (tempDir.existsSync()) {
-          await tempDir.delete(recursive: true);
-        }
         return "Please select backup destination";
       }
 
-      // 7) Copy to final destination
-      String destPath = p.join(targetDir, zipFileName);
+      // 7) Cleanup temp file (the saved file is already created)
+      await File(tempZipPath).delete();
 
-      // Avoid overwriting existing files
-      if (await File(destPath).exists()) {
-        final String base = p.basenameWithoutExtension(zipFileName);
-        final String ext = p.extension(zipFileName);
-        int counter = 1;
-        do {
-          destPath = p.join(targetDir, '${base}_$counter$ext');
-          counter++;
-        } while (await File(destPath).exists());
-      }
-
-      final File tempFile = File(tempZipPath);
-      //? If we face any permisson issue with copying use share
-      // ShareParams s = ShareParams(files: [XFile(tempFile.path)]);
-      // SharePlus.instance.share(s);
-      await tempFile.copy(destPath);
-      await tempFile.delete();
-
-      debugPrint('✅ Backup saved: $destPath');
-      return destPath;
+      debugPrint('✅ Backup saved at: $savedPathOrUri');
+      return savedPathOrUri;
     } catch (e, st) {
       debugPrint('❌ Backup error: $e\n$st');
       rethrow;

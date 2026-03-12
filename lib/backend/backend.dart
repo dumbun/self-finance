@@ -558,14 +558,14 @@ class BackEnd {
   }
 
   static Future<List<Customer>> fetchAllCustomerData() async {
-    final d = await db();
-    final rows = await (d.select(
+    final ItDataDatabase d = await db();
+    final List<CustomerRow> rows = await (d.select(
       d.customersTable,
     )..orderBy([(t) => OrderingTerm.asc(t.customerName)])).get();
 
     return rows
         .map(
-          (r) => Customer(
+          (CustomerRow r) => Customer(
             id: r.customerId,
             userID: r.userId,
             name: r.customerName,
@@ -605,7 +605,7 @@ class BackEnd {
 
     return rows
         .map(
-          (r) => Contact(
+          (TypedResult r) => Contact(
             id: r.read(d.customersTable.customerId)!,
             name: r.read(d.customersTable.customerName)!,
             number: r.read(d.customersTable.contactNumber)!,
@@ -615,7 +615,7 @@ class BackEnd {
   }
 
   static Future<String> fetchRequriedCustomerName(int id) async {
-    final d = await db();
+    final ItDataDatabase d = await db();
     final row =
         await (d.selectOnly(d.customersTable)
               ..addColumns([d.customersTable.customerName])
@@ -1246,11 +1246,9 @@ class BackEnd {
           (d.select(d.customersTable)
                 ..where((t) => t.customerId.equals(id))
                 ..limit(1))
-              .watch();
+              .watchSingle();
 
-      return q.map((rows) {
-        if (rows.isEmpty) return null;
-        final r = rows.first;
+      return q.map((CustomerRow r) {
         return Customer(
           id: r.customerId,
           userID: r.userId,

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/auth/auth.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/fonts/strong_heading_one_text.dart';
 import 'package:self_finance/core/utility/preferences_helper.dart';
 import 'package:self_finance/models/user_model.dart';
+import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/widgets/biometric_button_widget.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
@@ -13,12 +16,8 @@ import 'package:self_finance/widgets/pin_input_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
 class PinAuthView extends StatefulWidget {
-  const PinAuthView({
-    super.key,
-    required this.userDate,
-    this.scanBioMetrics = true,
-  });
-  final User userDate;
+  const PinAuthView({super.key, this.scanBioMetrics = true});
+
   final bool scanBioMetrics;
   @override
   State<PinAuthView> createState() => _PinAuthViewState();
@@ -85,60 +84,78 @@ class _PinAuthViewState extends State<PinAuthView> {
 
   @override
   Widget build(BuildContext context) {
-    final User user = widget.userDate;
-    final String profilePic = user.profilePicture.trim();
-    final bool hasProfilePic = profilePic.isNotEmpty;
     return Scaffold(
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                if (hasProfilePic)
-                  CircularImageWidget(
-                    imageData: profilePic,
-                    titile: user.userName,
-                  )
-                else
-                  DefaultUserImage(height: 42.sp),
+            child: Consumer(
+              builder: (context, ref, child) => ref
+                  .watch(userProvider)
+                  .when(
+                    loading: () => const CircularProgressIndicator.adaptive(),
+                    error: (_, _) =>
+                        const BodyTwoDefaultText(text: Constant.errorUserFetch),
+                    data: (User? user) {
+                      if (user == null) {
+                        return const BodyTwoDefaultText(
+                          text: Constant.errorUserFetch,
+                        );
+                      }
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          if (user.profilePicture.isNotEmpty)
+                            CircularImageWidget(
+                              imageData: user.profilePicture,
+                              titile: user.userName,
+                            )
+                          else
+                            DefaultUserImage(height: 42.sp),
 
-                SizedBox(height: 20.sp),
+                          SizedBox(height: 20.sp),
 
-                const StrongHeadingOne(
-                  bold: true,
-                  text: Constant.enterYourAppPin,
-                ),
+                          const StrongHeadingOne(
+                            bold: true,
+                            text: Constant.enterYourAppPin,
+                          ),
 
-                SizedBox(height: 20.sp),
+                          SizedBox(height: 20.sp),
 
-                PinInputWidget(
-                  pinController: _pinController,
-                  obscureText: true,
-                  validator: (String? value) {
-                    final v = value?.trim() ?? '';
-                    if (v.isEmpty) return Constant.enterYourAppPin;
-                    if (v != user.userPin) return Constant.enterCorrectPin;
-                    return null;
-                  },
-                ),
+                          PinInputWidget(
+                            pinController: _pinController,
+                            obscureText: true,
+                            validator: (String? value) {
+                              final v = value?.trim() ?? '';
+                              if (v.isEmpty) return Constant.enterYourAppPin;
+                              if (v != user.userPin) {
+                                return Constant.enterCorrectPin;
+                              }
+                              return null;
+                            },
+                          ),
 
-                SizedBox(height: 20.sp),
+                          SizedBox(height: 20.sp),
 
-                Padding(
-                  padding: EdgeInsetsGeometry.only(left: 22.sp, right: 22.sp),
-                  child: RoundedCornerButton(
-                    text: Constant.login,
-                    onPressed: () =>
-                        _handlePinSubmit(expectedPin: user.userPin),
+                          Padding(
+                            padding: EdgeInsetsGeometry.only(
+                              left: 22.sp,
+                              right: 22.sp,
+                            ),
+                            child: RoundedCornerButton(
+                              text: Constant.login,
+                              onPressed: () =>
+                                  _handlePinSubmit(expectedPin: user.userPin),
+                            ),
+                          ),
+
+                          SizedBox(height: 20.sp),
+
+                          BiometricButtonWidget(onPressed: _handleBiometric),
+                        ],
+                      );
+                    },
                   ),
-                ),
-
-                SizedBox(height: 20.sp),
-
-                BiometricButtonWidget(onPressed: _handleBiometric),
-              ],
             ),
           ),
         ),

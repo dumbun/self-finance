@@ -60,8 +60,6 @@ class RestoreUtility {
     InputFileStream? zipInputStream;
 
     try {
-      // 1) Close all databases before restore
-
       debugPrint('📦 Databases closed for restore');
 
       // Small delay to ensure all connections are fully closed
@@ -72,6 +70,7 @@ class RestoreUtility {
         type: FileType.custom,
         allowedExtensions: ['zip'],
         dialogTitle: 'Select backup ZIP file',
+        withData: true,
       );
 
       if (result == null || result.files.single.path == null) {
@@ -99,7 +98,7 @@ class RestoreUtility {
         dbPath = p.join(appDocPath, 'databases');
       } else {
         // Android: databases are in standard location
-        final a = await getApplicationDocumentsDirectory();
+        final Directory a = await getApplicationDocumentsDirectory();
         final dbDir = p.join(a.parent.path, 'databases');
         dbPath = dbDir;
       }

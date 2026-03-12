@@ -38,18 +38,20 @@ PODS:
     - Flutter
   - flutter_exit_app (2.0.0):
     - Flutter
+  - flutter_file_dialog (0.0.1):
+    - Flutter
   - flutter_local_notifications (0.0.1):
     - Flutter
   - flutter_timezone (0.0.1):
     - Flutter
   - image_picker_ios (0.0.1):
     - Flutter
+  - in_app_review (2.0.0):
+    - Flutter
   - local_auth_darwin (0.0.1):
     - Flutter
     - FlutterMacOS
   - package_info_plus (0.4.5):
-    - Flutter
-  - permission_handler_apple (9.3.0):
     - Flutter
   - restart_app (1.7.2):
     - Flutter
@@ -95,12 +97,13 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_email_sender (from `.symlinks/plugins/flutter_email_sender/ios`)
   - flutter_exit_app (from `.symlinks/plugins/flutter_exit_app/ios`)
+  - flutter_file_dialog (from `.symlinks/plugins/flutter_file_dialog/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_timezone (from `.symlinks/plugins/flutter_timezone/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
+  - in_app_review (from `.symlinks/plugins/in_app_review/ios`)
   - local_auth_darwin (from `.symlinks/plugins/local_auth_darwin/darwin`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
-  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - restart_app (from `.symlinks/plugins/restart_app/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
@@ -124,18 +127,20 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_email_sender/ios"
   flutter_exit_app:
     :path: ".symlinks/plugins/flutter_exit_app/ios"
+  flutter_file_dialog:
+    :path: ".symlinks/plugins/flutter_file_dialog/ios"
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   flutter_timezone:
     :path: ".symlinks/plugins/flutter_timezone/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
+  in_app_review:
+    :path: ".symlinks/plugins/in_app_review/ios"
   local_auth_darwin:
     :path: ".symlinks/plugins/local_auth_darwin/darwin"
   package_info_plus:
     :path: ".symlinks/plugins/package_info_plus/ios"
-  permission_handler_apple:
-    :path: ".symlinks/plugins/permission_handler_apple/ios"
   restart_app:
     :path: ".symlinks/plugins/restart_app/ios"
   share_plus:
@@ -154,12 +159,13 @@ SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_email_sender: aa1e9772696691d02cd91fea829856c11efb8e58
   flutter_exit_app: d37914f2759c459c72cc073c4fa3cff661b5f80d
+  flutter_file_dialog: ca8d7fbd1772d4f0c2777b4ab20a7787ef4e7dd8
   flutter_local_notifications: 643a3eda1ce1c0599413ca31672536d423dee214
   flutter_timezone: 7c838e17ffd4645d261e87037e5bebf6d38fe544
   image_picker_ios: e0ece4aa2a75771a7de3fa735d26d90817041326
+  in_app_review: 7dd1ea365263f834b8464673f9df72c80c17c937
   local_auth_darwin: c3ee6cce0a8d56be34c8ccb66ba31f7f180aaebb
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
-  permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
   restart_app: 98825697952793b5a8e489df3d52ed5ac4fd536d
   SDWebImage: 1bb6a1b84b6fe87b972a102bdc77dd589df33477
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
