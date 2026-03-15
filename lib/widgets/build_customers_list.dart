@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
@@ -22,43 +21,39 @@ class BuildCustomersListWidget extends ConsumerWidget {
             return data.isNotEmpty
                 ? ListView.builder(
                     itemCount: data.length,
-                    itemBuilder: (context, index) {
-                      final curr = data[index];
-
-                      return Padding(
-                        padding: EdgeInsets.only(top: 16.sp),
-                        child: Dismissible(
-                          key: ValueKey(curr.id),
-                          direction: DismissDirection.endToStart,
-                          background: Container(
-                            color: AppColors.contentColorBlue,
-                            alignment: Alignment.centerRight,
-                            padding: EdgeInsets.only(right: 16.sp),
-                            child: const Icon(Icons.phone_enabled_rounded),
-                          ),
-                          confirmDismiss: (_) async {
-                            Utility.makeCall(phoneNumber: curr.number);
-                            return false; // not actually dismissing
-                          },
-                          child: Card(
-                            elevation: 0,
-                            child: ListTile(
-                              onTap: () => Routes.navigateToContactDetailsView(
-                                context,
-                                customerID: curr.id,
-                              ),
-                              trailing: const Icon(
-                                Icons.arrow_forward_ios_rounded,
-                                color: AppColors.getLigthGreyColor,
-                              ),
-                              title: BodyTwoDefaultText(
-                                text: curr.name,
-                                bold: true,
-                              ),
-                              subtitle: BodyTwoDefaultText(
-                                text: curr.number,
-                                color: AppColors.getLigthGreyColor,
-                              ),
+                    itemBuilder: (_, int index) {
+                      final Contact curr = data[index];
+                      return Dismissible(
+                        key: ValueKey(curr.id),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          color: AppColors.contentColorBlue,
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 16),
+                          child: const Icon(Icons.phone_enabled_rounded),
+                        ),
+                        confirmDismiss: (_) async {
+                          Utility.makeCall(phoneNumber: curr.number);
+                          return false; // not actually dismissing
+                        },
+                        child: Card(
+                          elevation: 0,
+                          child: ListTile(
+                            onTap: () => Routes.navigateToContactDetailsView(
+                              context,
+                              customerID: curr.id,
+                            ),
+                            trailing: const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: AppColors.getLigthGreyColor,
+                            ),
+                            title: BodyTwoDefaultText(
+                              text: curr.name,
+                              bold: true,
+                            ),
+                            subtitle: BodyTwoDefaultText(
+                              text: curr.number,
+                              color: AppColors.getLigthGreyColor,
                             ),
                           ),
                         ),

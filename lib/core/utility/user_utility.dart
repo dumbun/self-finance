@@ -12,7 +12,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/constants.dart';
-import 'package:self_finance/views/pin_auth_view.dart';
+import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:signature/signature.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -25,14 +25,7 @@ class Utility {
       Constant.signOutMessage,
     ).then((int value) async {
       if (value == 1 && context.mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (BuildContext context) {
-              return const PinAuthView(scanBioMetrics: false);
-            },
-          ),
-          (Route<dynamic> route) => false,
-        );
+        Routes.navigateToPinAuthView(context: context);
         await BackEnd.close();
         await FlutterExitApp.exitApp();
       }
@@ -118,17 +111,12 @@ class Utility {
     }
   }
 
-  // to unfocus keyboard when user touches the white space in screen
-  static void unfocus() {
-    FocusManager.instance.primaryFocus?.unfocus();
-  }
-
   static String numberFormate(int number) {
-    return NumberFormat('#,##0').format(number);
+    return NumberFormat('#,##,##0').format(number);
   }
 
   static String doubleFormate(double number) {
-    return NumberFormat('#,##0').format(number);
+    return NumberFormat('#,##,##0').format(number);
   }
 
   static Future<bool> isNumberPresent(String value) async {

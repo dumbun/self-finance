@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
@@ -38,21 +37,21 @@ class ProofButton extends ConsumerWidget {
                 );
               }
             },
-            child: Card(
+            child: const Card(
               elevation: 0,
               child: Padding(
-                padding: EdgeInsets.all(14.sp),
+                padding: EdgeInsets.all(14),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(width: 12.sp),
-                    const Icon(
+                    SizedBox(width: 12),
+                    Icon(
                       Icons.arrow_forward_ios_rounded,
                       color: AppColors.getPrimaryColor,
                     ),
-                    SizedBox(width: 20.sp),
-                    const BodyOneDefaultText(
+                    SizedBox(width: 20),
+                    BodyOneDefaultText(
                       text: "Show Customer proof",
                       color: AppColors.getPrimaryColor,
                     ),

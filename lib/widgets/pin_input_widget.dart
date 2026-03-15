@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 
 class PinInputWidget extends StatelessWidget {
@@ -23,11 +22,14 @@ class PinInputWidget extends StatelessWidget {
     const fillColor = Color.fromRGBO(243, 246, 249, 0);
 
     final defaultPinTheme = PinTheme(
-      width: 30.sp,
-      height: 30.sp,
-      textStyle: TextStyle(fontSize: 22.sp, color: AppColors.getPrimaryColor),
+      width: 54,
+      height: 54,
+      textStyle: const TextStyle(
+        fontSize: 26,
+        color: AppColors.getPrimaryColor,
+      ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.sp),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.getPrimaryColor),
       ),
     );
@@ -49,14 +51,14 @@ class PinInputWidget extends StatelessWidget {
         keyboardType: TextInputType.number,
         focusedPinTheme: defaultPinTheme.copyWith(
           decoration: defaultPinTheme.decoration!.copyWith(
-            borderRadius: BorderRadius.circular(8.sp),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(color: focusedBorderColor),
           ),
         ),
         submittedPinTheme: defaultPinTheme.copyWith(
           decoration: defaultPinTheme.decoration!.copyWith(
             color: fillColor,
-            borderRadius: BorderRadius.circular(19.sp),
+            borderRadius: BorderRadius.circular(19),
             border: Border.all(color: focusedBorderColor),
           ),
         ),
@@ -70,7 +72,7 @@ class PinInputWidget extends StatelessWidget {
               return null;
             },
         defaultPinTheme: defaultPinTheme,
-        separatorBuilder: (int index) => SizedBox(width: 12.sp),
+        separatorBuilder: (int index) => const SizedBox(width: 16),
         hapticFeedbackType: HapticFeedbackType.lightImpact,
       ),
     );

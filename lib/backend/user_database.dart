@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:self_finance/models/user_model.dart';
@@ -171,6 +172,17 @@ class UserBackEnd {
     final d = await db();
     return (d.update(d.userTable)..where((t) => t.id.equals(id))).write(
       UserTableCompanion(profilePicture: Value(photoPath)),
+    );
+  }
+
+  static Future<void> deleteUserProfilePic({required int id}) async {
+    final UserDatabase d = await db();
+    final User s = await fetchUserData();
+    if (File(s.profilePicture).existsSync() && s.profilePicture.isNotEmpty) {
+      await File(s.profilePicture).delete();
+    }
+    (d.update(d.userTable)..where((t) => t.id.equals(id))).write(
+      const UserTableCompanion(profilePicture: Value("")),
     );
   }
 

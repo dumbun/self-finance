@@ -1,18 +1,17 @@
 import 'dart:math';
 import 'package:intl/intl.dart';
 
-/// LoanCalculator: calculates calendar months + remaining days,
-/// daily interest, total interest, and total payable amount.
+/// LoanCalculator
 ///
-/// ✅ takenDate is now a DateTime.
-/// tenureDate is optional; if omitted, DateTime.now() is used.
+/// Assumption:
+/// [rateOfInterest] is MONTHLY interest percentage.
+/// Example:
+///   3.0 => 3% per month
 class LoanCalculator {
   final double takenAmount;
-  final double rateOfInterest; // annual rate in percent (e.g. 12.0)
+  final double rateOfInterest;
   final DateTime takenDate;
   final DateTime? tenureDate;
-
-  /// If true, count both start and end day (adds 1 day).
   final bool inclusiveDays;
 
   const LoanCalculator({
@@ -21,69 +20,80 @@ class LoanCalculator {
     required this.takenDate,
     this.tenureDate,
     this.inclusiveDays = true,
-  });
+  }) : assert(takenAmount >= 0, 'takenAmount cannot be negative'),
+       assert(rateOfInterest >= 0, 'rateOfInterest cannot be negative');
 
-  /// Total days between takenDate and tenureDate (or now).
-  int get days => _getDays();
+  DateTime get _startDate => DateUtils.dateOnly(takenDate);
+  DateTime get _endDate => DateUtils.dateOnly(tenureDate ?? DateTime.now());
 
-  /// Example: "3 Months - 12 Days"
-  String get monthsAndRemainingDays => _getMonthsAndRemainingDaysString();
-
-  double get interestPerDay => _getInterestPerDay();
-
-  double get totalInterestAmount => _totalInterest();
-
-  double get totalAmount => _totalAmount();
-
-  List<int> get _md => DateUtils.getCalendarMonthsAndRemainingDays(
-    start: DateUtils.dateOnly(takenDate),
-    end: tenureDate ?? DateTime.now(),
+  /// Total counted days between start and end.
+  int get days => DateUtils.getDaysDifference(
+    startDate: _startDate,
+    endDate: _endDate,
+    inclusive: inclusiveDays,
   );
 
-  // ---------------- internal ----------------
+  /// [months, remainingDays]
+  List<int> get _monthsDays => DateUtils.getCalendarMonthsAndRemainingDays(
+    start: _startDate,
+    end: _endDate,
+  );
 
-  double _totalAmount() {
-    // Your original convention: month = 30 days
-    return takenAmount + _md[0] * interestPerDay * 30 + _md[1] * interestPerDay;
+  int get months => _monthsDays[0];
+  int get remainingDays => _monthsDays[1];
+
+  String get monthsAndRemainingDays => "$months Months - $remainingDays Days";
+
+  /// 3% => 0.03
+  double get _monthlyRate => rateOfInterest / 100.0;
+
+  /// Daily rate derived from monthly rate.
+  double get _dailyRate => _monthlyRate / 30.0;
+
+  /// Interest for one full month.
+  double get interestPerMonth => takenAmount * _monthlyRate;
+
+  /// Interest for one day.
+  double get interestPerDay => takenAmount * _dailyRate;
+
+  /// Simple interest only
+  double get totalInterestAmount =>
+      (months * interestPerMonth) + (remainingDays * interestPerDay);
+
+  /// Principal + simple interest
+  double get totalAmount => takenAmount + totalInterestAmount;
+
+  /// Compound amount after full months and remaining days
+  double get compoundTotalAmount {
+    final amountAfterMonths =
+        takenAmount * pow(1 + _monthlyRate, months).toDouble();
+
+    final amountAfterDays =
+        amountAfterMonths * pow(1 + _dailyRate, remainingDays).toDouble();
+
+    return amountAfterDays;
   }
 
-  int _getDays() {
-    final start = DateUtils.dateOnly(takenDate);
-    final end = tenureDate ?? DateTime.now();
-    return DateUtils.getDaysDifference(
-      startDate: start,
-      endDate: end,
-      inclusive: inclusiveDays,
-    );
-  }
+  /// Compound interest only
+  double get compoundInterestAmount => compoundTotalAmount - takenAmount;
 
-  String _getMonthsAndRemainingDaysString() {
-    return "${_md[0]} Months - ${_md[1]} Days";
-  }
+  /// Optional rounded helpers
+  double get totalAmountRounded => _roundTo2(totalAmount);
+  double get totalInterestAmountRounded => _roundTo2(totalInterestAmount);
+  double get compoundTotalAmountRounded => _roundTo2(compoundTotalAmount);
+  double get compoundInterestAmountRounded => _roundTo2(compoundInterestAmount);
 
-  double _getInterestPerMonth() {
-    // keep your original formula
-    return takenAmount * (rateOfInterest / 100.0);
-  }
-
-  double _getInterestPerDay() {
-    final monthlyInterest = _getInterestPerMonth();
-    return monthlyInterest / 30;
-  }
-
-  double _totalInterest() {
-    return _md[0] * _getInterestPerMonth() + _md[1] * _getInterestPerDay();
-  }
+  static double _roundTo2(double value) =>
+      double.parse(value.toStringAsFixed(2));
 }
 
 class DateUtils {
   static DateTime dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
-  /// Parse "dd-MM-yyyy" -> DateTime (midnight).
   static DateTime parseDateOnly(String ddMMyyyy) {
-    final f = DateFormat("dd-MM-yyyy");
-    final p = f.parseStrict(ddMMyyyy);
-    return DateTime(p.year, p.month, p.day);
+    final formatter = DateFormat('dd-MM-yyyy');
+    final parsed = formatter.parseStrict(ddMMyyyy);
+    return DateTime(parsed.year, parsed.month, parsed.day);
   }
 
   static int getDaysDifference({
@@ -91,19 +101,23 @@ class DateUtils {
     required DateTime endDate,
     bool inclusive = true,
   }) {
-    int diff = endDate.difference(startDate).inDays;
+    final start = dateOnly(startDate);
+    final end = dateOnly(endDate);
+
+    if (end.isBefore(start)) return 0;
+
+    int diff = end.difference(start).inDays;
     if (inclusive) diff += 1;
-    if (diff < 0) return 0;
     return diff;
   }
 
-  /// Returns [months, days] using calendar months (not 30-day fixed months).
+  /// Returns [calendarMonths, remainingDays]
   static List<int> getCalendarMonthsAndRemainingDays({
     required DateTime start,
     required DateTime end,
   }) {
-    final s = DateTime(start.year, start.month, start.day);
-    final e = DateTime(end.year, end.month, end.day);
+    final s = dateOnly(start);
+    final e = dateOnly(end);
 
     if (e.isBefore(s)) return [0, 0];
 
@@ -111,27 +125,24 @@ class DateUtils {
     DateTime candidate = _addCalendarMonthsClamped(s, months);
 
     if (candidate.isAfter(e)) {
-      months -= 1;
+      months--;
       candidate = _addCalendarMonthsClamped(s, months);
     }
 
-    int remainingDays = e.difference(candidate).inDays;
-    if (remainingDays < 0) remainingDays = 0;
-
+    final remainingDays = max(0, e.difference(candidate).inDays);
     return [months, remainingDays];
   }
 
   static DateTime _addCalendarMonthsClamped(DateTime date, int monthsToAdd) {
-    final totalMonths = date.month - 1 + monthsToAdd;
-    final newYear = date.year + totalMonths ~/ 12;
+    final totalMonths = (date.month - 1) + monthsToAdd;
+    final newYear = date.year + (totalMonths ~/ 12);
     final newMonth = (totalMonths % 12) + 1;
-    final maxDay = _daysInMonth(newYear, newMonth);
-    final newDay = min(date.day, maxDay);
+    final newDay = min(date.day, _daysInMonth(newYear, newMonth));
+
     return DateTime(newYear, newMonth, newDay);
   }
 
   static int _daysInMonth(int year, int month) {
-    final lastDay = DateTime(year, month + 1, 0);
-    return lastDay.day;
+    return DateTime(year, month + 1, 0).day;
   }
 }

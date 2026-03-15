@@ -199,7 +199,6 @@ class ItDataDatabase extends _$ItDataDatabase {
     );
   }
 
-  /// ✅ bumped because we now migrate old TEXT dates into DateTime (ms epoch)
   @override
   int get schemaVersion => 4;
 

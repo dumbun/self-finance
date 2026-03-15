@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
@@ -25,11 +24,11 @@ class AnalaticsGridWidget extends ConsumerWidget {
         final columns = _columnsForWidth(constraints.maxWidth);
 
         return Padding(
-          padding: EdgeInsets.all(16.sp),
+          padding: const EdgeInsets.all(16),
           child: GridView.count(
             crossAxisCount: columns,
-            mainAxisSpacing: 16.sp,
-            crossAxisSpacing: 16.sp,
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
             childAspectRatio: 1.1,
             shrinkWrap: true, // Important: allows grid to size itself
             physics:
@@ -168,17 +167,17 @@ class StatCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: EdgeInsets.all(16.sp),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.all(12.sp),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12.sp),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: iconColor, size: 18.sp),
+              child: Icon(icon, color: iconColor, size: 18),
             ),
 
             const Spacer(),
@@ -188,7 +187,7 @@ class StatCardWidget extends StatelessWidget {
                 ? CurrencyWidget(amount: value)
                 : BodyOneDefaultText(text: value, bold: true),
 
-            SizedBox(height: 8.sp),
+            const SizedBox(height: 8),
 
             // Title / description
             BodySmallText(text: title, overflow: TextOverflow.ellipsis),

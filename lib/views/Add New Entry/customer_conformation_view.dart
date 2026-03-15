@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
+import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/providers/contacts_provider.dart';
 import 'package:self_finance/providers/image_providers.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
@@ -63,7 +64,7 @@ class _CustomerConformationViewState
     bool currency = false,
   }) {
     return ListTile(
-      contentPadding: EdgeInsets.all(4.sp),
+      contentPadding: const EdgeInsets.all(4),
       subtitle: currency
           ? CurrencyWidget(amount: data)
           : BodyOneDefaultText(bold: true, text: data.toString()),
@@ -79,14 +80,14 @@ class _CustomerConformationViewState
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
+          children: <Widget>[
             Expanded(
               child: ImagePickerWidget(
                 imageProvider: imageFileProvider,
-                onSetImage: (file) =>
-                    ref.read(imageFileProvider.notifier).set(file),
+                onSetImage: (XFile? file) =>
+                    ref.read<ImageFile>(imageFileProvider.notifier).set(file),
                 onClearImage: () =>
-                    ref.read(imageFileProvider.notifier).clear(),
+                    ref.read<ImageFile>(imageFileProvider.notifier).clear(),
                 title: Constant.customerPhoto,
                 defaultImage: Constant.defaultProfileImagePath,
               ),
@@ -94,21 +95,23 @@ class _CustomerConformationViewState
             Expanded(
               child: ImagePickerWidget(
                 imageProvider: proofFileProvider,
-                onSetImage: (file) =>
-                    ref.read(proofFileProvider.notifier).set(file),
+                onSetImage: (XFile? file) =>
+                    ref.read<ProofFile>(proofFileProvider.notifier).set(file),
                 onClearImage: () =>
-                    ref.read(proofFileProvider.notifier).clear(),
+                    ref.read<ProofFile>(proofFileProvider.notifier).clear(),
                 title: Constant.customerProof,
                 defaultImage: Constant.defaultProofImagePath,
               ),
             ),
           ],
         ),
-        SizedBox(height: 10.sp),
+        const SizedBox(height: 10),
         ImagePickerWidget(
           imageProvider: itemFileProvider,
-          onSetImage: (file) => ref.read(itemFileProvider.notifier).set(file),
-          onClearImage: () => ref.read(itemFileProvider.notifier).clear(),
+          onSetImage: (XFile? file) =>
+              ref.read<ItemFile>(itemFileProvider.notifier).set(file),
+          onClearImage: () =>
+              ref.read<ItemFile>(itemFileProvider.notifier).clear(),
           title: Constant.customerItem,
           defaultImage: Constant.defaultItemImagePath,
         ),
@@ -177,7 +180,7 @@ class _CustomerConformationViewState
       ),
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(20.sp),
+          padding: const EdgeInsets.all(20),
           child: SingleChildScrollView(
             child: SizedBox(
               width: double.infinity,
@@ -207,7 +210,7 @@ class _CustomerConformationViewState
                   _buildListTile(
                     currency: true,
                     title: Constant.takenAmount,
-                    data: "${widget.takenAmount} ",
+                    data: Utility.doubleFormate(widget.takenAmount),
                   ),
 
                   _buildListTile(

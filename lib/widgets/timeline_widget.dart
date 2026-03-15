@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
@@ -32,7 +31,7 @@ class TimelineWidget extends StatelessWidget {
                 bold: true,
                 text: Constant.history.toUpperCase(),
               ),
-              SizedBox(height: 14.sp),
+              const SizedBox(height: 14),
 
               TimelineTile(
                 alignment: TimelineAlign.start,
@@ -43,7 +42,7 @@ class TimelineWidget extends StatelessWidget {
                 beforeLineStyle: const LineStyle(thickness: 2),
                 afterLineStyle: const LineStyle(thickness: 2),
                 endChild: Padding(
-                  padding: EdgeInsets.all(12.sp),
+                  padding: const EdgeInsets.all(12),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,7 +78,7 @@ class TimelineWidget extends StatelessWidget {
                 beforeLineStyle: const LineStyle(thickness: 2),
                 afterLineStyle: const LineStyle(thickness: 2),
                 endChild: Padding(
-                  padding: EdgeInsets.all(12.sp),
+                  padding: const EdgeInsets.all(12),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,7 +103,7 @@ class TimelineWidget extends StatelessWidget {
                 ),
                 hasIndicator: true,
               ),
-              SizedBox(height: 14.sp),
+              const SizedBox(height: 14),
             ],
           ),
         ),

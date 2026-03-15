@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
@@ -74,7 +73,7 @@ class _Content extends ConsumerWidget {
       children: [
         // ── Header ─────────────────────────────────────────────────────────
         Padding(
-          padding: EdgeInsets.fromLTRB(16.sp, 16.sp, 16.sp, 0),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
           child: Row(
             children: [
               Expanded(
@@ -84,7 +83,7 @@ class _Content extends ConsumerWidget {
                 color: AppColors.getPrimaryColor,
                 label: 'Received',
               ),
-              SizedBox(width: 14.sp),
+              const SizedBox(width: 14),
               const _LegendDot(
                 color: AppColors.getErrorColor,
                 label: 'Disbursed',
@@ -93,7 +92,7 @@ class _Content extends ConsumerWidget {
           ),
         ),
 
-        SizedBox(height: 14.sp),
+        const SizedBox(height: 14),
 
         // ── Tab bar ────────────────────────────────────────────────────────
         _TabBar(
@@ -104,7 +103,7 @@ class _Content extends ConsumerWidget {
           },
         ),
 
-        SizedBox(height: 4.sp),
+        const SizedBox(height: 4),
 
         // ── Animated body ──────────────────────────────────────────────────
         AnimatedSwitcher(
@@ -356,14 +355,14 @@ class _TodayBody extends ConsumerWidget {
         .watch(todayChartProvider)
         .when(
           data: (TodayState s) => Padding(
-            padding: EdgeInsets.fromLTRB(18.sp, 10.sp, 18.sp, 10.sp),
+            padding: const EdgeInsets.fromLTRB(18, 10, 18, 10),
             child: Column(
               children: [
-                SizedBox(height: 20.sp),
+                const SizedBox(height: 20),
                 _SplitGauge(state: s),
-                SizedBox(height: 16.sp),
+                const SizedBox(height: 16),
                 _NetBanner(net: s.net),
-                SizedBox(height: 16.sp),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
@@ -556,13 +555,13 @@ class _LineChartBodyState extends ConsumerState<_LineChartBody>
           ),
 
           // ── X-axis labels ──────────────────────────────────────────────
-          SizedBox(height: 10.sp),
+          const SizedBox(height: 10),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: data.map((d) => BodySmallText(text: d.month)).toList(),
           ),
 
-          SizedBox(height: 14.sp),
+          const SizedBox(height: 14),
 
           // ── Summary strip ──────────────────────────────────────────────
           _SummaryStrip(
@@ -785,9 +784,9 @@ class _Tooltip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 12.sp),
-      height: 28.sp,
-      padding: EdgeInsets.symmetric(horizontal: 14.sp),
+      margin: const EdgeInsets.only(top: 12),
+      height: 58,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
         color: AppColors.getLigthGreyColor.withAlpha(70),
         borderRadius: BorderRadius.circular(12),
@@ -799,11 +798,11 @@ class _Tooltip extends StatelessWidget {
             color: AppColors.getLigthGreyColor,
             bold: true,
           ),
-          SizedBox(width: 14.sp),
+          const SizedBox(width: 14),
           _TVal('In', received, AppColors.getGreenColor),
-          SizedBox(width: 12.sp),
+          const SizedBox(width: 14),
           _TVal('Out', disbursed, AppColors.getErrorColor),
-          SizedBox(width: 12.sp),
+          const SizedBox(width: 14),
           const Spacer(),
           GestureDetector(
             behavior: HitTestBehavior.opaque,
@@ -886,7 +885,7 @@ class _SummaryStrip extends StatelessWidget {
             icon: Icons.arrow_downward_rounded,
           ),
         ),
-        SizedBox(width: 12.sp),
+        const SizedBox(width: 12),
         Expanded(
           child: _SummaryTile(
             label: 'Total Disbursed',
@@ -925,21 +924,21 @@ class _SummaryTile extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 22.sp,
-            height: 22.sp,
+            width: 22,
+            height: 22,
             decoration: BoxDecoration(
               color: color.withAlpha(50),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: color, size: 0.25.dp),
+            child: Icon(icon, color: color, size: 14),
           ),
-          SizedBox(width: 12.sp),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 BodySmallText(text: label, bold: true),
-                SizedBox(height: 2.sp),
+                const SizedBox(height: 2),
                 CurrencyWidget(
                   amount: value.toStringAsFixed(2),
                   color: color,
@@ -980,7 +979,7 @@ class _SplitGauge extends StatelessWidget {
                 icon: Icons.arrow_downward_rounded,
               ),
             ),
-            SizedBox(width: 12.sp),
+            const SizedBox(width: 12),
             Expanded(
               child: _AmountTile(
                 label: 'Disbursed',
@@ -991,11 +990,11 @@ class _SplitGauge extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 12.sp),
+        const SizedBox(height: 12),
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: SizedBox(
-            height: 12.sp,
+            height: 12,
             child: LayoutBuilder(
               builder: (_, c) {
                 return Stack(
@@ -1013,9 +1012,9 @@ class _SplitGauge extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(height: 6.sp),
+        const SizedBox(height: 6),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             BodySmallText(
               text: '${(ratio * 100).toStringAsFixed(0)}% received',
@@ -1060,11 +1059,11 @@ class _AmountTile extends StatelessWidget {
           Row(
             children: [
               Icon(icon, color: color, size: 14),
-              SizedBox(width: 8.sp),
+              const SizedBox(width: 8),
               BodySmallText(text: label, color: color, bold: true),
             ],
           ),
-          SizedBox(height: 12.sp),
+          const SizedBox(height: 12),
           CurrencyWidget(
             amount: Utility.doubleFormate(amount),
             color: color,
@@ -1090,7 +1089,7 @@ class _NetBanner extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: color.withAlpha(30),
         borderRadius: BorderRadius.circular(12),
@@ -1101,7 +1100,7 @@ class _NetBanner extends StatelessWidget {
           Icon(
             isPos ? Icons.trending_up_rounded : Icons.trending_down_rounded,
             color: color,
-            size: 16.sp,
+            size: 16,
           ),
           const SizedBox(width: 8),
           BodySmallText(
@@ -1139,19 +1138,19 @@ class _CountCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(12.sp),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: color.withAlpha(20),
-        borderRadius: BorderRadius.circular(12.sp),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, color: color, size: 16),
-          SizedBox(height: 12.sp),
+          const SizedBox(height: 12),
           TitleWidget(text: '$count', color: color, bold: true),
           BodySmallText(text: label, color: AppColors.getLigthGreyColor),
-          SizedBox(height: 8.sp),
+          const SizedBox(height: 8),
           CurrencyWidget(amount: Utility.doubleFormate(amount), color: color),
         ],
       ),
@@ -1175,8 +1174,8 @@ class _LegendDot extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.circle, size: 12.sp, color: color),
-        SizedBox(width: 8.sp),
+        Icon(Icons.circle, size: 12, color: color),
+        const SizedBox(width: 8),
         BodySmallText(text: label, color: AppColors.getLigthGreyColor),
       ],
     );
@@ -1226,13 +1225,13 @@ class _SkeletonState extends State<_Skeleton>
           child: Column(
             children: [
               _Bone(52, op, base),
-              SizedBox(height: 14.sp),
+              const SizedBox(height: 14),
               _Bone(180, op, base),
-              SizedBox(height: 14.sp),
+              const SizedBox(height: 14),
               Row(
                 children: [
                   Expanded(child: _Bone(58, op, base)),
-                  SizedBox(width: 12.sp),
+                  const SizedBox(width: 12),
                   Expanded(child: _Bone(58, op, base)),
                 ],
               ),
@@ -1258,7 +1257,7 @@ class _Bone extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: base.withAlpha((op * 100).toInt()),
-        borderRadius: BorderRadius.circular(12.sp),
+        borderRadius: BorderRadius.circular(12),
       ),
     );
   }

@@ -7,7 +7,7 @@ import 'package:self_finance/providers/settings_provider.dart';
 class ThemeToggleIconButton extends ConsumerWidget {
   const ThemeToggleIconButton({
     super.key,
-    this.size = 22,
+    this.size = 32,
     this.padding = const EdgeInsets.all(10),
   });
 

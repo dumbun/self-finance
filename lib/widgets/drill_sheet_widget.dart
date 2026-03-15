@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
@@ -34,9 +33,9 @@ class DrillSheet extends ConsumerWidget {
         ),
         child: Column(
           children: [
-            SizedBox(height: 16.sp),
+            const SizedBox(height: 16),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.sp),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
                   Expanded(
@@ -52,7 +51,7 @@ class DrillSheet extends ConsumerWidget {
                 ],
               ),
             ),
-            Divider(height: 1.sp),
+            const Divider(height: 1),
             Expanded(
               child: dataAsync.when(
                 data: (List<DrillItem> items) {
@@ -91,12 +90,12 @@ class DrillSheet extends ConsumerWidget {
                       Row(
                         children: [
                           _MiniStat('In', totalRec, AppColors.getPrimaryColor),
-                          SizedBox(width: 12.sp),
+                          const SizedBox(width: 12),
                           _MiniStat('Out', totalDis, AppColors.getErrorColor),
-                          SizedBox(width: 12.sp),
+                          const SizedBox(width: 12),
                         ],
                       ),
-                      SizedBox(height: 14.sp),
+                      const SizedBox(height: 14),
                       ...items.map((item) => _DrillRow(item: item)),
                     ],
                   );
@@ -132,10 +131,10 @@ class _MiniStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: color.withAlpha(20),
-          borderRadius: BorderRadius.circular(10.sp),
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,8 +166,8 @@ class _DrillRow extends StatelessWidget {
         : Icons.arrow_upward_rounded;
 
     return Container(
-      margin: EdgeInsets.only(bottom: 14.sp),
-      padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 14.sp),
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.getLigthGreyColor.withAlpha(50)),
@@ -176,15 +175,15 @@ class _DrillRow extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 24.sp,
-            height: 24.sp,
+            width: 24,
+            height: 24,
             decoration: BoxDecoration(
               color: color.withAlpha(30),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 16),
           ),
-          SizedBox(width: 12.sp),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

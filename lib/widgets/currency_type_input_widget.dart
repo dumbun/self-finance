@@ -1,6 +1,6 @@
 import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
+
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
@@ -14,18 +14,18 @@ class CurrencyTypeInputWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => showCurrencyPicker(
-        theme: CurrencyPickerThemeData(bottomSheetHeight: 90.sp),
+        theme: CurrencyPickerThemeData(bottomSheetHeight: 400),
         useRootNavigator: true,
         context: context,
         showFlag: true,
         showSearchField: true,
         showCurrencyName: true,
         showCurrencyCode: true,
-        onSelect: (currency) => controller.text = currency.symbol,
+        onSelect: (Currency currency) => controller.text = currency.symbol,
       ),
       child: Card(
         child: Padding(
-          padding: EdgeInsets.all(14.sp),
+          padding: const EdgeInsets.all(14),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [

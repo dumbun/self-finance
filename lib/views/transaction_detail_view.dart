@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/logic/logic.dart';
@@ -27,7 +26,7 @@ class TransactionDetailView extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
-        actionsPadding: EdgeInsets.only(left: 8.sp),
+        actionsPadding: const EdgeInsets.only(left: 8),
         actions: [
           IconButton(
             onPressed: () => ref
@@ -47,7 +46,7 @@ class TransactionDetailView extends ConsumerWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsetsGeometry.only(left: 22.sp, right: 22.sp),
+          padding: const EdgeInsets.symmetric(horizontal: 18),
           child: SingleChildScrollView(
             child: ref
                 .watch(transactionByIDProvider(transactionId))
@@ -88,11 +87,11 @@ class TransactionDetailView extends ConsumerWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: <Widget>[
-                                      SizedBox(height: 36.sp),
+                                      const SizedBox(height: 36),
                                       StatusChipWidget(
                                         transaction.transacrtionType,
                                       ),
-                                      SizedBox(height: 12.sp),
+                                      const SizedBox(height: 12),
                                       CurrencyWidget(
                                         titleText: true,
                                         amount: Utility.doubleFormate(
@@ -118,7 +117,7 @@ class TransactionDetailView extends ConsumerWidget {
                                           ),
                                         ],
                                       ),
-                                      SizedBox(height: 36.sp),
+                                      const SizedBox(height: 36),
                                       if (payment.isNotEmpty)
                                         TimelineWidget(
                                           payment: payment.first,
@@ -140,7 +139,7 @@ class TransactionDetailView extends ConsumerWidget {
                                               customerId:
                                                   transaction.customerId,
                                             ),
-                                            SizedBox(height: 20.sp),
+                                            const SizedBox(height: 20),
                                             const BodyTwoDefaultText(
                                               text: "Transaction Details",
                                               bold: true,
@@ -299,7 +298,7 @@ class TransactionDetailView extends ConsumerWidget {
                                                 ],
                                               ),
                                             ),
-                                            SizedBox(height: 14.sp),
+                                            const SizedBox(height: 14),
                                             if (transaction
                                                 .signature
                                                 .isNotEmpty)
@@ -318,12 +317,12 @@ class TransactionDetailView extends ConsumerWidget {
                                                     fit: BoxFit.scaleDown,
                                                     imagePath:
                                                         transaction.signature,
-                                                    height: 52.sp,
-                                                    width: 42.sp,
+                                                    height: 72,
+                                                    width: 72,
                                                   ),
                                                 ),
                                               ),
-                                            SizedBox(height: 14.sp),
+                                            const SizedBox(height: 14),
                                             ItemImageWidget(
                                               transactionId: transactionId,
                                             ),
@@ -331,7 +330,7 @@ class TransactionDetailView extends ConsumerWidget {
                                         ),
                                       ),
 
-                                      SizedBox(height: 22.sp),
+                                      const SizedBox(height: 22),
                                       if (payment.isEmpty)
                                         RoundedCornerButton(
                                           text: "Mark as Paid",
@@ -347,11 +346,12 @@ class TransactionDetailView extends ConsumerWidget {
                                                     l.totalInterestAmount,
                                               ),
                                         ),
+                                      const SizedBox(height: 32),
                                     ],
                                   ),
                                 );
                               },
-                              error: (error, stackTrace) => const Center(
+                              error: (_, _) => const Center(
                                 child: BodyTwoDefaultText(
                                   text:
                                       Constant.errorFetchingTransactionMessage,
@@ -364,7 +364,7 @@ class TransactionDetailView extends ConsumerWidget {
                       },
                     );
                   },
-                  error: (error, stackTrace) => const Center(
+                  error: (_, _) => const Center(
                     child: BodyTwoDefaultText(
                       text: Constant.errorFetchingTransactionMessage,
                     ),

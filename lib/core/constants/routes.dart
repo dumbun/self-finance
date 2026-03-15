@@ -9,7 +9,6 @@ import 'package:self_finance/views/add_new_transaction_view.dart';
 import 'package:self_finance/views/contact_details_view.dart';
 import 'package:self_finance/views/customer_editind_view.dart';
 import 'package:self_finance/views/history/history_detailed_view.dart';
-import 'package:self_finance/views/pin_creating_view.dart';
 import 'package:self_finance/views/image_view.dart';
 import 'package:self_finance/views/transaction_detail_view.dart';
 import 'package:self_finance/views/user_creating_view.dart';
@@ -74,8 +73,10 @@ class Routes {
     );
   }
 
-  static void navigateToChangePinView({required BuildContext context}) {
-    Navigator.of(context).pushNamed(Constant.changePinView);
+  static void navigateToPinAuthView({required BuildContext context}) {
+    Navigator.of(
+      context,
+    ).pushNamedAndRemoveUntil(Constant.pinAuthView, (route) => false);
   }
 
   static void navigateToAccountSettingsView({required BuildContext context}) {
@@ -132,19 +133,9 @@ class Routes {
   }
 
   static void navigateToUserCreationView(BuildContext context, String pin) {
-    Navigator.pushAndRemoveUntil(
-      context,
+    Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => UserCreatingView(pin: pin)),
       (route) => false,
-    );
-  }
-
-  static void navigateToPinCreationView(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (BuildContext context) => const PinCreatingView(),
-      ),
     );
   }
 

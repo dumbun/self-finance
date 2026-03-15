@@ -33,7 +33,7 @@ final class ThemeNotifierProvider
   ThemeNotifier create() => ThemeNotifier();
 }
 
-String _$themeNotifierHash() => r'0d6d4d525d7e27ee78705c887400fcd25f3bd4a2';
+String _$themeNotifierHash() => r'7545f2565569719ada1ea413b24b84348b77d0e0';
 
 abstract class _$ThemeNotifier extends $AsyncNotifier<bool> {
   FutureOr<bool> build();

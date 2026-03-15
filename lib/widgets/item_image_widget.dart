@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/items_model.dart';
@@ -52,13 +51,13 @@ class ItemImageWidget extends ConsumerWidget {
                     child: Card(
                       elevation: 2,
                       child: Padding(
-                        padding: EdgeInsetsGeometry.all(12.sp),
+                        padding: const EdgeInsetsGeometry.all(12),
                         child: Column(
                           children: [
                             ImageWidget(
                               titile: item.description,
-                              height: 52.sp,
-                              width: 42.sp,
+                              height: 72,
+                              width: 72,
                               imagePath: item.photo,
                               fit: BoxFit.scaleDown,
                             ),

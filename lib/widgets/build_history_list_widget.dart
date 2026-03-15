@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
@@ -16,20 +15,6 @@ import 'package:self_finance/widgets/currency_widget.dart';
 class BuildHistoryListWidget extends ConsumerWidget {
   const BuildHistoryListWidget({super.key});
 
-  Icon _buildIcon({required String type}) {
-    return type == Constant.debited
-        ? Icon(
-            color: AppColors.getErrorColor,
-            Icons.arrow_upward_rounded,
-            size: 22.sp,
-          )
-        : Icon(
-            color: AppColors.getGreenColor,
-            Icons.arrow_downward_rounded,
-            size: 22.sp,
-          );
-  }
-
   static final _dateFmt = DateFormat.yMMMd();
   static final _timeFmt = DateFormat.Hm();
 
@@ -39,6 +24,7 @@ class BuildHistoryListWidget extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         BodySmallText(
+          bold: true,
           text: _dateFmt.format(dt),
           color: AppColors.getLigthGreyColor,
         ),
@@ -48,6 +34,20 @@ class BuildHistoryListWidget extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  Icon _buildIcon({required String type}) {
+    return type == Constant.debited
+        ? const Icon(
+            color: AppColors.getErrorColor,
+            Icons.arrow_upward_rounded,
+            size: 26,
+          )
+        : const Icon(
+            color: AppColors.getGreenColor,
+            Icons.arrow_downward_rounded,
+            size: 26,
+          );
   }
 
   @override

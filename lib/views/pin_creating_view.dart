@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
@@ -38,26 +37,26 @@ class _PinCreatingViewState extends State<PinCreatingView> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(18.sp),
+          padding: const EdgeInsets.all(18),
           child: Form(
             key: formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: 20.sp),
+                const SizedBox(height: 20),
                 const BodyOneDefaultText(
                   bold: true,
                   text: "Please create your login pin",
                 ),
-                SizedBox(height: 20.sp),
+                const SizedBox(height: 20),
                 PinInputWidget(pinController: p1, obscureText: false),
-                SizedBox(height: 20.sp),
+                const SizedBox(height: 20),
                 const BodyOneDefaultText(
                   bold: true,
                   text: "Please Enter Same Pin",
                 ),
-                SizedBox(height: 20.sp),
+                const SizedBox(height: 20),
                 PinInputWidget(
                   pinController: p2,
                   obscureText: false,
@@ -65,7 +64,7 @@ class _PinCreatingViewState extends State<PinCreatingView> {
                       ? null
                       : "* Please provide the same pin",
                 ),
-                SizedBox(height: 20.sp),
+                const SizedBox(height: 20),
                 RoundedCornerButton(
                   onPressed: () {
                     if (validateAndSave()) {

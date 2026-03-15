@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/backend/user_database.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
@@ -23,8 +22,8 @@ class UserCreatingView extends StatefulWidget {
 
 class _UserCreatingViewState extends State<UserCreatingView> {
   String userProfilePicString = "";
-  final double height = 55.sp;
-  final double width = 55.sp;
+  final double height = 85;
+  final double width = 85;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nameInput = TextEditingController();
   final TextEditingController _currencyInput = TextEditingController();
@@ -91,37 +90,36 @@ class _UserCreatingViewState extends State<UserCreatingView> {
         }
       },
       child: SizedBox(
-        height: height,
-        width: width,
+        height: 120,
+        width: 120,
         child: Stack(
           children: [
             Align(
               alignment: Alignment.center,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(100.sp),
+                borderRadius: BorderRadius.circular(100),
                 child: pickedImageFile == null
-                    ? DefaultUserImage(height: height, width: width)
+                    ? const DefaultUserImage(height: 120, width: 120)
                     : CircularImageWidget(
                         imageData: pickedImageFile!.path,
                         titile: "User image",
-                        customeSize: height,
-                        cache: width.toInt(),
+                        customeSize: 120,
                       ),
               ),
             ),
             Align(
               alignment: Alignment.bottomRight,
               child: Container(
-                height: 32.sp,
-                width: 32.sp,
-                padding: EdgeInsets.all(12.sp),
+                height: 46,
+                width: 46,
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.contentColorBlue,
-                  borderRadius: BorderRadius.circular(32.sp),
+                  borderRadius: BorderRadius.circular(32),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.edit,
-                  size: 22.sp,
+                  size: 22,
                   color: AppColors.contentColorWhite,
                 ),
               ),
@@ -142,19 +140,19 @@ class _UserCreatingViewState extends State<UserCreatingView> {
             child: Form(
               key: _formKey,
               child: Padding(
-                padding: EdgeInsets.all(18.sp),
+                padding: const EdgeInsets.all(18),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     _buildImagePickWidget(),
-                    SizedBox(height: 24.sp),
+                    const SizedBox(height: 24),
                     InputTextField(
                       controller: _nameInput,
                       hintText: Constant.pleaseEnterTheName,
                       keyboardType: TextInputType.name,
                     ),
-                    SizedBox(height: 24.sp),
+                    const SizedBox(height: 24),
                     CurrencyTypeInputWidget(controller: _currencyInput),
                     // const GoogleSignInButtonWidget(),
                   ],
@@ -188,7 +186,7 @@ class _UserCreatingViewState extends State<UserCreatingView> {
         shape: const CircleBorder(),
         tooltip: "Next",
         splashColor: AppColors.getPrimaryColor,
-        focusElevation: 40.sp,
+        focusElevation: 40,
         child: const Icon(
           Icons.arrow_forward_ios_rounded,
           color: AppColors.getBackgroundColor,

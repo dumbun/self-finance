@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
@@ -23,12 +22,9 @@ class AuthView extends ConsumerWidget {
               return const PinAuthView();
             }
           },
-          error: (error, stackTrace) => const Scaffold(
+          error: (error, _) => Scaffold(
             body: Center(
-              child: BodyTwoDefaultText(
-                text: Constant.errorUserFetch,
-                error: true,
-              ),
+              child: BodyTwoDefaultText(text: error.toString(), error: true),
             ),
           ),
           loading: () =>

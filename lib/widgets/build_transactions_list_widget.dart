@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
@@ -16,14 +15,12 @@ import 'package:self_finance/widgets/status_chip_widget.dart';
 
 class BuildTransactionsListWidget extends ConsumerWidget {
   const BuildTransactionsListWidget({super.key});
-
+  static const double _size = 44;
+  static const double _height = 16;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final double size = 28.sp;
-    final double height = 16.sp;
-    final int cacheSize = (size * MediaQuery.of(context).devicePixelRatio)
+    final int cacheSize = (_size * MediaQuery.of(context).devicePixelRatio)
         .round();
-
     return ref
         .watch(transactionsProvider)
         .when(
@@ -43,21 +40,21 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                       customerId: txn.customerId,
                       transactionId: txn.id!,
                       child: Padding(
-                        padding: EdgeInsets.all(14.sp),
+                        padding: const EdgeInsets.all(16),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 CustomerImageWidget(
                                   cache: cacheSize,
                                   customerId: txn.customerId,
-                                  size: size,
+                                  size: _size,
                                 ),
-                                SizedBox(width: height),
+                                const SizedBox(width: _height),
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,

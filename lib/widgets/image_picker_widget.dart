@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
@@ -35,15 +34,27 @@ class ImagePickerWidget extends ConsumerWidget {
           builder: (BuildContext context) {
             return Container(
               alignment: Alignment.center,
-              height: 60.sp,
-              padding: EdgeInsets.all(20.sp),
+              height: 200,
+              padding: const EdgeInsets.all(20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  _buildCard(context, "Camera", Icons.camera_alt),
-                  _buildCard(context, "Gallary", Icons.photo_library_sharp),
-                  _buildCard(context, "Remove", Icons.delete),
+                  _buildCard(
+                    context,
+                    "Camera",
+                    const Icon(Icons.camera_alt, size: 40),
+                  ),
+                  _buildCard(
+                    context,
+                    "Gallary",
+                    const Icon(Icons.photo_library_sharp, size: 40),
+                  ),
+                  _buildCard(
+                    context,
+                    "Remove",
+                    const Icon(Icons.delete, size: 40),
+                  ),
                 ],
               ),
             );
@@ -51,16 +62,16 @@ class ImagePickerWidget extends ConsumerWidget {
         );
       },
       child: Card(
-        elevation: 0.sp,
+        elevation: 0,
         child: Padding(
-          padding: EdgeInsets.all(18.sp),
+          padding: const EdgeInsets.all(18),
           child: Column(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(8.sp),
+                borderRadius: BorderRadius.circular(8),
                 child: _buildImageDisplay(ref),
               ),
-              SizedBox(height: 10.sp),
+              const SizedBox(height: 10),
               BodyTwoDefaultText(text: title, bold: true),
             ],
           ),
@@ -73,19 +84,18 @@ class ImagePickerWidget extends ConsumerWidget {
     final XFile? image = ref.watch(imageProvider);
 
     if (image == null) {
-      return Image.asset(defaultImage, height: 28.sp, width: 28.sp);
+      return Image.asset(defaultImage, height: 62, width: 62);
     }
     return ImageWidget(
       imagePath: image.path,
-      height: 42.sp,
-      width: 42.sp,
+      height: 62,
+      width: 62,
       titile: title,
-      cache: 500,
       showImage: false,
     );
   }
 
-  Widget _buildCard(BuildContext context, String title, IconData icon) {
+  Widget _buildCard(BuildContext context, String title, Icon icon) {
     return GestureDetector(
       onTap: () async {
         if (title == "Remove") {
@@ -113,7 +123,7 @@ class ImagePickerWidget extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(icon, size: 30.sp),
+          icon,
           BodyOneDefaultText(text: title),
         ],
       ),

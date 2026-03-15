@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/providers/contacts_provider.dart';
@@ -36,7 +35,7 @@ class _ContactsViewState extends ConsumerState<ContactsView> {
             _searchController.clear();
           },
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.sp),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,21 +45,21 @@ class _ContactsViewState extends ConsumerState<ContactsView> {
                   onChanged: (String value) =>
                       ref.read(contactsProvider.notifier).doSearch(value),
                   padding: WidgetStateProperty.all(
-                    EdgeInsets.symmetric(horizontal: 12.sp),
+                    const EdgeInsets.symmetric(horizontal: 12),
                   ),
-                  hintStyle: WidgetStatePropertyAll(
-                    TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+                  hintStyle: const WidgetStatePropertyAll(
+                    TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                   shape: WidgetStateProperty.all(
                     RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(20.sp),
+                      borderRadius: BorderRadiusGeometry.circular(20),
                     ),
                   ),
                   leading: const Icon(Icons.search),
                   elevation: const WidgetStatePropertyAll(0),
                   hintText: "phone no. or name",
                 ),
-                SizedBox(height: 12.sp),
+                const SizedBox(height: 12),
                 const Expanded(child: BuildCustomersListWidget()),
               ],
             ),

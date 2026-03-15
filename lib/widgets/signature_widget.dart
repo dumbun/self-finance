@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:signature/signature.dart';
 
@@ -22,9 +21,9 @@ class SignatureWidgetState extends State<SignatureWidget> {
           text: "Customer Signature (Requried) : ",
           bold: true,
         ),
-        SizedBox(height: 20.sp),
+        const SizedBox(height: 20),
         Container(
-          padding: EdgeInsets.all(18.sp),
+          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
           child: Signature(
             controller: widget.controller,
@@ -33,7 +32,7 @@ class SignatureWidgetState extends State<SignatureWidget> {
             height: 300,
           ),
         ),
-        SizedBox(height: 10.sp),
+        const SizedBox(height: 10),
         TextButton(
           onPressed: widget.controller.clear,
           child: const Text("Clear"),

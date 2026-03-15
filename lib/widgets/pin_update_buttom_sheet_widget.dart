@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/providers/user_provider.dart';
@@ -45,17 +44,17 @@ class _PinUpdatebuttomSheetWidgetState
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16.sp),
+      padding: const EdgeInsets.all(16),
       width: double.infinity,
-      height: 80.sp,
+      height: 420,
       child: Form(
         key: _formKey,
         child: Column(
           children: [
-            SizedBox(height: 18.sp),
+            const SizedBox(height: 18),
             const BodyOneDefaultText(text: "Please provide new pin"),
             PinInputWidget(pinController: _pin, obscureText: false),
-            SizedBox(height: 18.sp),
+            const SizedBox(height: 18),
             const BodyOneDefaultText(text: "Please conform new pin "),
             PinInputWidget(
               validator: (p0) => _pin.text != _conformPin.text
@@ -64,9 +63,9 @@ class _PinUpdatebuttomSheetWidgetState
               pinController: _conformPin,
               obscureText: false,
             ),
-            SizedBox(height: 18.sp),
+            const SizedBox(height: 18),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _buildActionButton(
@@ -82,7 +81,7 @@ class _PinUpdatebuttomSheetWidgetState
                   icon: const Icon(Icons.done_rounded),
                   text: "Confirm",
                 ),
-                SizedBox(width: 12.sp),
+                const SizedBox(width: 12),
                 _buildActionButton(
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(

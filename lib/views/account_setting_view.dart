@@ -1,7 +1,6 @@
 import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
@@ -31,7 +30,7 @@ class AccountSettingsView extends StatelessWidget {
         context: context,
         builder: (BuildContext context) {
           return Container(
-            padding: EdgeInsets.all(12.sp),
+            padding: const EdgeInsets.all(12),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -53,7 +52,7 @@ class AccountSettingsView extends StatelessWidget {
       );
     }
 
-    final double height = 12.sp;
+    const double height = 16;
 
     return Scaffold(
       appBar: AppBar(
@@ -65,7 +64,7 @@ class AccountSettingsView extends StatelessWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(12.sp),
+          padding: const EdgeInsets.all(12),
           child: Consumer(
             builder: (BuildContext context, WidgetRef ref, Widget? child) {
               return ref
@@ -79,12 +78,12 @@ class AccountSettingsView extends StatelessWidget {
                           child: ListView(
                             children: <Widget>[
                               // user profile pic
-                              SizedBox(height: height),
+                              const SizedBox(height: height),
                               UserImageUpdateWidget(
                                 userImageString: data.profilePicture,
                               ),
                               // user name
-                              SizedBox(height: height),
+                              const SizedBox(height: height),
                               _buildNameUpdateButton(
                                 context: context,
                                 userId: data.id!,
@@ -92,7 +91,7 @@ class AccountSettingsView extends StatelessWidget {
                               ),
 
                               // user pin update button
-                              SizedBox(height: height),
+                              const SizedBox(height: height),
                               _buildPinUpdateButton(
                                 context: context,
                                 id: data.id!,
@@ -100,7 +99,7 @@ class AccountSettingsView extends StatelessWidget {
                               ),
 
                               // user Currency update button
-                              SizedBox(height: height),
+                              const SizedBox(height: height),
                               _buildCurrencyUpdateButton(
                                 context: context,
                                 id: data.id!,
@@ -109,15 +108,15 @@ class AccountSettingsView extends StatelessWidget {
                               ),
 
                               // user terms and condition button
-                              SizedBox(height: height),
+                              const SizedBox(height: height),
                               _buildTermsAndConditionButton(),
 
                               // user privacy Policy button
-                              SizedBox(height: height),
+                              const SizedBox(height: height),
                               _buildPrivacyPolicyButton(),
 
                               // BackUp button
-                              SizedBox(height: height),
+                              const SizedBox(height: height),
                               _buildListTile(
                                 title: "Backup",
                                 onPressed: doBackUp,
@@ -127,22 +126,28 @@ class AccountSettingsView extends StatelessWidget {
                                 ),
                               ),
 
-                              SizedBox(height: height),
-                              _buildLogoutButton(
-                                context: context,
-                                userData: data,
+                              //logout button
+                              const SizedBox(height: height),
+                              _buildListTile(
+                                icon: const Icon(
+                                  Icons.logout,
+                                  color: AppColors.getErrorColor,
+                                ),
+                                onPressed: () async =>
+                                    await Utility.closeApp(context: context),
+                                title: Constant.logout,
                               ),
 
-                              SizedBox(height: height),
+                              const SizedBox(height: height),
                               const ThemeSwitchWidget(),
 
-                              SizedBox(height: height),
+                              const SizedBox(height: height),
                               const NotificationSwitchWidget(),
 
-                              SizedBox(height: height),
+                              const SizedBox(height: height),
                               const BiometricSwitchWidget(),
 
-                              SizedBox(height: height),
+                              const SizedBox(height: height),
                             ],
                           ),
                         );
@@ -220,7 +225,7 @@ class AccountSettingsView extends StatelessWidget {
         ).then((int value) {
           if (value == 1 && context.mounted) {
             showCurrencyPicker(
-              theme: CurrencyPickerThemeData(bottomSheetHeight: 90.sp),
+              theme: CurrencyPickerThemeData(bottomSheetHeight: 720),
               useRootNavigator: true,
               context: context,
               showFlag: true,
@@ -265,17 +270,6 @@ class AccountSettingsView extends StatelessWidget {
         Utility.launchInBrowserView(Constant.tAndcUrl);
       },
       title: Constant.tAndcString,
-    );
-  }
-
-  Card _buildLogoutButton({
-    required BuildContext context,
-    required User userData,
-  }) {
-    return _buildListTile(
-      icon: const Icon(Icons.logout, color: AppColors.getErrorColor),
-      onPressed: () async => await Utility.closeApp(context: context),
-      title: Constant.logout,
     );
   }
 

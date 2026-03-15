@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
@@ -42,7 +41,7 @@ class SlidableWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final double iconSize = 22.sp;
+    const double iconSize = 22;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
@@ -115,9 +114,9 @@ class _RoundedAction extends StatelessWidget {
       backgroundColor: Colors.transparent,
       foregroundColor: Colors.white,
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 10.sp, horizontal: 6.sp),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(9.sp),
+          borderRadius: BorderRadius.circular(9),
           child: ColoredBox(
             color: color,
             child: SizedBox.expand(

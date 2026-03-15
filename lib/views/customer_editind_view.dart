@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/utility/image_saving_utility.dart';
@@ -51,13 +50,13 @@ class _ContactEditingViewState extends State<ContactEditingView> {
   Column _buildTextFields() {
     return Column(
       children: [
-        SizedBox(height: 12.sp),
+        const SizedBox(height: 12),
         InputTextField(
           keyboardType: TextInputType.name,
           controller: _customerName,
           hintText: Constant.customerName,
         ),
-        SizedBox(height: 20.sp),
+        const SizedBox(height: 20),
         InputTextField(
           keyboardType: TextInputType.phone,
           controller: _mobileNumber,
@@ -70,13 +69,13 @@ class _ContactEditingViewState extends State<ContactEditingView> {
             }
           },
         ),
-        SizedBox(height: 20.sp),
+        const SizedBox(height: 20),
         InputTextField(
           keyboardType: TextInputType.name,
           controller: _gaurdianName,
           hintText: Constant.guardianName,
         ),
-        SizedBox(height: 20.sp),
+        const SizedBox(height: 20),
         InputTextField(
           keyboardType: TextInputType.streetAddress,
           controller: _address,
@@ -126,15 +125,15 @@ class _ContactEditingViewState extends State<ContactEditingView> {
           Card(
             elevation: 0,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.sp),
+              borderRadius: BorderRadius.circular(8),
               child: imagePath.isNotEmpty
                   ? ImageWidget(
                       titile: titile,
                       imagePath: imagePath,
-                      height: 42.sp,
-                      width: 42.sp,
+                      height: 72,
+                      width: 72,
                     )
-                  : Image.asset(defaultImages, height: 42.sp, width: 42.sp),
+                  : Image.asset(defaultImages, height: 72, width: 72),
             ),
           ),
           BodyTwoDefaultText(text: titile, bold: true),
@@ -151,7 +150,7 @@ class _ContactEditingViewState extends State<ContactEditingView> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(18.sp),
+          padding: const EdgeInsets.all(18),
           child: SingleChildScrollView(
             child: Form(
               key: _formKey,
@@ -196,9 +195,9 @@ class _ContactEditingViewState extends State<ContactEditingView> {
                     ],
                     // children: [_buildCustomerPhoto(), _buildCustomerProof()],
                   ),
-                  SizedBox(height: 20.sp),
+                  const SizedBox(height: 20),
                   _buildTextFields(),
-                  SizedBox(height: 20.sp),
+                  const SizedBox(height: 20),
                   Hero(
                     tag: Constant.saveButtonTag,
                     child: Consumer(

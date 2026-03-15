@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
@@ -16,19 +15,20 @@ import 'package:self_finance/widgets/proof_button.dart';
 
 class BuildCustomerDetailsWidget extends ConsumerWidget {
   const BuildCustomerDetailsWidget({super.key, required this.customerID});
+  final int customerID;
 
   Card _buildDetails(Widget icon, String title, String data) {
     return Card(
       elevation: 0,
       child: Padding(
-        padding: EdgeInsets.all(14.sp),
+        padding: const EdgeInsets.all(14),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            SizedBox(width: 12.sp),
+            const SizedBox(width: 12),
             icon,
-            SizedBox(width: 20.sp),
+            const SizedBox(width: 20),
             Column(
               mainAxisAlignment: title.isNotEmpty
                   ? MainAxisAlignment.start
@@ -40,7 +40,7 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                     text: title,
                     color: AppColors.getLigthGreyColor,
                   ),
-                SizedBox(height: 8.sp),
+                const SizedBox(height: 8),
                 SelectableTextWidget(data: data),
               ],
             ),
@@ -56,14 +56,14 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
       child: Card(
         elevation: 0,
         child: Padding(
-          padding: EdgeInsets.all(14.sp),
+          padding: const EdgeInsets.all(14),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(width: 12.sp),
+              const SizedBox(width: 12),
               CallButtonWidget(phoneNumber: customerNumber),
-              SizedBox(width: 20.sp),
+              const SizedBox(width: 20),
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,7 +72,7 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                     text: "Contact Number",
                     color: AppColors.getLigthGreyColor,
                   ),
-                  SizedBox(height: 8.sp),
+                  const SizedBox(height: 8),
                   SelectableTextWidget(data: customerNumber),
                 ],
               ),
@@ -93,8 +93,6 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
     );
   }
 
-  final int customerID;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SingleChildScrollView(
@@ -107,14 +105,14 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    SizedBox(height: 20.sp),
+                    const SizedBox(height: 20),
 
                     _buildImage(customer.photo, customer.name),
-                    SizedBox(height: 16.sp),
+                    const SizedBox(height: 16),
 
                     // Customer Name
                     Padding(
-                      padding: EdgeInsets.only(left: 20.sp, right: 20.sp),
+                      padding: const EdgeInsets.only(left: 20, right: 20),
                       child: Center(
                         child: TitleWidget(
                           textAlign: TextAlign.center,
@@ -122,10 +120,10 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    SizedBox(height: 16.sp),
+                    const SizedBox(height: 16),
 
                     _buildNumberDetails(customer.number),
-                    SizedBox(height: 12.sp),
+                    const SizedBox(height: 12),
                     _buildDetails(
                       const Icon(
                         Icons.location_on,
@@ -134,7 +132,7 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                       Constant.customerAddress,
                       customer.address,
                     ),
-                    SizedBox(height: 12.sp),
+                    const SizedBox(height: 12),
                     _buildDetails(
                       const Icon(
                         Icons.family_restroom,
@@ -143,7 +141,7 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                       Constant.guardianName,
                       customer.guardianName,
                     ),
-                    SizedBox(height: 12.sp),
+                    const SizedBox(height: 12),
                     if (customer.proof.isNotEmpty)
                       ProofButton(proofImagePath: customer.proof),
                   ],

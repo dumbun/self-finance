@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:self_finance/core/theme/app_colors.dart';
 
@@ -15,6 +16,7 @@ class InputTextField extends StatelessWidget {
     this.keyboardType,
     this.validator,
     this.initialValue,
+    this.inputFormatters,
   });
 
   final TextEditingController? controller;
@@ -24,10 +26,12 @@ class InputTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final String? initialValue;
   final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      inputFormatters: inputFormatters,
       initialValue: initialValue,
       onChanged: onChanged as void Function(String)?,
       validator:

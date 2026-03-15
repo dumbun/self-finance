@@ -4,6 +4,7 @@ import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/utility/image_saving_utility.dart';
 import 'package:self_finance/core/utility/invoice_generator_utility.dart';
+import 'package:self_finance/core/utility/review_helper.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
@@ -247,6 +248,7 @@ class TransactionByID extends _$TransactionByID {
           amount: amountpaid,
         ),
       );
+      await ReviewHelper.requestAppReview();
     }
   }
 

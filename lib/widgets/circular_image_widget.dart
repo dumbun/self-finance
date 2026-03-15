@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/image_widget.dart';
 
@@ -20,7 +19,7 @@ class CircularImageWidget extends StatelessWidget {
   final Widget errorBuilder;
 
   Widget _buildImage(int cache, double size, BuildContext context) {
-    if (imageData.isNotEmpty ) {
+    if (imageData.isNotEmpty) {
       return Hero(
         tag: titile,
         child: ClipOval(
@@ -40,7 +39,7 @@ class CircularImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double size = customeSize ?? 44.sp;
+    final double size = customeSize ?? 120;
     if (cache != null) {
       return _buildImage(cache!, size, context);
     }

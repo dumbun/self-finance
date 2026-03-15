@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
@@ -17,10 +16,10 @@ class BiometricButtonWidget extends ConsumerWidget {
           data: (bool data) => data
               ? IconButton(
                   onPressed: onPressed,
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.fingerprint,
                     color: AppColors.getPrimaryColor,
-                    size: 32.sp,
+                    size: 42,
                   ),
                 )
               : const SizedBox.shrink(),

@@ -20,7 +20,7 @@ final class UserNotifierProvider
         argument: null,
         retry: null,
         name: r'userProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -33,7 +33,7 @@ final class UserNotifierProvider
   UserNotifier create() => UserNotifier();
 }
 
-String _$userNotifierHash() => r'7b6d8575284291d8ee6dc359d0998171f397069f';
+String _$userNotifierHash() => r'605d79150bb1c0e776c755310129147914fa9981';
 
 abstract class _$UserNotifier extends $StreamNotifier<User?> {
   Stream<User?> build();

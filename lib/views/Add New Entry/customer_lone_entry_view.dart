@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
@@ -92,53 +91,55 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(20.sp),
+          padding: const EdgeInsets.all(20),
           child: Form(
             key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                //taken amount
-                SizedBox(height: 20.sp),
-                InputTextField(
-                  keyboardType: TextInputType.number,
-                  hintText: Constant.takenAmount,
-                  validator: (String? value) =>
-                      Utility.amountValidation(value: value),
-                  controller: _takenAmount,
-                ),
-
-                // rate of intrest
-                SizedBox(height: 20.sp),
-                InputTextField(
-                  validator: (String? value) =>
-                      Utility.amountValidation(value: value),
-                  hintText: Constant.rateOfIntrest,
-                  controller: _rateOfIntrest,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    signed: false,
-                    decimal: true,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  //taken amount
+                  const SizedBox(height: 20),
+                  InputTextField(
+                    keyboardType: TextInputType.number,
+                    hintText: Constant.takenAmount,
+                    validator: (String? value) =>
+                        Utility.amountValidation(value: value),
+                    controller: _takenAmount,
                   ),
-                ),
 
-                // taken date picker
-                SizedBox(height: 20.sp),
-                InputDatePicker(
-                  controller: _takenDate,
-                  labelText: Constant.takenDate,
-                  firstDate: DateTime(1000),
-                  lastDate: DateTime.now(),
-                  initialDate: DateTime.now(),
-                ),
+                  // rate of intrest
+                  const SizedBox(height: 20),
+                  InputTextField(
+                    validator: (String? value) =>
+                        Utility.amountValidation(value: value),
+                    hintText: Constant.rateOfIntrest,
+                    controller: _rateOfIntrest,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      signed: false,
+                      decimal: true,
+                    ),
+                  ),
 
-                // item description
-                SizedBox(height: 20.sp),
-                InputTextField(
-                  controller: _itemDescription,
-                  hintText: Constant.itemDescription,
-                ),
-              ],
+                  // taken date picker
+                  const SizedBox(height: 20),
+                  InputDatePicker(
+                    controller: _takenDate,
+                    labelText: Constant.takenDate,
+                    firstDate: DateTime(1000),
+                    lastDate: DateTime.now(),
+                    initialDate: DateTime.now(),
+                  ),
+
+                  // item description
+                  const SizedBox(height: 20),
+                  InputTextField(
+                    controller: _itemDescription,
+                    hintText: Constant.itemDescription,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

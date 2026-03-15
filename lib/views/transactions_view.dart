@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/widgets/build_transactions_list_widget.dart';
 import 'package:self_finance/widgets/transaction_filter_widget.dart';
@@ -34,7 +33,7 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
         ref.read(transactionsSearchQueryProvider.notifier).clear();
       },
       child: Padding(
-        padding: EdgeInsets.all(12.sp),
+        padding: const EdgeInsets.all(12),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -42,15 +41,15 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
             SearchBar(
               controller: _searchTextController,
               padding: WidgetStateProperty.all(
-                EdgeInsets.symmetric(horizontal: 12.sp),
+                const EdgeInsets.symmetric(horizontal: 12),
               ),
               shape: WidgetStateProperty.all(
                 RoundedRectangleBorder(
-                  borderRadius: BorderRadiusGeometry.circular(20.sp),
+                  borderRadius: BorderRadiusGeometry.circular(20),
                 ),
               ),
-              hintStyle: WidgetStatePropertyAll(
-                TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+              hintStyle: const WidgetStatePropertyAll(
+                TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
               elevation: const WidgetStatePropertyAll(0),
               hintText: "Search transaction ID",
@@ -89,9 +88,9 @@ class _TransactionsViewState extends ConsumerState<TransactionsView> {
                 ),
               ],
             ),
-            SizedBox(height: 16.sp),
+            const SizedBox(height: 16),
             const TransactionFilterWidget(),
-            SizedBox(height: 16.sp),
+            const SizedBox(height: 16),
             // List Builder
             const Expanded(child: BuildTransactionsListWidget()),
           ],

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
@@ -10,14 +9,14 @@ class ExpandableFab extends StatelessWidget {
 
   Card _buildFlotingActionButtons(
     void Function()? onTap,
-    IconData? icon,
+    Icon icon,
     String title,
   ) {
     return Card(
       color: AppColors.getPrimaryColor,
       child: ListTile(
         onTap: onTap,
-        leading: Icon(icon, color: AppColors.getPrimaryTextColor),
+        leading: icon,
         title: BodyTwoDefaultText(
           text: title,
           color: AppColors.getPrimaryTextColor,
@@ -32,12 +31,12 @@ class ExpandableFab extends StatelessWidget {
   }
 
   void _navigateToContactsView(BuildContext context) {
-    Navigator.of(context).pop(context);
+    Navigator.of(context).pop();
     Routes.navigateToContactsView(context);
   }
 
   void _navigateToAddNewEntry(BuildContext context) {
-    Navigator.of(context).pop(context);
+    Navigator.of(context).pop();
     Routes.navigateToAddNewEntry(context: context);
   }
 
@@ -54,27 +53,32 @@ class ExpandableFab extends StatelessWidget {
           useSafeArea: true,
           context: context,
           builder: (BuildContext context) {
-            return Container(
-              height: 64.sp,
-              padding: EdgeInsets.all(20.sp),
-              margin: EdgeInsets.symmetric(vertical: 20.sp),
-              width: double.infinity,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildFlotingActionButtons(
-                    () => _navigateToAddNewEntry(context),
-                    Icons.add,
-                    "Create new Contact",
-                  ),
-                  SizedBox(height: 12.sp),
-                  _buildFlotingActionButtons(
-                    () => _navigateToContactsView(context),
-                    Icons.contact_page_rounded,
-                    "Show Contacts",
-                  ),
-                ],
+            return SingleChildScrollView(
+              child: Container(
+                height: 200,
+                padding: const EdgeInsets.all(20),
+                margin: const EdgeInsets.symmetric(vertical: 20),
+                width: double.infinity,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildFlotingActionButtons(
+                      () => _navigateToAddNewEntry(context),
+                      const Icon(Icons.add, color: AppColors.contentColorBlack),
+                      "Create new Contact",
+                    ),
+                    const SizedBox(height: 12),
+                    _buildFlotingActionButtons(
+                      () => _navigateToContactsView(context),
+                      const Icon(
+                        Icons.contact_page_rounded,
+                        color: AppColors.contentColorBlack,
+                      ),
+                      "Show Contacts",
+                    ),
+                  ],
+                ),
               ),
             );
           },

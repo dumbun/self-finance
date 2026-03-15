@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 
 class TitleWidget extends StatelessWidget {
@@ -33,7 +32,7 @@ class TitleWidget extends StatelessWidget {
       text,
       style: TextStyle(
         fontFamily: "hell",
-        fontSize: 22.sp,
+        fontSize: 24,
         fontWeight: bold ? FontWeight.bold : FontWeight.w700,
         color: _getColor(context),
       ),

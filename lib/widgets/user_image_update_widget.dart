@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/providers/user_provider.dart';
@@ -25,9 +24,9 @@ class UserImageUpdateWidget extends ConsumerWidget {
             builder: (BuildContext context) {
               return Container(
                 alignment: Alignment.center,
-                height: 60.sp,
+                height: 200,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     GestureDetector(
@@ -43,12 +42,12 @@ class UserImageUpdateWidget extends ConsumerWidget {
                           Navigator.of(context).pop();
                         }
                       },
-                      child: Column(
+                      child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(Icons.camera_alt, size: 30.sp),
-                          const BodyOneDefaultText(text: "Camera"),
+                          Icon(Icons.camera_alt, size: 60),
+                          BodyOneDefaultText(text: "Camera"),
                         ],
                       ),
                     ),
@@ -65,12 +64,30 @@ class UserImageUpdateWidget extends ConsumerWidget {
                           Navigator.of(context).pop();
                         }
                       },
-                      child: Column(
+                      child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(Icons.photo, size: 30.sp),
-                          const BodyOneDefaultText(text: "Gallery"),
+                          Icon(Icons.photo, size: 60),
+                          BodyOneDefaultText(text: "Gallery"),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        ref
+                            .read(userProvider.notifier)
+                            .removeProfilePic(userId: 1);
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                      child: const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(Icons.delete, size: 60),
+                          BodyOneDefaultText(text: "Remove"),
                         ],
                       ),
                     ),
@@ -81,20 +98,18 @@ class UserImageUpdateWidget extends ConsumerWidget {
           );
         },
         child: SizedBox(
-          width: 48.sp,
-          height: 48.sp,
+          width: 120,
+          height: 120,
           child: Stack(
             alignment: Alignment.center,
             children: [
               Align(
                 alignment: Alignment.topCenter,
                 child: userImageString.isEmpty
-                    ? DefaultUserImage(width: 46.sp, height: 46.sp)
+                    ? const DefaultUserImage(width: 120, height: 120)
                     : CircularImageWidget(
                         imageData: userImageString,
                         titile: "user",
-                        customeSize: 500,
-                        cache: 500,
                       ),
               ),
               Align(
@@ -104,9 +119,9 @@ class UserImageUpdateWidget extends ConsumerWidget {
                     shape: BoxShape.circle,
                     color: AppColors.getPrimaryColor,
                   ),
-                  padding: EdgeInsets.all(12.sp),
-                  child: Icon(
-                    size: 24.sp,
+                  padding: const EdgeInsets.all(12),
+                  child: const Icon(
+                    size: 24,
                     Icons.edit_rounded,
                     color: AppColors.getBackgroundColor,
                   ),

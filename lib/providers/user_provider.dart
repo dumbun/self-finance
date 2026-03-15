@@ -5,7 +5,7 @@ import 'package:self_finance/core/utility/image_saving_utility.dart';
 import 'package:self_finance/models/user_model.dart';
 part 'user_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class UserNotifier extends _$UserNotifier {
   Stream<User?> _fetchUser() {
     return UserBackEnd.watchUserData();
@@ -41,6 +41,14 @@ class UserNotifier extends _$UserNotifier {
   }) async {
     try {
       await UserBackEnd.updateUserCurrency(id: id, currency: newCurrency);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  Future<void> removeProfilePic({required int userId}) async {
+    try {
+      await UserBackEnd.deleteUserProfilePic(id: userId);
     } catch (e) {
       debugPrint(e.toString());
     }

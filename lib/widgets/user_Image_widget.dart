@@ -7,8 +7,8 @@ import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 
-class UserImageWIdget extends ConsumerWidget {
-  const UserImageWIdget({super.key});
+class UserImageWidget extends ConsumerWidget {
+  const UserImageWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

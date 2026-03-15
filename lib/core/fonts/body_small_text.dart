@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 
 class BodySmallText extends StatelessWidget {
@@ -38,7 +37,7 @@ class BodySmallText extends StatelessWidget {
       softWrap: true,
       style: TextStyle(
         fontWeight: bold ? FontWeight.bold : FontWeight.w400,
-        fontSize: 14.sp,
+        fontSize: 12,
         fontFamily: "hell",
         color: !error ? color : AppColors.getErrorColor,
         fontStyle: italic ?? false ? FontStyle.italic : null,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 
 class SelectableTextWidget extends StatelessWidget {
@@ -10,9 +9,9 @@ class SelectableTextWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SelectableText(
       data,
-      style: TextStyle(
+      style: const TextStyle(
         fontWeight: FontWeight.w400,
-        fontSize: 18.sp,
+        fontSize: 18,
         fontFamily: "hell",
         color: AppColors.getPrimaryColor,
       ),

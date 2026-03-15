@@ -14,7 +14,6 @@ dependencies:
   drift: ^2.31.0  
   drift_flutter: ^0.2.8
   flutter_email_sender: ^8.0.0
-  responsive_sizer: ^3.3.1
   url_launcher: ^6.3.2
   pinput: ^6.0.1
   path_provider: ^2.1.5
@@ -59,6 +58,7 @@ dev_dependencies:
   riverpod_lint: ^3.1.0
   analyzer: ^8.4.0
   drift_dev: ^2.31.0
+  test: ^1.30.0
 
 
 analyzer:

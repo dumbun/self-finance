@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/logic/logic.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
+import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/input_date_picker.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
@@ -37,14 +37,15 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
 
   @override
   Widget build(BuildContext context) {
+    const SizedBox sb = SizedBox(height: 20);
     return Padding(
-      padding: EdgeInsetsGeometry.all(16.sp),
+      padding: const EdgeInsetsGeometry.all(16),
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(height: 16.sp),
+            sb,
             //taken date
             InputDatePicker(
               controller: _takenDataInput,
@@ -53,7 +54,7 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
               lastDate: _lastDate,
               initialDate: _initalDate,
             ),
-            SizedBox(height: 20.sp),
+            sb,
             // Tenture Date
             InputDatePicker(
               labelText: Constant.tenureDate,
@@ -62,14 +63,16 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
               initialDate: _initalDate,
               lastDate: _lastDate,
             ),
-            SizedBox(height: 20.sp),
+            sb,
+
             // taken amount
             InputTextField(
               hintText: Constant.takenAmount,
               keyboardType: TextInputType.number,
               controller: _amountGivenInput,
             ),
-            SizedBox(height: 20.sp),
+            sb,
+
             // rate of Intrest
             InputTextField(
               hintText: Constant.rateOfIntrest,
@@ -78,7 +81,8 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
               ),
               controller: _rateOfIntrestInput,
             ),
-            SizedBox(height: 20.sp),
+            sb,
+
             RoundedCornerButton(
               onPressed: _doCalculation,
               text: Constant.doCalculation,
@@ -94,9 +98,9 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
                     totalAmount: _loanCalculator.totalAmount,
                     totalInterest: _loanCalculator.totalInterestAmount,
                   )
-                : Padding(
-                    padding: EdgeInsets.only(top: 20.sp),
-                    child: const BodyTwoDefaultText(
+                : const Padding(
+                    padding: EdgeInsets.only(top: 20),
+                    child: BodyTwoDefaultText(
                       error: true,
                       text: Constant.pleaseFillAllFields,
                     ),
@@ -137,46 +141,50 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
         emiPerMonth != 0 &&
         principalAmount != 0 &&
         monthsAndDays != "") {
+      const SizedBox sb = SizedBox(height: 10);
       return Container(
-        margin: EdgeInsets.only(top: 20.sp),
+        margin: const EdgeInsets.only(top: 20),
         width: double.infinity,
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 10.sp),
+            sb,
             _buildDetailCard(
+              currencyType: true,
               icon: Icons.account_balance_wallet,
               label: Constant.takenAmount,
               result: Utility.doubleFormate(principalAmount),
             ),
-            SizedBox(height: 10.sp),
+            sb,
             _buildDetailCard(
               icon: Icons.calendar_month,
               label: 'No.due Dates :',
               result: monthsAndDays,
             ),
-            SizedBox(height: 10.sp),
+            sb,
             _buildDetailCard(
+              currencyType: true,
               icon: Icons.percent_rounded,
               label: 'Intrest per Month : ',
-              result: Utility.reduceDecimals(emiPerMonth).toString(),
+              result: Utility.doubleFormate(emiPerMonth),
             ),
-            SizedBox(height: 10.sp),
+            sb,
             _buildDetailCard(
+              currencyType: true,
               icon: Icons.addchart_rounded,
               label: 'Total Intrest Amount : ',
-              result: Utility.reduceDecimals(totalInterest).toString(),
+              result: Utility.doubleFormate(totalInterest),
             ),
-            SizedBox(height: 10.sp),
+            sb,
             _buildDetailCard(
+              currencyType: true,
               icon: Icons.arrow_downward_rounded,
               label: 'Total Amount : ',
-              result: Utility.reduceDecimals(totalAmount).toString(),
+              result: Utility.doubleFormate(totalAmount),
             ),
-            SizedBox(height: 12.sp),
-            SizedBox(height: 10.sp),
+            const SizedBox(height: 32),
           ],
         ),
       );
@@ -189,12 +197,15 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
     required IconData icon,
     required String label,
     required String result,
+    bool currencyType = false,
   }) {
     return Card(
       child: ListTile(
         leading: Icon(icon),
         title: BodyTwoDefaultText(text: label, bold: true),
-        trailing: BodyTwoDefaultText(text: result, bold: true),
+        trailing: currencyType
+            ? CurrencyWidget(amount: result, smallText: true)
+            : BodyTwoDefaultText(text: result, bold: true),
       ),
     );
   }

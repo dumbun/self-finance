@@ -62,10 +62,11 @@ abstract class Constant {
 
   static const String signOutMessage = "Press 'Yes' to sign out.";
 
-  static const String changePinView = "/changePinView/";
+  static const String pinAuthView = "/pinAuthView/";
   static const String dashboardView = "/dashboardview/";
   static const String addNewEntryView = "/addNewEntry/";
   static const String contactView = "/contactsView/";
+  static const String pinCreatingView = "/pinCreatingView/";
   static const String accountSettingsView = "/AccountSettingsView/";
 
   static const String currencyType = "Please select a currency type";
@@ -154,7 +155,7 @@ abstract class Constant {
   static const String debited = "Debited";
   static const String credit = "Credit";
 
-  static const String rateOfIntrest = "Interest rate (%)";
+  static const String rateOfIntrest = "Monthly interest rate % ";
 
   static const String homeScreen = "Home screen";
   static const String userProfileTag = "User-Profile-Tag";

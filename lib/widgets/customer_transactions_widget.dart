@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
+
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
@@ -25,12 +25,11 @@ class CustomerTransactionsWidget extends ConsumerWidget {
               return transactions.isNotEmpty
                   ? ListView.separated(
                       itemCount: transactions.length,
-                      separatorBuilder: (BuildContext context, int index) =>
-                          SizedBox(height: 12.sp),
+                      separatorBuilder: (_, int index) =>
+                          const SizedBox(height: 12),
                       itemBuilder: (BuildContext context, int index) {
                         final Trx transaction = transactions[index]!;
                         return SlidableWidget(
-                          key: ValueKey(transaction.id),
                           transactionId: transaction.id!,
                           customerId: transaction.customerId,
                           child: GestureDetector(
@@ -42,21 +41,21 @@ class CustomerTransactionsWidget extends ConsumerWidget {
                                 ),
                             child: Card(
                               child: Padding(
-                                padding: EdgeInsets.all(16.sp),
+                                padding: const EdgeInsets.all(16),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Icon(
                                       Icons.circle,
-                                      size: 24.sp,
+                                      size: 24,
                                       color:
                                           transaction.transacrtionType ==
                                               Constant.active
                                           ? AppColors.getGreenColor
                                           : AppColors.getErrorColor,
                                     ),
-                                    SizedBox(width: 18.sp),
+                                    const SizedBox(width: 18),
                                     Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,

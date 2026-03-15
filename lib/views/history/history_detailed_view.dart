@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
@@ -48,7 +47,7 @@ class HistoryDetailedView extends ConsumerWidget {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(8.sp),
+          padding: const EdgeInsets.all(8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -57,7 +56,7 @@ class HistoryDetailedView extends ConsumerWidget {
                 formattedDate: formattedDate,
                 isDebit: isDebit,
               ),
-              SizedBox(height: 20.sp),
+              const SizedBox(height: 20),
               _TransactionSection(transactionId: history.transactionID),
             ],
           ),
@@ -95,8 +94,8 @@ class _HeaderSection extends StatelessWidget {
     final namePrefix = isDebit ? 'To' : 'From';
 
     return Container(
-      margin: EdgeInsets.only(top: 18.sp),
-      padding: EdgeInsets.symmetric(horizontal: 18.sp),
+      margin: const EdgeInsets.only(top: 18),
+      padding: const EdgeInsets.symmetric(horizontal: 18),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -112,7 +111,9 @@ class _HeaderSection extends StatelessWidget {
                 GestureDetector(
                   onTap: () => _navigateToContact(context),
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: 60.sp),
+                    constraints: const BoxConstraints(
+                      maxWidth: double.infinity,
+                    ),
                     child: Consumer(
                       builder:
                           (BuildContext context, WidgetRef ref, Widget? child) {
@@ -201,7 +202,7 @@ class _TransactionSection extends ConsumerWidget {
                   value: trx.intrestRate.toString(),
                 ),
                 _TransactionStatusCard(transactionType: trx.transacrtionType),
-                SizedBox(height: 24.sp),
+                const SizedBox(height: 24),
                 Center(
                   child: TextButton(
                     onPressed: () => Routes.navigateToTransactionDetailsView(

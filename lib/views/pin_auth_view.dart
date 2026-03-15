@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/auth/auth.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
@@ -107,20 +106,21 @@ class _PinAuthViewState extends State<PinAuthView> {
                         children: <Widget>[
                           if (user.profilePicture.isNotEmpty)
                             CircularImageWidget(
+                              customeSize: 120,
                               imageData: user.profilePicture,
                               titile: user.userName,
                             )
                           else
-                            DefaultUserImage(height: 42.sp),
+                            const DefaultUserImage(height: 120),
 
-                          SizedBox(height: 20.sp),
+                          const SizedBox(height: 20),
 
                           const StrongHeadingOne(
                             bold: true,
                             text: Constant.enterYourAppPin,
                           ),
 
-                          SizedBox(height: 20.sp),
+                          const SizedBox(height: 20),
 
                           PinInputWidget(
                             pinController: _pinController,
@@ -135,12 +135,12 @@ class _PinAuthViewState extends State<PinAuthView> {
                             },
                           ),
 
-                          SizedBox(height: 20.sp),
+                          const SizedBox(height: 20),
 
                           Padding(
-                            padding: EdgeInsetsGeometry.only(
-                              left: 22.sp,
-                              right: 22.sp,
+                            padding: const EdgeInsetsGeometry.only(
+                              left: 22,
+                              right: 22,
                             ),
                             child: RoundedCornerButton(
                               text: Constant.login,
@@ -149,7 +149,7 @@ class _PinAuthViewState extends State<PinAuthView> {
                             ),
                           ),
 
-                          SizedBox(height: 20.sp),
+                          const SizedBox(height: 20),
 
                           BiometricButtonWidget(onPressed: _handleBiometric),
                         ],

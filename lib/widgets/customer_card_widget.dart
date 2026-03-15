@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
 
@@ -18,11 +18,11 @@ class CustomerCardWidget extends ConsumerWidget {
       child: Card(
         elevation: 2,
         child: Padding(
-          padding: EdgeInsets.all(16.sp),
+          padding: const EdgeInsets.all(16),
           child: ref
               .watch(customerProvider(customerId))
               .when(
-                data: (data) {
+                data: (Customer? data) {
                   if (data == null) {
                     return const BodyTwoDefaultText(
                       text: Constant.errorFetchingContactMessage,
@@ -33,11 +33,11 @@ class CustomerCardWidget extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       CircularImageWidget(
-                        customeSize: 32.sp,
+                        customeSize: 46,
                         imageData: data.photo,
                         titile: "Customer Photo",
                       ),
-                      SizedBox(width: 16.sp),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,

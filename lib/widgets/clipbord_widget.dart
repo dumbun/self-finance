@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:responsive_sizer/responsive_sizer.dart' show DeviceExt;
+
 import 'package:self_finance/core/theme/app_colors.dart' show AppColors;
 import 'package:self_finance/widgets/snack_bar_widget.dart';
 
@@ -34,9 +34,9 @@ class _ClipbordWidgetState extends State<ClipbordWidget> {
             if (mounted) setState(() => _isdone = false);
           }
         },
-        icon: Icon(
+        icon: const Icon(
           Icons.copy_outlined,
-          size: 18.sp,
+          size: 18,
           color: AppColors.contentColorYellow,
         ),
       ),

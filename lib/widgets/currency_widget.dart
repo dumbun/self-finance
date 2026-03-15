@@ -25,7 +25,7 @@ class CurrencyWidget extends ConsumerWidget {
       userProvider.select((a) => a.asData?.value?.userCurrency),
     );
 
-    final text = currency == null ? amount : '$amount $currency';
+    final String text = currency == null ? amount : '$amount $currency';
 
     if (titleText) {
       return TitleWidget(

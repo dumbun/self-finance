@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/providers/date_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
@@ -82,10 +82,10 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
           child: Form(
             key: _formKey,
             child: Padding(
-              padding: EdgeInsets.all(18.sp),
+              padding: const EdgeInsets.all(18),
               child: Column(
                 children: [
-                  SizedBox(height: 12.sp),
+                  const SizedBox(height: 12),
                   InputTextField(
                     validator: (String? value) =>
                         Utility.amountValidation(value: value),
@@ -93,7 +93,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                     hintText: Constant.takenAmount,
                     controller: _amount,
                   ),
-                  SizedBox(height: 20.sp),
+                  const SizedBox(height: 20),
                   InputTextField(
                     validator: (String? value) =>
                         Utility.amountValidation(value: value),
@@ -103,7 +103,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                     hintText: Constant.rateOfIntrest,
                     controller: _rateOfIntrest,
                   ),
-                  SizedBox(height: 20.sp),
+                  const SizedBox(height: 20),
                   InputDatePicker(
                     controller: _transacrtionDate,
                     firstDate: DateTime(1000),
@@ -111,29 +111,29 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
                     lastDate: DateTime.now(),
                     labelText: Constant.takenDate,
                   ),
-                  SizedBox(height: 20.sp),
+                  const SizedBox(height: 20),
                   InputTextField(
                     keyboardType: TextInputType.multiline,
                     hintText: Constant.itemDescription,
                     controller: _description,
                   ),
-                  SizedBox(height: 30.sp),
+                  const SizedBox(height: 30),
                   // _buildItemImagePicker(),
                   ImagePickerWidget(
                     imageProvider: itemFileProvider,
-                    onSetImage: (file) =>
-                        ref.read(itemFileProvider.notifier).set(file),
+                    onSetImage: (XFile? file) =>
+                        ref.read<ItemFile>(itemFileProvider.notifier).set(file),
                     onClearImage: () =>
-                        ref.read(itemFileProvider.notifier).clear(),
+                        ref.read<ItemFile>(itemFileProvider.notifier).clear(),
                     title: Constant.customerItem,
                     defaultImage: Constant.defaultItemImagePath,
                   ),
 
                   //! Signature Widget that stores signatures on a app data
-                  SizedBox(height: 30.sp),
+                  const SizedBox(height: 30),
                   SignatureWidget(controller: _signatureController),
 
-                  SizedBox(height: 30.sp),
+                  const SizedBox(height: 30),
                   Hero(
                     tag: Constant.saveButtonTag,
                     child: Visibility(

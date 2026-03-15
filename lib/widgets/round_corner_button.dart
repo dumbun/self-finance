@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 
@@ -27,7 +26,7 @@ class RoundedCornerButton extends StatelessWidget {
               icon: Icon(icon),
               onPressed: onPressed,
               label: Padding(
-                padding: EdgeInsets.all(14.sp),
+                padding: const EdgeInsets.all(14),
                 child: BodyOneDefaultText(
                   whiteColor: true,
                   text: text,
@@ -44,7 +43,7 @@ class RoundedCornerButton extends StatelessWidget {
               ),
               onPressed: onPressed,
               child: Padding(
-                padding: EdgeInsets.all(14.sp),
+                padding: const EdgeInsets.all(14),
                 child: BodyOneDefaultText(
                   whiteColor: true,
                   text: text,

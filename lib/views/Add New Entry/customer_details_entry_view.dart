@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
@@ -96,7 +95,7 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(20.sp),
+            padding: const EdgeInsets.all(20),
             child: Form(
               key: _formKey,
               child: Column(
@@ -104,16 +103,16 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // Customer name
-                  SizedBox(height: 20.sp),
+                  const SizedBox(height: 20),
                   InputTextField(
                     hintText: Constant.customerName,
                     controller: _customerName,
                   ),
 
                   // gaurfian Name
-                  SizedBox(height: 20.sp),
+                  const SizedBox(height: 20),
                   DropDownGardianSelection(controller: _gaurdianAlias),
-                  SizedBox(height: 20.sp),
+                  const SizedBox(height: 20),
 
                   //Guardian name
                   InputTextField(
@@ -122,7 +121,7 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
                   ),
 
                   // customer address
-                  SizedBox(height: 20.sp),
+                  const SizedBox(height: 20),
                   InputTextField(
                     keyboardType: TextInputType.streetAddress,
                     controller: _address,
@@ -130,7 +129,7 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
                   ),
 
                   // customer mobile number
-                  SizedBox(height: 20.sp),
+                  const SizedBox(height: 20),
                   InputTextField(
                     keyboardType: TextInputType.phone,
                     controller: _mobileNumber,

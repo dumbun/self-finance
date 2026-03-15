@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
@@ -100,9 +99,9 @@ class PopupMenuWidget extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(icon, color: iconColor),
-          SizedBox(width: 18.sp),
+          const SizedBox(width: 18),
           BodyTwoDefaultText(text: title),
-          SizedBox(width: 18.sp),
+          const SizedBox(width: 18),
         ],
       ),
     );

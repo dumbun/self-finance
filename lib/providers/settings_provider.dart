@@ -6,7 +6,7 @@ part 'settings_provider.g.dart';
 @Riverpod(keepAlive: true)
 class ThemeNotifier extends _$ThemeNotifier {
   @override
-  Future<bool> build() async => PreferencesHelper.isDarkTheme(); // reads from SharedPreferences directly
+  Future<bool> build() async => await PreferencesHelper.isDarkTheme(); // reads from SharedPreferences directly
 
   Future<void> toggle() async {
     final current = state.value ?? false;

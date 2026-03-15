@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
@@ -60,25 +59,25 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
       valueListenable: _state,
       builder: (context, s, _) {
         return Card(
-          margin: EdgeInsets.all(12.sp),
+          margin: const EdgeInsets.all(12),
           child: Padding(
-            padding: EdgeInsets.all(16.sp),
+            padding: const EdgeInsets.all(16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const BodyOneDefaultText(text: 'Backup', bold: true),
-                SizedBox(height: 12.sp),
+                const SizedBox(height: 12),
 
                 _HeaderLine(state: s),
 
-                SizedBox(height: 10.sp),
+                const SizedBox(height: 10),
 
                 if (s.isRunning) ...[
                   LinearProgressIndicator(
                     value: s.progress == 0 ? null : s.progress,
                   ),
-                  SizedBox(height: 8.sp),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
@@ -88,7 +87,7 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      SizedBox(width: 8.sp),
+                      const SizedBox(width: 8),
                       BodyTwoDefaultText(
                         text: s.eta == null
                             ? 'Estimating…'
@@ -100,7 +99,7 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
                   Row(
                     children: [
                       const Icon(Icons.check_circle, size: 18),
-                      SizedBox(width: 8.sp),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: BodyTwoDefaultText(
                           text: 'Backup saved: ${_truncate(s.zipPath!)}',
@@ -126,7 +125,7 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
                   ),
                 ],
 
-                SizedBox(height: 14.sp),
+                const SizedBox(height: 14),
 
                 Align(
                   alignment: Alignment.centerRight,
@@ -206,7 +205,7 @@ class _HeaderLine extends StatelessWidget {
           color: color,
           size: 18,
         ),
-        SizedBox(width: 8.sp),
+        const SizedBox(width: 8),
         Expanded(
           child: BodyTwoDefaultText(text: text, color: color),
         ),

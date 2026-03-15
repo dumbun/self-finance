@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
-import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/fonts/strong_heading_one_text.dart';
@@ -19,14 +17,13 @@ class TermsAndConditons extends StatefulWidget {
 class _TermsAndConditonsState extends State<TermsAndConditons> {
   bool _ticked = false;
   bool _pAndP = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Container(
           alignment: Alignment.center,
-          padding: EdgeInsets.all(24.sp),
+          padding: const EdgeInsets.all(24),
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -34,12 +31,12 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
               children: <Widget>[
                 // _getIcon(),
                 _getHeading(),
-                SizedBox(height: 16.sp),
+                const SizedBox(height: 16),
                 // _getTerms(),
                 _getCheckBoxWithDescription(),
                 _getPrivacyAndPolicyButton(),
                 _getNextButton(),
-                SizedBox(height: 16.sp),
+                const SizedBox(height: 16),
                 const RestoreWithProgressWidget(),
               ],
             ),
@@ -52,7 +49,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
   Container _getPrivacyAndPolicyButton() {
     return Container(
       width: double.infinity,
-      margin: EdgeInsets.only(bottom: 16.sp),
+      margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
         onTap: () => setState(() {
           _pAndP = !_pAndP;
@@ -68,7 +65,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
               }),
               activeColor: AppColors.getPrimaryColor,
             ),
-            SizedBox(width: 10.sp),
+            const SizedBox(width: 10),
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,7 +75,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
                   color: AppColors.getLigthGreyColor,
                   text: Constant.pAndPDistription,
                 ),
-                SizedBox(height: 8.sp),
+                const SizedBox(height: 8),
                 GestureDetector(
                   onTap: () => Utility.launchInBrowserView(Constant.pAndPUrl),
                   child: const BodySmallText(
@@ -101,7 +98,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
       child: RoundedCornerButton(
         text: Constant.next,
         onPressed: _pAndP == true && _ticked == true
-            ? () => Routes.navigateToPinCreationView(context)
+            ? () => Navigator.of(context).pushNamed(Constant.pinCreatingView)
             : null,
       ),
     );
@@ -112,7 +109,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
       onTap: () => setState(() => _ticked = !_ticked),
       child: Container(
         width: double.infinity,
-        margin: EdgeInsets.only(top: 20.sp, bottom: 20.sp),
+        margin: const EdgeInsets.only(top: 20, bottom: 20),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -126,30 +123,28 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
               },
               activeColor: AppColors.getPrimaryColor,
             ),
-            SizedBox(width: 10.sp),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(
-                  width: 66.sp,
-                  height: 34.sp,
-                  child: const BodySmallText(
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  const BodySmallText(
                     bold: true,
                     color: AppColors.getLigthGreyColor,
                     text: Constant.termAcknowledge,
                   ),
-                ),
-                SizedBox(height: 8.sp),
-                GestureDetector(
-                  onTap: () => Utility.launchInBrowserView(Constant.tAndcUrl),
-                  child: const BodySmallText(
-                    bold: true,
-                    color: AppColors.getPrimaryColor,
-                    text: "Click Here to see",
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () => Utility.launchInBrowserView(Constant.tAndcUrl),
+                    child: const BodySmallText(
+                      bold: true,
+                      color: AppColors.getPrimaryColor,
+                      text: "Click Here to see",
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

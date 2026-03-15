@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 
 class BodyOneDefaultText extends StatelessWidget {
@@ -34,7 +33,7 @@ class BodyOneDefaultText extends StatelessWidget {
       softWrap: true,
       style: TextStyle(
         fontWeight: bold ? FontWeight.bold : FontWeight.w400,
-        fontSize: 18.sp,
+        fontSize: 20,
         fontFamily: "hell",
         color: _getColor(context),
       ),

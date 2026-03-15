@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
@@ -49,8 +48,8 @@ class _UserNameUpdateButtomSheetWidgetState
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60.sp,
-      padding: EdgeInsets.all(16.sp),
+      height: 320,
+      padding: const EdgeInsets.all(16),
       child: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -58,13 +57,13 @@ class _UserNameUpdateButtomSheetWidgetState
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              SizedBox(height: 18.sp),
+              const SizedBox(height: 18),
               InputTextField(
                 keyboardType: TextInputType.name,
                 hintText: "New User Name",
                 controller: _newUserName,
               ),
-              SizedBox(height: 18.sp),
+              const SizedBox(height: 18),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -86,7 +85,7 @@ class _UserNameUpdateButtomSheetWidgetState
                     icon: const Icon(Icons.done_rounded),
                     text: "Done",
                   ),
-                  SizedBox(width: 12.sp),
+                  const SizedBox(width: 12),
                   _buildActionButton(
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(

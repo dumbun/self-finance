@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/widgets/build_history_list_widget.dart';
 
@@ -27,7 +26,7 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
         ref.refresh(historyProvider.future).ignore();
       },
       child: Padding(
-        padding: EdgeInsets.all(12.sp),
+        padding: const EdgeInsets.all(12),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,23 +34,23 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
             SearchBar(
               controller: _searchTextController,
               padding: WidgetStateProperty.all(
-                EdgeInsets.symmetric(horizontal: 12.sp),
+                const EdgeInsets.symmetric(horizontal: 12),
               ),
               shape: WidgetStateProperty.all(
                 RoundedRectangleBorder(
-                  borderRadius: BorderRadiusGeometry.circular(20.sp),
+                  borderRadius: BorderRadiusGeometry.circular(20),
                 ),
               ),
               elevation: const WidgetStatePropertyAll(0),
               hintText: "phone number or t_transactionID or customer name",
-              hintStyle: WidgetStatePropertyAll(
-                TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+              hintStyle: const WidgetStatePropertyAll(
+                TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
               leading: const Icon(Icons.person_search_sharp),
               onChanged: (String value) =>
                   ref.read(historyProvider.notifier).doSearch(userInput: value),
             ),
-            SizedBox(height: 12.sp),
+            const SizedBox(height: 12),
             const Expanded(child: BuildHistoryListWidget()),
           ],
         ),

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
-import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_view.dart';
 import 'package:self_finance/views/history/history_view.dart';
 import 'package:self_finance/views/home_screen.dart';
@@ -41,8 +39,8 @@ class _DashboardViewState extends State<DashboardView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actionsPadding: EdgeInsets.only(right: 12.sp),
-        actions: [ThemeToggleIconButton(size: 22.sp)],
+        actionsPadding: const EdgeInsets.only(right: 12),
+        actions: const [ThemeToggleIconButton()],
         forceMaterialTransparency: true,
         title: ValueListenableBuilder<int>(
           valueListenable: _selectedIndex,
@@ -60,17 +58,12 @@ class _DashboardViewState extends State<DashboardView> {
         ),
       ),
       drawer: const DrawerWidget(),
-      body: SafeArea(
-        child: GestureDetector(
-          onTap: Utility.unfocus,
-          child: PageView(
-            controller: _pageController,
-            onPageChanged: (int index) {
-              _selectedIndex.value = index;
-            },
-            children: _pages,
-          ),
-        ),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (int index) {
+          _selectedIndex.value = index;
+        },
+        children: _pages,
       ),
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       floatingActionButton: ValueListenableBuilder<int>(
@@ -83,7 +76,6 @@ class _DashboardViewState extends State<DashboardView> {
         valueListenable: _selectedIndex,
         builder: (_, int index, _) {
           return NavigationBar(
-            key: const ValueKey(0),
             maintainBottomViewPadding: true,
             selectedIndex: index,
             onDestinationSelected: (int tappedIndex) {
@@ -95,8 +87,8 @@ class _DashboardViewState extends State<DashboardView> {
             },
             indicatorColor: AppColors.getPrimaryColor,
             labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-            labelTextStyle: WidgetStatePropertyAll(
-              TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+            labelTextStyle: const WidgetStatePropertyAll(
+              TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
             destinations: const [
               NavigationDestination(

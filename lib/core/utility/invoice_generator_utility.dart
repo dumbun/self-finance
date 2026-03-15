@@ -11,6 +11,7 @@ import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/backend/user_database.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/logic/logic.dart';
+import 'package:self_finance/core/utility/review_helper.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/payment_model.dart';
@@ -235,7 +236,8 @@ class InvoiceGenerator {
         text: 'Invoice for ${customer.name} - Transaction #${transaction.id}',
       );
       await SharePlus.instance.share(s);
-      await deleteInvoice(filePath);
+      await _deleteInvoice(filePath);
+      await ReviewHelper.requestAppReview();
     } catch (e) {
       debugPrint('Error sharing invoice: $e');
       rethrow;
@@ -671,7 +673,7 @@ class InvoiceGenerator {
   }
 
   /// Delete an invoice
-  static Future<bool> deleteInvoice(String filePath) async {
+  static Future<bool> _deleteInvoice(String filePath) async {
     try {
       final file = File(filePath);
       if (await file.exists()) {
