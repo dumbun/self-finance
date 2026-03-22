@@ -5,7 +5,6 @@ import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
-import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/user_history_model.dart';
@@ -70,7 +69,7 @@ class BuildHistoryListWidget extends ConsumerWidget {
                     title: CurrencyWidget(
                       amount: Utility.doubleFormate(curr.amount),
                     ),
-                    subtitle: BodyTwoDefaultText(
+                    subtitle: BodySmallText(
                       text: curr.customerName,
                       color: AppColors.getLigthGreyColor,
                       bold: true,

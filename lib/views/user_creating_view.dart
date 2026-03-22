@@ -133,7 +133,6 @@ class _UserCreatingViewState extends State<UserCreatingView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

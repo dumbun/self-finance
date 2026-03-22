@@ -2,7 +2,7 @@ name: self_finance
 description: "The Self-finance app is a mobile application designed to streamline financial operations for shopkeepers and small finance companies. This solution empowers users with tools to manage their daily transactions and customer accounts efficiently."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 2.6.10+14
+version: 2.6.11+15
 
 environment:
   sdk: ^3.8.1
@@ -17,7 +17,7 @@ dependencies:
   url_launcher: ^6.3.2
   pinput: ^6.0.1
   path_provider: ^2.1.5
-  local_auth: ^3.0.0
+  local_auth: ^3.0.1
   intl: ^0.20.2
   image_picker: ^1.2.1
   photo_view: ^0.15.0
@@ -37,7 +37,7 @@ dependencies:
   flutter_dotenv: ^6.0.0
   flutter_slidable: ^4.0.3
   timeline_tile: ^2.0.0
-  flutter_local_notifications: ^21.0.0-dev.1
+  flutter_local_notifications: ^21.0.0
   timezone: ^0.11.0
   flutter_timezone: ^5.0.1
   shared_preferences: ^2.5.4

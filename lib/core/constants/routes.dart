@@ -4,16 +4,33 @@ import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/user_history_model.dart';
 import 'package:self_finance/views/Add%20New%20Entry/customer_conformation_view.dart';
+import 'package:self_finance/views/Add%20New%20Entry/customer_details_entry_view.dart';
 import 'package:self_finance/views/Add%20New%20Entry/customer_lone_entry_view.dart';
+import 'package:self_finance/views/account_setting_view.dart';
 import 'package:self_finance/views/add_new_transaction_view.dart';
 import 'package:self_finance/views/contact_details_view.dart';
+import 'package:self_finance/views/contacts_view.dart';
 import 'package:self_finance/views/customer_editind_view.dart';
+import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/history/history_detailed_view.dart';
 import 'package:self_finance/views/image_view.dart';
+import 'package:self_finance/views/pin_auth_view.dart';
+import 'package:self_finance/views/pin_creating_view.dart';
 import 'package:self_finance/views/transaction_detail_view.dart';
 import 'package:self_finance/views/user_creating_view.dart';
 
 class Routes {
+  static Map<String, Widget Function(BuildContext)> namedRoutes = {
+    Constant.pinAuthView: (BuildContext context) => const PinAuthView(),
+    Constant.dashboardView: (BuildContext context) => const DashboardView(),
+    Constant.addNewEntryView: (BuildContext context) =>
+        const CustomerDetailsEntryView(),
+    Constant.contactView: (BuildContext context) => const ContactsView(),
+    Constant.accountSettingsView: (BuildContext context) =>
+        const AccountSettingsView(),
+    Constant.pinCreatingView: (BuildContext context) => const PinCreatingView(),
+  };
+
   static void navigateToTransactionDetailsView({
     required int transacrtionId,
     required int customerId,

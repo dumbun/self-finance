@@ -821,11 +821,6 @@ class _Tooltip extends StatelessWidget {
                     bold: true,
                     color: AppColors.getPrimaryColor,
                   ),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    color: AppColors.getPrimaryColor,
-                    size: 14,
-                  ),
                 ],
               ),
             ),

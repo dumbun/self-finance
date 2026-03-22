@@ -83,16 +83,6 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
     );
   }
 
-  /// [ _buildImage()] method to build the image of the customer
-  Center _buildImage(String imageData, String customerName) {
-    return Center(
-      child: CircularImageWidget(
-        imageData: imageData,
-        titile: "$customerName photo",
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SingleChildScrollView(
@@ -103,11 +93,13 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
               if (customer != null) {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     const SizedBox(height: 20),
-
-                    _buildImage(customer.photo, customer.name),
+                    CircularImageWidget(
+                      imageData: customer.photo,
+                      titile: "${customer.name} photo",
+                    ),
                     const SizedBox(height: 16),
 
                     // Customer Name

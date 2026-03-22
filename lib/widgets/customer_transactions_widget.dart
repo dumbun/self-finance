@@ -67,11 +67,11 @@ class CustomerTransactionsWidget extends ConsumerWidget {
                                             transaction.amount,
                                           ),
                                         ),
-                                        BodyOneDefaultText(
+                                        BodyTwoDefaultText(
                                           text:
                                               "${Constant.takenDateSmall}: ${Utility.formatDate(date: transaction.transacrtionDate)}",
                                         ),
-                                        BodyOneDefaultText(
+                                        BodyTwoDefaultText(
                                           text:
                                               "${Constant.rateOfIntrest}: ${transaction.intrestRate}",
                                         ),

@@ -13,7 +13,6 @@ class ImageWidget extends ConsumerWidget {
     required this.imagePath,
     required this.height,
     required this.width,
-    this.cache,
     this.fit = BoxFit.fill,
     required this.titile,
     this.showImage = true,
@@ -24,7 +23,6 @@ class ImageWidget extends ConsumerWidget {
   final String imagePath;
   final double height;
   final double width;
-  final int? cache;
   final BoxFit? fit;
   final bool showImage;
   final Widget errorBuilder;
@@ -36,29 +34,27 @@ class ImageWidget extends ConsumerWidget {
         .when(
           data: (String data) {
             final String imageWithAppDir = p.join(data, imagePath);
-            if(File(imageWithAppDir).existsSync()) {
+            if (File(imageWithAppDir).existsSync()) {
               return RepaintBoundary(
-              child: GestureDetector(
-                onTap: showImage
-                    ? () => Routes.navigateToImageView(
-                        context: context,
-                        titile: titile,
-                        imagePath: imageWithAppDir,
-                      )
-                    : null,
-                child: Image.file(
-                  File(imageWithAppDir),
-                  errorBuilder: (_, _, _) => errorBuilder,
-                  height: height,
-                  width: width,
-                  fit: fit,
-                  cacheHeight: cache,
-                  cacheWidth: cache,
-                  gaplessPlayback: true,
+                child: GestureDetector(
+                  onTap: showImage
+                      ? () => Routes.navigateToImageView(
+                          context: context,
+                          titile: titile,
+                          imagePath: imageWithAppDir,
+                        )
+                      : null,
+                  child: Image.file(
+                    File(imageWithAppDir),
+                    errorBuilder: (_, _, _) => errorBuilder,
+                    height: height,
+                    width: width,
+                    fit: fit,
+                    gaplessPlayback: true,
+                  ),
                 ),
-              ),
-            );
-            }else{
+              );
+            } else {
               return errorBuilder;
             }
           },

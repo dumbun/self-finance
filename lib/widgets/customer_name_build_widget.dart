@@ -18,10 +18,14 @@ class CustomerNameBuildWidget extends ConsumerWidget {
             if (customer == null) {
               return const BodyTwoDefaultText(text: 'Customer not found');
             }
-            return BodyTwoDefaultText(
-              text: customer.name,
-              bold: true,
-              color: AppColors.getLigthGreyColor,
+            return SizedBox(
+              width: 120,
+              child: BodyTwoDefaultText(
+                text: customer.name,
+                bold: true,
+                overflow: TextOverflow.ellipsis,
+                color: AppColors.getLigthGreyColor,
+              ),
             );
           },
           loading: () => const CircularProgressIndicator.adaptive(),

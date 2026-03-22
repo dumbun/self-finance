@@ -42,7 +42,7 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
                 ),
               ),
               elevation: const WidgetStatePropertyAll(0),
-              hintText: "phone number or t_transactionID or customer name",
+              hintText: "phone number or customer name",
               hintStyle: const WidgetStatePropertyAll(
                 TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),

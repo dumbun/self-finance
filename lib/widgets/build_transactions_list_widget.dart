@@ -19,8 +19,6 @@ class BuildTransactionsListWidget extends ConsumerWidget {
   static const double _height = 16;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final int cacheSize = (_size * MediaQuery.of(context).devicePixelRatio)
-        .round();
     return ref
         .watch(transactionsProvider)
         .when(
@@ -30,7 +28,7 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                 itemCount: data.length, // ← important
                 itemBuilder: (BuildContext context, int index) {
                   final Trx txn = data[index];
-                  return InkWell(
+                  return GestureDetector(
                     onTap: () => Routes.navigateToTransactionDetailsView(
                       transacrtionId: txn.id!,
                       customerId: txn.customerId,
@@ -50,7 +48,6 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 CustomerImageWidget(
-                                  cache: cacheSize,
                                   customerId: txn.customerId,
                                   size: _size,
                                 ),

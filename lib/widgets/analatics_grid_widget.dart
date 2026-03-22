@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
@@ -21,14 +22,15 @@ class AnalaticsGridWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final columns = _columnsForWidth(constraints.maxWidth);
+        final int columns = _columnsForWidth(constraints.maxWidth);
 
         return Padding(
           padding: const EdgeInsets.all(16),
           child: GridView.count(
+            key: const ValueKey<String>(Constant.gridWidgetKey),
             crossAxisCount: columns,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
+            mainAxisSpacing: 13,
+            crossAxisSpacing: 13,
             childAspectRatio: 1.1,
             shrinkWrap: true, // Important: allows grid to size itself
             physics:
@@ -167,20 +169,19 @@ class StatCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: iconColor, size: 18),
             ),
-
-            const Spacer(),
+            const SizedBox(height: 10),
 
             // Value
             currency
@@ -190,7 +191,13 @@ class StatCardWidget extends StatelessWidget {
             const SizedBox(height: 8),
 
             // Title / description
-            BodySmallText(text: title, overflow: TextOverflow.ellipsis),
+            Expanded(
+              child: BodySmallText(
+                text: title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
       ),

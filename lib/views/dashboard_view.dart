@@ -21,13 +21,6 @@ class _DashboardViewState extends State<DashboardView> {
   final PageController _pageController = PageController(initialPage: 0);
   final ValueNotifier<int> _selectedIndex = ValueNotifier<int>(0);
 
-  static const List<Widget> _pages = <Widget>[
-    HomeScreen(),
-    TransactionsView(),
-    EMICalculatorView(),
-    HistoryView(),
-  ];
-
   @override
   void dispose() {
     _pageController.dispose();
@@ -58,12 +51,19 @@ class _DashboardViewState extends State<DashboardView> {
         ),
       ),
       drawer: const DrawerWidget(),
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (int index) {
-          _selectedIndex.value = index;
-        },
-        children: _pages,
+      body: SafeArea(
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (int index) {
+            _selectedIndex.value = index;
+          },
+          children: const [
+            HomeScreen(),
+            TransactionsView(),
+            EMICalculatorView(),
+            HistoryView(),
+          ],
+        ),
       ),
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       floatingActionButton: ValueListenableBuilder<int>(

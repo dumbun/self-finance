@@ -7,18 +7,17 @@ class CircularImageWidget extends StatelessWidget {
     super.key,
     required this.imageData,
     required this.titile,
-    this.customeSize,
-    this.cache,
+    this.customeSize = 120,
     this.errorBuilder = const SizedBox.shrink(),
   });
 
   final String imageData;
   final String titile;
-  final double? customeSize;
-  final int? cache;
+  final double customeSize;
   final Widget errorBuilder;
 
-  Widget _buildImage(int cache, double size, BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     if (imageData.isNotEmpty) {
       return Hero(
         tag: titile,
@@ -27,25 +26,12 @@ class CircularImageWidget extends StatelessWidget {
             errorBuilder: errorBuilder,
             titile: titile,
             imagePath: imageData,
-            height: size,
-            width: size,
-            cache: cache,
+            height: customeSize,
+            width: customeSize,
           ),
         ),
       );
     }
-    return DefaultUserImage(height: size, width: size, cache: cache);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final double size = customeSize ?? 120;
-    if (cache != null) {
-      return _buildImage(cache!, size, context);
-    }
-
-    final int cacheSize = (size * MediaQuery.of(context).devicePixelRatio)
-        .round();
-    return _buildImage(cacheSize, size, context);
+    return DefaultUserImage(height: customeSize, width: customeSize);
   }
 }

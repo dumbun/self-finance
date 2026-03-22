@@ -12,15 +12,11 @@ class CustomerImageWidget extends ConsumerWidget {
     super.key,
     required this.customerId,
     required this.size,
-    this.cache,
   });
   final int customerId;
   final double size;
-  final int? cache;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final int cacheSize =
-        cache ?? (size * MediaQuery.of(context).devicePixelRatio).round();
     return ref
         .watch(customerProvider(customerId))
         .when(
@@ -31,16 +27,13 @@ class CustomerImageWidget extends ConsumerWidget {
               );
             }
             return CircularImageWidget(
-              cache: cacheSize,
               customeSize: size,
               imageData: data.photo,
               titile: data.name,
             );
           },
-          loading: () =>
-              const Center(child: CircularProgressIndicator.adaptive()),
-          error: (_, _) =>
-              DefaultUserImage(height: size, width: size, cache: cacheSize),
+          loading: () => DefaultUserImage(height: size),
+          error: (_, _) => DefaultUserImage(height: size, width: size),
         );
   }
 }

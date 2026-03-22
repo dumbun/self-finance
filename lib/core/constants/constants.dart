@@ -120,6 +120,7 @@ abstract class Constant {
 
   static const String emiCalculatorTitle = "EMI Calculator";
   static const String calculator = "Calculator";
+  static const String gridWidgetKey = "App analatics grid widget key";
   static const String emiCalculatorToolTip =
       "EMI calculator page where you can calculate interest.";
 
