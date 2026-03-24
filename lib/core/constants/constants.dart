@@ -1,4 +1,30 @@
+import 'package:flutter/material.dart';
+import 'package:self_finance/models/csv_model.dart';
+
 abstract class Constant {
+  static const Map<CsvExportType, (IconData, String, String)> typeInfo = {
+    CsvExportType.allTransactions: (
+      Icons.receipt_long_rounded,
+      'All Transactions',
+      'Every loan record regardless of status',
+    ),
+    CsvExportType.activeLoans: (
+      Icons.pending_actions_rounded,
+      'Active Loans',
+      'Only currently open/unpaid loans',
+    ),
+    CsvExportType.completedLoans: (
+      Icons.check_circle_outline_rounded,
+      'Completed Loans',
+      'Fully paid / closed loans',
+    ),
+    CsvExportType.paymentHistory: (
+      Icons.history_rounded,
+      'Payment History',
+      'All payment records with amounts',
+    ),
+  };
+
   static const String applicationHandleEmail = "sf.help.vamshi@gmail.com";
   static const String doCalculation = "Do calculations";
 

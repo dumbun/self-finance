@@ -10,6 +10,7 @@ import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/widgets/backup_with_progress_widget.dart';
 import 'package:self_finance/widgets/biometric_switch_widget.dart';
+import 'package:self_finance/widgets/csv_export_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/core/fonts/title_widget.dart';
 import 'package:self_finance/widgets/notification_switch_widget.dart';
@@ -136,6 +137,16 @@ class AccountSettingsView extends StatelessWidget {
                                 onPressed: () async =>
                                     await Utility.closeApp(context: context),
                                 title: Constant.logout,
+                              ),
+
+                              const SizedBox(height: height),
+                              _buildListTile(
+                                title: "Export to CSV",
+                                onPressed: () => CsvExportWidget.show(context),
+                                icon: const Icon(
+                                  Icons.file_download_outlined,
+                                  color: AppColors.getPrimaryColor,
+                                ),
                               ),
 
                               const SizedBox(height: height),
