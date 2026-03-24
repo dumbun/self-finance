@@ -55,7 +55,7 @@ class ItemImageWidget extends ConsumerWidget {
                         child: Column(
                           children: [
                             ImageWidget(
-                              titile: item.description,
+                              title: item.description,
                               height: 72,
                               width: 72,
                               imagePath: item.photo,

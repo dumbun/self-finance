@@ -128,7 +128,7 @@ class _ContactEditingViewState extends State<ContactEditingView> {
               borderRadius: BorderRadius.circular(8),
               child: imagePath.isNotEmpty
                   ? ImageWidget(
-                      titile: titile,
+                      title: titile,
                       imagePath: imagePath,
                       height: 72,
                       width: 72,

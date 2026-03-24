@@ -12,11 +12,11 @@ import 'package:self_finance/widgets/customer_image_widget.dart';
 import 'package:self_finance/widgets/customer_name_build_widget.dart';
 import 'package:self_finance/widgets/slidable_widget.dart';
 import 'package:self_finance/widgets/status_chip_widget.dart';
+import 'package:self_finance/core/fonts/body_small_text.dart';
 
 class BuildTransactionsListWidget extends ConsumerWidget {
   const BuildTransactionsListWidget({super.key});
-  static const double _size = 44;
-  static const double _height = 16;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ref
@@ -37,57 +37,91 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                     child: SlidableWidget(
                       customerId: txn.customerId,
                       transactionId: txn.id!,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: ListTile(
+                        key: ValueKey<int?>(txn.id),
+                        leading: CustomerImageWidget(
+                          customerId: txn.customerId,
+                          size: 44,
+                        ),
+                        title: CurrencyWidget(
+                          amount: Utility.doubleFormate(txn.amount),
+                        ),
+                        subtitle: CustomerNameBuildWidget(
+                          customerID: txn.customerId,
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                CustomerImageWidget(
-                                  customerId: txn.customerId,
-                                  size: _size,
-                                ),
-                                const SizedBox(width: _height),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CurrencyWidget(
-                                      amount: Utility.doubleFormate(txn.amount),
-                                    ),
-                                    CustomerNameBuildWidget(
-                                      customerID: txn.customerId,
-                                    ),
-                                  ],
-                                ),
-                              ],
+                            BodySmallText(
+                              text: Utility.formatDate(
+                                date: txn.transacrtionDate,
+                              ),
+                              bold: true,
+                              color: AppColors.getLigthGreyColor,
                             ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                BodyTwoDefaultText(
-                                  text: Utility.formatDate(
-                                    date: txn.transacrtionDate,
-                                  ),
-                                  bold: true,
-                                  color: AppColors.getLigthGreyColor,
-                                ),
-                                BodyTwoDefaultText(
-                                  text: 'ID: ${txn.id.toString()}',
-                                  bold: true,
-                                  color: AppColors.getLigthGreyColor,
-                                ),
-                                StatusChipWidget(txn.transacrtionType),
-                              ],
+
+                            StatusChipWidget(
+                              smallText: true,
+                              status: txn.transacrtionType,
                             ),
                           ],
                         ),
                       ),
+                      // child: Padding(
+                      //   padding: const EdgeInsets.all(16),
+                      //   child: Row(
+                      //     crossAxisAlignment: CrossAxisAlignment.center,
+                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //     children: [
+                      //       Row(
+                      //         mainAxisAlignment: MainAxisAlignment.center,
+                      //         crossAxisAlignment: CrossAxisAlignment.center,
+                      //         children: [
+                      //           CustomerImageWidget(
+                      //             customerId: txn.customerId,
+                      //             size: _size,
+                      //           ),
+                      //           const SizedBox(width: _height),
+                      //           Column(
+                      //             mainAxisAlignment: MainAxisAlignment.start,
+                      //             crossAxisAlignment: CrossAxisAlignment.start,
+                      //             children: [
+                      //               CurrencyWidget(
+                      //                 amount: Utility.doubleFormate(txn.amount),
+                      //               ),
+                      //               CustomerNameBuildWidget(
+                      //                 customerID: txn.customerId,
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         ],
+                      //       ),
+                      //       Column(
+                      //         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      //         crossAxisAlignment: CrossAxisAlignment.start,
+                      //         children: [
+                      //           BodySmallText(
+                      //             text: Utility.formatDate(
+                      //               date: txn.transacrtionDate,
+                      //             ),
+                      //             bold: true,
+                      //             color: AppColors.getLigthGreyColor,
+                      //           ),
+                      //           BodySmallText(
+                      //             text: 'ID: ${txn.id.toString()}',
+                      //             bold: true,
+                      //             color: AppColors.getLigthGreyColor,
+                      //           ),
+                      //           StatusChipWidget(
+                      //             smallText: true,
+                      //             status: txn.transacrtionType,
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                     ),
                   );
                 },

@@ -90,7 +90,7 @@ class ImagePickerWidget extends ConsumerWidget {
       imagePath: image.path,
       height: 62,
       width: 62,
-      titile: title,
+      title: title,
       showImage: false,
     );
   }

@@ -259,7 +259,7 @@ class _TransactionStatusCard extends StatelessWidget {
     return Card(
       child: ListTile(
         title: const BodyTwoDefaultText(text: Constant.transacrtionStatus),
-        trailing: StatusChipWidget(transactionType),
+        trailing: StatusChipWidget(status: transactionType),
       ),
     );
   }

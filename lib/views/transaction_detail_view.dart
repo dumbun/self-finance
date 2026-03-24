@@ -89,7 +89,7 @@ class TransactionDetailView extends ConsumerWidget {
                                     children: <Widget>[
                                       const SizedBox(height: 36),
                                       StatusChipWidget(
-                                        transaction.transacrtionType,
+                                        status: transaction.transacrtionType,
                                       ),
                                       const SizedBox(height: 12),
                                       CurrencyWidget(
@@ -313,7 +313,7 @@ class TransactionDetailView extends ConsumerWidget {
                                                 width: double.infinity,
                                                 child: Card(
                                                   child: ImageWidget(
-                                                    titile: "Signature",
+                                                    title: "Signature",
                                                     fit: BoxFit.scaleDown,
                                                     imagePath:
                                                         transaction.signature,

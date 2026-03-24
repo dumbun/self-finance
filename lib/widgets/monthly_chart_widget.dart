@@ -935,7 +935,7 @@ class _SummaryTile extends StatelessWidget {
                 BodySmallText(text: label, bold: true),
                 const SizedBox(height: 2),
                 CurrencyWidget(
-                  amount: value.toStringAsFixed(2),
+                  amount: Utility.doubleFormate(value),
                   color: color,
                   smallText: true,
                 ),

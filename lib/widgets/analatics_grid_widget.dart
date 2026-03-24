@@ -181,7 +181,7 @@ class StatCardWidget extends StatelessWidget {
               ),
               child: Icon(icon, color: iconColor, size: 18),
             ),
-            const SizedBox(height: 10),
+            const Spacer(),
 
             // Value
             currency

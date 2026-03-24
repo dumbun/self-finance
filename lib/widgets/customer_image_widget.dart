@@ -27,6 +27,7 @@ class CustomerImageWidget extends ConsumerWidget {
               );
             }
             return CircularImageWidget(
+              errorBuilder: const DefaultUserImage(),
               customeSize: size,
               imageData: data.photo,
               titile: data.name,

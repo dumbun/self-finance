@@ -29,7 +29,7 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
         padding: const EdgeInsets.all(12),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SearchBar(
               controller: _searchTextController,

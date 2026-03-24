@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 
 class StatusChipWidget extends StatelessWidget {
+  const StatusChipWidget({
+    super.key,
+    required this.status,
+    this.smallText = false,
+  });
+
+  final bool smallText;
   final String status;
-  const StatusChipWidget(this.status, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,11 +26,21 @@ class StatusChipWidget extends StatelessWidget {
             : AppColors.getErrorColor.withAlpha(30),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: BodyTwoDefaultText(
-        text: isActive ? 'Active' : 'Inactive',
-        bold: true,
-        color: isActive ? AppColors.getGreenColor : AppColors.getErrorColor,
-      ),
+      child: smallText
+          ? BodySmallText(
+              text: isActive ? 'Active' : 'Inactive',
+              bold: true,
+              color: isActive
+                  ? AppColors.getGreenColor
+                  : AppColors.getErrorColor,
+            )
+          : BodyTwoDefaultText(
+              text: isActive ? 'Active' : 'Inactive',
+              bold: true,
+              color: isActive
+                  ? AppColors.getGreenColor
+                  : AppColors.getErrorColor,
+            ),
     );
   }
 }

@@ -14,12 +14,12 @@ class ImageWidget extends ConsumerWidget {
     required this.height,
     required this.width,
     this.fit = BoxFit.fill,
-    required this.titile,
+    required this.title,
     this.showImage = true,
     this.errorBuilder = const SizedBox.shrink(),
   });
 
-  final String titile;
+  final String title;
   final String imagePath;
   final double height;
   final double width;
@@ -35,23 +35,22 @@ class ImageWidget extends ConsumerWidget {
           data: (String data) {
             final String imageWithAppDir = p.join(data, imagePath);
             if (File(imageWithAppDir).existsSync()) {
-              return RepaintBoundary(
-                child: GestureDetector(
-                  onTap: showImage
-                      ? () => Routes.navigateToImageView(
-                          context: context,
-                          titile: titile,
-                          imagePath: imageWithAppDir,
-                        )
-                      : null,
-                  child: Image.file(
-                    File(imageWithAppDir),
-                    errorBuilder: (_, _, _) => errorBuilder,
-                    height: height,
-                    width: width,
-                    fit: fit,
-                    gaplessPlayback: true,
-                  ),
+              return GestureDetector(
+                onTap: showImage
+                    ? () => Routes.navigateToImageView(
+                        context: context,
+                        titile: title,
+                        imagePath: imageWithAppDir,
+                      )
+                    : null,
+                child: Image.file(
+                  key: ValueKey<String>(imageWithAppDir),
+                  File(imageWithAppDir),
+                  errorBuilder: (_, _, _) => errorBuilder,
+                  height: height,
+                  width: width,
+                  fit: fit,
+                  gaplessPlayback: true,
                 ),
               );
             } else {
