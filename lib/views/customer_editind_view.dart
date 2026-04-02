@@ -86,7 +86,7 @@ class _ContactEditingViewState extends State<ContactEditingView> {
   }
 
   void _navigateToContactsView() {
-    Navigator.of(context).pop();
+    Navigator.pop(context);
     SnackBarWidget.snackBarWidget(
       context: context,
       message: Constant.contactUpdatedSuccessfully,

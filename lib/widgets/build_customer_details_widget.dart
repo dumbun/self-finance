@@ -98,7 +98,7 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                     const SizedBox(height: 20),
                     CircularImageWidget(
                       imageData: customer.photo,
-                      titile: "${customer.name} photo",
+                      titile: customer.name,
                     ),
                     const SizedBox(height: 16),
 

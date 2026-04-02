@@ -35,7 +35,7 @@ class CustomerCardWidget extends ConsumerWidget {
                       CircularImageWidget(
                         customeSize: 46,
                         imageData: data.photo,
-                        titile: "Customer Photo",
+                        titile: data.name,
                       ),
                       const SizedBox(width: 16),
                       Expanded(

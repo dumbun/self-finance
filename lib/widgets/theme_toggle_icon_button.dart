@@ -11,10 +11,7 @@ class ThemeToggleIconButton extends ConsumerWidget {
     this.padding = const EdgeInsets.all(10),
   });
 
-  /// Icon size
   final double size;
-
-  /// Tap target padding (keeps ~44x44+ hit area)
   final EdgeInsetsGeometry padding;
 
   /// Animation duration

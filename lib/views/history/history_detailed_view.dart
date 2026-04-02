@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
+import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
@@ -12,9 +13,8 @@ import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history_model.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
-import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
-import 'package:self_finance/widgets/default_user_image.dart';
+import 'package:self_finance/widgets/customer_image_widget.dart';
 import 'package:self_finance/widgets/status_chip_widget.dart';
 
 class HistoryDetailedView extends ConsumerWidget {
@@ -91,7 +91,7 @@ class _HeaderSection extends StatelessWidget {
         : AppColors.getGreenColor;
     final String formattedAmount =
         '${isDebit ? '-' : '+'} ${Utility.doubleFormate(history.amount)}';
-    final namePrefix = isDebit ? 'To' : 'From';
+    final String namePrefix = isDebit ? 'To' : 'From';
 
     return Container(
       margin: const EdgeInsets.only(top: 18),
@@ -134,11 +134,9 @@ class _HeaderSection extends StatelessWidget {
                                       text: '$namePrefix ${customer.name}',
                                     );
                                   },
-                                  error: (error, stackTrace) =>
-                                      const BodyTwoDefaultText(
-                                        text: Constant
-                                            .errorFetchingContactMessage,
-                                      ),
+                                  error: (_, _) => const BodyTwoDefaultText(
+                                    text: Constant.errorFetchingContactMessage,
+                                  ),
                                   loading: () => const Center(
                                     child: LinearProgressIndicator(),
                                   ),
@@ -147,31 +145,11 @@ class _HeaderSection extends StatelessWidget {
                     ),
                   ),
                 ),
-                BodyTwoDefaultText(text: formattedDate),
+                BodySmallText(text: formattedDate),
               ],
             ),
           ),
-          Consumer(
-            builder: (BuildContext context, WidgetRef ref, Widget? child) {
-              return ref
-                  .watch(customerProvider(history.customerID))
-                  .when(
-                    data: (Customer? customer) {
-                      if (customer == null) return const DefaultUserImage();
-                      return CircularImageWidget(
-                        imageData: customer.photo,
-                        titile: customer.name,
-                      );
-                    },
-                    error: (error, stackTrace) => const BodyTwoDefaultText(
-                      text: Constant.errorFetchingContactMessage,
-                    ),
-                    loading: () => const Center(
-                      child: CircularProgressIndicator.adaptive(),
-                    ),
-                  );
-            },
-          ),
+          CustomerImageWidget(customerId: history.customerID, size: 100),
         ],
       ),
     );

@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/providers/user_provider.dart';
-import 'package:self_finance/widgets/circular_image_widget.dart';
-import 'package:self_finance/widgets/default_user_image.dart';
+import 'package:self_finance/widgets/user_image_widget.dart';
 
 class UserImageUpdateWidget extends ConsumerWidget {
   const UserImageUpdateWidget({super.key, required this.userImageString});
@@ -39,7 +38,7 @@ class UserImageUpdateWidget extends ConsumerWidget {
                               photoPath: userImageString,
                             );
                         if (context.mounted) {
-                          Navigator.of(context).pop();
+                          Navigator.pop(context);
                         }
                       },
                       child: const Column(
@@ -61,7 +60,7 @@ class UserImageUpdateWidget extends ConsumerWidget {
                               photoPath: userImageString,
                             );
                         if (context.mounted) {
-                          Navigator.of(context).pop();
+                          Navigator.pop(context);
                         }
                       },
                       child: const Column(
@@ -79,7 +78,7 @@ class UserImageUpdateWidget extends ConsumerWidget {
                             .read(userProvider.notifier)
                             .removeProfilePic(userId: 1);
                         if (context.mounted) {
-                          Navigator.of(context).pop();
+                          Navigator.pop(context);
                         }
                       },
                       child: const Column(
@@ -103,14 +102,9 @@ class UserImageUpdateWidget extends ConsumerWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              Align(
+              const Align(
                 alignment: Alignment.topCenter,
-                child: userImageString.isEmpty
-                    ? const DefaultUserImage(width: 120, height: 120)
-                    : CircularImageWidget(
-                        imageData: userImageString,
-                        titile: "user",
-                      ),
+                child: UserImageWidget(),
               ),
               Align(
                 alignment: Alignment.bottomRight,

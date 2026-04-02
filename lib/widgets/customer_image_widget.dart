@@ -8,29 +8,25 @@ import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/default_user_image.dart';
 
 class CustomerImageWidget extends ConsumerWidget {
-  const CustomerImageWidget({
-    super.key,
-    required this.customerId,
-    required this.size,
-  });
+  const CustomerImageWidget({super.key, required this.customerId, this.size});
   final int customerId;
-  final double size;
+  final double? size;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ref
         .watch(customerProvider(customerId))
         .when(
-          data: (Customer? data) {
-            if (data == null) {
+          data: (Customer? customer) {
+            if (customer == null) {
               return const BodyTwoDefaultText(
                 text: Constant.errorUpdatingContactMessage,
               );
             }
             return CircularImageWidget(
               errorBuilder: const DefaultUserImage(),
-              customeSize: size,
-              imageData: data.photo,
-              titile: data.name,
+              customeSize: size ?? 120,
+              imageData: customer.photo,
+              titile: customer.name,
             );
           },
           loading: () => DefaultUserImage(height: size),

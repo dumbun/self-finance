@@ -194,7 +194,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
       context: context,
       message: Constant.transacrtionAddedSuccessfully,
     );
-    Navigator.of(context).pop();
+    Navigator.pop(context);
   }
 
   void _saveUnSuccessfull() {

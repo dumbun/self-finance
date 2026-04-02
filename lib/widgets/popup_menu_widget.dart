@@ -24,7 +24,7 @@ class PopupMenuWidget extends ConsumerWidget {
       );
 
       if (context.mounted) {
-        Routes.navigateToContactsView(context);
+        Routes.navigateToDashboard(context: context);
       }
     }
 

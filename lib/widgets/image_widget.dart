@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
@@ -32,8 +31,8 @@ class ImageWidget extends ConsumerWidget {
     return ref
         .watch(appDirProvider)
         .when(
-          data: (String data) {
-            final String imageWithAppDir = p.join(data, imagePath);
+          data: (String appDirPath) {
+            final String imageWithAppDir = p.join(appDirPath, imagePath);
             if (File(imageWithAppDir).existsSync()) {
               return GestureDetector(
                 onTap: showImage

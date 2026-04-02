@@ -31,12 +31,12 @@ class ExpandableFab extends StatelessWidget {
   }
 
   void _navigateToContactsView(BuildContext context) {
-    Navigator.of(context).pop();
+    Navigator.pop(context);
     Routes.navigateToContactsView(context);
   }
 
   void _navigateToAddNewEntry(BuildContext context) {
-    Navigator.of(context).pop();
+    Navigator.pop(context);
     Routes.navigateToAddNewEntry(context: context);
   }
 

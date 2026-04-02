@@ -5,7 +5,6 @@ import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/utility/review_helper.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
-import 'package:self_finance/widgets/app_version_widget.dart';
 import 'package:self_finance/widgets/drawer_button_widget.dart';
 import 'package:self_finance/widgets/user_image_widget.dart';
 
@@ -62,10 +61,6 @@ class DrawerWidget extends StatelessWidget {
                   ),
                   buyMeACoffeeName: "charlierosp",
                 ),
-
-                const SizedBox(height: 32),
-
-                const AppVersionWidget(),
               ],
             ),
           ),
