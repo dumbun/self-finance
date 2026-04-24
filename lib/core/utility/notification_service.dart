@@ -9,7 +9,7 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin notificationPlugin =
       FlutterLocalNotificationsPlugin();
 
-  bool _isInitialized = false;
+  static bool _isInitialized = false;
 
   Future<void> initNotification() async {
     if (_isInitialized) return;
