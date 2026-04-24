@@ -27,7 +27,7 @@ class NotificationsNotifier extends _$NotificationsNotifier {
       await PreferencesHelper.areNotificationsEnabled();
 
   Future<void> toggle() async {
-    final current = state.value ?? true;
+    final bool current = state.value ?? true;
     state = AsyncData(!current);
     await PreferencesHelper.setNotificationsEnabled(!current);
   }

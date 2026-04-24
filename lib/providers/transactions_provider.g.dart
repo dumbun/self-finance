@@ -194,7 +194,7 @@ final class TransactionsNotifierProvider
 }
 
 String _$transactionsNotifierHash() =>
-    r'146db9da8f2dcc1cea413c5a99e70f76d16e51da';
+    r'4041675ec0a337a727ee343dad8962884f182282';
 
 abstract class _$TransactionsNotifier extends $StreamNotifier<List<Trx>> {
   Stream<List<Trx>> build();
@@ -255,7 +255,7 @@ final class TransactionByIDProvider
   }
 }
 
-String _$transactionByIDHash() => r'c69d0a69d71e6cbcbc7d83874357c95e535b7341';
+String _$transactionByIDHash() => r'4e8da5357ba5f644c751f9aed8ec558cb0e432f8';
 
 final class TransactionByIDFamily extends $Family
     with

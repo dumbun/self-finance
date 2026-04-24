@@ -75,7 +75,7 @@ class PreferencesHelper {
   ///
   /// Pass `true` to enable notifications, `false` to disable.
   static Future<void> setNotificationsEnabled(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyNotifications, enabled);
     enabled
         ? await NotificationService().initNotification()

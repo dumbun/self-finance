@@ -159,4 +159,48 @@ class NotificationService {
     await notificationPlugin.cancelAll();
     _isInitialized = false;
   }
+
+  Future<void> scheduleTransactionDueReminder({
+    required int transactionId,
+    required String customerName,
+    required DateTime dueDate,
+  }) async {
+    // Cancel any existing reminder for this transaction first
+    await cancelTransactionReminder(transactionId: transactionId);
+
+    final now = tz.TZDateTime.now(tz.local);
+
+    // ── On due date ────────────────────────────────────────────────
+    final onDueDate = tz.TZDateTime(
+      tz.local,
+      dueDate.year,
+      dueDate.month,
+      dueDate.day,
+      8,
+      0,
+    );
+
+    if (onDueDate.isAfter(now)) {
+      await notificationPlugin.zonedSchedule(
+        id: _reminderIdBase(transactionId, 2),
+        notificationDetails: _notificationDetails(),
+        title: '🔴 Loan Due Today',
+        body:
+            '$customerName\'s loan payment is due today. Please collect payment.',
+        scheduledDate: onDueDate,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
+    }
+  }
+
+  // Generates unique notification IDs per transaction
+  // transactionId * 10 + slot (0, 1, 2)
+  // e.g. transactionId=5 → IDs 50, 51, 52
+  int _reminderIdBase(int transactionId, int slot) {
+    return (transactionId * 10) + slot;
+  }
+
+  Future<void> cancelTransactionReminder({required int transactionId}) async {
+    await notificationPlugin.cancel(id: _reminderIdBase(transactionId, 2));
+  }
 }

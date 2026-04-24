@@ -4,6 +4,8 @@ import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/utility/image_saving_utility.dart';
 import 'package:self_finance/core/utility/invoice_generator_utility.dart';
+import 'package:self_finance/core/utility/notification_service.dart';
+import 'package:self_finance/core/utility/preferences_helper.dart';
 import 'package:self_finance/core/utility/review_helper.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/customer_model.dart';
@@ -182,7 +184,16 @@ class TransactionsNotifier extends _$TransactionsNotifier {
             amount: pawnAmount,
           ),
         );
+        final bool notificationsEnabled =
+            await PreferencesHelper.areNotificationsEnabled();
 
+        if (notificationsEnabled) {
+          await NotificationService().scheduleTransactionDueReminder(
+            transactionId: transacrtionId,
+            customerName: customerName,
+            dueDate: userInputDate.add(const Duration(days: 6 * 30)),
+          );
+        }
         return historyId != 0 ? true : false;
       } else {
         return false;
@@ -195,6 +206,10 @@ class TransactionsNotifier extends _$TransactionsNotifier {
   Future<Map<String, int>> deleteTransaction({
     required int transactionId,
   }) async {
+    // Cancel notifications before deleting
+    await NotificationService().cancelTransactionReminder(
+      transactionId: transactionId,
+    );
     return await BackEnd.deleteTransaction(transactionId: transactionId);
   }
 }
@@ -216,6 +231,10 @@ class TransactionByID extends _$TransactionByID {
   }) async {
     final Trx? trx = state.value;
     if (trx != null) {
+      // Cancel the due reminder since it's now paid
+      await NotificationService().cancelTransactionReminder(
+        transactionId: trx.id!,
+      );
       final List<Customer> customers = await BackEnd.fetchSingleContactDetails(
         id: trx.customerId,
       );
