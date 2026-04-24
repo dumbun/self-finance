@@ -68,4 +68,4 @@ Please review this file occasionally for any updates.
 
 If you have any questions or suggestions regarding this Privacy Policy, please contact me at:
 
-📧 [sf.help.vamshi@gmail.com](mailto:sf.help.vamshi@gmail.com)
+📧 [sf.help.vamshi@gmail.com](mailto:"selffinance.help@gmail.com")

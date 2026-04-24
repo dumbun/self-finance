@@ -161,6 +161,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Contact
 
-If you have any questions or feedback, feel free to contact us at [vamsikrishna2644@gmail.com](mailto:vamsikrishna2644@gmail.com).
+If you have any questions or feedback, feel free to contact us at ["selffinance.help@gmail.com"](mailto:"selffinance.help@gmail.com").
 
 Enjoy using the Self-Finance app and happy managing your finances!

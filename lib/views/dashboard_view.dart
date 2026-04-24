@@ -88,7 +88,7 @@ class _DashboardViewState extends State<DashboardView> {
             indicatorColor: AppColors.getPrimaryColor,
             labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
             labelTextStyle: const WidgetStatePropertyAll(
-              TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
             ),
             destinations: const [
               NavigationDestination(

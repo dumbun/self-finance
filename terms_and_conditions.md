@@ -60,4 +60,4 @@ Please let us know what you think of the Service, these Terms and, in general, *
 
 ## Questions & Contact Information
 
-Questions or comments about the Service may be directed to us at the email address **sf.help.vamshi@gmail.com**.
+Questions or comments about the Service may be directed to us at the email address **selffinance.help@gmail.com**.

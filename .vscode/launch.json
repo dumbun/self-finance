@@ -7,19 +7,8 @@
         {
             "name": "self-finance",
             "request": "launch",
-            "type": "dart"
-        },
-        {
-            "name": "self-finance (profile mode)",
-            "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "flutterMode": "debug",
         },
-        {
-            "name": "self-finance (release mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
-        }
     ]
 }

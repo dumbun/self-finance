@@ -66,7 +66,7 @@ class RestoreUtility {
       await Future.delayed(const Duration(milliseconds: 500));
 
       // 2) Pick ZIP file
-      final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      final FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['zip'],
         dialogTitle: 'Select backup ZIP file',

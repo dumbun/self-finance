@@ -45,7 +45,7 @@ captures/
 
 # Keystore files
 # Uncomment the following line if you do not want to check your keystore files in.
-#*.jks
+*.jks
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
@@ -163,6 +163,7 @@ fabric.properties
 .DS_Store
 .AppleDouble
 .LSOverride
+.vscode
 
 # Icon must end with two \r
 Icon

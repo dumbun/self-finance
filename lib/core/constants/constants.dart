@@ -25,7 +25,7 @@ abstract class Constant {
     ),
   };
 
-  static const String applicationHandleEmail = "sf.help.vamshi@gmail.com";
+  static const String applicationHandleEmail = "selffinance.help@gmail.com";
   static const String doCalculation = "Do calculations";
 
   static const String errorFetchingTransactionMessage =
