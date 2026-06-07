@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
+import 'package:self_finance/core/fonts/title_widget.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/fonts/strong_heading_one_text.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
+import 'package:self_finance/views/EMI%20Calculator/emi_calculator_view.dart';
 import 'package:self_finance/widgets/restore_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
@@ -17,30 +19,90 @@ class TermsAndConditons extends StatefulWidget {
 class _TermsAndConditonsState extends State<TermsAndConditons> {
   bool _ticked = false;
   bool _pAndP = false;
+  final PageController _pageController = PageController(initialPage: 0);
+  final ValueNotifier<int> _selectedIndex = ValueNotifier<int>(0);
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _selectedIndex.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.all(24),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                // _getIcon(),
-                _getHeading(),
-                const SizedBox(height: 16),
-                // _getTerms(),
-                _getCheckBoxWithDescription(),
-                _getPrivacyAndPolicyButton(),
-                _getNextButton(),
-                const SizedBox(height: 16),
-                const RestoreWithProgressWidget(),
-              ],
+      bottomNavigationBar: ValueListenableBuilder<int>(
+        valueListenable: _selectedIndex,
+        builder: (_, int index, _) {
+          return NavigationBar(
+            maintainBottomViewPadding: true,
+            selectedIndex: index,
+            onDestinationSelected: (int tappedIndex) {
+              _pageController.animateToPage(
+                tappedIndex,
+                duration: const Duration(milliseconds: 450),
+                curve: Curves.easeInOut,
+              );
+            },
+            indicatorColor: AppColors.getPrimaryColor,
+            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+            labelTextStyle: const WidgetStatePropertyAll(
+              TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
             ),
-          ),
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.calculate_outlined),
+                label: Constant.emiCalculatorTitle,
+                selectedIcon: Icon(Icons.calculate),
+                tooltip: Constant.calculator,
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.person_2_outlined),
+                selectedIcon: Icon(Icons.person),
+                label: Constant.account,
+                tooltip: Constant.account,
+              ),
+            ],
+          );
+        },
+      ),
+      body: SafeArea(
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (int index) {
+            _selectedIndex.value = index;
+          },
+          children: [
+            SingleChildScrollView(
+              child: const Column(
+                children: [
+                  SizedBox(height: 22),
+                  TitleWidget(text: Constant.emiCalculatorTitle),
+                  EMICalculatorView(),
+                ],
+              ),
+            ),
+            Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(24),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    _getHeading(),
+                    const SizedBox(height: 16),
+                    _getCheckBoxWithDescription(),
+                    _getPrivacyAndPolicyButton(),
+                    _getNextButton(),
+                    const SizedBox(height: 16),
+                    const RestoreWithProgressWidget(),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

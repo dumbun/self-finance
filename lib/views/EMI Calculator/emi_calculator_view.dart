@@ -25,6 +25,7 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
   final DateTime _initalDate = DateTime.now();
   final DateTime _lastDate = DateTime(9999);
   late LoanCalculator _loanCalculator;
+  final ValueNotifier<bool> _checkbox = ValueNotifier(false);
 
   @override
   void dispose() {
@@ -32,6 +33,7 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
     _rateOfIntrestInput.dispose();
     _takenDataInput.dispose();
     _tenureDataInput.dispose();
+    _checkbox.dispose();
     super.dispose();
   }
 
@@ -62,6 +64,28 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
               firstDate: _firstDate,
               initialDate: _initalDate,
               lastDate: _lastDate,
+            ),
+            sb,
+
+            //include last date
+            ValueListenableBuilder<bool>(
+              valueListenable: _checkbox,
+              builder: (context, value, child) {
+                return InkWell(
+                  onTap: () => _checkbox.value = !value,
+                  child: Row(
+                    children: [
+                      Checkbox.adaptive(
+                        value: value,
+                        onChanged: (newValue) {
+                          _checkbox.value = newValue ?? false;
+                        },
+                      ),
+                      const BodyTwoDefaultText(text: "Include this date"),
+                    ],
+                  ),
+                );
+              },
             ),
             sb,
 

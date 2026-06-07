@@ -206,9 +206,10 @@ abstract class Constant {
   static const String transacrtionAddedSuccessfully =
       "Transaction added successfully.";
 
+  static const String byeMeACoffee = "charlierosp";
+
   static const String showTransaction = "Show transaction";
   static const String transacrtionStatus = "Transaction status";
-
   static const String transactionDetails = "Transaction details";
   static const String transactionStatus = "Transaction status";
 

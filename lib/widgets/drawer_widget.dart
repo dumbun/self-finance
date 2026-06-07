@@ -59,7 +59,7 @@ class DrawerWidget extends StatelessWidget {
                   style: ButtonStyle(
                     maximumSize: WidgetStatePropertyAll(Size.infinite),
                   ),
-                  buyMeACoffeeName: "charlierosp",
+                  buyMeACoffeeName: Constant.byeMeACoffee,
                 ),
               ],
             ),
