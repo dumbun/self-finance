@@ -25,103 +25,46 @@ class BuildTransactionsListWidget extends ConsumerWidget {
           data: (List<Trx> data) {
             if (data.isNotEmpty) {
               return ListView.builder(
-                itemCount: data.length, // ← important
+                itemCount: data.length,
                 itemBuilder: (BuildContext context, int index) {
                   final Trx txn = data[index];
-                  return GestureDetector(
-                    onTap: () => Routes.navigateToTransactionDetailsView(
-                      transacrtionId: txn.id!,
-                      customerId: txn.customerId,
-                      context: context,
-                    ),
-                    child: SlidableWidget(
-                      customerId: txn.customerId,
-                      transactionId: txn.id!,
-                      child: ListTile(
-                        key: ValueKey<int?>(txn.id),
-                        leading: CustomerImageWidget(
-                          customerId: txn.customerId,
-                          size: 44,
-                        ),
-                        title: CurrencyWidget(
-                          amount: Utility.doubleFormate(txn.amount),
-                        ),
-                        subtitle: CustomerNameBuildWidget(
-                          customerID: txn.customerId,
-                        ),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            BodySmallText(
-                              text: Utility.formatDate(
-                                date: txn.transacrtionDate,
-                              ),
-                              bold: true,
-                              color: AppColors.getLigthGreyColor,
-                            ),
-
-                            StatusChipWidget(
-                              smallText: true,
-                              status: txn.transacrtionType,
-                            ),
-                          ],
-                        ),
+                  return SlidableWidget(
+                    customerId: txn.customerId,
+                    transactionId: txn.id!,
+                    child: ListTile(
+                      onTap: () => Routes.navigateToTransactionDetailsView(
+                        transacrtionId: txn.id!,
+                        customerId: txn.customerId,
+                        context: context,
                       ),
-                      // child: Padding(
-                      //   padding: const EdgeInsets.all(16),
-                      //   child: Row(
-                      //     crossAxisAlignment: CrossAxisAlignment.center,
-                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //     children: [
-                      //       Row(
-                      //         mainAxisAlignment: MainAxisAlignment.center,
-                      //         crossAxisAlignment: CrossAxisAlignment.center,
-                      //         children: [
-                      //           CustomerImageWidget(
-                      //             customerId: txn.customerId,
-                      //             size: _size,
-                      //           ),
-                      //           const SizedBox(width: _height),
-                      //           Column(
-                      //             mainAxisAlignment: MainAxisAlignment.start,
-                      //             crossAxisAlignment: CrossAxisAlignment.start,
-                      //             children: [
-                      //               CurrencyWidget(
-                      //                 amount: Utility.doubleFormate(txn.amount),
-                      //               ),
-                      //               CustomerNameBuildWidget(
-                      //                 customerID: txn.customerId,
-                      //               ),
-                      //             ],
-                      //           ),
-                      //         ],
-                      //       ),
-                      //       Column(
-                      //         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      //         crossAxisAlignment: CrossAxisAlignment.start,
-                      //         children: [
-                      //           BodySmallText(
-                      //             text: Utility.formatDate(
-                      //               date: txn.transacrtionDate,
-                      //             ),
-                      //             bold: true,
-                      //             color: AppColors.getLigthGreyColor,
-                      //           ),
-                      //           BodySmallText(
-                      //             text: 'ID: ${txn.id.toString()}',
-                      //             bold: true,
-                      //             color: AppColors.getLigthGreyColor,
-                      //           ),
-                      //           StatusChipWidget(
-                      //             smallText: true,
-                      //             status: txn.transacrtionType,
-                      //           ),
-                      //         ],
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
+                      leading: CustomerImageWidget(
+                        customerId: txn.customerId,
+                        size: 44,
+                      ),
+                      title: CurrencyWidget(
+                        amount: Utility.doubleFormate(txn.amount),
+                      ),
+                      subtitle: CustomerNameBuildWidget(
+                        customerID: txn.customerId,
+                      ),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          BodySmallText(
+                            text: Utility.formatDate(
+                              date: txn.transacrtionDate,
+                            ),
+                            bold: true,
+                            color: AppColors.getLigthGreyColor,
+                          ),
+
+                          StatusChipWidget(
+                            smallText: true,
+                            status: txn.transacrtionType,
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -137,7 +80,7 @@ class BuildTransactionsListWidget extends ConsumerWidget {
           },
           error: (Object error, StackTrace stackTrace) =>
               BodyTwoDefaultText(text: error.toString()),
-          loading: () => const CircularProgressIndicator(),
+          loading: () => const CircularProgressIndicator.adaptive(),
         );
   }
 }

@@ -73,9 +73,9 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
           onPageChanged: (int index) {
             _selectedIndex.value = index;
           },
-          children: [
-            SingleChildScrollView(
-              child: const Column(
+          children: <Widget>[
+            const SingleChildScrollView(
+              child: Column(
                 children: [
                   SizedBox(height: 22),
                   TitleWidget(text: Constant.emiCalculatorTitle),

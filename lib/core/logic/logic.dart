@@ -13,6 +13,7 @@ class LoanCalculator {
   final DateTime takenDate;
   final DateTime? tenureDate;
   final bool inclusiveDays;
+  final bool includeEndDate;
 
   const LoanCalculator({
     required this.takenAmount,
@@ -20,6 +21,7 @@ class LoanCalculator {
     required this.takenDate,
     this.tenureDate,
     this.inclusiveDays = true,
+    this.includeEndDate = true,
   }) : assert(takenAmount >= 0, 'takenAmount cannot be negative'),
        assert(rateOfInterest >= 0, 'rateOfInterest cannot be negative');
 
@@ -37,6 +39,7 @@ class LoanCalculator {
   List<int> get _monthsDays => DateUtils.getCalendarMonthsAndRemainingDays(
     start: _startDate,
     end: _endDate,
+    includeEndDate: includeEndDate,
   );
 
   int get months => _monthsDays[0];
@@ -115,6 +118,7 @@ class DateUtils {
   static List<int> getCalendarMonthsAndRemainingDays({
     required DateTime start,
     required DateTime end,
+    required bool includeEndDate,
   }) {
     final s = dateOnly(start);
     final e = dateOnly(end);
@@ -129,7 +133,10 @@ class DateUtils {
       candidate = _addCalendarMonthsClamped(s, months);
     }
 
-    final remainingDays = max(0, e.difference(candidate).inDays);
+    int remainingDays = max(0, e.difference(candidate).inDays);
+    if (includeEndDate == false) {
+      remainingDays = remainingDays - 1;
+    }
     return [months, remainingDays];
   }
 

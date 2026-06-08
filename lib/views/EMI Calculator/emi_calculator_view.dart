@@ -144,6 +144,7 @@ class _EMICalculatorViewState extends State<EMICalculatorView> {
       final DateFormat format = DateFormat('dd-MM-yyyy');
       setState(() {
         _loanCalculator = LoanCalculator(
+          includeEndDate: _checkbox.value,
           takenAmount: Utility.textToDouble(_amountGivenInput.text),
           rateOfInterest: Utility.textToDouble(_rateOfIntrestInput.text),
           takenDate: format.parseStrict(_takenDataInput.text),
