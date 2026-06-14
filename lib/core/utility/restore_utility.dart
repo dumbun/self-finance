@@ -70,7 +70,6 @@ class RestoreUtility {
         type: FileType.custom,
         allowedExtensions: ['zip'],
         dialogTitle: 'Select backup ZIP file',
-        withData: true,
       );
 
       if (result == null || result.files.single.path == null) {

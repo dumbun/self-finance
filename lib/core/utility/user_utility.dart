@@ -4,19 +4,42 @@ import 'dart:io';
 import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:self_finance/backend/backend.dart';
+import 'package:self_finance/backend/user_database.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
+import 'package:self_finance/core/utility/debug_print.dart';
+import 'package:self_finance/core/utility/notification_service.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:signature/signature.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Utility {
+  static Future<void> appInit() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await dotenv.load(fileName: '.env');
+    await UserBackEnd.db().timeout(
+      const Duration(seconds: 10),
+      onTimeout: () => throw Exception('DB init timed out'),
+    );
+    await NotificationService().initNotification();
+    if (Platform.isAndroid) {
+      try {
+        await FlutterDisplayMode.setHighRefreshRate();
+        dPrint(() => "Enabled high refresh mode");
+      } catch (e) {
+        dPrint(() => "Error setting high refresh rate: $e");
+      }
+    }
+  }
+
   static Future<void> closeApp({required BuildContext context}) async {
     AlertDilogs.alertDialogWithTwoAction(
       context,

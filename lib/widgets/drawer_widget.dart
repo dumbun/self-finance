@@ -52,7 +52,7 @@ class DrawerWidget extends StatelessWidget {
                     Icons.star_rounded,
                     color: AppColors.contentColorYellow,
                   ),
-                  onTap: () => ReviewHelper.openStore(),
+                  onTap: () async => await ReviewHelper.openStore(),
                 ),
 
                 const BuyMeACoffeeButton(

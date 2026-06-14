@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
@@ -12,8 +13,8 @@ class ImageWidget extends ConsumerWidget {
     required this.imagePath,
     required this.height,
     required this.width,
-    this.fit = BoxFit.fill,
     required this.title,
+    this.fit = BoxFit.cover,
     this.showImage = true,
     this.errorBuilder = const SizedBox.shrink(),
   });
@@ -22,46 +23,51 @@ class ImageWidget extends ConsumerWidget {
   final String imagePath;
   final double height;
   final double width;
-  final BoxFit? fit;
+  final BoxFit fit;
   final bool showImage;
   final Widget errorBuilder;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ref
-        .watch(appDirProvider)
-        .when(
-          data: (String appDirPath) {
-            final String imageWithAppDir = p.join(appDirPath, imagePath);
-            if (File(imageWithAppDir).existsSync()) {
-              return GestureDetector(
-                onTap: showImage
-                    ? () => Routes.navigateToImageView(
-                        context: context,
-                        titile: title,
-                        imagePath: imageWithAppDir,
-                      )
-                    : null,
-                child: Image.file(
-                  key: ValueKey<String>(imageWithAppDir),
-                  File(imageWithAppDir),
-                  errorBuilder: (_, _, _) => errorBuilder,
-                  height: height,
-                  width: width,
-                  fit: fit,
-                  gaplessPlayback: true,
-                ),
-              );
-            } else {
-              return errorBuilder;
-            }
-          },
-          error: (error, _) => BodyOneDefaultText(text: error.toString()),
-          loading: () => SizedBox(
+    final AsyncValue<String> appDir = ref.watch(appDirProvider);
+
+    return appDir.when(
+      data: (String appDirPath) {
+        final String fullPath = p.join(appDirPath, imagePath);
+        final File imageFile = File(fullPath);
+
+        return GestureDetector(
+          onTap: showImage
+              ? () {
+                  Routes.navigateToImageView(
+                    context: context,
+                    titile: title,
+                    imagePath: imageFile.path,
+                  );
+                }
+              : null,
+          child: Image.file(
+            imageFile,
             height: height,
             width: width,
-            child: const CircularProgressIndicator.adaptive(),
+            fit: fit,
+            gaplessPlayback: true,
+            filterQuality: FilterQuality.medium,
+            errorBuilder: (_, _, _) =>
+                SizedBox(height: height, width: width, child: errorBuilder),
           ),
         );
+      },
+      loading: () => SizedBox(
+        height: height,
+        width: width,
+        child: const Center(child: CircularProgressIndicator.adaptive()),
+      ),
+      error: (Object error, StackTrace stackTrace) => SizedBox(
+        height: height,
+        width: width,
+        child: Center(child: BodyOneDefaultText(text: error.toString())),
+      ),
+    );
   }
 }

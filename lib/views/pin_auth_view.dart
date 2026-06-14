@@ -14,17 +14,32 @@ import 'package:self_finance/widgets/default_user_image.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
-class PinAuthView extends StatefulWidget {
+class PinAuthView extends ConsumerStatefulWidget {
   const PinAuthView({super.key, this.scanBioMetrics = true});
 
   final bool scanBioMetrics;
+
   @override
-  State<PinAuthView> createState() => _PinAuthViewState();
+  ConsumerState<PinAuthView> createState() => _PinAuthViewState();
 }
 
-class _PinAuthViewState extends State<PinAuthView> {
-  final TextEditingController _pinController = TextEditingController();
+class _PinAuthViewState extends ConsumerState<PinAuthView> {
+  late final TextEditingController _pinController;
+
   bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _pinController = TextEditingController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.scanBioMetrics) {
+        _handleBiometric();
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -32,130 +47,141 @@ class _PinAuthViewState extends State<PinAuthView> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    if (widget.scanBioMetrics) _handleBiometric();
-    super.initState();
-  }
-
-  void _goToDashboard() {
+  void _navigateToDashboard() {
     if (!mounted) return;
+
     Routes.navigateToDashboard(context: context);
   }
 
-  void _clearPin() {
-    if (_pinController.text.isEmpty) return;
-    _pinController.clear();
-  }
-
-  void _handlePinSubmit({required String expectedPin}) {
+  Future<void> _handlePinSubmit({required String expectedPin}) async {
     if (_isSubmitting) return;
 
-    final entered = _pinController.text.trim();
-    if (entered.isEmpty) return;
+    final String enteredPin = _pinController.text.trim();
 
-    _isSubmitting = true;
+    if (enteredPin.isEmpty) return;
+
+    setState(() => _isSubmitting = true);
+
     try {
-      if (entered == expectedPin) {
-        _goToDashboard();
-      } else {
-        _clearPin();
+      if (enteredPin == expectedPin) {
+        _navigateToDashboard();
+        return;
+      }
+
+      _pinController.clear();
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text(Constant.enterCorrectPin)));
       }
     } finally {
-      _isSubmitting = false;
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
 
   Future<void> _handleBiometric() async {
     if (_isSubmitting) return;
 
-    _isSubmitting = true;
+    setState(() => _isSubmitting = true);
+
     try {
-      final bool res = await PreferencesHelper.isBiometrics();
-      if (res) {
-        final bool ok = await LocalAuthenticator.authenticate();
-        if (ok) _goToDashboard();
+      final bool biometricsEnabled = await PreferencesHelper.isBiometrics();
+
+      if (!biometricsEnabled) return;
+
+      final bool authenticated = await LocalAuthenticator.authenticate();
+
+      if (!mounted) return;
+
+      if (authenticated) {
+        _navigateToDashboard();
       }
     } finally {
-      _isSubmitting = false;
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final AsyncValue<User?> userAsync = ref.watch(userProvider);
+
     return Scaffold(
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            child: Consumer(
-              builder: (context, ref, child) => ref
-                  .watch(userProvider)
-                  .when(
-                    loading: () => const CircularProgressIndicator.adaptive(),
-                    error: (_, _) =>
-                        const BodyTwoDefaultText(text: Constant.errorUserFetch),
-                    data: (User? user) {
-                      if (user == null) {
-                        return const BodyTwoDefaultText(
-                          text: Constant.errorUserFetch,
-                        );
-                      }
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          if (user.profilePicture.isNotEmpty)
-                            CircularImageWidget(
-                              customeSize: 120,
-                              imageData: user.profilePicture,
-                              titile: user.userName,
-                            )
-                          else
-                            const DefaultUserImage(height: 120),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: userAsync.when(
+              loading: () => const CircularProgressIndicator.adaptive(),
 
-                          const SizedBox(height: 20),
+              error: (_, _) =>
+                  const BodyTwoDefaultText(text: Constant.errorUserFetch),
 
-                          const StrongHeadingOne(
-                            bold: true,
-                            text: Constant.enterYourAppPin,
-                          ),
+              data: (User? user) {
+                if (user == null) {
+                  return const BodyTwoDefaultText(
+                    text: Constant.errorUserFetch,
+                  );
+                }
 
-                          const SizedBox(height: 20),
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    if (user.profilePicture.isNotEmpty)
+                      CircularImageWidget(
+                        customeSize: 120,
+                        imageData: user.profilePicture,
+                        titile: user.userName,
+                      )
+                    else
+                      const DefaultUserImage(height: 120),
 
-                          PinInputWidget(
-                            pinController: _pinController,
-                            obscureText: true,
-                            validator: (String? value) {
-                              final v = value?.trim() ?? '';
-                              if (v.isEmpty) return Constant.enterYourAppPin;
-                              if (v != user.userPin) {
-                                return Constant.enterCorrectPin;
-                              }
-                              return null;
-                            },
-                          ),
+                    const SizedBox(height: 20),
 
-                          const SizedBox(height: 20),
+                    const StrongHeadingOne(
+                      text: Constant.enterYourAppPin,
+                      bold: true,
+                    ),
 
-                          Padding(
-                            padding: const EdgeInsetsGeometry.only(
-                              left: 22,
-                              right: 22,
-                            ),
-                            child: RoundedCornerButton(
-                              text: Constant.login,
-                              onPressed: () =>
-                                  _handlePinSubmit(expectedPin: user.userPin),
-                            ),
-                          ),
+                    const SizedBox(height: 20),
 
-                          const SizedBox(height: 20),
+                    PinInputWidget(
+                      pinController: _pinController,
+                      obscureText: true,
+                      validator: (String? value) {
+                        if ((value?.trim().isEmpty ?? true)) {
+                          return Constant.enterYourAppPin;
+                        }
 
-                          BiometricButtonWidget(onPressed: _handleBiometric),
-                        ],
-                      );
-                    },
-                  ),
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 22),
+                      child: RoundedCornerButton(
+                        text: _isSubmitting ? "Please wait..." : Constant.login,
+                        onPressed: _isSubmitting
+                            ? null
+                            : () => _handlePinSubmit(expectedPin: user.userPin),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    BiometricButtonWidget(
+                      onPressed: _isSubmitting ? null : _handleBiometric,
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),

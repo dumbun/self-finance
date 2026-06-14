@@ -23,53 +23,7 @@ class BuildTransactionsListWidget extends ConsumerWidget {
         .watch(transactionsProvider)
         .when(
           data: (List<Trx> data) {
-            if (data.isNotEmpty) {
-              return ListView.builder(
-                itemCount: data.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final Trx txn = data[index];
-                  return SlidableWidget(
-                    customerId: txn.customerId,
-                    transactionId: txn.id!,
-                    child: ListTile(
-                      onTap: () => Routes.navigateToTransactionDetailsView(
-                        transacrtionId: txn.id!,
-                        customerId: txn.customerId,
-                        context: context,
-                      ),
-                      leading: CustomerImageWidget(
-                        customerId: txn.customerId,
-                        size: 44,
-                      ),
-                      title: CurrencyWidget(
-                        amount: Utility.doubleFormate(txn.amount),
-                      ),
-                      subtitle: CustomerNameBuildWidget(
-                        customerID: txn.customerId,
-                      ),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BodySmallText(
-                            text: Utility.formatDate(
-                              date: txn.transacrtionDate,
-                            ),
-                            bold: true,
-                            color: AppColors.getLigthGreyColor,
-                          ),
-
-                          StatusChipWidget(
-                            smallText: true,
-                            status: txn.transacrtionType,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              );
-            } else {
+            if (data.isEmpty) {
               return const Center(
                 child: BodyOneDefaultText(
                   bold: true,
@@ -77,6 +31,48 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                 ),
               );
             }
+            return ListView.builder(
+              itemCount: data.length,
+              itemBuilder: (BuildContext context, int index) {
+                final Trx txn = data[index];
+                return SlidableWidget(
+                  customerId: txn.customerId,
+                  transactionId: txn.id!,
+                  child: ListTile(
+                    onTap: () => Routes.navigateToTransactionDetailsView(
+                      transacrtionId: txn.id!,
+                      customerId: txn.customerId,
+                      context: context,
+                    ),
+                    leading: CustomerImageWidget(
+                      customerId: txn.customerId,
+                      size: 44,
+                    ),
+                    title: CurrencyWidget(
+                      amount: Utility.doubleFormate(txn.amount),
+                    ),
+                    subtitle: CustomerNameBuildWidget(
+                      customerID: txn.customerId,
+                    ),
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        BodySmallText(
+                          text: Utility.formatDate(date: txn.transacrtionDate),
+                          bold: true,
+                          color: AppColors.getLigthGreyColor,
+                        ),
+                        StatusChipWidget(
+                          smallText: true,
+                          status: txn.transacrtionType,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
           },
           error: (Object error, StackTrace stackTrace) =>
               BodyTwoDefaultText(text: error.toString()),

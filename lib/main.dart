@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:self_finance/backend/user_database.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:self_finance/core/utility/notification_service.dart';
-import 'package:feedback/feedback.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:feedback/feedback.dart';
+import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/self_finance.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await UserBackEnd.db();
-  await dotenv.load(fileName: ".env");
-  await NotificationService().initNotification();
+  await Utility.appInit();
   runApp(const BetterFeedback(child: ProviderScope(child: SelfFinance())));
 }

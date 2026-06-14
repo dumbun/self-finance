@@ -1400,11 +1400,11 @@ class BackEnd {
 
   static Stream<double> watchSumOfTakenAmount() {
     return Stream.fromFuture(db()).asyncExpand((d) {
-      final q = d
+      final Stream<List<QueryRow>> q = d
           .customSelect(
             '''
         SELECT COALESCE(SUM(Amount), 0) AS total
-        FROM Transactions
+        FROM Transactions WHERE Transaction_Type = 'Active'
         ''',
             readsFrom: {d.transactionsTable},
           )
