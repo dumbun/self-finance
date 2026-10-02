@@ -2,26 +2,25 @@ import 'package:local_auth/local_auth.dart';
 import 'package:self_finance/core/constants/constants.dart';
 
 class LocalAuthenticator {
-  static LocalAuthentication get _newMethod => LocalAuthentication();
+  static final LocalAuthentication _auth = LocalAuthentication();
 
   static Future<bool> authenticate() async {
     try {
-      bool canCheckBiometrics = await _newMethod.canCheckBiometrics;
+      final bool canCheckBiometrics = await _auth.canCheckBiometrics;
       if (!canCheckBiometrics) {
         // Biometrics is not available on this device
         return false;
       }
 
-      List<BiometricType> availableBiometrics = await _newMethod
-          .getAvailableBiometrics();
+      final List<BiometricType> availableBiometrics =
+          await _auth.getAvailableBiometrics();
       if (availableBiometrics.isEmpty) {
         // No biometrics are available on this device
         return false;
       }
 
-      bool isAuthenticated = await _newMethod.authenticate(
+      final bool isAuthenticated = await _auth.authenticate(
         localizedReason: Constant.localizedReason, // Displayed to the user
-        sensitiveTransaction: true,
       );
 
       return isAuthenticated;

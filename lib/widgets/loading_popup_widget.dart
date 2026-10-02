@@ -11,7 +11,6 @@ class LoadingPopup {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      useRootNavigator: true,
       builder: (_) => PopScope(
         canPop: false, // blocks back button
         child: Dialog(

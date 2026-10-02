@@ -96,8 +96,6 @@ class TransactionDetailView extends ConsumerWidget {
                                       return Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
                                         children: <Widget>[
                                           TransactionDetailsHeroWidget(
                                             transaction: transaction,
@@ -111,8 +109,6 @@ class TransactionDetailView extends ConsumerWidget {
                                               transaction: transaction,
                                             ),
                                           Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: <Widget>[

@@ -43,8 +43,6 @@ class CustomerTransactionsWidget extends ConsumerWidget {
                               child: Padding(
                                 padding: const EdgeInsets.all(16),
                                 child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Icon(
                                       Icons.circle,
@@ -57,8 +55,6 @@ class CustomerTransactionsWidget extends ConsumerWidget {
                                     ),
                                     const SizedBox(width: 18),
                                     Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [

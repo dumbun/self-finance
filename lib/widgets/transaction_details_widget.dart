@@ -22,7 +22,6 @@ class TransactionDetailsWidget extends StatelessWidget {
     return Card(
       elevation: 2,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(

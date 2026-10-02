@@ -24,7 +24,7 @@ class DrillSheet extends ConsumerWidget {
       initialChildSize: 0.55,
       minChildSize: 0.35,
       maxChildSize: 0.92,
-      builder: (_, ScrollController sc) => Container(
+      builder: (_, ScrollController sc) => DecoratedBox(
         decoration: BoxDecoration(
           color: Theme.of(
             context,

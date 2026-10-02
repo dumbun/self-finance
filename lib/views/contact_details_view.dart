@@ -14,7 +14,6 @@ class ContactDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      initialIndex: 0,
       length: 2,
       child: Scaffold(
         floatingActionButton: Fab(

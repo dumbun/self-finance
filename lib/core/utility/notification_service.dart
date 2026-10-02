@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:self_finance/core/constants/constants.dart';
@@ -13,20 +14,26 @@ class NotificationService {
 
   Future<void> initNotification() async {
     if (_isInitialized) return;
-    // timezone initalization
+
+    // initializeTimeZones() MUST run on the main isolate — it populates a
+    // global in-memory timezone database. Running it via compute() would
+    // initialise the DB in the spawned isolate's memory, leaving the main
+    // isolate with an empty DB and crashing tz.getLocation() below.
     tz.initializeTimeZones();
 
-    final TimezoneInfo currentTimeZone =
-        await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation((currentTimeZone.identifier)));
+    try {
+      final TimezoneInfo currentTimeZone =
+          await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(currentTimeZone.identifier));
+    } catch (_) {
+      tz.setLocalLocation(tz.UTC);
+    }
 
     const androidInit = AndroidInitializationSettings(
       '@drawable/ic_launcher_foreground',
     );
     const DarwinInitializationSettings iosInit = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+      
     );
 
     const settings = InitializationSettings(android: androidInit, iOS: iosInit);
@@ -41,52 +48,61 @@ class NotificationService {
 
     await notificationPlugin.initialize(settings: settings);
 
+    _isInitialized = true;
+
+    // Schedule daily reminders off the critical startup path — these don't
+    // need to complete before the first frame is rendered.
+    _scheduleDailyNotificationsInBackground();
+  }
+
+  /// Fires all daily scheduled notifications without blocking the caller.
+  void _scheduleDailyNotificationsInBackground() {
     //At 6am
-    await scheduleNotification(
+    unawaited(scheduleNotification(
       id: 101,
       title: "💰 Daily Finance Reminder",
       body: getTodaysQuote(),
       hr: 06,
       min: 00,
-    );
+    ));
 
     //At 9am
-    await scheduleNotification(
+    unawaited(scheduleNotification(
       id: 102,
       title: "Analatics",
       body: "Do you want to check how much you made it Yesterday 💸",
       hr: 09,
       min: 00,
-    );
+    ));
 
     //At 2pm
-    await scheduleNotification(
+    unawaited(scheduleNotification(
       id: 103,
       title: "💰 Daily Finance Reminder",
       body: getTodaysQuote(),
       hr: 14,
       min: 0,
-    );
+    ));
 
     //At 6pm
-    await scheduleNotification(
+    unawaited(scheduleNotification(
       id: 104,
       title: "💰 Daily Finance Reminder",
       body: getTodaysQuote(),
       hr: 18,
       min: 0,
-    );
+    ));
 
     // At 8pm
-    await scheduleNotification(
+    unawaited(scheduleNotification(
       id: 105,
       title: "Analatics",
       body: "Do you want to check how much you made it today 🏆",
       hr: 20,
       min: 00,
-    );
-    _isInitialized = true;
+    ));
   }
+
 
   static String getTodaysQuote() {
     final DateTime now = DateTime.now();
@@ -165,6 +181,9 @@ class NotificationService {
     required String customerName,
     required DateTime dueDate,
   }) async {
+    if (!_isInitialized) {
+      await initNotification();
+    }
     // Cancel any existing reminder for this transaction first
     await cancelTransactionReminder(transactionId: transactionId);
 
@@ -177,7 +196,6 @@ class NotificationService {
       dueDate.month,
       dueDate.day,
       8,
-      0,
     );
 
     if (onDueDate.isAfter(now)) {

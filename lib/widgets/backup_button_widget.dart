@@ -10,8 +10,6 @@ class BackupButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Future<void> doBackUp() async {
       return await showAdaptiveDialog<void>(
-        barrierDismissible: false,
-        useRootNavigator: true,
         context: context,
         builder: (BuildContext context) {
           return Container(

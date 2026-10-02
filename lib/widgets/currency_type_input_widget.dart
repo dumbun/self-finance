@@ -17,10 +17,6 @@ class CurrencyTypeInputWidget extends StatelessWidget {
         theme: CurrencyPickerThemeData(bottomSheetHeight: 400),
         useRootNavigator: true,
         context: context,
-        showFlag: true,
-        showSearchField: true,
-        showCurrencyName: true,
-        showCurrencyCode: true,
         onSelect: (Currency currency) => controller.text = currency.symbol,
       ),
       child: Card(

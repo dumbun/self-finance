@@ -15,7 +15,6 @@ import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/backend/user_database.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
-import 'package:self_finance/core/utility/debug_print.dart';
 import 'package:self_finance/core/utility/notification_service.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:signature/signature.dart';
@@ -23,25 +22,28 @@ import 'package:url_launcher/url_launcher.dart';
 
 class Utility {
   static Future<void> appInit() async {
-    WidgetsFlutterBinding.ensureInitialized(); // must stay first, synchronous
-
     await Future.wait([
-      dotenv.load(fileName: '.env'),
+      dotenv.load(),
       UserBackEnd.db().timeout(
-        const Duration(seconds: 10),
+        const Duration(seconds: 5),
         onTimeout: () => throw Exception('DB init timed out'),
       ),
-      NotificationService().initNotification(),
     ]);
+  }
 
-    if (Platform.isAndroid) {
-      try {
-        await FlutterDisplayMode.setHighRefreshRate();
-        dPrint(() => "Enabled high refresh mode");
-      } catch (e) {
-        dPrint(() => "Error setting high refresh rate: $e");
+  /// Initialises non-critical background services (high refresh rate and notifications)
+  /// without blocking the startup frame pipeline.
+  static void backgroundServicesInit() {
+    Future.delayed(const Duration(seconds: 2), () async {
+      if (Platform.isAndroid) {
+        try {
+          await FlutterDisplayMode.setHighRefreshRate();
+        } catch (_) {}
       }
-    }
+      try {
+        await NotificationService().initNotification();
+      } catch (_) {}
+    });
   }
 
   static Future<void> closeApp({required BuildContext context}) async {
@@ -93,7 +95,6 @@ class Utility {
         subject: Constant.feedbackSubject,
         recipients: [Constant.applicationHandleEmail],
         attachmentPaths: [screenshotFilePath],
-        isHTML: false,
       );
       await FlutterEmailSender.send(email);
     });
@@ -184,12 +185,12 @@ class Utility {
         if (bytes != null && signatureController.isNotEmpty) {
           final Directory applicationDocumentDirectory =
               await getApplicationDocumentsDirectory();
-          String path = applicationDocumentDirectory.path;
+          final String path = applicationDocumentDirectory.path;
           // create directory on external storage
           await Directory('$path/Images/signatures').create(recursive: true);
           final String fullImageName =
               "signature_itemid_${imageName}_${DateTime.now().millisecondsSinceEpoch}_${DateTime.now()}.png";
-          String fullPath = '$path/Images/signatures/$fullImageName';
+          final String fullPath = '$path/Images/signatures/$fullImageName';
           final File file = File(fullPath);
           await file.writeAsBytes(bytes, flush: true);
           return p.join("Images", "signatures", fullImageName);

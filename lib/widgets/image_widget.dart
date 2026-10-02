@@ -51,7 +51,6 @@ class ImageWidget extends ConsumerWidget {
             width: width,
             fit: fit,
             gaplessPlayback: true,
-            filterQuality: FilterQuality.medium,
             errorBuilder: (_, _, _) =>
                 SizedBox(height: height, width: width, child: errorBuilder),
           ),

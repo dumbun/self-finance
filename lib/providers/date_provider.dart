@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'date_provider.g.dart';
 
-@Riverpod(keepAlive: false)
+@Riverpod()
 class DateNotifier extends _$DateNotifier {
   @override
   DateTime? build() => null;

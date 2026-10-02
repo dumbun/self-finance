@@ -45,8 +45,6 @@ class InputTextField extends StatelessWidget {
       keyboardType: keyboardType,
       textInputAction: TextInputAction.done,
       controller: controller,
-      enableSuggestions: true,
-      textAlign: TextAlign.start,
       decoration: InputDecoration(
         labelText: hintText,
         border: const OutlineInputBorder(),

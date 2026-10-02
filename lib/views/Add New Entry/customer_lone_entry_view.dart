@@ -96,7 +96,6 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
             key: _formKey,
             child: SingleChildScrollView(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   //taken amount
@@ -117,7 +116,6 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
                     hintText: Constant.rateOfIntrest,
                     controller: _rateOfIntrest,
                     keyboardType: const TextInputType.numberWithOptions(
-                      signed: false,
                       decimal: true,
                     ),
                   ),

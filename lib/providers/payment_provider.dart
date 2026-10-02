@@ -4,7 +4,7 @@ import 'package:self_finance/models/payment_model.dart';
 
 part 'payment_provider.g.dart';
 
-@Riverpod(keepAlive: false)
+@Riverpod()
 class PaymentByTrxId extends _$PaymentByTrxId {
   @override
   Stream<List<Payment>> build({required int transactionId}) {

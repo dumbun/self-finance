@@ -123,18 +123,6 @@ class UserBackEnd {
     return row?.read(d.userTable.id) ?? 0;
   }
 
-  static Future<bool> fetchUserPIN(int id) async {
-    final d = await db();
-    final row =
-        await (d.select(d.userTable)
-              ..where((t) => t.id.equals(id))
-              ..limit(1))
-            .getSingleOrNull();
-
-    if (row == null) return false;
-    return row.userPin.isNotEmpty;
-  }
-
   static Future<int> updateUserName({
     required int id,
     required String newUserName,

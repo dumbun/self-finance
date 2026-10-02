@@ -84,7 +84,7 @@ class _InputDatePickerState extends ConsumerState<InputDatePicker> {
       //   ),
       // ),
       onTap: () async {
-        DateTime? pickedDate = await showDatePicker(
+        final DateTime? pickedDate = await showDatePicker(
           locale: const Locale('en', 'GB'),
           context: context,
           keyboardType: TextInputType.text,

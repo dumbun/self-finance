@@ -23,7 +23,6 @@ class TimelineWidget extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               BodyTwoDefaultText(
@@ -34,17 +33,14 @@ class TimelineWidget extends StatelessWidget {
               const SizedBox(height: 14),
 
               TimelineTile(
-                alignment: TimelineAlign.start,
                 lineXY: 0.08, // position of the line
                 isFirst: true,
-                isLast: false,
                 indicatorStyle: const IndicatorStyle(width: 10),
                 beforeLineStyle: const LineStyle(thickness: 2),
                 afterLineStyle: const LineStyle(thickness: 2),
                 endChild: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       BodyTwoDefaultText(
@@ -66,13 +62,9 @@ class TimelineWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-
-                hasIndicator: true,
               ),
               TimelineTile(
-                alignment: TimelineAlign.start,
                 lineXY: 0.08, // position of the line
-                isFirst: false,
                 isLast: true,
                 indicatorStyle: const IndicatorStyle(width: 10),
                 beforeLineStyle: const LineStyle(thickness: 2),
@@ -80,7 +72,6 @@ class TimelineWidget extends StatelessWidget {
                 endChild: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       BodyTwoDefaultText(
@@ -101,7 +92,6 @@ class TimelineWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-                hasIndicator: true,
               ),
               const SizedBox(height: 14),
             ],

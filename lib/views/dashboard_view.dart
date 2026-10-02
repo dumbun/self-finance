@@ -18,7 +18,7 @@ class DashboardView extends StatefulWidget {
 }
 
 class _DashboardViewState extends State<DashboardView> {
-  final PageController _pageController = PageController(initialPage: 0);
+  final PageController _pageController = PageController();
   final ValueNotifier<int> _selectedIndex = ValueNotifier<int>(0);
 
   @override
@@ -52,17 +52,19 @@ class _DashboardViewState extends State<DashboardView> {
       ),
       drawer: const DrawerWidget(),
       body: SafeArea(
-        child: PageView(
+        child: PageView.builder(
+          itemCount: 4,
+          itemBuilder: (context, index) => switch (index) {
+            0 => const HomeScreen(),
+            1 => const TransactionsView(),
+            2 => const EMICalculatorView(),
+            3 => const HistoryView(),
+            _ => const HomeScreen(),
+          },
           controller: _pageController,
           onPageChanged: (int index) {
             _selectedIndex.value = index;
           },
-          children: const [
-            HomeScreen(),
-            TransactionsView(),
-            EMICalculatorView(),
-            HistoryView(),
-          ],
         ),
       ),
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,

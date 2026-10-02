@@ -37,7 +37,6 @@ class PinInputWidget extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Pinput(
-        toolbarEnabled: true,
         errorTextStyle: const TextStyle(
           fontFamily: "hell",
           fontStyle: FontStyle.italic,
@@ -46,9 +45,6 @@ class PinInputWidget extends StatelessWidget {
         ),
         readOnly: readOnly,
         obscureText: obscureText,
-        length: 4,
-        closeKeyboardWhenCompleted: true,
-        keyboardType: TextInputType.number,
         focusedPinTheme: defaultPinTheme.copyWith(
           decoration: defaultPinTheme.decoration!.copyWith(
             borderRadius: BorderRadius.circular(8),

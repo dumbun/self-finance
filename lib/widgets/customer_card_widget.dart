@@ -29,8 +29,6 @@ class CustomerCardWidget extends ConsumerWidget {
                     );
                   }
                   return Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       CircularImageWidget(
                         customeSize: 46,

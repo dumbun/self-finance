@@ -271,10 +271,6 @@ class _CurrencyTile extends StatelessWidget {
       theme: CurrencyPickerThemeData(bottomSheetHeight: 720),
       useRootNavigator: true,
       context: context,
-      showFlag: true,
-      showSearchField: true,
-      showCurrencyName: true,
-      showCurrencyCode: true,
       onSelect: (Currency selected) {
         ref
             .read(userProvider.notifier)

@@ -46,7 +46,6 @@ class CustomerConformationView extends ConsumerStatefulWidget {
 class _CustomerConformationViewState
     extends ConsumerState<CustomerConformationView> {
   final SignatureController _signatureGlobalKey = SignatureController(
-    penColor: Colors.black,
     exportPenColor: Colors.black,
     exportBackgroundColor: Colors.white,
     penStrokeWidth: 5,
@@ -74,12 +73,9 @@ class _CustomerConformationViewState
 
   Column _buildImagePickers() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Expanded(
               child: ImagePickerWidget(

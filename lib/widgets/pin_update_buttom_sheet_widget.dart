@@ -66,7 +66,6 @@ class _PinUpdatebuttomSheetWidgetState
             const SizedBox(height: 18),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _buildActionButton(
                   onPressed: () {

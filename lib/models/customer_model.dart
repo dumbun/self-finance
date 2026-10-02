@@ -34,7 +34,7 @@ class Customer {
         address: e["Customer_Address"] as String,
         number: e["Contact_Number"] as String,
         photo: e["Customer_Photo"] as String,
-        proof: (e["Proof_Photo"] as String),
+        proof: e["Proof_Photo"] as String,
         createdDate: e["Created_Date"] as DateTime,
       );
     }).toList();

@@ -42,8 +42,6 @@ class ProofButton extends ConsumerWidget {
               child: Padding(
                 padding: EdgeInsets.all(14),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(width: 12),
                     Icon(

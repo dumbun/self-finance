@@ -6,9 +6,6 @@ import 'package:drift/native.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
-
 import 'package:self_finance/core/logic/logic.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
@@ -17,6 +14,7 @@ import 'package:self_finance/models/payment_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history_model.dart';
 import 'package:self_finance/threads/threads.dart';
+import 'package:self_finance/models/trx_with_customer_model.dart';
 
 import 'db_paths.dart';
 
@@ -482,48 +480,9 @@ class BackEnd {
   static DateTime _dayEnd(DateTime d) =>
       _dayStart(d).add(const Duration(days: 1));
 
-  static DateTime _monthStart(DateTime d) => DateTime(d.year, d.month, 1);
-  static DateTime _monthEnd(DateTime d) => DateTime(d.year, d.month + 1, 1);
+  static DateTime _monthStart(DateTime d) => DateTime(d.year, d.month);
+  static DateTime _monthEnd(DateTime d) => DateTime(d.year, d.month + 1);
 
-  static Future<double> _sumTransactionsInRange(
-    ItDataDatabase d,
-    DateTime start,
-    DateTime end,
-  ) async {
-    final totalExpr = d.transactionsTable.amount.sum();
-
-    final row =
-        await (d.selectOnly(d.transactionsTable)
-              ..addColumns([totalExpr])
-              ..where(
-                d.transactionsTable.transactionDate.isBiggerOrEqualValue(
-                      start,
-                    ) &
-                    d.transactionsTable.transactionDate.isSmallerThanValue(end),
-              ))
-            .getSingle();
-
-    return (row.read(totalExpr) ?? 0).toDouble();
-  }
-
-  static Future<double> _sumPaymentsInRange(
-    ItDataDatabase d,
-    DateTime start,
-    DateTime end,
-  ) async {
-    final totalExpr = d.paymentsTable.amountPaid.sum();
-
-    final row =
-        await (d.selectOnly(d.paymentsTable)
-              ..addColumns([totalExpr])
-              ..where(
-                d.paymentsTable.paymentDate.isBiggerOrEqualValue(start) &
-                    d.paymentsTable.paymentDate.isSmallerThanValue(end),
-              ))
-            .getSingle();
-
-    return (row.read(totalExpr) ?? 0).toDouble();
-  }
 
   // ===========================================================================
   // CUSTOMERS
@@ -564,6 +523,9 @@ class BackEnd {
       d.customersTable,
     )..orderBy([(t) => OrderingTerm.asc(t.customerName)])).get();
 
+    if (rows.length < 500) {
+      return Threads.computeAllCustomersDetails(rows);
+    }
     return await compute(Threads.computeAllCustomersDetails, rows);
   }
 
@@ -576,42 +538,6 @@ class BackEnd {
             .get();
 
     return rows.map((r) => r.read(d.customersTable.contactNumber)!).toList();
-  }
-
-  static Future<List<Contact>> fetchAllCustomerNumbersWithNames() async {
-    final d = await db();
-    final List<TypedResult> rows =
-        await (d.selectOnly(d.customersTable)
-              ..addColumns([
-                d.customersTable.customerId,
-                d.customersTable.customerName,
-                d.customersTable.contactNumber,
-              ])
-              ..orderBy([OrderingTerm.asc(d.customersTable.customerName)]))
-            .get();
-
-    return rows
-        .map(
-          (TypedResult r) => Contact(
-            id: r.read(d.customersTable.customerId)!,
-            name: r.read(d.customersTable.customerName)!,
-            number: r.read(d.customersTable.contactNumber)!,
-          ),
-        )
-        .toList();
-  }
-
-  static Future<String> fetchRequriedCustomerName(int id) async {
-    final ItDataDatabase d = await db();
-    final row =
-        await (d.selectOnly(d.customersTable)
-              ..addColumns([d.customersTable.customerName])
-              ..where(d.customersTable.customerId.equals(id))
-              ..limit(1))
-            .getSingleOrNull();
-
-    if (row == null) throw Exception('Customer not found');
-    return row.read(d.customersTable.customerName)!;
   }
 
   static Future<List<Customer>> fetchSingleContactDetails({
@@ -728,58 +654,6 @@ class BackEnd {
         );
   }
 
-  static Future<List<Items>> fetchAllItems() async {
-    final d = await db();
-    final rows = await (d.select(
-      d.itemsTable,
-    )..orderBy([(t) => OrderingTerm.desc(t.createdDate)])).get();
-
-    return rows
-        .map(
-          (r) => Items(
-            id: r.itemId,
-            customerid: r.customerId,
-            name: r.itemName,
-            description: r.itemDescription,
-            pawnedDate: r.pawnedDate,
-            expiryDate: r.expiryDate,
-            pawnAmount: r.pawnAmount,
-            status: r.itemStatus,
-            photo: r.itemPhoto,
-            createdDate: r.createdDate,
-          ),
-        )
-        .toList();
-  }
-
-  static Future<List<Items>> fetchitemOfRequriedCustomer({
-    required int customerID,
-  }) async {
-    final d = await db();
-    final rows =
-        await (d.select(d.itemsTable)
-              ..where((t) => t.customerId.equals(customerID))
-              ..orderBy([(t) => OrderingTerm.desc(t.createdDate)]))
-            .get();
-
-    return rows
-        .map(
-          (r) => Items(
-            id: r.itemId,
-            customerid: r.customerId,
-            name: r.itemName,
-            description: r.itemDescription,
-            pawnedDate: r.pawnedDate,
-            expiryDate: r.expiryDate,
-            pawnAmount: r.pawnAmount,
-            status: r.itemStatus,
-            photo: r.itemPhoto,
-            createdDate: r.createdDate,
-          ),
-        )
-        .toList();
-  }
-
   static Future<List<Items>> fetchRequriedItem({required int itemId}) async {
     final d = await db();
     final row =
@@ -836,35 +710,87 @@ class BackEnd {
         );
   }
 
+  static Future<int> createNewTransactionAtomic({
+    required Items item,
+    required Trx Function(int itemId) transactionBuilder,
+    required UserHistory Function(int itemId, int transactionId) historyBuilder,
+  }) async {
+    if (item.name.trim().isEmpty) {
+      throw ArgumentError('Item name cannot be empty');
+    }
+    if (item.pawnAmount <= 0) {
+      throw ArgumentError('Pawn amount must be greater than 0');
+    }
+
+    final d = await db();
+    return await d.transaction(() async {
+      final itemId = await d
+          .into(d.itemsTable)
+          .insert(
+            ItemsTableCompanion.insert(
+              customerId: item.customerid,
+              itemName: item.name.trim(),
+              itemDescription: item.description.trim(),
+              pawnedDate: item.pawnedDate,
+              expiryDate: item.expiryDate,
+              pawnAmount: item.pawnAmount,
+              itemStatus: item.status,
+              itemPhoto: item.photo,
+              createdDate: item.createdDate,
+            ),
+          );
+
+      final transaction = transactionBuilder(itemId);
+      if (transaction.amount <= 0) {
+        throw ArgumentError('Transaction amount must be greater than 0');
+      }
+      if (transaction.intrestRate < 0) {
+        throw ArgumentError('Interest rate cannot be negative');
+      }
+
+      final transactionId = await d
+          .into(d.transactionsTable)
+          .insert(
+            TransactionsTableCompanion.insert(
+              customerId: transaction.customerId,
+              itemId: itemId,
+              transactionDate: transaction.transacrtionDate,
+              transactionType: transaction.transacrtionType,
+              amount: transaction.amount,
+              interestRate: transaction.intrestRate,
+              interestAmount: transaction.intrestAmount,
+              remainingAmount: transaction.remainingAmount,
+              signature: transaction.signature,
+              createdDate: transaction.createdDate,
+            ),
+          );
+
+      final history = historyBuilder(itemId, transactionId);
+      await d
+          .into(d.historyTable)
+          .insert(
+            HistoryTableCompanion.insert(
+              userId: history.userID,
+              customerId: history.customerID,
+              customerName: history.customerName,
+              contactNumber: history.customerNumber,
+              itemId: itemId,
+              transactionId: transactionId,
+              amount: history.amount,
+              eventDate: history.eventDate,
+              eventType: history.eventType,
+            ),
+          );
+
+      return transactionId;
+    });
+  }
+
   static Future<List<Trx>> fetchAllTransactions() async {
     final d = await db();
     final rows = await (d.select(
       d.transactionsTable,
     )..orderBy([(t) => OrderingTerm.desc(t.transactionId)])).get();
-
-    return rows.map(_trxFromRow).toList();
-  }
-
-  static Future<List<Trx>> fetchActiveTransactions() async {
-    final d = await db();
-    final rows =
-        await (d.select(d.transactionsTable)
-              ..where((t) => t.transactionType.equals('Active'))
-              ..orderBy([(t) => OrderingTerm.desc(t.transactionDate)]))
-            .get();
-
-    return rows.map(_trxFromRow).toList();
-  }
-
-  static Future<List<Trx>> fetchRequriedCustomerTransactions({
-    required int customerId,
-  }) async {
-    final d = await db();
-    final rows =
-        await (d.select(d.transactionsTable)
-              ..where((t) => t.customerId.equals(customerId))
-              ..orderBy([(t) => OrderingTerm.desc(t.transactionDate)]))
-            .get();
 
     return rows.map(_trxFromRow).toList();
   }
@@ -883,18 +809,6 @@ class BackEnd {
     return [_trxFromRow(row)];
   }
 
-  static Future<double> fetchSumOfTakenAmount() async {
-    final d = await db();
-    final rows = await d
-        .customSelect(
-          'SELECT COALESCE(SUM(Amount), 0) as total FROM Transactions WHERE Transaction_Type = ?',
-          variables: const [Variable<String>('Active')],
-        )
-        .get();
-
-    return (rows.first.data['total'] as num).toDouble();
-  }
-
   static Future<int> updateTransactionAsPaid({
     required int id,
     required double intrestAmount,
@@ -911,58 +825,56 @@ class BackEnd {
     );
   }
 
-  /// ✅ DATE RANGE instead of equals (handles time too)
-  static Future<List<Trx>> fetchTransactionsByDate({
-    required DateTime inputDate,
+  static Future<void> markTransactionAsPaidAtomic({
+    required Payment payment,
+    required int transactionId,
+    required double interestAmount,
+    required UserHistory history,
   }) async {
-    try {
-      final d = await db();
-      final start = _dayStart(inputDate);
-      final end = _dayEnd(inputDate);
-
-      final rows =
-          await (d.select(d.transactionsTable)
-                ..where(
-                  (t) =>
-                      t.transactionDate.isBiggerOrEqualValue(start) &
-                      t.transactionDate.isSmallerThanValue(end),
-                )
-                ..orderBy([(t) => OrderingTerm.desc(t.createdDate)]))
-              .get();
-
-      return rows.map(_trxFromRow).toList();
-    } on SqliteException catch (e) {
-      throw Exception('Database error while fetching transactions: $e');
-    } catch (e) {
-      throw Exception('Failed to fetch transactions by date: $e');
-    }
-  }
-
-  static Future<List<Trx>> fetchTransactionsByAge({required int months}) async {
-    if (![1, 3, 6, 12].contains(months)) {
-      throw ArgumentError('Months must be one of: 1, 3, 6, or 12');
+    if (payment.amountpaid <= 0) {
+      throw ArgumentError('Payment amount must be greater than 0');
     }
 
-    try {
-      final d = await db();
-      final now = DateTime.now();
-      final cutoff = DateTime(now.year, now.month - months, now.day);
+    final d = await db();
+    await d.transaction(() async {
+      await d
+          .into(d.paymentsTable)
+          .insert(
+            PaymentsTableCompanion.insert(
+              transactionId: payment.transactionId,
+              paymentDate: payment.paymentDate,
+              amountPaid: payment.amountpaid,
+              paymentType: payment.type,
+              createdDate: payment.createdDate,
+            ),
+          );
 
-      final rows =
-          await (d.select(d.transactionsTable)
-                ..where((t) => t.transactionDate.isSmallerThanValue(cutoff))
-                ..orderBy([
-                  (t) => OrderingTerm.desc(t.transactionDate),
-                  (t) => OrderingTerm.desc(t.transactionId),
-                ]))
-              .get();
+      await (d.update(
+        d.transactionsTable,
+      )..where((t) => t.transactionId.equals(transactionId))).write(
+        TransactionsTableCompanion(
+          transactionType: const Value('Inactive'),
+          interestAmount: Value(interestAmount),
+          updatedDate: Value(DateTime.now().toIso8601String()),
+        ),
+      );
 
-      return rows.map(_trxFromRow).toList();
-    } on SqliteException catch (e) {
-      throw Exception('Database error while fetching transactions: $e');
-    } catch (e) {
-      throw Exception('Failed to fetch transactions by age: $e');
-    }
+      await d
+          .into(d.historyTable)
+          .insert(
+            HistoryTableCompanion.insert(
+              userId: history.userID,
+              customerId: history.customerID,
+              customerName: history.customerName,
+              contactNumber: history.customerNumber,
+              itemId: history.itemID,
+              transactionId: history.transactionID,
+              amount: history.amount,
+              eventDate: history.eventDate,
+              eventType: history.eventType,
+            ),
+          );
+    });
   }
 
   static Future<Map<String, int>> deleteTransaction({
@@ -1082,30 +994,6 @@ class BackEnd {
   // HISTORY
   // ===========================================================================
 
-  static Future<List<UserHistory>> fetchAllUserHistory() async {
-    final d = await db();
-    final rows = await (d.select(
-      d.historyTable,
-    )..orderBy([(t) => OrderingTerm.desc(t.eventDate)])).get();
-
-    return rows
-        .map(
-          (r) => UserHistory(
-            id: r.historyId,
-            userID: r.userId,
-            customerID: r.customerId,
-            customerName: r.customerName,
-            customerNumber: r.contactNumber,
-            itemID: r.itemId,
-            transactionID: r.transactionId,
-            amount: r.amount,
-            eventDate: r.eventDate,
-            eventType: r.eventType,
-          ),
-        )
-        .toList();
-  }
-
   static Future<int> createNewHistory(UserHistory history) async {
     final d = await db();
     return await d
@@ -1125,65 +1013,11 @@ class BackEnd {
         );
   }
 
-  static Future<int> deleteHistory({required int transactionId}) async {
-    final d = await db();
-    try {
-      return await d.transaction(() async {
-        return (d.delete(
-          d.historyTable,
-        )..where((t) => t.transactionId.equals(transactionId))).go();
-      });
-    } catch (e) {
-      throw Exception('Database error while deleting history: $e');
-    }
-  }
-
   // ===========================================================================
   // STREAMS (reactive)
   // ===========================================================================
 
   // CUSTOMERS streams
-  static Stream<List<Customer>> watchAllCustomerData() {
-    return Stream.fromFuture(db()).asyncExpand((d) {
-      final q = (d.select(
-        d.customersTable,
-      )..orderBy([(t) => OrderingTerm.asc(t.customerName)])).watch();
-
-      return q.map(
-        (rows) => rows
-            .map(
-              (r) => Customer(
-                id: r.customerId,
-                userID: r.userId,
-                name: r.customerName,
-                guardianName: r.gaurdianName,
-                address: r.customerAddress,
-                number: r.contactNumber,
-                photo: r.customerPhoto,
-                proof: r.proofPhoto,
-                createdDate: r.createdDate,
-              ),
-            )
-            .toList(),
-      );
-    });
-  }
-
-  static Stream<List<String>> watchAllCustomerNumbers() {
-    return Stream.fromFuture(db()).asyncExpand((d) {
-      final Stream<List<TypedResult>> q =
-          (d.selectOnly(d.customersTable)
-                ..addColumns([d.customersTable.contactNumber])
-                ..orderBy([OrderingTerm.asc(d.customersTable.contactNumber)]))
-              .watch();
-
-      return q.map(
-        (rows) =>
-            rows.map((r) => r.read(d.customersTable.contactNumber)!).toList(),
-      );
-    });
-  }
-
   static Stream<List<Contact>> watchAllCustomerNumbersWithNames() {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final Stream<List<TypedResult>> q =
@@ -1216,23 +1050,6 @@ class BackEnd {
     });
   }
 
-  static Stream<String> watchRequriedCustomerName({required int customerId}) {
-    return Stream.fromFuture(db()).asyncExpand((d) {
-      final q =
-          (d.selectOnly(d.customersTable)
-                ..addColumns([d.customersTable.customerName])
-                ..where(d.customersTable.customerId.equals(customerId))
-                ..limit(1))
-              .watch();
-
-      return q.map(
-        (rows) => rows.isEmpty
-            ? ''
-            : (rows.first.read(d.customersTable.customerName) ?? ''),
-      );
-    });
-  }
-
   static Stream<Customer?> watchSingleCustomer({required int id}) {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final q =
@@ -1258,64 +1075,6 @@ class BackEnd {
   }
 
   // ITEMS streams
-  static Stream<List<Items>> watchAllItems() {
-    return Stream.fromFuture(db()).asyncExpand((d) {
-      final q = (d.select(
-        d.itemsTable,
-      )..orderBy([(t) => OrderingTerm.desc(t.createdDate)])).watch();
-
-      return q.map(
-        (rows) => rows
-            .map(
-              (r) => Items(
-                id: r.itemId,
-                customerid: r.customerId,
-                name: r.itemName,
-                description: r.itemDescription,
-                pawnedDate: r.pawnedDate,
-                expiryDate: r.expiryDate,
-                pawnAmount: r.pawnAmount,
-                status: r.itemStatus,
-                photo: r.itemPhoto,
-                createdDate: r.createdDate,
-              ),
-            )
-            .toList(),
-      );
-    });
-  }
-
-  static Stream<List<Items>> watchitemOfRequriedCustomer({
-    required int customerID,
-  }) {
-    return Stream.fromFuture(db()).asyncExpand((d) {
-      final q =
-          (d.select(d.itemsTable)
-                ..where((t) => t.customerId.equals(customerID))
-                ..orderBy([(t) => OrderingTerm.desc(t.createdDate)]))
-              .watch();
-
-      return q.map(
-        (rows) => rows
-            .map(
-              (r) => Items(
-                id: r.itemId,
-                customerid: r.customerId,
-                name: r.itemName,
-                description: r.itemDescription,
-                pawnedDate: r.pawnedDate,
-                expiryDate: r.expiryDate,
-                pawnAmount: r.pawnAmount,
-                status: r.itemStatus,
-                photo: r.itemPhoto,
-                createdDate: r.createdDate,
-              ),
-            )
-            .toList(),
-      );
-    });
-  }
-
   static Stream<Items?> watchRequriedItem({required int itemId}) {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final q =
@@ -1343,7 +1102,6 @@ class BackEnd {
     });
   }
 
-  // TRANSACTIONS streams
   static Stream<List<Trx>> watchAllTransactions() {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final Stream<List<TransactionRow>> q = (d.select(
@@ -1360,15 +1118,41 @@ class BackEnd {
     });
   }
 
-  static Stream<List<Trx>> watchActiveTransactions() {
+  /// Returns a joined stream of transactions + their customer's name & photo
+  /// in a single SQL query — eliminates N+1 per-row subscriptions in the list UI.
+  static Stream<List<TrxWithCustomer>> watchTransactionsWithCustomer() {
     return Stream.fromFuture(db()).asyncExpand((d) {
-      final Stream<List<TransactionRow>> q =
-          (d.select(d.transactionsTable)
-                ..where((t) => t.transactionType.equals('Active'))
-                ..orderBy([(t) => OrderingTerm.desc(t.transactionDate)]))
+      final t = d.transactionsTable;
+      final c = d.customersTable;
+
+      final q =
+          (d.select(t).join([
+                leftOuterJoin(c, c.customerId.equalsExp(t.customerId)),
+              ])
+                ..orderBy([OrderingTerm.desc(t.transactionId)]))
               .watch();
 
-      return q.map((rows) => rows.map(_trxFromRow).toList());
+      return q.map((rows) {
+        return rows.map((row) {
+          final txn = row.readTable(t);
+          final cust = row.readTableOrNull(c);
+          return TrxWithCustomer(
+            id: txn.transactionId,
+            customerId: txn.customerId,
+            itemId: txn.itemId,
+            transactionDate: txn.transactionDate,
+            transactionType: txn.transactionType,
+            amount: txn.amount,
+            interestRate: txn.interestRate,
+            interestAmount: txn.interestAmount,
+            remainingAmount: txn.remainingAmount,
+            signature: txn.signature,
+            createdDate: txn.createdDate,
+            customerName: cust?.customerName ?? '',
+            customerPhoto: cust?.customerPhoto ?? '',
+          );
+        }).toList();
+      });
     });
   }
 
@@ -1395,25 +1179,6 @@ class BackEnd {
               .watch();
 
       return q.map((rows) => rows.isEmpty ? null : _trxFromRow(rows.first));
-    });
-  }
-
-  static Stream<double> watchSumOfTakenAmount() {
-    return Stream.fromFuture(db()).asyncExpand((d) {
-      final Stream<List<QueryRow>> q = d
-          .customSelect(
-            '''
-        SELECT COALESCE(SUM(Amount), 0) AS total
-        FROM Transactions WHERE Transaction_Type = 'Active'
-        ''',
-            readsFrom: {d.transactionsTable},
-          )
-          .watch();
-
-      return q.map((rows) {
-        final num n = (rows.first.data['total'] as num?) ?? 0;
-        return n.toDouble();
-      });
     });
   }
 
@@ -1457,6 +1222,97 @@ class BackEnd {
               .watch();
 
       return q.map((rows) => rows.map(_trxFromRow).toList());
+    });
+  }
+
+  /// Joined variant of [watchTransactionsByDate] — returns [TrxWithCustomer].
+  static Stream<List<TrxWithCustomer>> watchTransactionsByDateWithCustomer({
+    required DateTime inputDate,
+  }) {
+    return Stream.fromFuture(db()).asyncExpand((d) {
+      final start = _dayStart(inputDate);
+      final end = _dayEnd(inputDate);
+      final t = d.transactionsTable;
+      final c = d.customersTable;
+
+      final q =
+          (d.select(t).join([leftOuterJoin(c, c.customerId.equalsExp(t.customerId))])
+                ..where(
+                  t.transactionDate.isBiggerOrEqualValue(start) &
+                      t.transactionDate.isSmallerThanValue(end),
+                )
+                ..orderBy([OrderingTerm.desc(t.createdDate)]))
+              .watch();
+
+      return q.map(
+        (rows) => rows.map((row) {
+          final txn = row.readTable(t);
+          final cust = row.readTableOrNull(c);
+          return TrxWithCustomer(
+            id: txn.transactionId,
+            customerId: txn.customerId,
+            itemId: txn.itemId,
+            transactionDate: txn.transactionDate,
+            transactionType: txn.transactionType,
+            amount: txn.amount,
+            interestRate: txn.interestRate,
+            interestAmount: txn.interestAmount,
+            remainingAmount: txn.remainingAmount,
+            signature: txn.signature,
+            createdDate: txn.createdDate,
+            customerName: cust?.customerName ?? '',
+            customerPhoto: cust?.customerPhoto ?? '',
+          );
+        }).toList(),
+      );
+    });
+  }
+
+
+  /// Joined variant of [watchTransactionsByAge] — returns [TrxWithCustomer].
+  static Stream<List<TrxWithCustomer>> watchTransactionsByAgeWithCustomer({
+    required int months,
+  }) {
+    if (![1, 3, 6, 12].contains(months)) {
+      throw ArgumentError('Months must be one of: 1, 3, 6, or 12');
+    }
+
+    return Stream.fromFuture(db()).asyncExpand((d) {
+      final now = DateTime.now();
+      final cutoff = DateTime(now.year, now.month - months, now.day);
+      final t = d.transactionsTable;
+      final c = d.customersTable;
+
+      final q =
+          (d.select(t).join([leftOuterJoin(c, c.customerId.equalsExp(t.customerId))])
+                ..where(t.transactionDate.isSmallerThanValue(cutoff))
+                ..orderBy([
+                  OrderingTerm.desc(t.transactionDate),
+                  OrderingTerm.desc(t.transactionId),
+                ]))
+              .watch();
+
+      return q.map(
+        (rows) => rows.map((row) {
+          final txn = row.readTable(t);
+          final cust = row.readTableOrNull(c);
+          return TrxWithCustomer(
+            id: txn.transactionId,
+            customerId: txn.customerId,
+            itemId: txn.itemId,
+            transactionDate: txn.transactionDate,
+            transactionType: txn.transactionType,
+            amount: txn.amount,
+            interestRate: txn.interestRate,
+            interestAmount: txn.interestAmount,
+            remainingAmount: txn.remainingAmount,
+            signature: txn.signature,
+            createdDate: txn.createdDate,
+            customerName: cust?.customerName ?? '',
+            customerPhoto: cust?.customerPhoto ?? '',
+          );
+        }).toList(),
+      );
     });
   }
 
@@ -1520,6 +1376,76 @@ class BackEnd {
   // ANALYTICS (streams)
   // ===========================================================================
 
+  // ---------------------------------------------------------------------------
+  // Outstanding calculation cache & helpers — the LoanCalculator loop is
+  // CPU-bound. To ensure optimal performance:
+  // 1. Results are cached and only recalculated when active loans actually
+  //    change (amount, rate, transactionDate, or list membership) or when the
+  //    calendar date changes (since interest accrues daily).
+  // 2. Unrelated stream ticks (e.g. customer changes, payments, or duplicate
+  //    notifications from _combineLatest2) hit the cache with zero overhead.
+  // 3. For small datasets (<20 loans), calculation runs inline to avoid isolate
+  //    spawning latency (~2ms). For larger datasets (>=20 loans), it is
+  //    offloaded to a background isolate via compute() to keep UI frame rates
+  //    fluid (60/120fps).
+  // ---------------------------------------------------------------------------
+
+  static List<TransactionRow>? _cachedActiveLoans;
+  static double _cachedOutstanding = 0.0;
+  static DateTime? _cachedCalcDate;
+
+  /// Checks whether two lists of active [TransactionRow]s have identical
+  /// properties affecting [LoanCalculator] results.
+  static bool _areActiveLoansEqual(
+    List<TransactionRow>? a,
+    List<TransactionRow> b,
+  ) {
+    if (a == null) return false;
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      final ra = a[i];
+      final rb = b[i];
+      if (ra.transactionId != rb.transactionId ||
+          ra.amount != rb.amount ||
+          ra.interestRate != rb.interestRate ||
+          ra.transactionDate != rb.transactionDate) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Converts active [TransactionRow]s into serialisable maps for compute().
+  static List<Map<String, Object>> _buildLoanPayloads(
+    List<TransactionRow> rows,
+  ) {
+    return rows
+        .map(
+          (r) => <String, Object>{
+            'amount': r.amount,
+            'rate': r.interestRate,
+            // millisecondsSinceEpoch is a plain int — safe across isolates
+            'dateMs': r.transactionDate.millisecondsSinceEpoch,
+          },
+        )
+        .toList();
+  }
+
+  /// Runs inside the background isolate — must be a static method.
+  static double _computeOutstanding(List<Map<String, Object>> payloads) {
+    double total = 0.0;
+    for (final p in payloads) {
+      final l = LoanCalculator(
+        takenAmount: p['amount']! as double,
+        rateOfInterest: p['rate']! as double,
+        takenDate: DateTime.fromMillisecondsSinceEpoch(p['dateMs']! as int),
+      );
+      total += l.totalAmount;
+    }
+    return total;
+  }
+
   static Stream<Map<String, num>> watchAnalyticsData() {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final base = d
@@ -1554,20 +1480,54 @@ class BackEnd {
         d.transactionsTable,
       )..where((t) => t.transactionType.equals('Active'))).watch();
 
-      return _combineLatest2(base, activeTxns, (baseRows, activeRows) {
+      // Combine both streams and use asyncMap so we can await the compute()
+      // future when recalculation is necessary.
+      return _combineLatest2(
+        base,
+        activeTxns,
+        (baseRows, activeRows) => (baseRows, activeRows),
+      ).asyncMap((
+        (List<QueryRow>, List<TransactionRow>) pair,
+      ) async {
+        final (baseRows, activeRows) = pair;
         final row = baseRows.first.data;
 
-        double totalOutstanding = 0.0;
-        for (final t in activeRows) {
-          final l = LoanCalculator(
-            takenAmount: t.amount,
-            rateOfInterest: t.interestRate,
-            takenDate: t.transactionDate,
-          );
-          totalOutstanding += l.totalAmount;
+        final today = AppDateUtils.dateOnly(DateTime.now());
+        final double totalOutstanding;
+
+        if (activeRows.isEmpty) {
+          totalOutstanding = 0.0;
+          _cachedActiveLoans = activeRows;
+          _cachedOutstanding = 0.0;
+          _cachedCalcDate = today;
+        } else if (_cachedCalcDate == today &&
+            _areActiveLoansEqual(_cachedActiveLoans, activeRows)) {
+          // Re-use cached result — avoid re-running LoanCalculator on every DB tick
+          // when active transactions haven't changed (e.g. customer/payment changes
+          // or duplicate stream events).
+          totalOutstanding = _cachedOutstanding;
+        } else {
+          // Threshold: spin up an isolate only when there is real work to justify
+          // the ~2 ms isolate-spawn overhead.
+          if (activeRows.length < 20) {
+            // Small dataset — run inline on the main isolate.
+            totalOutstanding = _computeOutstanding(
+              _buildLoanPayloads(activeRows),
+            );
+          } else {
+            // Large dataset — offload to a background isolate so the UI stays
+            // smooth regardless of how many active loans exist.
+            totalOutstanding = await compute(
+              _computeOutstanding,
+              _buildLoanPayloads(activeRows),
+            );
+          }
+          _cachedActiveLoans = activeRows;
+          _cachedOutstanding = totalOutstanding;
+          _cachedCalcDate = today;
         }
 
-        return {
+        return <String, num>{
           'totalCustomers': (row['totalCustomers'] as num?) ?? 0,
           'activeLoans': (row['activeLoans'] as num?) ?? 0,
           'outstandingAmount': totalOutstanding,
@@ -1581,8 +1541,8 @@ class BackEnd {
 
   static Stream<List<Map<String, dynamic>>> watchMonthlyChartData() {
     return Stream.fromFuture(db()).asyncExpand((d) {
-      final txns = (d.select(d.transactionsTable)).watch();
-      final pays = (d.select(d.paymentsTable)).watch();
+      final txns = d.select(d.transactionsTable).watch();
+      final pays = d.select(d.paymentsTable).watch();
 
       return _combineLatest2(txns, pays, (_, _) => 0).asyncMap((_) async {
         return fetchMonthlyChartData();
@@ -1601,97 +1561,9 @@ class BackEnd {
     _db = null;
   }
 
-  static Future<String> backupDatabase() async {
-    final d = await db();
-    final File dbFile = await d.dbFile;
-
-    final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final Directory backupDir = Directory(p.join(appDocDir.path, 'backups'));
-    await backupDir.create(recursive: true);
-
-    final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
-    final backupPath = p.join(backupDir.path, 'backup_$timestamp.db');
-
-    await dbFile.copy(backupPath);
-    return backupPath;
-  }
-
-  static Future<int> getDatabaseSize() async {
-    final d = await db();
-    final File file = await d.dbFile;
-    return file.length();
-  }
-
-  static Future<void> vacuumDatabase() async {
-    final d = await db();
-    await d.customStatement('VACUUM');
-  }
-
-  static Future<bool> checkDatabaseIntegrity() async {
-    final d = await db();
-    final rows = await d.customSelect('PRAGMA integrity_check').get();
-    return rows.isNotEmpty && rows.first.data['integrity_check'] == 'ok';
-  }
-
   // ===========================================================================
   // ANALYTICS (future)
   // ===========================================================================
-
-  static Future<Map<String, num>> fetchAnalyticsData() async {
-    final d = await db();
-
-    final rows = await d
-        .customSelect(
-          '''
-      SELECT
-        (SELECT COUNT(*) FROM Customers)  AS totalCustomers,
-
-        (SELECT COUNT(*)
-           FROM Transactions
-           WHERE Transaction_Type = ?)   AS activeLoans,
-
-        (SELECT COALESCE(SUM(Interest_Amount), 0)
-           FROM Transactions
-           WHERE Transaction_Type = ?)  AS interestEarned,
-
-        (SELECT COALESCE(SUM(Amount), 0)
-           FROM Transactions) AS totalDisbursed,
-
-        (SELECT COALESCE(SUM(Amount_Paid), 0)
-           FROM Payments)  AS paymentsReceived
-      ''',
-          variables: const [
-            Variable<String>('Active'),
-            Variable<String>('Inactive'),
-          ],
-        )
-        .get();
-
-    final row = rows.first.data;
-
-    final activeTxns = await (d.select(
-      d.transactionsTable,
-    )..where((t) => t.transactionType.equals('Active'))).get();
-
-    double totalOutstanding = 0.0;
-    for (final t in activeTxns) {
-      final l = LoanCalculator(
-        takenAmount: t.amount,
-        rateOfInterest: t.interestRate,
-        takenDate: t.transactionDate,
-      );
-      totalOutstanding += l.totalAmount;
-    }
-
-    return {
-      'totalCustomers': (row['totalCustomers'] as num?) ?? 0,
-      'activeLoans': (row['activeLoans'] as num?) ?? 0,
-      'outstandingAmount': totalOutstanding,
-      'interestEarned': (row['interestEarned'] as num?) ?? 0,
-      'totalDisbursed': (row['totalDisbursed'] as num?) ?? 0,
-      'paymentsReceived': (row['paymentsReceived'] as num?) ?? 0,
-    };
-  }
 
   // ===========================================================================
   // CHARTS (future) - ✅ DateTime ranges
@@ -1700,20 +1572,67 @@ class BackEnd {
   static Future<List<Map<String, dynamic>>> fetchMonthlyChartData() async {
     final d = await db();
     final now = DateTime.now();
+
+    final overallStart = _monthStart(DateTime(now.year, now.month - 5));
+    final overallEnd = _monthEnd(DateTime(now.year, now.month));
+
+    final txnQuery = (d.selectOnly(d.transactionsTable)
+          ..addColumns([
+            d.transactionsTable.transactionDate,
+            d.transactionsTable.amount,
+          ])
+          ..where(
+            d.transactionsTable.transactionDate.isBiggerOrEqualValue(
+                  overallStart,
+                ) &
+                d.transactionsTable.transactionDate.isSmallerThanValue(
+                  overallEnd,
+                ),
+          ))
+        .get();
+
+    final payQuery = (d.selectOnly(d.paymentsTable)
+          ..addColumns([
+            d.paymentsTable.paymentDate,
+            d.paymentsTable.amountPaid,
+          ])
+          ..where(
+            d.paymentsTable.paymentDate.isBiggerOrEqualValue(overallStart) &
+                d.paymentsTable.paymentDate.isSmallerThanValue(overallEnd),
+          ))
+        .get();
+
+    final queryResults = await Future.wait([txnQuery, payQuery]);
+    final txnRows = queryResults[0];
+    final payRows = queryResults[1];
+
+    final Map<String, double> disbursedByMonth = {};
+    for (final r in txnRows) {
+      final dt = r.read(d.transactionsTable.transactionDate);
+      if (dt == null) continue;
+      final k = '${dt.year}-${dt.month}';
+      final amt = r.read(d.transactionsTable.amount) ?? 0.0;
+      disbursedByMonth[k] = (disbursedByMonth[k] ?? 0.0) + amt;
+    }
+
+    final Map<String, double> receivedByMonth = {};
+    for (final r in payRows) {
+      final dt = r.read(d.paymentsTable.paymentDate);
+      if (dt == null) continue;
+      final k = '${dt.year}-${dt.month}';
+      final amt = r.read(d.paymentsTable.amountPaid) ?? 0.0;
+      receivedByMonth[k] = (receivedByMonth[k] ?? 0.0) + amt;
+    }
+
     final results = <Map<String, dynamic>>[];
-
     for (int i = 5; i >= 0; i--) {
-      final monthDate = DateTime(now.year, now.month - i, 1);
-      final start = _monthStart(monthDate);
-      final end = _monthEnd(monthDate);
-
-      final disbursed = await _sumTransactionsInRange(d, start, end);
-      final received = await _sumPaymentsInRange(d, start, end);
+      final monthDate = DateTime(now.year, now.month - i);
+      final k = '${monthDate.year}-${monthDate.month}';
 
       results.add({
         'month': DateFormat('MMM').format(monthDate),
-        'disbursed': disbursed,
-        'received': received,
+        'disbursed': disbursedByMonth[k] ?? 0.0,
+        'received': receivedByMonth[k] ?? 0.0,
       });
     }
 
@@ -1753,20 +1672,67 @@ class BackEnd {
   static Future<List<Map<String, dynamic>>> fetchYearlyChartData() async {
     final d = await db();
     final now = DateTime.now();
+
+    final overallStart = _monthStart(DateTime(now.year, now.month - 11));
+    final overallEnd = _monthEnd(DateTime(now.year, now.month));
+
+    final txnQuery = (d.selectOnly(d.transactionsTable)
+          ..addColumns([
+            d.transactionsTable.transactionDate,
+            d.transactionsTable.amount,
+          ])
+          ..where(
+            d.transactionsTable.transactionDate.isBiggerOrEqualValue(
+                  overallStart,
+                ) &
+                d.transactionsTable.transactionDate.isSmallerThanValue(
+                  overallEnd,
+                ),
+          ))
+        .get();
+
+    final payQuery = (d.selectOnly(d.paymentsTable)
+          ..addColumns([
+            d.paymentsTable.paymentDate,
+            d.paymentsTable.amountPaid,
+          ])
+          ..where(
+            d.paymentsTable.paymentDate.isBiggerOrEqualValue(overallStart) &
+                d.paymentsTable.paymentDate.isSmallerThanValue(overallEnd),
+          ))
+        .get();
+
+    final queryResults = await Future.wait([txnQuery, payQuery]);
+    final txnRows = queryResults[0];
+    final payRows = queryResults[1];
+
+    final Map<String, double> disbursedByMonth = {};
+    for (final r in txnRows) {
+      final dt = r.read(d.transactionsTable.transactionDate);
+      if (dt == null) continue;
+      final k = '${dt.year}-${dt.month}';
+      final amt = r.read(d.transactionsTable.amount) ?? 0.0;
+      disbursedByMonth[k] = (disbursedByMonth[k] ?? 0.0) + amt;
+    }
+
+    final Map<String, double> receivedByMonth = {};
+    for (final r in payRows) {
+      final dt = r.read(d.paymentsTable.paymentDate);
+      if (dt == null) continue;
+      final k = '${dt.year}-${dt.month}';
+      final amt = r.read(d.paymentsTable.amountPaid) ?? 0.0;
+      receivedByMonth[k] = (receivedByMonth[k] ?? 0.0) + amt;
+    }
+
     final results = <Map<String, dynamic>>[];
-
     for (int i = 11; i >= 0; i--) {
-      final monthDate = DateTime(now.year, now.month - i, 1);
-      final start = _monthStart(monthDate);
-      final end = _monthEnd(monthDate);
-
-      final disbursed = await _sumTransactionsInRange(d, start, end);
-      final received = await _sumPaymentsInRange(d, start, end);
+      final monthDate = DateTime(now.year, now.month - i);
+      final k = '${monthDate.year}-${monthDate.month}';
 
       results.add({
         'month': DateFormat('MMM').format(monthDate),
-        'disbursed': disbursed,
-        'received': received,
+        'disbursed': disbursedByMonth[k] ?? 0.0,
+        'received': receivedByMonth[k] ?? 0.0,
         '_monthNum': monthDate.month,
         '_year': monthDate.year,
       });
@@ -1790,20 +1756,68 @@ class BackEnd {
   static Future<List<Map<String, dynamic>>> fetchWeeklyChartData() async {
     final d = await db();
     final now = DateTime.now();
-    final results = <Map<String, dynamic>>[];
 
+    final oldestDay = now.subtract(const Duration(days: 6));
+    final overallStart = _dayStart(oldestDay);
+    final overallEnd = _dayEnd(now);
+
+    final txnQuery = (d.selectOnly(d.transactionsTable)
+          ..addColumns([
+            d.transactionsTable.transactionDate,
+            d.transactionsTable.amount,
+          ])
+          ..where(
+            d.transactionsTable.transactionDate.isBiggerOrEqualValue(
+                  overallStart,
+                ) &
+                d.transactionsTable.transactionDate.isSmallerThanValue(
+                  overallEnd,
+                ),
+          ))
+        .get();
+
+    final payQuery = (d.selectOnly(d.paymentsTable)
+          ..addColumns([
+            d.paymentsTable.paymentDate,
+            d.paymentsTable.amountPaid,
+          ])
+          ..where(
+            d.paymentsTable.paymentDate.isBiggerOrEqualValue(overallStart) &
+                d.paymentsTable.paymentDate.isSmallerThanValue(overallEnd),
+          ))
+        .get();
+
+    final queryResults = await Future.wait([txnQuery, payQuery]);
+    final txnRows = queryResults[0];
+    final payRows = queryResults[1];
+
+    final Map<String, double> disbursedByDay = {};
+    for (final r in txnRows) {
+      final dt = r.read(d.transactionsTable.transactionDate);
+      if (dt == null) continue;
+      final k = '${dt.year}-${dt.month}-${dt.day}';
+      final amt = r.read(d.transactionsTable.amount) ?? 0.0;
+      disbursedByDay[k] = (disbursedByDay[k] ?? 0.0) + amt;
+    }
+
+    final Map<String, double> receivedByDay = {};
+    for (final r in payRows) {
+      final dt = r.read(d.paymentsTable.paymentDate);
+      if (dt == null) continue;
+      final k = '${dt.year}-${dt.month}-${dt.day}';
+      final amt = r.read(d.paymentsTable.amountPaid) ?? 0.0;
+      receivedByDay[k] = (receivedByDay[k] ?? 0.0) + amt;
+    }
+
+    final results = <Map<String, dynamic>>[];
     for (int i = 6; i >= 0; i--) {
       final day = now.subtract(Duration(days: i));
-      final start = _dayStart(day);
-      final end = _dayEnd(day);
-
-      final disbursed = await _sumTransactionsInRange(d, start, end);
-      final received = await _sumPaymentsInRange(d, start, end);
+      final k = '${day.year}-${day.month}-${day.day}';
 
       results.add({
         'month': DateFormat('EEE').format(day),
-        'disbursed': disbursed,
-        'received': received,
+        'disbursed': disbursedByDay[k] ?? 0.0,
+        'received': receivedByDay[k] ?? 0.0,
         // keep for your drill-down UI compatibility
         '_txnDate': DateFormat('dd/MM/yyyy').format(day),
         '_payDate': DateFormat('yyyy-MM-dd').format(day),
@@ -1837,31 +1851,33 @@ class BackEnd {
     final paySumExpr = d.paymentsTable.amountPaid.sum();
     final payCountExpr = d.paymentsTable.paymentId.count();
 
-    final txnRow =
-        await (d.selectOnly(d.transactionsTable)
-              ..addColumns([txnSumExpr, txnCountExpr])
-              ..where(
-                d.transactionsTable.transactionDate.isBiggerOrEqualValue(
-                      start,
-                    ) &
-                    d.transactionsTable.transactionDate.isSmallerThanValue(end),
-              ))
-            .getSingle();
+    final txnFuture = (d.selectOnly(d.transactionsTable)
+          ..addColumns([txnSumExpr, txnCountExpr])
+          ..where(
+            d.transactionsTable.transactionDate.isBiggerOrEqualValue(
+                  start,
+                ) &
+                d.transactionsTable.transactionDate.isSmallerThanValue(end),
+          ))
+        .getSingle();
 
-    final payRow =
-        await (d.selectOnly(d.paymentsTable)
-              ..addColumns([paySumExpr, payCountExpr])
-              ..where(
-                d.paymentsTable.paymentDate.isBiggerOrEqualValue(start) &
-                    d.paymentsTable.paymentDate.isSmallerThanValue(end),
-              ))
-            .getSingle();
+    final payFuture = (d.selectOnly(d.paymentsTable)
+          ..addColumns([paySumExpr, payCountExpr])
+          ..where(
+            d.paymentsTable.paymentDate.isBiggerOrEqualValue(start) &
+                d.paymentsTable.paymentDate.isSmallerThanValue(end),
+          ))
+        .getSingle();
 
-    final disbTotal = (txnRow.read(txnSumExpr) ?? 0).toDouble();
-    final disbCount = (txnRow.read(txnCountExpr) ?? 0);
+    final rows = await Future.wait([txnFuture, payFuture]);
+    final txnRow = rows[0];
+    final payRow = rows[1];
 
-    final recTotal = (payRow.read(paySumExpr) ?? 0).toDouble();
-    final recCount = (payRow.read(payCountExpr) ?? 0);
+    final double disbTotal = (txnRow.read(txnSumExpr) ?? 0).toDouble();
+    final int disbCount = txnRow.read(txnCountExpr) ?? 0;
+
+    final double recTotal = (payRow.read(paySumExpr) ?? 0).toDouble();
+    final int recCount = payRow.read(payCountExpr) ?? 0;
 
     return {
       'disbursed': disbTotal,
@@ -1882,8 +1898,8 @@ class BackEnd {
   }) async {
     final d = await db();
 
-    final start = DateTime(year, month, 1);
-    final end = DateTime(year, month + 1, 1);
+    final start = DateTime(year, month);
+    final end = DateTime(year, month + 1);
 
     final txns =
         await (d.select(d.transactionsTable)

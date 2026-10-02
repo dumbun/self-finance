@@ -54,7 +54,6 @@ class _UserNameUpdateButtomSheetWidgetState
         key: _formKey,
         child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               const SizedBox(height: 18),
@@ -66,7 +65,6 @@ class _UserNameUpdateButtomSheetWidgetState
               const SizedBox(height: 18),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   _buildActionButton(
                     onPressed: () {

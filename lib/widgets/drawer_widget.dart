@@ -20,7 +20,6 @@ class DrawerWidget extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const UserImageWidget(),
                 const SizedBox(height: 16),

@@ -95,7 +95,6 @@ class _UserCreatingViewState extends State<UserCreatingView> {
         child: Stack(
           children: [
             Align(
-              alignment: Alignment.center,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(100),
                 child: pickedImageFile == null
@@ -103,7 +102,6 @@ class _UserCreatingViewState extends State<UserCreatingView> {
                     : CircularImageWidget(
                         imageData: pickedImageFile!.path,
                         titile: "User image",
-                        customeSize: 120,
                       ),
               ),
             ),
@@ -142,7 +140,6 @@ class _UserCreatingViewState extends State<UserCreatingView> {
                 padding: const EdgeInsets.all(18),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     _buildImagePickWidget(),
                     const SizedBox(height: 24),
@@ -181,7 +178,6 @@ class _UserCreatingViewState extends State<UserCreatingView> {
         enableFeedback: true,
         autofocus: true,
         isExtended: true,
-        mini: false,
         shape: const CircleBorder(),
         tooltip: "Next",
         splashColor: AppColors.getPrimaryColor,

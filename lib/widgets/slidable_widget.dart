@@ -44,9 +44,7 @@ class SlidableWidget extends ConsumerWidget {
     const double iconSize = 22;
 
     return Slidable(
-      direction: Axis.horizontal,
       key: ValueKey<int>(transactionId),
-      closeOnScroll: true,
       startActionPane: phoneNumber != null
           ? ActionPane(
               motion: const StretchMotion(),

@@ -88,6 +88,7 @@ abstract class Constant {
 
   static const String signOutMessage = "Press 'Yes' to sign out.";
 
+  static const String splashView = "/splashView/";
   static const String pinAuthView = "/pinAuthView/";
   static const String dashboardView = "/dashboardview/";
   static const String addNewEntryView = "/addNewEntry/";

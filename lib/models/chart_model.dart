@@ -114,7 +114,7 @@ class ChartData {
   }
 
   static List<ChartData> toList(List<Map<String, dynamic>> maps) {
-    return maps.map((map) => ChartData.fromMap(map)).toList();
+    return maps.map(ChartData.fromMap).toList();
   }
 }
 

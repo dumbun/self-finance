@@ -1,7 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
+import 'package:self_finance/backend/user_database.dart';
 import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/core/utility/image_saving_utility.dart';
 import 'package:self_finance/core/utility/invoice_generator_utility.dart';
 import 'package:self_finance/core/utility/notification_service.dart';
@@ -12,6 +18,7 @@ import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/payment_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
+import 'package:self_finance/models/trx_with_customer_model.dart';
 import 'package:self_finance/models/user_history_model.dart';
 import 'package:self_finance/providers/image_providers.dart';
 import 'package:self_finance/widgets/transaction_filter_widget.dart';
@@ -91,13 +98,13 @@ class TransactionsDateSearchQuery extends _$TransactionsDateSearchQuery {
 
 @riverpod
 class TransactionsNotifier extends _$TransactionsNotifier {
-  Stream<List<Trx>> _fetchTransactions() {
-    return BackEnd.watchAllTransactions();
+  Stream<List<TrxWithCustomer>> _fetchTransactions() {
+    return BackEnd.watchTransactionsWithCustomer();
   }
 
   @override
-  Stream<List<Trx>> build() {
-    final Stream<List<Trx>> base = _fetchTransactions();
+  Stream<List<TrxWithCustomer>> build() {
+    final Stream<List<TrxWithCustomer>> base = _fetchTransactions();
     final String query = ref
         .watch(transactionsSearchQueryProvider)
         .trim()
@@ -107,15 +114,20 @@ class TransactionsNotifier extends _$TransactionsNotifier {
 
     if (query.isEmpty && dateQuery == null && filterQuery.isEmpty) return base;
     if (query.isNotEmpty && dateQuery == null && filterQuery.isEmpty) {
-      return base.map((List<Trx> transactions) {
-        return transactions
-            .where((Trx element) => element.id.toString().trim() == query)
-            .toList();
+      return base.map((List<TrxWithCustomer> transactions) {
+        return transactions.where((TrxWithCustomer element) {
+          final idMatch = element.id.toString().trim() == query;
+          final nameMatch = element.customerName.toLowerCase().contains(query);
+          final amountMatch = element.amount.toString().contains(query);
+          return idMatch || nameMatch || amountMatch;
+        }).toList();
       });
     } else if (query.isEmpty && dateQuery != null && filterQuery.isEmpty) {
-      return BackEnd.watchTransactionsByDate(inputDate: dateQuery);
+      return BackEnd.watchTransactionsByDateWithCustomer(inputDate: dateQuery);
     } else if (query.isEmpty && dateQuery == null && filterQuery.isNotEmpty) {
-      return BackEnd.watchTransactionsByAge(months: filterQuery.first.months);
+      return BackEnd.watchTransactionsByAgeWithCustomer(
+        months: filterQuery.first.months,
+      );
     } else {
       return base;
     }
@@ -133,31 +145,37 @@ class TransactionsNotifier extends _$TransactionsNotifier {
   }) async {
     ref.keepAlive();
 
-    final String itemImagePath = await ImageSavingUtility.saveImage(
-      location: 'items',
-      image: ref.read(itemFileProvider),
-    );
-    final int itemId = await BackEnd.createNewItem(
-      Items(
-        customerid: customerId,
-        name: discription,
-        description: discription,
-        pawnedDate: userInputDate,
-        expiryDate: userInputDate,
-        pawnAmount: pawnAmount,
-        status: Constant.active,
-        photo: itemImagePath,
-        createdDate: DateTime.now(),
-      ),
-    );
-    if (itemId != 0) {
-      //saving signature to the storage
-      final String signaturePath = await Utility.saveSignaturesInStorage(
-        signatureController: signatureController,
-        imageName: itemId.toString(),
+    String itemImagePath = '';
+    String signaturePath = '';
+
+    try {
+      itemImagePath = await ImageSavingUtility.saveImage(
+        location: 'items',
+        image: ref.read(itemFileProvider),
       );
-      final int transacrtionId = await BackEnd.createNewTransaction(
-        Trx(
+
+      signaturePath = await Utility.saveSignaturesInStorage(
+        signatureController: signatureController,
+        imageName: '${customerId}_${DateTime.now().millisecondsSinceEpoch}',
+      );
+
+      final User user = await UserBackEnd.fetchUserData();
+      final int activeUserId =
+          (user.id != null && user.id! > 0) ? user.id! : 1;
+
+      final int transacrtionId = await BackEnd.createNewTransactionAtomic(
+        item: Items(
+          customerid: customerId,
+          name: discription,
+          description: discription,
+          pawnedDate: userInputDate,
+          expiryDate: userInputDate,
+          pawnAmount: pawnAmount,
+          status: Constant.active,
+          photo: itemImagePath,
+          createdDate: DateTime.now(),
+        ),
+        transactionBuilder: (itemId) => Trx(
           customerId: customerId,
           itemId: itemId,
           transacrtionDate: userInputDate,
@@ -169,21 +187,20 @@ class TransactionsNotifier extends _$TransactionsNotifier {
           signature: signaturePath,
           createdDate: DateTime.now(),
         ),
+        historyBuilder: (itemId, txnId) => UserHistory(
+          userID: activeUserId,
+          itemID: itemId,
+          customerID: customerId,
+          customerName: customerName,
+          customerNumber: customerNumber,
+          transactionID: txnId,
+          eventDate: DateTime.now(),
+          eventType: Constant.debited,
+          amount: pawnAmount,
+        ),
       );
+
       if (transacrtionId != 0) {
-        final int historyId = await BackEnd.createNewHistory(
-          UserHistory(
-            userID: 1,
-            itemID: itemId,
-            customerID: customerId,
-            customerName: customerName,
-            customerNumber: customerNumber,
-            transactionID: transacrtionId,
-            eventDate: DateTime.now(),
-            eventType: Constant.debited,
-            amount: pawnAmount,
-          ),
-        );
         final bool notificationsEnabled =
             await PreferencesHelper.areNotificationsEnabled();
 
@@ -194,12 +211,26 @@ class TransactionsNotifier extends _$TransactionsNotifier {
             dueDate: userInputDate.add(const Duration(days: 6 * 30)),
           );
         }
-        return historyId != 0 ? true : false;
+        return true;
       } else {
         return false;
       }
-    } else {
-      return false;
+    } catch (e) {
+      if (itemImagePath.isNotEmpty) {
+        try {
+          final dir = await getApplicationDocumentsDirectory();
+          final file = File(p.join(dir.path, itemImagePath));
+          if (await file.exists()) await file.delete();
+        } catch (_) {}
+      }
+      if (signaturePath.isNotEmpty) {
+        try {
+          final dir = await getApplicationDocumentsDirectory();
+          final file = File(p.join(dir.path, signaturePath));
+          if (await file.exists()) await file.delete();
+        } catch (_) {}
+      }
+      rethrow;
     }
   }
 
@@ -214,7 +245,7 @@ class TransactionsNotifier extends _$TransactionsNotifier {
   }
 }
 
-@Riverpod(keepAlive: false)
+@Riverpod()
 class TransactionByID extends _$TransactionByID {
   @override
   Stream<Trx?> build(int transactionId) {
@@ -249,14 +280,17 @@ class TransactionByID extends _$TransactionByID {
         type: 'cash',
         createdDate: Utility.presentDate(),
       );
-      await BackEnd.addPayment(payment: payment);
-      await BackEnd.updateTransactionAsPaid(
-        id: transactionId,
-        intrestAmount: intrestAmount,
-      );
-      await BackEnd.createNewHistory(
-        UserHistory(
-          userID: 1,
+
+      final User user = await UserBackEnd.fetchUserData();
+      final int activeUserId =
+          (user.id != null && user.id! > 0) ? user.id! : 1;
+
+      await BackEnd.markTransactionAsPaidAtomic(
+        payment: payment,
+        transactionId: transactionId,
+        interestAmount: intrestAmount,
+        history: UserHistory(
+          userID: activeUserId,
           customerID: customer.id!,
           itemID: trx.itemId,
           customerNumber: customer.number,

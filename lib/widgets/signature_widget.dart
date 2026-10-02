@@ -15,7 +15,6 @@ class SignatureWidgetState extends State<SignatureWidget> {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const BodyTwoDefaultText(
           text: "Customer Signature (Requried) : ",

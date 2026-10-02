@@ -173,7 +173,8 @@ abstract class _$TransactionsDateSearchQuery extends $Notifier<DateTime?> {
 final transactionsProvider = TransactionsNotifierProvider._();
 
 final class TransactionsNotifierProvider
-    extends $StreamNotifierProvider<TransactionsNotifier, List<Trx>> {
+    extends
+        $StreamNotifierProvider<TransactionsNotifier, List<TrxWithCustomer>> {
   TransactionsNotifierProvider._()
     : super(
         from: null,
@@ -194,19 +195,25 @@ final class TransactionsNotifierProvider
 }
 
 String _$transactionsNotifierHash() =>
-    r'4041675ec0a337a727ee343dad8962884f182282';
+    r'4d1dbc93d04c7f5533db83dbcc905597ba48c441';
 
-abstract class _$TransactionsNotifier extends $StreamNotifier<List<Trx>> {
-  Stream<List<Trx>> build();
+abstract class _$TransactionsNotifier
+    extends $StreamNotifier<List<TrxWithCustomer>> {
+  Stream<List<TrxWithCustomer>> build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<List<Trx>>, List<Trx>>;
+    final ref =
+        this.ref
+            as $Ref<AsyncValue<List<TrxWithCustomer>>, List<TrxWithCustomer>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<List<Trx>>, List<Trx>>,
-              AsyncValue<List<Trx>>,
+              AnyNotifier<
+                AsyncValue<List<TrxWithCustomer>>,
+                List<TrxWithCustomer>
+              >,
+              AsyncValue<List<TrxWithCustomer>>,
               Object?,
               Object?
             >;
@@ -255,7 +262,7 @@ final class TransactionByIDProvider
   }
 }
 
-String _$transactionByIDHash() => r'4e8da5357ba5f644c751f9aed8ec558cb0e432f8';
+String _$transactionByIDHash() => r'295f07ef8519e36cf22a1068aaca98e82bf81629';
 
 final class TransactionByIDFamily extends $Family
     with

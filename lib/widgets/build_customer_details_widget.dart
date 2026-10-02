@@ -23,8 +23,6 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             const SizedBox(width: 12),
             icon,
@@ -58,14 +56,11 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(width: 12),
               CallButtonWidget(phoneNumber: customerNumber),
               const SizedBox(width: 20),
               Column(
-                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const BodyTwoDefaultText(
@@ -92,8 +87,6 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
             data: (Customer? customer) {
               if (customer != null) {
                 return Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     const SizedBox(height: 20),
                     CircularImageWidget(

@@ -31,7 +31,6 @@ class TransactionDetailsHeroWidget extends StatelessWidget {
           CurrencyWidget(titleText: true, amount: Utility.doubleFormate(value)),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               const BodyTwoDefaultText(text: "Transaction ID: "),
               BodyTwoDefaultText(text: transaction.id.toString(), bold: true),

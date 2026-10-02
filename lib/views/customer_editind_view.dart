@@ -120,7 +120,6 @@ class _ContactEditingViewState extends State<ContactEditingView> {
       onTap: onTap,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Card(
             elevation: 0,
@@ -155,12 +154,10 @@ class _ContactEditingViewState extends State<ContactEditingView> {
             child: Form(
               key: _formKey,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       _buidImages(
                         onTap: () async {

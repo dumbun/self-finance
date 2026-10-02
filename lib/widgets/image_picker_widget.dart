@@ -28,7 +28,6 @@ class ImagePickerWidget extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         showModalBottomSheet(
-          enableDrag: true,
           useSafeArea: true,
           context: context,
           builder: (BuildContext context) {
@@ -38,7 +37,6 @@ class ImagePickerWidget extends ConsumerWidget {
               padding: const EdgeInsets.all(20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   _buildCard(
                     context,
@@ -121,7 +119,6 @@ class ImagePickerWidget extends ConsumerWidget {
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           icon,
           BodyOneDefaultText(text: title),

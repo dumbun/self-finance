@@ -41,7 +41,6 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   final TextEditingController _description = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final SignatureController _signatureController = SignatureController(
-    penColor: AppColors.contentColorBlack,
     exportPenColor: AppColors.contentColorBlack,
     exportBackgroundColor: AppColors.getBackgroundColor,
     penStrokeWidth: 5,

@@ -11,6 +11,23 @@ include: package:flutter_lints/flutter.yaml
 
 linter:
   rules:
+    # Performance / efficiency
+    avoid_function_literals_in_foreach_calls: true
     prefer_const_constructors: true
     prefer_const_declarations: true
     prefer_const_literals_to_create_immutables: true
+    prefer_final_locals: true
+
+    # Prevent unnecessarily expensive patterns
+    avoid_unnecessary_containers: true
+    sized_box_for_whitespace: true
+    use_decorated_box: true
+
+    # Better widget construction
+    use_key_in_widget_constructors: true
+
+    # Code quality that can indirectly help performance
+    avoid_redundant_argument_values: true
+    unnecessary_lambdas: true
+    unnecessary_parenthesis: true
+    unnecessary_string_interpolations: true

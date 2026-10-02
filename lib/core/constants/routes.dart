@@ -17,10 +17,12 @@ import 'package:self_finance/views/image_view.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
 import 'package:self_finance/views/pin_creating_view.dart';
 import 'package:self_finance/views/transaction_detail_view.dart';
+import 'package:self_finance/views/splash_screen.dart';
 import 'package:self_finance/views/user_creating_view.dart';
 
 class Routes {
   static Map<String, Widget Function(BuildContext)> namedRoutes = {
+    Constant.splashView: (BuildContext context) => const SplashScreen(),
     Constant.pinAuthView: (BuildContext context) => const PinAuthView(),
     Constant.dashboardView: (BuildContext context) => const DashboardView(),
     Constant.addNewEntryView: (BuildContext context) =>
@@ -112,7 +114,7 @@ class Routes {
         MaterialPageRoute(
           builder: (context) => AddNewTransactionView(
             customerName: res.first.name,
-            customerNumber: res.first.name,
+            customerNumber: res.first.number,
             customerID: customerID,
           ),
         ),
@@ -192,5 +194,9 @@ class Routes {
 
   static void navigateToAddNewEntry({required BuildContext context}) async {
     Navigator.of(context).pushNamed(Constant.addNewEntryView);
+  }
+
+  static void navigateToPinCreatingView(BuildContext context) {
+    Navigator.of(context).pushNamed(Constant.pinCreatingView);
   }
 }

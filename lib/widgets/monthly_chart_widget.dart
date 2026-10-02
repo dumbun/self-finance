@@ -261,7 +261,6 @@ class _YearlyBody extends ConsumerWidget {
                   final DateTime date = DateTime(
                     now.year,
                     now.month - offset,
-                    1,
                   );
 
                   final int month = raw?['_monthNum'] as int? ?? date.month;
@@ -295,7 +294,7 @@ class _MonthlyBody extends ConsumerWidget {
             onPointTapped: (data, index, _) {
               final now = DateTime.now();
               final offset = state.data.length - 1 - index;
-              final date = DateTime(now.year, now.month - offset, 1);
+              final date = DateTime(now.year, now.month - offset);
 
               _openDrill(
                 context,

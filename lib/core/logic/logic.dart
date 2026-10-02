@@ -25,18 +25,18 @@ class LoanCalculator {
   }) : assert(takenAmount >= 0, 'takenAmount cannot be negative'),
        assert(rateOfInterest >= 0, 'rateOfInterest cannot be negative');
 
-  DateTime get _startDate => DateUtils.dateOnly(takenDate);
-  DateTime get _endDate => DateUtils.dateOnly(tenureDate ?? DateTime.now());
+  DateTime get _startDate => AppDateUtils.dateOnly(takenDate);
+  DateTime get _endDate => AppDateUtils.dateOnly(tenureDate ?? DateTime.now());
 
   /// Total counted days between start and end.
-  int get days => DateUtils.getDaysDifference(
+  int get days => AppDateUtils.getDaysDifference(
     startDate: _startDate,
     endDate: _endDate,
     inclusive: inclusiveDays,
   );
 
   /// [months, remainingDays]
-  List<int> get _monthsDays => DateUtils.getCalendarMonthsAndRemainingDays(
+  List<int> get _monthsDays => AppDateUtils.getCalendarMonthsAndRemainingDays(
     start: _startDate,
     end: _endDate,
     includeEndDate: includeEndDate,
@@ -90,7 +90,7 @@ class LoanCalculator {
       double.parse(value.toStringAsFixed(2));
 }
 
-class DateUtils {
+class AppDateUtils {
   static DateTime dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
   static DateTime parseDateOnly(String ddMMyyyy) {

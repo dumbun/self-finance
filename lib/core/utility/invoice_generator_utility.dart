@@ -111,12 +111,12 @@ class InvoiceGenerator {
       throw ArgumentError('Customer name cannot be empty');
     }
 
-    ByteData data = await rootBundle.load("assets/fonts/Helvetica.ttf");
-    ByteData font = data.buffer.asByteData();
-    ByteData dataBold = await rootBundle.load(
+    final ByteData data = await rootBundle.load("assets/fonts/Helvetica.ttf");
+    final ByteData font = data.buffer.asByteData();
+    final ByteData dataBold = await rootBundle.load(
       "assets/fonts/Helvetica-Bold.ttf",
     );
-    ByteData fontBold = dataBold.buffer.asByteData();
+    final ByteData fontBold = dataBold.buffer.asByteData();
     try {
       final pw.Document pdf = pw.Document(
         theme: pw.ThemeData.withFont(
@@ -230,7 +230,7 @@ class InvoiceGenerator {
       );
 
       final xFile = XFile(filePath);
-      ShareParams s = ShareParams(
+      final ShareParams s = ShareParams(
         files: [xFile],
         subject: 'Transaction Invoice #${transaction.id}',
         text: 'Invoice for ${customer.name} - Transaction #${transaction.id}',

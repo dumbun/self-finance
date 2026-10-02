@@ -112,7 +112,7 @@ class _HeaderSection extends StatelessWidget {
                   onTap: () => _navigateToContact(context),
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(
-                      maxWidth: double.infinity,
+                      
                     ),
                     child: Consumer(
                       builder:

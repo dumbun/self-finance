@@ -39,7 +39,6 @@ class ItemImageWidget extends ConsumerWidget {
               );
             } else {
               return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const BodyTwoDefaultText(

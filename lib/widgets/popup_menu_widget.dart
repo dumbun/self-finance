@@ -95,8 +95,6 @@ class PopupMenuWidget extends ConsumerWidget {
     return PopupMenuItem<String>(
       value: value,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(icon, color: iconColor),
           const SizedBox(width: 18),

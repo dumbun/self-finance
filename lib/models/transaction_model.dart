@@ -99,6 +99,7 @@ class Trx {
       'intrestRate': intrestRate,
       'intrestAmount': intrestAmount,
       'remainingAmount': remainingAmount,
+      'signature': signature,
       'createdDate': createdDate,
     };
   }
@@ -121,7 +122,7 @@ class Trx {
 
   @override
   String toString() {
-    return 'Transaction(id: $id, customerId: $customerId, itemId: $itemId, transacrtionDate: $transacrtionDate, transacrtionType: $transacrtionType, amount: $amount, intrestRate: $intrestRate, intrestAmount: $intrestAmount, remainingAmount: $remainingAmount, createdDate: $createdDate)';
+    return 'Transaction(id: $id, customerId: $customerId, itemId: $itemId, transacrtionDate: $transacrtionDate, transacrtionType: $transacrtionType, amount: $amount, intrestRate: $intrestRate, intrestAmount: $intrestAmount, remainingAmount: $remainingAmount, signature: $signature, createdDate: $createdDate)';
   }
 
   @override
@@ -137,6 +138,7 @@ class Trx {
         other.intrestRate == intrestRate &&
         other.intrestAmount == intrestAmount &&
         other.remainingAmount == remainingAmount &&
+        other.signature == signature &&
         other.createdDate == createdDate;
   }
 
@@ -151,6 +153,7 @@ class Trx {
         intrestRate.hashCode ^
         intrestAmount.hashCode ^
         remainingAmount.hashCode ^
+        signature.hashCode ^
         createdDate.hashCode;
   }
 }

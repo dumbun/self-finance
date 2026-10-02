@@ -117,7 +117,7 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: userAsync.when(
-              loading: () => const CircularProgressIndicator.adaptive(),
+              loading: () => const SizedBox.shrink(),
 
               error: (_, _) =>
                   const BodyTwoDefaultText(text: Constant.errorUserFetch),
@@ -134,7 +134,6 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
                   children: <Widget>[
                     if (user.profilePicture.isNotEmpty)
                       CircularImageWidget(
-                        customeSize: 120,
                         imageData: user.profilePicture,
                         titile: user.userName,
                       )
@@ -154,7 +153,7 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
                       pinController: _pinController,
                       obscureText: true,
                       validator: (String? value) {
-                        if ((value?.trim().isEmpty ?? true)) {
+                        if (value?.trim().isEmpty ?? true) {
                           return Constant.enterYourAppPin;
                         }
 

@@ -48,7 +48,6 @@ class ExpandableFab extends StatelessWidget {
       tooltip: Constant.addNewTransactionToolTip,
       onPressed: () async {
         await showModalBottomSheet(
-          enableDrag: true,
           showDragHandle: true,
           useSafeArea: true,
           context: context,
@@ -60,7 +59,6 @@ class ExpandableFab extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(vertical: 20),
                 width: double.infinity,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildFlotingActionButtons(

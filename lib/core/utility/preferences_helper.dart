@@ -101,7 +101,7 @@ class PreferencesHelper {
       'isDarkTheme': prefs.getBool(_keyDarkTheme) ?? _defaultDarkTheme,
       'notificationsEnabled':
           prefs.getBool(_keyNotifications) ?? _defaultNotifications,
-      'isBiometrics': prefs.getBool(_keyBiometrics) ?? _defaultNotifications,
+      'isBiometrics': prefs.getBool(_keyBiometrics) ?? _defaultBiometrics,
     };
   }
 

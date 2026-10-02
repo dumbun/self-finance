@@ -265,7 +265,7 @@ class CsvExportUtility {
     try {
       final Directory dir = await _exportDir();
       if (!await dir.exists()) return;
-      await for (final FileSystemEntity entity in dir.list(recursive: false)) {
+      await for (final FileSystemEntity entity in dir.list()) {
         if (entity is File && entity.path.endsWith('.csv')) {
           await entity.delete();
         }

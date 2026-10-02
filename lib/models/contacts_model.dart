@@ -6,7 +6,7 @@ class Contact {
 
   // Factory method to convert list of maps to list of contacts
   static List<Contact> fromList(List<Map<String, Object?>> data) {
-    return data.map((e) => Contact.fromMap(e)).toList(growable: false);
+    return data.map(Contact.fromMap).toList(growable: false);
   }
 
   static List<Contact> toList(List<Map<String, Object?>> data) {

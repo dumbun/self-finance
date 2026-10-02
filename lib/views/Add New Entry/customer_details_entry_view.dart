@@ -99,8 +99,6 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
             child: Form(
               key: _formKey,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // Customer name
                   const SizedBox(height: 20),

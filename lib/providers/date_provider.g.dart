@@ -41,7 +41,7 @@ final class DateNotifierProvider
   }
 }
 
-String _$dateNotifierHash() => r'5dfbe5e7c608d26e2e81b8286a8af692ec370436';
+String _$dateNotifierHash() => r'97382d5d883383e8b5a3f3420adedc9129397608';
 
 abstract class _$DateNotifier extends $Notifier<DateTime?> {
   DateTime? build();

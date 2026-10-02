@@ -42,7 +42,6 @@ class _PinCreatingViewState extends State<PinCreatingView> {
             key: formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 20),
                 const BodyOneDefaultText(

@@ -17,7 +17,6 @@ class UserImageUpdateWidget extends ConsumerWidget {
         onTap: () async {
           await showModalBottomSheet(
             showDragHandle: true,
-            enableDrag: true,
             useSafeArea: true,
             context: context,
             builder: (BuildContext context) {
@@ -26,7 +25,6 @@ class UserImageUpdateWidget extends ConsumerWidget {
                 height: 200,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     GestureDetector(
                       onTap: () async {
@@ -43,7 +41,6 @@ class UserImageUpdateWidget extends ConsumerWidget {
                       },
                       child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Icon(Icons.camera_alt, size: 60),
                           BodyOneDefaultText(text: "Camera"),
@@ -65,7 +62,6 @@ class UserImageUpdateWidget extends ConsumerWidget {
                       },
                       child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Icon(Icons.photo, size: 60),
                           BodyOneDefaultText(text: "Gallery"),
@@ -83,7 +79,6 @@ class UserImageUpdateWidget extends ConsumerWidget {
                       },
                       child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Icon(Icons.delete, size: 60),
                           BodyOneDefaultText(text: "Remove"),
