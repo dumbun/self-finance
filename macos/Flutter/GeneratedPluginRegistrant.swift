@@ -5,9 +5,9 @@
 import FlutterMacOS
 import Foundation
 
-import file_picker
+import file_picker_darwin
 import file_selector_macos
-import flutter_email_sender
+import flutter_email_sender_method_channel
 import flutter_local_notifications
 import flutter_timezone
 import in_app_review

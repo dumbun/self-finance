@@ -29,12 +29,11 @@ class ImageWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<String> appDir = ref.watch(appDirProvider);
+    final AsyncValue<String> appDir = ref.read(appDirProvider);
 
     return appDir.when(
       data: (String appDirPath) {
         final String fullPath = p.join(appDirPath, imagePath);
-        final File imageFile = File(fullPath);
 
         return GestureDetector(
           onTap: showImage
@@ -42,12 +41,12 @@ class ImageWidget extends ConsumerWidget {
                   Routes.navigateToImageView(
                     context: context,
                     titile: title,
-                    imagePath: imageFile.path,
+                    imagePath: fullPath,
                   );
                 }
               : null,
           child: Image.file(
-            imageFile,
+            File(fullPath),
             height: height,
             width: width,
             fit: fit,

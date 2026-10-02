@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -15,6 +16,7 @@ import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/models/payment_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_history_model.dart';
+import 'package:self_finance/threads/threads.dart';
 
 import 'db_paths.dart';
 
@@ -562,21 +564,7 @@ class BackEnd {
       d.customersTable,
     )..orderBy([(t) => OrderingTerm.asc(t.customerName)])).get();
 
-    return rows
-        .map(
-          (CustomerRow r) => Customer(
-            id: r.customerId,
-            userID: r.userId,
-            name: r.customerName,
-            guardianName: r.gaurdianName,
-            address: r.customerAddress,
-            number: r.contactNumber,
-            photo: r.customerPhoto,
-            proof: r.proofPhoto,
-            createdDate: r.createdDate,
-          ),
-        )
-        .toList();
+    return await compute(Threads.computeAllCustomersDetails, rows);
   }
 
   static Future<List<String>> fetchAllCustomerNumbers() async {
@@ -592,7 +580,7 @@ class BackEnd {
 
   static Future<List<Contact>> fetchAllCustomerNumbersWithNames() async {
     final d = await db();
-    final rows =
+    final List<TypedResult> rows =
         await (d.selectOnly(d.customersTable)
               ..addColumns([
                 d.customersTable.customerId,
@@ -1183,7 +1171,7 @@ class BackEnd {
 
   static Stream<List<String>> watchAllCustomerNumbers() {
     return Stream.fromFuture(db()).asyncExpand((d) {
-      final q =
+      final Stream<List<TypedResult>> q =
           (d.selectOnly(d.customersTable)
                 ..addColumns([d.customersTable.contactNumber])
                 ..orderBy([OrderingTerm.asc(d.customersTable.contactNumber)]))
@@ -1198,7 +1186,7 @@ class BackEnd {
 
   static Stream<List<Contact>> watchAllCustomerNumbersWithNames() {
     return Stream.fromFuture(db()).asyncExpand((d) {
-      final q =
+      final Stream<List<TypedResult>> q =
           (d.selectOnly(d.customersTable)
                 ..addColumns([
                   d.customersTable.customerId,
@@ -1208,17 +1196,23 @@ class BackEnd {
                 ..orderBy([OrderingTerm.asc(d.customersTable.customerName)]))
               .watch();
 
-      return q.map(
-        (rows) => rows
+      return q.asyncMap((rows) {
+        final raw = rows
             .map(
-              (r) => Contact(
-                name: r.read(d.customersTable.customerName) ?? '',
-                number: r.read(d.customersTable.contactNumber) ?? '',
-                id: r.read(d.customersTable.customerId) ?? 0,
+              (r) => (
+                r.read(d.customersTable.customerId) ?? 0,
+                r.read(d.customersTable.customerName) ?? '',
+                r.read(d.customersTable.contactNumber) ?? '',
               ),
             )
-            .toList(),
-      );
+            .toList();
+
+        if (raw.length < 500) {
+          return Threads.mapRowsToContacts(raw);
+        }
+
+        return compute(Threads.mapRowsToContacts, raw);
+      });
     });
   }
 
@@ -1352,17 +1346,23 @@ class BackEnd {
   // TRANSACTIONS streams
   static Stream<List<Trx>> watchAllTransactions() {
     return Stream.fromFuture(db()).asyncExpand((d) {
-      final q = (d.select(
+      final Stream<List<TransactionRow>> q = (d.select(
         d.transactionsTable,
       )..orderBy([(t) => OrderingTerm.desc(t.transactionId)])).watch();
 
-      return q.map((rows) => rows.map(_trxFromRow).toList());
+      return q.asyncMap((rows) {
+        // Isolate hop only pays off once there's real work to hand off.
+        if (rows.length < 1000) {
+          return Future.value(Threads.computeAllTransactions(rows));
+        }
+        return compute(Threads.computeAllTransactions, rows);
+      });
     });
   }
 
   static Stream<List<Trx>> watchActiveTransactions() {
     return Stream.fromFuture(db()).asyncExpand((d) {
-      final q =
+      final Stream<List<TransactionRow>> q =
           (d.select(d.transactionsTable)
                 ..where((t) => t.transactionType.equals('Active'))
                 ..orderBy([(t) => OrderingTerm.desc(t.transactionDate)]))

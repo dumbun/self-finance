@@ -23,13 +23,17 @@ import 'package:url_launcher/url_launcher.dart';
 
 class Utility {
   static Future<void> appInit() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    await dotenv.load(fileName: '.env');
-    await UserBackEnd.db().timeout(
-      const Duration(seconds: 10),
-      onTimeout: () => throw Exception('DB init timed out'),
-    );
-    await NotificationService().initNotification();
+    WidgetsFlutterBinding.ensureInitialized(); // must stay first, synchronous
+
+    await Future.wait([
+      dotenv.load(fileName: '.env'),
+      UserBackEnd.db().timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => throw Exception('DB init timed out'),
+      ),
+      NotificationService().initNotification(),
+    ]);
+
     if (Platform.isAndroid) {
       try {
         await FlutterDisplayMode.setHighRefreshRate();

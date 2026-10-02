@@ -36,6 +36,7 @@ class BuildTransactionsListWidget extends ConsumerWidget {
               itemBuilder: (BuildContext context, int index) {
                 final Trx txn = data[index];
                 return SlidableWidget(
+                  key: ValueKey(txn.id!),
                   customerId: txn.customerId,
                   transactionId: txn.id!,
                   child: ListTile(

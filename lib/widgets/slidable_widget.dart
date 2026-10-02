@@ -43,53 +43,50 @@ class SlidableWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     const double iconSize = 22;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Slidable(
-        direction: Axis.horizontal,
+    return Slidable(
+      direction: Axis.horizontal,
+      key: ValueKey<int>(transactionId),
+      closeOnScroll: true,
+      startActionPane: phoneNumber != null
+          ? ActionPane(
+              motion: const StretchMotion(),
+              dragDismissible: false,
+              children: [
+                _RoundedAction(
+                  color: AppColors.getPrimaryColor,
+                  icon: Icons.phone,
+                  iconSize: iconSize,
+                  onTap: () => Utility.makeCall(phoneNumber: phoneNumber!),
+                ),
+              ],
+            )
+          : null,
+      endActionPane: ActionPane(
+        dragDismissible: false,
         key: ValueKey<int>(transactionId),
-        closeOnScroll: true,
-        startActionPane: phoneNumber != null
-            ? ActionPane(
-                motion: const StretchMotion(),
-                dragDismissible: false,
-                children: [
-                  _RoundedAction(
-                    color: AppColors.getPrimaryColor,
-                    icon: Icons.phone,
-                    iconSize: iconSize,
-                    onTap: () => Utility.makeCall(phoneNumber: phoneNumber!),
-                  ),
-                ],
-              )
-            : null,
-        endActionPane: ActionPane(
-          dragDismissible: false,
-          key: ValueKey<int>(transactionId),
-          motion: const StretchMotion(),
-          extentRatio: 0.45,
-          children: [
-            _RoundedAction(
-              color: AppColors.getPrimaryColor,
-              icon: Icons.share_rounded,
-              iconSize: iconSize,
-              onTap: () {
-                Slidable.of(context)?.close();
-                ref
-                    .read(transactionByIDProvider(transactionId).notifier)
-                    .shareTransaction();
-              },
-            ),
-            _RoundedAction(
-              color: AppColors.getErrorColor,
-              icon: Icons.delete_forever_rounded,
-              iconSize: iconSize,
-              onTap: () => _confirmAndDelete(context, ref),
-            ),
-          ],
-        ),
-        child: SizedBox(width: double.infinity, child: child),
+        motion: const StretchMotion(),
+        extentRatio: 0.45,
+        children: [
+          _RoundedAction(
+            color: AppColors.getPrimaryColor,
+            icon: Icons.share_rounded,
+            iconSize: iconSize,
+            onTap: () {
+              Slidable.of(context)?.close();
+              ref
+                  .read(transactionByIDProvider(transactionId).notifier)
+                  .shareTransaction();
+            },
+          ),
+          _RoundedAction(
+            color: AppColors.getErrorColor,
+            icon: Icons.delete_forever_rounded,
+            iconSize: iconSize,
+            onTap: () => _confirmAndDelete(context, ref),
+          ),
+        ],
       ),
+      child: SizedBox(width: double.infinity, child: child),
     );
   }
 }

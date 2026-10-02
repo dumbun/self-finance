@@ -66,17 +66,17 @@ class RestoreUtility {
       await Future.delayed(const Duration(milliseconds: 500));
 
       // 2) Pick ZIP file
-      final FilePickerResult? result = await FilePicker.pickFiles(
+      final PlatformFile? result = await FilePicker.pickFile(
         type: FileType.custom,
         allowedExtensions: ['zip'],
         dialogTitle: 'Select backup ZIP file',
       );
 
-      if (result == null || result.files.single.path == null) {
+      if (result == null || result.path == null) {
         throw Exception('No backup file selected');
       }
 
-      final File zipFile = File(result.files.single.path!);
+      final File zipFile = File(result.path!);
       if (!await zipFile.exists()) {
         throw Exception('Backup file not found');
       }
