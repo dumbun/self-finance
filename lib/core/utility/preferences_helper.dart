@@ -2,7 +2,7 @@ import 'package:self_finance/core/utility/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A helper class for managing app preferences using SharedPreferences.
-/// Handles theme mode and notification toggle persistence.
+/// Handles theme mode, notification toggle, biometrics, and onboarding persistence.
 class PreferencesHelper {
   PreferencesHelper._(); // Private constructor — use static methods only
 
@@ -10,11 +10,29 @@ class PreferencesHelper {
   static const String _keyDarkTheme = 'is_dark_theme';
   static const String _keyNotifications = 'notifications_enabled';
   static const String _keyBiometrics = 'is_bio_metrics';
+  static const String _keyOnboardingComplete = 'onboarding_complete';
 
   // ─── Defaults ─────────────────────────────────────────────────────────────
   static const bool _defaultDarkTheme = false;
   static const bool _defaultNotifications = true;
   static const bool _defaultBiometrics = true;
+  static const bool _defaultOnboardingComplete = false;
+
+  // ─── Onboarding ────────────────────────────────────────────────────────────
+
+  /// Returns `true` if the user has completed onboarding.
+  static Future<bool> isOnboardingComplete() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_keyOnboardingComplete) ?? _defaultOnboardingComplete;
+  }
+
+  /// Saves whether onboarding has been completed.
+  ///
+  /// Pass `true` after the user finishes or skips onboarding.
+  static Future<void> setOnboardingComplete(bool complete) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyOnboardingComplete, complete);
+  }
 
   // ─── Biometrics ────────────────────────────────────────────────────────────────
 
@@ -94,7 +112,7 @@ class PreferencesHelper {
 
   /// Loads all preferences at once and returns them as a map.
   ///
-  /// Keys: `isDarkTheme`, `notificationsEnabled`, `isBiometrics`
+  /// Keys: `isDarkTheme`, `notificationsEnabled`, `isBiometrics`, `onboardingComplete`
   static Future<Map<String, bool>> loadAll() async {
     final prefs = await SharedPreferences.getInstance();
     return {
@@ -102,6 +120,8 @@ class PreferencesHelper {
       'notificationsEnabled':
           prefs.getBool(_keyNotifications) ?? _defaultNotifications,
       'isBiometrics': prefs.getBool(_keyBiometrics) ?? _defaultBiometrics,
+      'onboardingComplete':
+          prefs.getBool(_keyOnboardingComplete) ?? _defaultOnboardingComplete,
     };
   }
 
@@ -111,5 +131,7 @@ class PreferencesHelper {
     await prefs.remove(_keyDarkTheme);
     await prefs.remove(_keyNotifications);
     await prefs.remove(_keyBiometrics);
+    await prefs.remove(_keyOnboardingComplete);
   }
 }
+

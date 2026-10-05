@@ -33,8 +33,8 @@ class Utility {
 
   /// Initialises non-critical background services (high refresh rate and notifications)
   /// without blocking the startup frame pipeline.
-  static void backgroundServicesInit() {
-    Future.delayed(const Duration(seconds: 2), () async {
+  static Future<void> backgroundServicesInit() async {
+    await Future.delayed(const Duration(seconds: 2), () async {
       if (Platform.isAndroid) {
         try {
           await FlutterDisplayMode.setHighRefreshRate();
@@ -42,7 +42,9 @@ class Utility {
       }
       try {
         await NotificationService().initNotification();
-      } catch (_) {}
+      } catch (error) {
+        debugPrint(error.toString());
+      }
     });
   }
 
