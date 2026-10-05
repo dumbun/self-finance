@@ -62,7 +62,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
       // Pre-warm user state and appDir while splash screen is active so that
       // AuthView and PinAuthView can render immediately without flashing a circular loading screen.
-      final results = await Future.wait([
+      final List<Object?> results = await Future.wait([
         ref
             .read(userProvider.future)
             .timeout(const Duration(seconds: 2), onTimeout: () => null),
@@ -85,9 +85,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       await Future.delayed(Duration(milliseconds: minDuration - elapsed));
     }
 
-    if (!mounted) return;
-
     await Utility.backgroundServicesInit();
+
+    if (!mounted) return;
 
     // Route to onboarding for first-time users, or directly to auth for returning users
     final Widget destination = onboardingComplete
@@ -97,7 +97,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => destination,
-        transitionDuration: const Duration(milliseconds: 550),
+        transitionDuration: const Duration(milliseconds: 1200),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           final curved = CurvedAnimation(
             parent: animation,
