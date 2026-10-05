@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
+import 'package:self_finance/core/utility/preferences_helper.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/providers/app_dir_provider.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/views/auth_view.dart';
+import 'package:self_finance/views/onboarding_screen.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -30,17 +32,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     );
 
     _scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeOutBack,
-      ),
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeIn,
-      ),
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
     );
 
     _animationController.forward();
@@ -59,23 +55,27 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     final Stopwatch stopwatch = Stopwatch()..start();
 
+    late final bool onboardingComplete;
+
     try {
       await Utility.appInit();
 
       // Pre-warm user state and appDir while splash screen is active so that
       // AuthView and PinAuthView can render immediately without flashing a circular loading screen.
-      await Future.wait([
-        ref.read(userProvider.future).timeout(
-              const Duration(seconds: 2),
-              onTimeout: () => null,
-            ),
-        ref.read(appDirProvider.future).timeout(
-              const Duration(seconds: 2),
-              onTimeout: () => '',
-            ),
+      final results = await Future.wait([
+        ref
+            .read(userProvider.future)
+            .timeout(const Duration(seconds: 2), onTimeout: () => null),
+        ref
+            .read(appDirProvider.future)
+            .timeout(const Duration(seconds: 2), onTimeout: () => ''),
+        PreferencesHelper.isOnboardingComplete(),
       ]);
+
+      onboardingComplete = results[2] as bool;
     } catch (e) {
       debugPrint('Initialization error: $e');
+      onboardingComplete = false;
     }
 
     // Ensure splash is visible for at least 1200ms so animation is smooth and not a flash
@@ -87,12 +87,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     if (!mounted) return;
 
-    Utility.backgroundServicesInit();
+    await Utility.backgroundServicesInit();
+
+    // Route to onboarding for first-time users, or directly to auth for returning users
+    final Widget destination = onboardingComplete
+        ? const AuthView()
+        : const OnboardingScreen();
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            const AuthView(),
+        pageBuilder: (context, animation, secondaryAnimation) => destination,
         transitionDuration: const Duration(milliseconds: 550),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           final curved = CurvedAnimation(
@@ -157,8 +161,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       Container(
                         padding: const EdgeInsets.all(22),
                         decoration: BoxDecoration(
-                          color:
-                              isDark ? const Color(0xFF1E293B) : Colors.white,
+                          color: isDark
+                              ? const Color(0xFF1E293B)
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(32),
                           border: Border.all(
                             color: AppColors.getPrimaryColor.withValues(

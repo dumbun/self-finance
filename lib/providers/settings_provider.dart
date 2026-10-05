@@ -54,3 +54,14 @@ class BiometricsNotifier extends _$BiometricsNotifier {
     await PreferencesHelper.setBiometrics(value);
   }
 }
+
+@Riverpod(keepAlive: true)
+class OnboardingCompleteNotifier extends _$OnboardingCompleteNotifier {
+  @override
+  Future<bool> build() async => await PreferencesHelper.isOnboardingComplete();
+
+  Future<void> set(bool value) async {
+    state = AsyncData(value);
+    await PreferencesHelper.setOnboardingComplete(value);
+  }
+}
