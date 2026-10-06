@@ -483,7 +483,6 @@ class BackEnd {
   static DateTime _monthStart(DateTime d) => DateTime(d.year, d.month);
   static DateTime _monthEnd(DateTime d) => DateTime(d.year, d.month + 1);
 
-
   // ===========================================================================
   // CUSTOMERS
   // ===========================================================================
@@ -1125,17 +1124,14 @@ class BackEnd {
       final t = d.transactionsTable;
       final c = d.customersTable;
 
-      final q =
-          (d.select(t).join([
-                leftOuterJoin(c, c.customerId.equalsExp(t.customerId)),
-              ])
-                ..orderBy([OrderingTerm.desc(t.transactionId)]))
-              .watch();
+      final q = (d.select(t).join([
+        leftOuterJoin(c, c.customerId.equalsExp(t.customerId)),
+      ])..orderBy([OrderingTerm.desc(t.transactionId)])).watch();
 
-      return q.map((rows) {
-        return rows.map((row) {
-          final txn = row.readTable(t);
-          final cust = row.readTableOrNull(c);
+      return q.map((List<TypedResult> rows) {
+        return rows.map((TypedResult row) {
+          final TransactionRow txn = row.readTable(t);
+          final CustomerRow? cust = row.readTableOrNull(c);
           return TrxWithCustomer(
             id: txn.transactionId,
             customerId: txn.customerId,
@@ -1236,7 +1232,9 @@ class BackEnd {
       final c = d.customersTable;
 
       final q =
-          (d.select(t).join([leftOuterJoin(c, c.customerId.equalsExp(t.customerId))])
+          (d.select(t).join([
+                  leftOuterJoin(c, c.customerId.equalsExp(t.customerId)),
+                ])
                 ..where(
                   t.transactionDate.isBiggerOrEqualValue(start) &
                       t.transactionDate.isSmallerThanValue(end),
@@ -1268,7 +1266,6 @@ class BackEnd {
     });
   }
 
-
   /// Joined variant of [watchTransactionsByAge] — returns [TrxWithCustomer].
   static Stream<List<TrxWithCustomer>> watchTransactionsByAgeWithCustomer({
     required int months,
@@ -1284,7 +1281,9 @@ class BackEnd {
       final c = d.customersTable;
 
       final q =
-          (d.select(t).join([leftOuterJoin(c, c.customerId.equalsExp(t.customerId))])
+          (d.select(t).join([
+                  leftOuterJoin(c, c.customerId.equalsExp(t.customerId)),
+                ])
                 ..where(t.transactionDate.isSmallerThanValue(cutoff))
                 ..orderBy([
                   OrderingTerm.desc(t.transactionDate),
@@ -1486,9 +1485,7 @@ class BackEnd {
         base,
         activeTxns,
         (baseRows, activeRows) => (baseRows, activeRows),
-      ).asyncMap((
-        (List<QueryRow>, List<TransactionRow>) pair,
-      ) async {
+      ).asyncMap(((List<QueryRow>, List<TransactionRow>) pair) async {
         final (baseRows, activeRows) = pair;
         final row = baseRows.first.data;
 
@@ -1576,31 +1573,33 @@ class BackEnd {
     final overallStart = _monthStart(DateTime(now.year, now.month - 5));
     final overallEnd = _monthEnd(DateTime(now.year, now.month));
 
-    final txnQuery = (d.selectOnly(d.transactionsTable)
-          ..addColumns([
-            d.transactionsTable.transactionDate,
-            d.transactionsTable.amount,
-          ])
-          ..where(
-            d.transactionsTable.transactionDate.isBiggerOrEqualValue(
-                  overallStart,
-                ) &
-                d.transactionsTable.transactionDate.isSmallerThanValue(
-                  overallEnd,
-                ),
-          ))
-        .get();
+    final txnQuery =
+        (d.selectOnly(d.transactionsTable)
+              ..addColumns([
+                d.transactionsTable.transactionDate,
+                d.transactionsTable.amount,
+              ])
+              ..where(
+                d.transactionsTable.transactionDate.isBiggerOrEqualValue(
+                      overallStart,
+                    ) &
+                    d.transactionsTable.transactionDate.isSmallerThanValue(
+                      overallEnd,
+                    ),
+              ))
+            .get();
 
-    final payQuery = (d.selectOnly(d.paymentsTable)
-          ..addColumns([
-            d.paymentsTable.paymentDate,
-            d.paymentsTable.amountPaid,
-          ])
-          ..where(
-            d.paymentsTable.paymentDate.isBiggerOrEqualValue(overallStart) &
-                d.paymentsTable.paymentDate.isSmallerThanValue(overallEnd),
-          ))
-        .get();
+    final payQuery =
+        (d.selectOnly(d.paymentsTable)
+              ..addColumns([
+                d.paymentsTable.paymentDate,
+                d.paymentsTable.amountPaid,
+              ])
+              ..where(
+                d.paymentsTable.paymentDate.isBiggerOrEqualValue(overallStart) &
+                    d.paymentsTable.paymentDate.isSmallerThanValue(overallEnd),
+              ))
+            .get();
 
     final queryResults = await Future.wait([txnQuery, payQuery]);
     final txnRows = queryResults[0];
@@ -1676,31 +1675,33 @@ class BackEnd {
     final overallStart = _monthStart(DateTime(now.year, now.month - 11));
     final overallEnd = _monthEnd(DateTime(now.year, now.month));
 
-    final txnQuery = (d.selectOnly(d.transactionsTable)
-          ..addColumns([
-            d.transactionsTable.transactionDate,
-            d.transactionsTable.amount,
-          ])
-          ..where(
-            d.transactionsTable.transactionDate.isBiggerOrEqualValue(
-                  overallStart,
-                ) &
-                d.transactionsTable.transactionDate.isSmallerThanValue(
-                  overallEnd,
-                ),
-          ))
-        .get();
+    final txnQuery =
+        (d.selectOnly(d.transactionsTable)
+              ..addColumns([
+                d.transactionsTable.transactionDate,
+                d.transactionsTable.amount,
+              ])
+              ..where(
+                d.transactionsTable.transactionDate.isBiggerOrEqualValue(
+                      overallStart,
+                    ) &
+                    d.transactionsTable.transactionDate.isSmallerThanValue(
+                      overallEnd,
+                    ),
+              ))
+            .get();
 
-    final payQuery = (d.selectOnly(d.paymentsTable)
-          ..addColumns([
-            d.paymentsTable.paymentDate,
-            d.paymentsTable.amountPaid,
-          ])
-          ..where(
-            d.paymentsTable.paymentDate.isBiggerOrEqualValue(overallStart) &
-                d.paymentsTable.paymentDate.isSmallerThanValue(overallEnd),
-          ))
-        .get();
+    final payQuery =
+        (d.selectOnly(d.paymentsTable)
+              ..addColumns([
+                d.paymentsTable.paymentDate,
+                d.paymentsTable.amountPaid,
+              ])
+              ..where(
+                d.paymentsTable.paymentDate.isBiggerOrEqualValue(overallStart) &
+                    d.paymentsTable.paymentDate.isSmallerThanValue(overallEnd),
+              ))
+            .get();
 
     final queryResults = await Future.wait([txnQuery, payQuery]);
     final txnRows = queryResults[0];
@@ -1761,31 +1762,33 @@ class BackEnd {
     final overallStart = _dayStart(oldestDay);
     final overallEnd = _dayEnd(now);
 
-    final txnQuery = (d.selectOnly(d.transactionsTable)
-          ..addColumns([
-            d.transactionsTable.transactionDate,
-            d.transactionsTable.amount,
-          ])
-          ..where(
-            d.transactionsTable.transactionDate.isBiggerOrEqualValue(
-                  overallStart,
-                ) &
-                d.transactionsTable.transactionDate.isSmallerThanValue(
-                  overallEnd,
-                ),
-          ))
-        .get();
+    final txnQuery =
+        (d.selectOnly(d.transactionsTable)
+              ..addColumns([
+                d.transactionsTable.transactionDate,
+                d.transactionsTable.amount,
+              ])
+              ..where(
+                d.transactionsTable.transactionDate.isBiggerOrEqualValue(
+                      overallStart,
+                    ) &
+                    d.transactionsTable.transactionDate.isSmallerThanValue(
+                      overallEnd,
+                    ),
+              ))
+            .get();
 
-    final payQuery = (d.selectOnly(d.paymentsTable)
-          ..addColumns([
-            d.paymentsTable.paymentDate,
-            d.paymentsTable.amountPaid,
-          ])
-          ..where(
-            d.paymentsTable.paymentDate.isBiggerOrEqualValue(overallStart) &
-                d.paymentsTable.paymentDate.isSmallerThanValue(overallEnd),
-          ))
-        .get();
+    final payQuery =
+        (d.selectOnly(d.paymentsTable)
+              ..addColumns([
+                d.paymentsTable.paymentDate,
+                d.paymentsTable.amountPaid,
+              ])
+              ..where(
+                d.paymentsTable.paymentDate.isBiggerOrEqualValue(overallStart) &
+                    d.paymentsTable.paymentDate.isSmallerThanValue(overallEnd),
+              ))
+            .get();
 
     final queryResults = await Future.wait([txnQuery, payQuery]);
     final txnRows = queryResults[0];
@@ -1851,23 +1854,25 @@ class BackEnd {
     final paySumExpr = d.paymentsTable.amountPaid.sum();
     final payCountExpr = d.paymentsTable.paymentId.count();
 
-    final txnFuture = (d.selectOnly(d.transactionsTable)
-          ..addColumns([txnSumExpr, txnCountExpr])
-          ..where(
-            d.transactionsTable.transactionDate.isBiggerOrEqualValue(
-                  start,
-                ) &
-                d.transactionsTable.transactionDate.isSmallerThanValue(end),
-          ))
-        .getSingle();
+    final txnFuture =
+        (d.selectOnly(d.transactionsTable)
+              ..addColumns([txnSumExpr, txnCountExpr])
+              ..where(
+                d.transactionsTable.transactionDate.isBiggerOrEqualValue(
+                      start,
+                    ) &
+                    d.transactionsTable.transactionDate.isSmallerThanValue(end),
+              ))
+            .getSingle();
 
-    final payFuture = (d.selectOnly(d.paymentsTable)
-          ..addColumns([paySumExpr, payCountExpr])
-          ..where(
-            d.paymentsTable.paymentDate.isBiggerOrEqualValue(start) &
-                d.paymentsTable.paymentDate.isSmallerThanValue(end),
-          ))
-        .getSingle();
+    final payFuture =
+        (d.selectOnly(d.paymentsTable)
+              ..addColumns([paySumExpr, payCountExpr])
+              ..where(
+                d.paymentsTable.paymentDate.isBiggerOrEqualValue(start) &
+                    d.paymentsTable.paymentDate.isSmallerThanValue(end),
+              ))
+            .getSingle();
 
     final rows = await Future.wait([txnFuture, payFuture]);
     final txnRow = rows[0];

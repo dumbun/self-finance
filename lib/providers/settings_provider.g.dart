@@ -142,3 +142,48 @@ abstract class _$BiometricsNotifier extends $AsyncNotifier<bool> {
     element.handleCreate(ref, build);
   }
 }
+
+@ProviderFor(OnboardingCompleteNotifier)
+final onboardingCompleteProvider = OnboardingCompleteNotifierProvider._();
+
+final class OnboardingCompleteNotifierProvider
+    extends $AsyncNotifierProvider<OnboardingCompleteNotifier, bool> {
+  OnboardingCompleteNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'onboardingCompleteProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$onboardingCompleteNotifierHash();
+
+  @$internal
+  @override
+  OnboardingCompleteNotifier create() => OnboardingCompleteNotifier();
+}
+
+String _$onboardingCompleteNotifierHash() =>
+    r'3c1dbb0be7d357287b75e28c874a7287bb29f880';
+
+abstract class _$OnboardingCompleteNotifier extends $AsyncNotifier<bool> {
+  FutureOr<bool> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<bool>, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<bool>, bool>,
+              AsyncValue<bool>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

@@ -1,0 +1,24 @@
+💡 Feature Suggestions
+FS1 — Search in History View
+The HistoryView has no search bar. With thousands of history entries, finding a specific event is impossible. Adding a search/filter (by customer name, event type, date range) would be highly valuable.
+
+FS2 — Overdue Loan Alerts on Dashboard
+The dashboard shows active loans count but doesn't highlight overdue loans (where transactionDate + loan period < today). A red badge or dedicated "Overdue" section on the home screen would surface critical info immediately.
+
+FS3 — Export to PDF (all transactions)
+InvoiceGenerator already generates per-transaction PDFs. Adding a bulk "Export All Transactions" PDF with a summary table would improve reporting for business users.
+
+FS4 — Dark Mode Chart Colors
+The chart widget (monthly_chart_widget.dart) uses hardcoded colors (getPrimaryColor, getErrorColor). In dark mode these look fine but could be theme-aware. A subtle luminosity adjustment for dark mode would improve legibility.
+
+FS5 — Transaction Due in X Days Badge
+When viewing a customer's transaction list (requriedCustomerTransactionsProvider), show a "Due in N days" chip so users know at a glance without opening each transaction.
+
+FS6 — PIN Strength Validation
+PinInputWidget only checks that a PIN is non-empty; no minimum length enforcement at the auth view. An attacker could set a 1-digit PIN. Enforce minimum 4 digits at the PinCreatingView level.
+
+FS7 — Bulk Delete / Archive Transactions
+Currently transactions are deleted one-by-one via swipe. Power users managing hundreds of old records would benefit from a bulk-select + delete / archive feature in TransactionsView.
+
+FS8 — Offline First-Run Quick Setup Wizard
+The current onboarding (TermsAndConditons) is good but has no walkthrough of the core workflow (add customer → create transaction → receive payment). A 3-step interactive tutorial after first login would improve retention.

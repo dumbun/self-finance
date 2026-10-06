@@ -6,25 +6,12 @@ import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/fonts/title_widget.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/preferences_helper.dart';
+import 'package:self_finance/models/onboarding_model.dart';
 import 'package:self_finance/views/auth_view.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
-/// Content of a single onboarding page.
-class _OnboardingItem {
-  const _OnboardingItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.description,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final String description;
-}
-
 /// First-launch onboarding.
+/// Content of a single onboarding page.
 ///
 /// Three swipeable pages that follow the same visual language as the splash
 /// screen (primary colour, soft radial background, rounded icon card).
@@ -37,8 +24,8 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  static const List<_OnboardingItem> _items = <_OnboardingItem>[
-    _OnboardingItem(
+  static const List<OnboardingItem> _items = <OnboardingItem>[
+    OnboardingItem(
       icon: Icons.lock_outline_rounded,
       title: 'Secure & Offline',
       subtitle: '100% private on your device',
@@ -46,7 +33,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           'Your ledger never leaves your phone. Protect it with a PIN or '
           'biometrics, and keep it safe with encrypted backups.',
     ),
-    _OnboardingItem(
+    OnboardingItem(
       icon: Icons.auto_graph_rounded,
       title: 'Smart Interest',
       subtitle: 'Monthly rate, daily precision',
@@ -54,7 +41,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           'Interest, due time and total payable are calculated '
           'automatically, so you always know exactly what to collect.',
     ),
-    _OnboardingItem(
+    OnboardingItem(
       icon: Icons.receipt_long_outlined,
       title: 'Manage Every Loan',
       subtitle: 'Built for shopkeepers & lenders',
@@ -247,7 +234,7 @@ class _OnboardingPage extends StatelessWidget {
     required this.controller,
   });
 
-  final _OnboardingItem item;
+  final OnboardingItem item;
   final int index;
   final PageController controller;
 
@@ -279,7 +266,7 @@ class _OnboardingPage extends StatelessWidget {
 class _PageContent extends StatelessWidget {
   const _PageContent({required this.item});
 
-  final _OnboardingItem item;
+  final OnboardingItem item;
 
   @override
   Widget build(BuildContext context) {

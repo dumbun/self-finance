@@ -45,7 +45,6 @@ class BuildTransactionsListWidget extends ConsumerWidget {
                       customerId: txn.customerId,
                       context: context,
                     ),
-                    // ✅ No per-row DB subscription — photo comes from the JOIN
                     leading: txn.customerPhoto.isNotEmpty
                         ? CircularImageWidget(
                             errorBuilder: const DefaultUserImage(),
