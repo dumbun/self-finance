@@ -15,10 +15,10 @@ class TransactionsView extends HookConsumerWidget {
 
     Future<void> refreshData() async {
       searchController.clear();
-      ref.invalidate(transactionsProvider);
       ref.read(filterProvider.notifier).clear();
       ref.read(transactionsDateSearchQueryProvider.notifier).clear();
       ref.read(transactionsSearchQueryProvider.notifier).clear();
+      ref.invalidate(transactionsProvider);
     }
 
     return RefreshIndicator(
@@ -73,13 +73,9 @@ class TransactionsView extends HookConsumerWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 16),
-
             const TransactionFilterWidget(),
-
             const SizedBox(height: 16),
-
             const Expanded(child: BuildTransactionsListWidget()),
           ],
         ),

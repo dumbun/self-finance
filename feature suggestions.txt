@@ -22,3 +22,39 @@ Currently transactions are deleted one-by-one via swipe. Power users managing hu
 
 FS8 — Offline First-Run Quick Setup Wizard
 The current onboarding (TermsAndConditons) is good but has no walkthrough of the core workflow (add customer → create transaction → receive payment). A 3-step interactive tutorial after first login would improve retention.
+
+FS9 — Add Date/Time to Transaction Details
+When viewing a transaction's details (HistoryDetailView or requiredCustomerTransactionsProvider summary), the timestamp is missing. Add a "Time: HH:MM AM/PM" field next to the date for complete audit trail.
+
+FS10 — Prevent Multiple Accounts with Same Name
+AccountListWidget allows duplicate account names (e.g., two "Bank" accounts). When the user types in "Bank", the filtering shows both. Enforce unique account names at the point of creation (in AccountSettingsView).
+
+FS11 — Export Filters
+When exporting to CSV or PDF (HistoryView), allow the user to apply filters first. Currently export exports everything. A "Export Filtered Results" option would enable targeted reporting (e.g., "Export only transactions from last month").
+
+FS12 — Delete Draft Transaction
+In AddNewTransactionView, if the user abandons the form, the transaction is saved as a draft in Firestore. There is no UI to delete these drafts. A small "Saved Drafts" section or cleanup mechanism would prevent clutter.
+
+FS13 — Confirmation Dialog for "Continue Without Login"
+In CreateAccountView, the "Continue Without Login" button is easy to tap accidentally. Add a confirmation dialog ("Are you sure you want to create a temporary account?") to prevent accidental data loss.
+
+FS14 — Dark Mode Status Bar
+In dark mode, the top status bar (time, WiFi, battery) is barely visible against the dark gray background. Add a white tint or adjust the status bar style (SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR / SYSTEM_UI_FLAG_LIGHT_STATUS_BAR) in dark mode.
+
+FS15 — Edit Transaction (Basic Fields Only)
+Currently editing a transaction requires a full form reload. Allow inline editing for Amount, Type (Give/Get), and Date without restarting the session. Keep customer/item lookup read-only for simplicity.
+
+FS16 — Duplicate Transaction Warning
+When a user enters the same Amount + Customer + Type within a short time window, show a subtle warning: "This looks similar to a previous transaction. Is this a duplicate?" (with "Yes" and "No" buttons).
+
+FS17 — Mark as "Bounced" (Bad Check)
+For Give (Credit) transactions, add a "Mark as Bounced" button in HistoryDetailView. This would tag the transaction as "Bounced", revert the customer balance effect, and add a red "Bounced" badge to the history list.
+
+FS18 — Dark Mode Friendly Icons
+Some icons (e.g., Back button in HeaderBar) are dark gray and hard to see in dark mode. Use theme colors (getPrimaryColor / invert with opacity) for action icons in dark backgrounds.
+
+FS19 — Auto-Backup Status on Settings
+In AppSettingsView, show "Last Backup: [Date] [Time]" and "Status: OK". If a backup fails, display a red warning icon with "Backup Failed. Tap to sync now."
+
+FS20 — Disable Save Button When Required Fields Missing
+In AddNewTransactionView, disable the Save button until all required fields (Amount, Customer, Item/Description, Date) are filled. The current behavior is to show an empty snackbar error, which is confusing.

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show debugPrint, debugPrintStack;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -98,40 +99,109 @@ class TransactionsDateSearchQuery extends _$TransactionsDateSearchQuery {
 
 @riverpod
 class TransactionsNotifier extends _$TransactionsNotifier {
-  Stream<List<TrxWithCustomer>> _fetchTransactions() {
-    return BackEnd.watchTransactionsWithCustomer();
-  }
+  static const int _pageSize = BackEnd.transactionsPageSize;
+
+  final List<TrxWithCustomer> _transactions = [];
+  int? _lastTransactionId;
+  bool _hasMore = true;
+  bool _isLoadingMore = false;
+
+  String _searchQuery = '';
+  DateTime? _dateQuery;
+  int? _ageMonths;
+
+  /// Incremented on every rebuild. Async results that finish after the
+  /// filters changed compare against this and are discarded.
+  int _generation = 0;
+
+  bool get hasMore => _hasMore;
+  bool get isLoadingMore => _isLoadingMore;
 
   @override
-  Stream<List<TrxWithCustomer>> build() {
-    final Stream<List<TrxWithCustomer>> base = _fetchTransactions();
+  Future<List<TrxWithCustomer>> build() async {
+    final int gen = ++_generation;
+
     final String query = ref
         .watch(transactionsSearchQueryProvider)
         .trim()
         .toLowerCase();
     final DateTime? dateQuery = ref.watch(transactionsDateSearchQueryProvider);
-    final filterQuery = ref.watch(filterProvider);
+    final Set<TransactionsFilters> filterQuery = ref.watch(filterProvider);
+    final int? ageMonths = filterQuery.isEmpty
+        ? null
+        : filterQuery.first.months;
 
-    if (query.isEmpty && dateQuery == null && filterQuery.isEmpty) return base;
-    if (query.isNotEmpty && dateQuery == null && filterQuery.isEmpty) {
-      return base.map((List<TrxWithCustomer> transactions) {
-        return transactions.where((TrxWithCustomer element) {
-          final idMatch = element.id.toString().trim() == query;
-          final nameMatch = element.customerName.toLowerCase().contains(query);
-          final amountMatch = element.amount.toString().contains(query);
-          return idMatch || nameMatch || amountMatch;
-        }).toList();
-      });
-    } else if (query.isEmpty && dateQuery != null && filterQuery.isEmpty) {
-      return BackEnd.watchTransactionsByDateWithCustomer(inputDate: dateQuery);
-    } else if (query.isEmpty && dateQuery == null && filterQuery.isNotEmpty) {
-      return BackEnd.watchTransactionsByAgeWithCustomer(
-        months: filterQuery.first.months,
-      );
-    } else {
-      return base;
+    _searchQuery = query;
+    _dateQuery = dateQuery;
+    _ageMonths = ageMonths;
+    _isLoadingMore = false;
+
+    final List<TrxWithCustomer> firstPage = await BackEnd.fetchTransactionsPage(
+      searchQuery: query,
+      dateQuery: dateQuery,
+      ageMonths: ageMonths,
+    );
+
+    // A newer build started while we were waiting: don't touch shared state.
+    if (gen != _generation) {
+      return List<TrxWithCustomer>.unmodifiable(firstPage);
+    }
+
+    _transactions
+      ..clear()
+      ..addAll(firstPage);
+    _lastTransactionId = firstPage.isEmpty ? null : firstPage.last.id;
+    _hasMore = firstPage.length >= _pageSize;
+
+    return List<TrxWithCustomer>.unmodifiable(_transactions);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Pagination
+  // ---------------------------------------------------------------------------
+
+  Future<void> loadMore() async {
+    if (_isLoadingMore || !_hasMore) return;
+    if (!state.hasValue) return; // first page still loading
+
+    final int gen = _generation;
+    _isLoadingMore = true;
+
+    try {
+      final List<TrxWithCustomer> nextPage =
+          await BackEnd.fetchTransactionsPage(
+            beforeTransactionId: _lastTransactionId,
+            searchQuery: _searchQuery,
+            dateQuery: _dateQuery,
+            ageMonths: _ageMonths,
+          );
+
+      if (gen != _generation) return; // filters changed, discard
+
+      _transactions.addAll(nextPage);
+      if (nextPage.isNotEmpty) _lastTransactionId = nextPage.last.id;
+      _hasMore = nextPage.length >= _pageSize;
+    } catch (e, st) {
+      if (gen != _generation) return;
+      // Stop auto-retrying; pull-to-refresh resets this.
+      _hasMore = false;
+      debugPrint('Failed to load more transactions: $e');
+      debugPrintStack(stackTrace: st);
+    } finally {
+      if (gen == _generation) {
+        _isLoadingMore = false;
+        // Always publish so the footer spinner updates.
+        state = AsyncData(List<TrxWithCustomer>.unmodifiable(_transactions));
+      }
     }
   }
+
+  /// Reloads from page 1. The old list stays visible while loading.
+  void refreshTransactions() => ref.invalidateSelf();
+
+  // ---------------------------------------------------------------------------
+  // Create
+  // ---------------------------------------------------------------------------
 
   Future<bool> addNewTransactoion({
     required int customerId,
@@ -143,7 +213,7 @@ class TransactionsNotifier extends _$TransactionsNotifier {
     required double rateOfIntrest,
     required SignatureController signatureController,
   }) async {
-    ref.keepAlive();
+    final keepAlive = ref.keepAlive();
 
     String itemImagePath = '';
     String signaturePath = '';
@@ -160,8 +230,7 @@ class TransactionsNotifier extends _$TransactionsNotifier {
       );
 
       final User user = await UserBackEnd.fetchUserData();
-      final int activeUserId =
-          (user.id != null && user.id! > 0) ? user.id! : 1;
+      final int activeUserId = (user.id != null && user.id! > 0) ? user.id! : 1;
 
       final int transacrtionId = await BackEnd.createNewTransactionAtomic(
         item: Items(
@@ -211,10 +280,12 @@ class TransactionsNotifier extends _$TransactionsNotifier {
             dueDate: userInputDate.add(const Duration(days: 6 * 30)),
           );
         }
+
+        // Show the new transaction at the top of the list.
+        refreshTransactions();
         return true;
-      } else {
-        return false;
       }
+      return false;
     } catch (e) {
       if (itemImagePath.isNotEmpty) {
         try {
@@ -231,17 +302,28 @@ class TransactionsNotifier extends _$TransactionsNotifier {
         } catch (_) {}
       }
       rethrow;
+    } finally {
+      keepAlive.close();
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // Delete
+  // ---------------------------------------------------------------------------
 
   Future<Map<String, int>> deleteTransaction({
     required int transactionId,
   }) async {
-    // Cancel notifications before deleting
     await NotificationService().cancelTransactionReminder(
       transactionId: transactionId,
     );
-    return await BackEnd.deleteTransaction(transactionId: transactionId);
+    final Map<String, int> result = await BackEnd.deleteTransaction(
+      transactionId: transactionId,
+    );
+    if (ref.mounted) {
+      refreshTransactions();
+    }
+    return result;
   }
 }
 
@@ -262,7 +344,6 @@ class TransactionByID extends _$TransactionByID {
   }) async {
     final Trx? trx = state.value;
     if (trx != null) {
-      // Cancel the due reminder since it's now paid
       await NotificationService().cancelTransactionReminder(
         transactionId: trx.id!,
       );
@@ -282,8 +363,7 @@ class TransactionByID extends _$TransactionByID {
       );
 
       final User user = await UserBackEnd.fetchUserData();
-      final int activeUserId =
-          (user.id != null && user.id! > 0) ? user.id! : 1;
+      final int activeUserId = (user.id != null && user.id! > 0) ? user.id! : 1;
 
       await BackEnd.markTransactionAsPaidAtomic(
         payment: payment,
@@ -301,6 +381,11 @@ class TransactionByID extends _$TransactionByID {
           amount: amountpaid,
         ),
       );
+
+      // The list is no longer a live stream, so refresh it manually
+      // so the Active/Inactive chip updates.
+      ref.invalidate(transactionsProvider);
+
       await ReviewHelper.requestAppReview();
     }
   }

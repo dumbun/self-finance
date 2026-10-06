@@ -153,16 +153,17 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
     );
   }
 
-  double _doubleCheck(String text, {String errorString = Constant.error}) {
+  double? _doubleCheck(String text, {String errorString = Constant.error}) {
     try {
       return double.parse(text);
     } catch (e) {
-      _isloading = false;
-      return AlertDilogs.alertDialogWithOneAction(
+      setState(() => _isloading = false);
+      AlertDilogs.alertDialogWithOneAction(
         context,
         errorString,
         e.toString(),
       );
+      return null;
     }
   }
 
@@ -170,7 +171,13 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
     final DateTime? userPickedDate = ref.read(dateProvider);
 
     if (_validateAndSave() && userPickedDate != null) {
-      _isloading = true;
+      final double? pawnAmount = _doubleCheck(_amount.text);
+      final double? rateOfIntrest = _doubleCheck(_rateOfIntrest.text);
+
+      // Bail out if either value failed to parse — dialog was already shown.
+      if (pawnAmount == null || rateOfIntrest == null) return;
+
+      setState(() => _isloading = true);
       final bool res = await ref
           .read(transactionsProvider.notifier)
           .addNewTransactoion(
@@ -179,8 +186,8 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
             customerId: widget.customerID,
             discription: _description.text,
             userInputDate: userPickedDate,
-            pawnAmount: _doubleCheck(_amount.text),
-            rateOfIntrest: _doubleCheck(_rateOfIntrest.text),
+            pawnAmount: pawnAmount,
+            rateOfIntrest: rateOfIntrest,
             signatureController: _signatureController,
           );
       res ? _safeSuccuse() : _saveUnSuccessfull();
@@ -188,7 +195,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   }
 
   void _safeSuccuse() {
-    _isloading = false;
+    setState(() => _isloading = false);
     SnackBarWidget.snackBarWidget(
       context: context,
       message: Constant.transacrtionAddedSuccessfully,
@@ -197,7 +204,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   }
 
   void _saveUnSuccessfull() {
-    _isloading = false;
+    setState(() => _isloading = false);
     AlertDilogs.alertDialogWithOneAction(
       context,
       Constant.error,

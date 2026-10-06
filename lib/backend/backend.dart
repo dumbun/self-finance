@@ -252,6 +252,9 @@ class ItDataDatabase extends _$ItDataDatabase {
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_history_date ON History(Event_Date)',
     );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_transactions_date ON Transactions(Transaction_Date)',
+    );
   }
 
   Future<void> _coerceLegacyTextDatesOnOpen() async {
@@ -1117,39 +1120,163 @@ class BackEnd {
     });
   }
 
-  /// Returns a joined stream of transactions + their customer's name & photo
-  /// in a single SQL query — eliminates N+1 per-row subscriptions in the list UI.
-  static Stream<List<TrxWithCustomer>> watchTransactionsWithCustomer() {
-    return Stream.fromFuture(db()).asyncExpand((d) {
-      final t = d.transactionsTable;
-      final c = d.customersTable;
+  // /// Returns a joined stream of transactions + their customer's name & photo
+  // /// in a single SQL query — eliminates N+1 per-row subscriptions in the list UI.
+  // static Stream<List<TrxWithCustomer>> watchTransactionsWithCustomer() {
+  //   return Stream.fromFuture(db()).asyncExpand((d) {
+  //     final t = d.transactionsTable;
+  //     final c = d.customersTable;
 
-      final q = (d.select(t).join([
-        leftOuterJoin(c, c.customerId.equalsExp(t.customerId)),
-      ])..orderBy([OrderingTerm.desc(t.transactionId)])).watch();
+  //     final q = (d.select(t).join([
+  //       leftOuterJoin(c, c.customerId.equalsExp(t.customerId)),
+  //     ])..orderBy([OrderingTerm.desc(t.transactionId)])).watch();
 
-      return q.map((List<TypedResult> rows) {
-        return rows.map((TypedResult row) {
-          final TransactionRow txn = row.readTable(t);
-          final CustomerRow? cust = row.readTableOrNull(c);
-          return TrxWithCustomer(
-            id: txn.transactionId,
-            customerId: txn.customerId,
-            itemId: txn.itemId,
-            transactionDate: txn.transactionDate,
-            transactionType: txn.transactionType,
-            amount: txn.amount,
-            interestRate: txn.interestRate,
-            interestAmount: txn.interestAmount,
-            remainingAmount: txn.remainingAmount,
-            signature: txn.signature,
-            createdDate: txn.createdDate,
-            customerName: cust?.customerName ?? '',
-            customerPhoto: cust?.customerPhoto ?? '',
-          );
-        }).toList();
-      });
-    });
+  //     return q.map((List<TypedResult> rows) {
+  //       return rows.map((TypedResult row) {
+  //         final TransactionRow txn = row.readTable(t);
+  //         final CustomerRow? cust = row.readTableOrNull(c);
+  //         return TrxWithCustomer(
+  //           id: txn.transactionId,
+  //           customerId: txn.customerId,
+  //           itemId: txn.itemId,
+  //           transactionDate: txn.transactionDate,
+  //           transactionType: txn.transactionType,
+  //           amount: txn.amount,
+  //           interestRate: txn.interestRate,
+  //           interestAmount: txn.interestAmount,
+  //           remainingAmount: txn.remainingAmount,
+  //           signature: txn.signature,
+  //           createdDate: txn.createdDate,
+  //           customerName: cust?.customerName ?? '',
+  //           customerPhoto: cust?.customerPhoto ?? '',
+  //         );
+  //       }).toList();
+  //     });
+  //   });
+  // }
+
+  // ===========================================================================
+  // PAGINATED TRANSACTIONS (keyset / cursor)
+  // ===========================================================================
+
+  /// Number of transactions loaded per page.
+  static const int transactionsPageSize = 30;
+
+  /// Fetches ONE page of transactions (newest transaction ID first).
+  ///
+  /// How the cursor works:
+  ///   * First page  -> pass no [beforeTransactionId].
+  ///   * Next pages  -> pass the ID of the LAST row of the previous page.
+  ///                    Only rows with a smaller ID are returned.
+  ///
+  /// Optional filters (all combined with AND):
+  ///   * [searchQuery] : exact transaction ID, OR customer name contains,
+  ///                     OR amount contains.
+  ///   * [dateQuery]   : transactions made on that calendar day.
+  ///   * [ageMonths]   : transactions older than 1, 3, 6 or 12 months.
+  static Future<List<TrxWithCustomer>> fetchTransactionsPage({
+    int? beforeTransactionId,
+    String searchQuery = '',
+    DateTime? dateQuery,
+    int? ageMonths,
+    int limit = transactionsPageSize,
+  }) async {
+    // ---- 1. Validate input -------------------------------------------------
+    if (limit <= 0) {
+      throw ArgumentError('limit must be greater than 0');
+    }
+    if (ageMonths != null && ![1, 3, 6, 12].contains(ageMonths)) {
+      throw ArgumentError('Months must be one of: 1, 3, 6, or 12');
+    }
+
+    // ---- 2. Set up tables and the JOIN ------------------------------------
+    final d = await db();
+    final t = d.transactionsTable;
+    final c = d.customersTable;
+
+    final joined = d.select(t).join([
+      leftOuterJoin(c, c.customerId.equalsExp(t.customerId)),
+    ]);
+
+    // ---- 3. Build the WHERE conditions ------------------------------------
+    final List<Expression<bool>> conditions = [];
+
+    // 3a. Cursor: only rows older than the last loaded one.
+    if (beforeTransactionId != null) {
+      conditions.add(t.transactionId.isSmallerThanValue(beforeTransactionId));
+    }
+
+    // 3b. Search by ID / customer name / amount.
+    final String query = searchQuery.trim().toLowerCase();
+    if (query.isNotEmpty) {
+      final String pattern = '%$query%';
+      final int? idQuery = int.tryParse(query);
+
+      // Exact ID match (same behaviour as the old stream version).
+      final Expression<bool> idMatch = idQuery != null
+          ? t.transactionId.equals(idQuery)
+          : const Constant<bool>(false);
+
+      final Expression<bool> nameMatch = c.customerName.like(pattern);
+      final Expression<bool> amountMatch = t.amount.cast<String>().like(
+        pattern,
+      );
+
+      conditions.add(idMatch | nameMatch | amountMatch);
+    }
+
+    // 3c. Single-day filter.
+    if (dateQuery != null) {
+      conditions.add(
+        t.transactionDate.isBiggerOrEqualValue(_dayStart(dateQuery)) &
+            t.transactionDate.isSmallerThanValue(_dayEnd(dateQuery)),
+      );
+    }
+
+    // 3d. "Older than N months" filter.
+    if (ageMonths != null) {
+      final DateTime now = DateTime.now();
+      final DateTime cutoff = DateTime(
+        now.year,
+        now.month - ageMonths,
+        now.day,
+      );
+      conditions.add(t.transactionDate.isSmallerThanValue(cutoff));
+    }
+
+    // Combine everything with AND and apply once.
+    if (conditions.isNotEmpty) {
+      joined.where(conditions.reduce((a, b) => a & b));
+    }
+
+    // ---- 4. Order + LIMIT --------------------------------------------------
+    joined
+      ..orderBy([OrderingTerm.desc(t.transactionId)])
+      ..limit(limit);
+
+    // ---- 5. Run the query and map rows ------------------------------------
+    final rows = await joined.get();
+
+    return rows.map((row) {
+      final txn = row.readTable(t);
+      final cust = row.readTableOrNull(c);
+
+      return TrxWithCustomer(
+        id: txn.transactionId,
+        customerId: txn.customerId,
+        itemId: txn.itemId,
+        transactionDate: txn.transactionDate,
+        transactionType: txn.transactionType,
+        amount: txn.amount,
+        interestRate: txn.interestRate,
+        interestAmount: txn.interestAmount,
+        remainingAmount: txn.remainingAmount,
+        signature: txn.signature,
+        createdDate: txn.createdDate,
+        customerName: cust?.customerName ?? '',
+        customerPhoto: cust?.customerPhoto ?? '',
+      );
+    }).toList();
   }
 
   static Stream<List<Trx>> watchRequriedCustomerTransactions({

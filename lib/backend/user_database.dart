@@ -169,7 +169,7 @@ class UserBackEnd {
     if (File(s.profilePicture).existsSync() && s.profilePicture.isNotEmpty) {
       await File(s.profilePicture).delete();
     }
-    (d.update(d.userTable)..where((t) => t.id.equals(id))).write(
+    await (d.update(d.userTable)..where((t) => t.id.equals(id))).write(
       const UserTableCompanion(profilePicture: Value("")),
     );
   }

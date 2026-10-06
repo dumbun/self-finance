@@ -1,16 +1,13 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/providers/transactions_provider.dart';
 part 'customer_provider.g.dart';
 
 @riverpod
 class CustomerNotifier extends _$CustomerNotifier {
   @override
   Stream<Customer?> build(int id) => BackEnd.watchSingleCustomer(id: id);
-
-  Future<void> deleteCustomer(int customerID) async {
-    await BackEnd.deleteTheCustomer(customerID: customerID);
-  }
 
   Future<int> updateCustomer({required Customer customer}) async {
     return await BackEnd.updateCustomerDetails(
@@ -23,5 +20,10 @@ class CustomerNotifier extends _$CustomerNotifier {
       newProofPhoto: customer.proof,
       newCreatedDate: DateTime.now(),
     );
+  }
+
+  Future<void> deleteCustomer(int customerID) async {
+    await BackEnd.deleteTheCustomer(customerID: customerID);
+    ref.invalidate(transactionsProvider);
   }
 }

@@ -22,74 +22,63 @@ class CustomerTransactionsWidget extends ConsumerWidget {
         .when<Widget>(
           data: (List<Trx?> transactions) {
             if (transactions.isNotEmpty) {
-              return transactions.isNotEmpty
-                  ? ListView.separated(
-                      itemCount: transactions.length,
-                      separatorBuilder: (_, int index) =>
-                          const SizedBox(height: 12),
-                      itemBuilder: (BuildContext context, int index) {
-                        final Trx transaction = transactions[index]!;
-                        return SlidableWidget(
-                          transactionId: transaction.id!,
-                          customerId: transaction.customerId,
-                          child: GestureDetector(
-                            onTap: () =>
-                                Routes.navigateToTransactionDetailsView(
-                                  transacrtionId: transaction.id!,
-                                  customerId: customerId,
-                                  context: context,
-                                ),
-                            child: Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.circle,
-                                      size: 24,
-                                      color:
-                                          transaction.transacrtionType ==
-                                              Constant.active
-                                          ? AppColors.getGreenColor
-                                          : AppColors.getErrorColor,
-                                    ),
-                                    const SizedBox(width: 18),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        CurrencyWidget(
-                                          amount: Utility.doubleFormate(
-                                            transaction.amount,
-                                          ),
-                                        ),
-                                        BodyTwoDefaultText(
-                                          text:
-                                              "${Constant.takenDateSmall}: ${Utility.formatDate(date: transaction.transacrtionDate)}",
-                                        ),
-                                        BodyTwoDefaultText(
-                                          text:
-                                              "${Constant.rateOfIntrest}: ${transaction.intrestRate}",
-                                        ),
-                                        BodyTwoDefaultText(
-                                          text:
-                                              'ID:  ${transaction.id.toString()}',
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    )
-                  : const Center(
-                      child: BodyOneDefaultText(
-                        text: Constant.noTransactionMessage,
+              return ListView.separated(
+                itemCount: transactions.length,
+                separatorBuilder: (_, int index) => const SizedBox(height: 12),
+                itemBuilder: (BuildContext context, int index) {
+                  final Trx transaction = transactions[index]!;
+                  return SlidableWidget(
+                    transactionId: transaction.id!,
+                    customerId: transaction.customerId,
+                    child: GestureDetector(
+                      onTap: () => Routes.navigateToTransactionDetailsView(
+                        transacrtionId: transaction.id!,
+                        customerId: customerId,
+                        context: context,
                       ),
-                    );
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.circle,
+                                size: 24,
+                                color: transaction.transacrtionType ==
+                                        Constant.active
+                                    ? AppColors.getGreenColor
+                                    : AppColors.getErrorColor,
+                              ),
+                              const SizedBox(width: 18),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CurrencyWidget(
+                                    amount: Utility.doubleFormate(
+                                      transaction.amount,
+                                    ),
+                                  ),
+                                  BodyTwoDefaultText(
+                                    text:
+                                        "${Constant.takenDateSmall}: ${Utility.formatDate(date: transaction.transacrtionDate)}",
+                                  ),
+                                  BodyTwoDefaultText(
+                                    text:
+                                        "${Constant.rateOfIntrest}: ${transaction.intrestRate}",
+                                  ),
+                                  BodyTwoDefaultText(
+                                    text: 'ID:  ${transaction.id.toString()}',
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
             } else {
               return const Column(
                 mainAxisAlignment: MainAxisAlignment.center,

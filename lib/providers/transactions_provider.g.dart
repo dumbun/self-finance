@@ -174,7 +174,7 @@ final transactionsProvider = TransactionsNotifierProvider._();
 
 final class TransactionsNotifierProvider
     extends
-        $StreamNotifierProvider<TransactionsNotifier, List<TrxWithCustomer>> {
+        $AsyncNotifierProvider<TransactionsNotifier, List<TrxWithCustomer>> {
   TransactionsNotifierProvider._()
     : super(
         from: null,
@@ -195,11 +195,11 @@ final class TransactionsNotifierProvider
 }
 
 String _$transactionsNotifierHash() =>
-    r'4d1dbc93d04c7f5533db83dbcc905597ba48c441';
+    r'2d8c36d465197829eb7b16ad75bca709de08798d';
 
 abstract class _$TransactionsNotifier
-    extends $StreamNotifier<List<TrxWithCustomer>> {
-  Stream<List<TrxWithCustomer>> build();
+    extends $AsyncNotifier<List<TrxWithCustomer>> {
+  FutureOr<List<TrxWithCustomer>> build();
   @$mustCallSuper
   @override
   void runBuild() {
@@ -262,7 +262,7 @@ final class TransactionByIDProvider
   }
 }
 
-String _$transactionByIDHash() => r'295f07ef8519e36cf22a1068aaca98e82bf81629';
+String _$transactionByIDHash() => r'2a918e8a675a4bbf58bbda877319f4cc5abb7cf9';
 
 final class TransactionByIDFamily extends $Family
     with
