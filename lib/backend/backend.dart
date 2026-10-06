@@ -1158,10 +1158,6 @@ class BackEnd {
   // ===========================================================================
   // PAGINATED TRANSACTIONS (keyset / cursor)
   // ===========================================================================
-
-  /// Number of transactions loaded per page.
-  static const int transactionsPageSize = 30;
-
   /// Fetches ONE page of transactions (newest transaction ID first).
   ///
   /// How the cursor works:
@@ -1179,7 +1175,7 @@ class BackEnd {
     String searchQuery = '',
     DateTime? dateQuery,
     int? ageMonths,
-    int limit = transactionsPageSize,
+    int limit = 30,
   }) async {
     // ---- 1. Validate input -------------------------------------------------
     if (limit <= 0) {
@@ -1190,9 +1186,9 @@ class BackEnd {
     }
 
     // ---- 2. Set up tables and the JOIN ------------------------------------
-    final d = await db();
-    final t = d.transactionsTable;
-    final c = d.customersTable;
+    final ItDataDatabase d = await db();
+    final $TransactionsTableTable t = d.transactionsTable;
+    final $CustomersTableTable c = d.customersTable;
 
     final joined = d.select(t).join([
       leftOuterJoin(c, c.customerId.equalsExp(t.customerId)),
@@ -1255,12 +1251,11 @@ class BackEnd {
       ..limit(limit);
 
     // ---- 5. Run the query and map rows ------------------------------------
-    final rows = await joined.get();
+    final List<TypedResult> rows = await joined.get();
 
     return rows.map((row) {
-      final txn = row.readTable(t);
-      final cust = row.readTableOrNull(c);
-
+      final TransactionRow txn = row.readTable(t);
+      final CustomerRow? cust = row.readTableOrNull(c);
       return TrxWithCustomer(
         id: txn.transactionId,
         customerId: txn.customerId,

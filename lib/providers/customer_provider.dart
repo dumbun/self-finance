@@ -10,6 +10,7 @@ class CustomerNotifier extends _$CustomerNotifier {
   Stream<Customer?> build(int id) => BackEnd.watchSingleCustomer(id: id);
 
   Future<int> updateCustomer({required Customer customer}) async {
+    ref.invalidate(transactionsProvider);
     return await BackEnd.updateCustomerDetails(
       customerId: customer.id!,
       newCustomerName: customer.name,
