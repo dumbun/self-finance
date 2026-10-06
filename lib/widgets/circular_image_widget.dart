@@ -7,12 +7,14 @@ class CircularImageWidget extends StatelessWidget {
     super.key,
     required this.imageData,
     required this.titile,
+    this.heroTag,
     this.customeSize = 120,
     this.errorBuilder = const SizedBox.shrink(),
   });
 
   final String imageData;
   final String titile;
+  final String? heroTag;
   final double customeSize;
   final Widget errorBuilder;
 
@@ -20,7 +22,7 @@ class CircularImageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     if (imageData.isNotEmpty) {
       return Hero(
-        tag: titile,
+        tag: heroTag ?? titile,
         child: ClipOval(
           child: ImageWidget(
             errorBuilder: errorBuilder,

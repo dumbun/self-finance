@@ -110,6 +110,7 @@ class _BuildTransactionsListWidgetState
                             customeSize: 44,
                             imageData: txn.customerPhoto,
                             titile: txn.customerName,
+                            heroTag: '${txn.customerName}-${txn.id}',
                           )
                         : const DefaultUserImage(height: 44, width: 44),
                     title: CurrencyWidget(
