@@ -10,7 +10,7 @@ class CustomerNotifier extends _$CustomerNotifier {
   Stream<Customer?> build(int id) => BackEnd.watchSingleCustomer(id: id);
 
   Future<int> updateCustomer({required Customer customer}) async {
-    return await BackEnd.updateCustomerDetails(
+    final int res = await BackEnd.updateCustomerDetails(
       customerId: customer.id!,
       newCustomerName: customer.name,
       newGuardianName: customer.guardianName,
@@ -20,6 +20,11 @@ class CustomerNotifier extends _$CustomerNotifier {
       newProofPhoto: customer.proof,
       newCreatedDate: DateTime.now(),
     );
+
+    if (res != 0) {
+      ref.invalidate(transactionsProvider);
+    }
+    return res;
   }
 
   Future<void> deleteCustomer(int customerID) async {

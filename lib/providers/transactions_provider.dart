@@ -99,7 +99,7 @@ class TransactionsDateSearchQuery extends _$TransactionsDateSearchQuery {
 
 @riverpod
 class TransactionsNotifier extends _$TransactionsNotifier {
-  static const int _pageSize = BackEnd.transactionsPageSize;
+  static const int _pageSize = 30;
 
   final List<TrxWithCustomer> _transactions = [];
   int? _lastTransactionId;
