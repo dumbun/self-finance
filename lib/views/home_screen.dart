@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:self_finance/widgets/analatics_grid_widget.dart';
 import 'package:self_finance/widgets/animated_dots_widget.dart';
 import 'package:self_finance/widgets/invite_button_widget.dart';

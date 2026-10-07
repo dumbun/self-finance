@@ -1,10 +1,9 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 import 'package:self_finance/core/constants/routes.dart';
-import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/providers/app_dir_provider.dart';
 
 class ImageWidget extends ConsumerWidget {
@@ -29,42 +28,27 @@ class ImageWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<String> appDir = ref.read(appDirProvider);
+    final String appDirPath = ref.watch(appDirProvider);
+    final String fullPath = p.join(appDirPath, imagePath);
 
-    return appDir.when(
-      data: (String appDirPath) {
-        final String fullPath = p.join(appDirPath, imagePath);
-
-        return GestureDetector(
-          onTap: showImage
-              ? () {
-                  Routes.navigateToImageView(
-                    context: context,
-                    titile: title,
-                    imagePath: fullPath,
-                  );
-                }
-              : null,
-          child: Image.file(
-            File(fullPath),
-            height: height,
-            width: width,
-            fit: fit,
-            gaplessPlayback: true,
-            errorBuilder: (_, _, _) =>
-                SizedBox(height: height, width: width, child: errorBuilder),
-          ),
-        );
-      },
-      loading: () => SizedBox(
+    return GestureDetector(
+      onTap: showImage
+          ? () {
+              Routes.navigateToImageView(
+                context: context,
+                titile: title,
+                imagePath: fullPath,
+              );
+            }
+          : null,
+      child: Image.file(
+        File(fullPath),
         height: height,
         width: width,
-        child: const Center(child: CircularProgressIndicator.adaptive()),
-      ),
-      error: (Object error, StackTrace stackTrace) => SizedBox(
-        height: height,
-        width: width,
-        child: Center(child: BodyOneDefaultText(text: error.toString())),
+        fit: fit,
+        gaplessPlayback: true,
+        errorBuilder: (_, _, _) =>
+            SizedBox(height: height, width: width, child: errorBuilder),
       ),
     );
   }

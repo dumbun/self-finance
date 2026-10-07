@@ -2,7 +2,7 @@ import 'dart:core';
 import 'dart:io';
 
 import 'package:feedback/feedback.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';

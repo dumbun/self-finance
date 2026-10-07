@@ -1,10 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/preferences_helper.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
-import 'package:self_finance/providers/app_dir_provider.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/views/auth_view.dart';
 import 'package:self_finance/views/onboarding_screen.dart';
@@ -66,13 +65,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         ref
             .read(userProvider.future)
             .timeout(const Duration(seconds: 2), onTimeout: () => null),
-        ref
-            .read(appDirProvider.future)
-            .timeout(const Duration(seconds: 2), onTimeout: () => ''),
         PreferencesHelper.isOnboardingComplete(),
       ]);
 
-      onboardingComplete = results[2] as bool;
+      onboardingComplete = results[1] as bool;
     } catch (e) {
       debugPrint('Initialization error: $e');
       onboardingComplete = false;

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:flutter_localizations/flutter_localizations.dart' as native_loc;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
@@ -15,6 +16,11 @@ class SelfFinance extends ConsumerWidget {
     final bool darkMode = themeAsync.value ?? false;
 
     return MaterialApp(
+      localizationsDelegates: const [
+        native_loc.GlobalMaterialLocalizations.delegate,
+        native_loc.GlobalWidgetsLocalizations.delegate,
+        native_loc.GlobalCupertinoLocalizations.delegate,
+      ],
       routes: Routes.namedRoutes,
       color: AppColors.getPrimaryColor,
       title: Constant.appTitle,

@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -61,8 +61,9 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
   }
 
   void _recalculate({bool auto = false}) {
-    final String cleanAmount =
-        _amountController.text.replaceAll(',', '').trim();
+    final String cleanAmount = _amountController.text
+        .replaceAll(',', '')
+        .trim();
     final String cleanRate = _rateController.text.trim();
 
     final double? amount = double.tryParse(cleanAmount);
@@ -82,7 +83,9 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
       if (!auto) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Please enter a valid loan amount and interest rate."),
+            content: Text(
+              "Please enter a valid loan amount and interest rate.",
+            ),
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
           ),
@@ -181,18 +184,21 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
   String _formatAmountInWords(double amount) {
     if (amount >= 10000000) {
       final double cr = amount / 10000000;
-      final String formatted =
-          cr.truncateToDouble() == cr ? cr.toStringAsFixed(0) : cr.toStringAsFixed(2);
+      final String formatted = cr.truncateToDouble() == cr
+          ? cr.toStringAsFixed(0)
+          : cr.toStringAsFixed(2);
       return '$formatted Crore';
     } else if (amount >= 100000) {
       final double lk = amount / 100000;
-      final String formatted =
-          lk.truncateToDouble() == lk ? lk.toStringAsFixed(0) : lk.toStringAsFixed(2);
+      final String formatted = lk.truncateToDouble() == lk
+          ? lk.toStringAsFixed(0)
+          : lk.toStringAsFixed(2);
       return '$formatted Lakh';
     } else if (amount >= 1000) {
       final double k = amount / 1000;
-      final String formatted =
-          k.truncateToDouble() == k ? k.toStringAsFixed(0) : k.toStringAsFixed(1);
+      final String formatted = k.truncateToDouble() == k
+          ? k.toStringAsFixed(0)
+          : k.toStringAsFixed(1);
       return '$formatted Thousand';
     }
     return '';
@@ -209,10 +215,12 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
         : _loanCalculator!.totalInterestAmount;
 
     final double rate =
-        double.tryParse(_rateController.text.trim()) ?? _loanCalculator!.rateOfInterest;
+        double.tryParse(_rateController.text.trim()) ??
+        _loanCalculator!.rateOfInterest;
     final double apr = rate * 12;
 
-    final String text = '''
+    final String text =
+        '''
 ══════════════════════════════════════
   SELF FINANCE - LOAN CALCULATION
 ══════════════════════════════════════
@@ -249,10 +257,12 @@ Calculated via Self Finance App
         : _loanCalculator!.totalInterestAmount;
 
     final double rate =
-        double.tryParse(_rateController.text.trim()) ?? _loanCalculator!.rateOfInterest;
+        double.tryParse(_rateController.text.trim()) ??
+        _loanCalculator!.rateOfInterest;
     final double apr = rate * 12;
 
-    final String text = '''
+    final String text =
+        '''
 ══════════════════════════════════════
   SELF FINANCE - LOAN CALCULATION
 ══════════════════════════════════════
@@ -285,10 +295,12 @@ Calculated via Self Finance App
     final String currencySymbol =
         (userCurrency != null && userCurrency.isNotEmpty) ? userCurrency : '₹';
 
-    final double? parsedAmount =
-        double.tryParse(_amountController.text.replaceAll(',', '').trim());
-    final String amountWords =
-        parsedAmount != null ? _formatAmountInWords(parsedAmount) : '';
+    final double? parsedAmount = double.tryParse(
+      _amountController.text.replaceAll(',', '').trim(),
+    );
+    final String amountWords = parsedAmount != null
+        ? _formatAmountInWords(parsedAmount)
+        : '';
     final double? parsedRate = double.tryParse(_rateController.text.trim());
 
     return GestureDetector(
@@ -520,7 +532,9 @@ Calculated via Self Finance App
                         _recalculate();
                       },
                       inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d*\.?\d*'),
+                        ),
                       ],
                       style: const TextStyle(
                         fontSize: 16,
@@ -716,7 +730,8 @@ Calculated via Self Finance App
                           _QuickChip(
                             label: "1 Year",
                             isSelected:
-                                _tenureDate == _addMonthsClamped(_takenDate, 12),
+                                _tenureDate ==
+                                _addMonthsClamped(_takenDate, 12),
                             onTap: () => _setDurationMonths(12),
                             isDark: isDark,
                           ),
@@ -805,7 +820,7 @@ Calculated via Self Finance App
                     SizedBox(
                       width: double.infinity,
                       height: 50,
-                      child: ElevatedButton.icon(
+                      child: FilledButton.icon(
                         onPressed: () {
                           FocusScope.of(context).unfocus();
                           _recalculate();
@@ -819,12 +834,13 @@ Calculated via Self Finance App
                             letterSpacing: 0.3,
                           ),
                         ),
-                        style: ElevatedButton.styleFrom(
+                        style: FilledButton.styleFrom(
                           backgroundColor: AppColors.getPrimaryColor,
                           foregroundColor: Colors.white,
                           elevation: 2,
-                          shadowColor:
-                              AppColors.getPrimaryColor.withValues(alpha: 0.3),
+                          shadowColor: AppColors.getPrimaryColor.withValues(
+                            alpha: 0.3,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
@@ -953,8 +969,10 @@ class _EmiHeader extends StatelessWidget {
               TextButton.icon(
                 onPressed: onDemo,
                 style: TextButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
@@ -1081,8 +1099,8 @@ class _EmiModeSelector extends StatelessWidget {
                 fontSize: 10,
                 color: isSelected
                     ? (isDark
-                        ? Colors.white.withValues(alpha: 0.8)
-                        : AppColors.getLigthGreyColor)
+                          ? Colors.white.withValues(alpha: 0.8)
+                          : AppColors.getLigthGreyColor)
                     : AppColors.getLigthGreyColor.withValues(alpha: 0.7),
               ),
             ),
@@ -1123,14 +1141,14 @@ class _QuickChip extends StatelessWidget {
         backgroundColor: isSelected
             ? AppColors.getPrimaryColor
             : (isDark
-                ? Colors.white.withValues(alpha: 0.06)
-                : Colors.black.withValues(alpha: 0.04)),
+                  ? Colors.white.withValues(alpha: 0.06)
+                  : Colors.black.withValues(alpha: 0.04)),
         side: BorderSide(
           color: isSelected
               ? AppColors.getPrimaryColor
               : (isDark
-                  ? Colors.white.withValues(alpha: 0.1)
-                  : Colors.black.withValues(alpha: 0.08)),
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.black.withValues(alpha: 0.08)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -1251,21 +1269,25 @@ class _EmiResultsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double totalAmount =
-        isCompound ? calc.compoundTotalAmount : calc.totalAmount;
-    final double totalInterest =
-        isCompound ? calc.compoundInterestAmount : calc.totalInterestAmount;
+    final double totalAmount = isCompound
+        ? calc.compoundTotalAmount
+        : calc.totalAmount;
+    final double totalInterest = isCompound
+        ? calc.compoundInterestAmount
+        : calc.totalInterestAmount;
     final double principal = calc.takenAmount;
 
-    final double principalRatio =
-        totalAmount > 0 ? (principal / totalAmount).clamp(0.0, 1.0) : 1.0;
-    final double interestRatio =
-        totalAmount > 0 ? (totalInterest / totalAmount).clamp(0.0, 1.0) : 0.0;
+    final double principalRatio = totalAmount > 0
+        ? (principal / totalAmount).clamp(0.0, 1.0)
+        : 1.0;
+    final double interestRatio = totalAmount > 0
+        ? (totalInterest / totalAmount).clamp(0.0, 1.0)
+        : 0.0;
 
-    final int totalMonthsCount =
-        calc.months + (calc.remainingDays > 0 ? 1 : 0);
-    final double averageMonthlyPayback =
-        totalMonthsCount > 0 ? (totalAmount / totalMonthsCount) : totalAmount;
+    final int totalMonthsCount = calc.months + (calc.remainingDays > 0 ? 1 : 0);
+    final double averageMonthlyPayback = totalMonthsCount > 0
+        ? (totalAmount / totalMonthsCount)
+        : totalAmount;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1518,8 +1540,9 @@ class _EmiResultsSection extends StatelessWidget {
                 label: const Text("Copy Summary"),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  foregroundColor:
-                      isDark ? Colors.white : AppColors.getPrimaryTextColor,
+                  foregroundColor: isDark
+                      ? Colors.white
+                      : AppColors.getPrimaryTextColor,
                   side: BorderSide(color: borderColor),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -1529,11 +1552,11 @@ class _EmiResultsSection extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: ElevatedButton.icon(
+              child: FilledButton.icon(
                 onPressed: onShare,
                 icon: const Icon(Icons.share_rounded, size: 16),
                 label: const Text("Share"),
-                style: ElevatedButton.styleFrom(
+                style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   backgroundColor: AppColors.getPrimaryColor,
                   foregroundColor: Colors.white,

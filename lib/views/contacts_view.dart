@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -42,15 +42,15 @@ class ContactsView extends HookConsumerWidget {
                   onChanged: (String value) {
                     ref.read(contactsProvider.notifier).doSearch(value);
                   },
-                  padding: WidgetStateProperty.all(
-                    const EdgeInsets.symmetric(horizontal: 12),
+                  padding: const WidgetStatePropertyAll(
+                    EdgeInsets.symmetric(horizontal: 12),
                   ),
                   hintStyle: const WidgetStatePropertyAll(
                     TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   ),
-                  shape: WidgetStateProperty.all(
+                  shape: const WidgetStatePropertyAll(
                     RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
                     ),
                   ),
                   leading: const Icon(Icons.search),

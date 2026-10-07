@@ -12,9 +12,8 @@ part of 'app_dir_provider.dart';
 @ProviderFor(appDir)
 final appDirProvider = AppDirProvider._();
 
-final class AppDirProvider
-    extends $FunctionalProvider<AsyncValue<String>, String, FutureOr<String>>
-    with $FutureModifier<String>, $FutureProvider<String> {
+final class AppDirProvider extends $FunctionalProvider<String, String, String>
+    with $Provider<String> {
   AppDirProvider._()
     : super(
         from: null,
@@ -31,13 +30,21 @@ final class AppDirProvider
 
   @$internal
   @override
-  $FutureProviderElement<String> $createElement($ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+  $ProviderElement<String> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
-  FutureOr<String> create(Ref ref) {
+  String create(Ref ref) {
     return appDir(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
   }
 }
 
-String _$appDirHash() => r'8d417624e17ada353b68ba92dc3275674a8c0930';
+String _$appDirHash() => r'1192e2635821abb05b43fc456134a2317de5e782';

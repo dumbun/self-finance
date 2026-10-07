@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
@@ -262,9 +262,9 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
           SizedBox(
             width: double.infinity,
             height: 52,
-            child: ElevatedButton(
+            child: FilledButton(
               onPressed: _canProceed ? _onProceed : null,
-              style: ElevatedButton.styleFrom(
+              style: FilledButton.styleFrom(
                 backgroundColor: AppColors.getPrimaryColor,
                 disabledBackgroundColor: isDark
                     ? Colors.white.withValues(alpha: 0.1)
@@ -471,11 +471,7 @@ class _FeatureTile extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              icon,
-              size: 20,
-              color: AppColors.getPrimaryColor,
-            ),
+            child: Icon(icon, size: 20, color: AppColors.getPrimaryColor),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -487,8 +483,9 @@ class _FeatureTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color:
-                        isDark ? Colors.white : AppColors.getPrimaryTextColor,
+                    color: isDark
+                        ? Colors.white
+                        : AppColors.getPrimaryTextColor,
                   ),
                 ),
                 const SizedBox(height: 2),
