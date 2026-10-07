@@ -11,11 +11,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   drift: ^2.31.0  
   drift_flutter: ^0.2.8
-  flutter_email_sender: ^10.0.1
+  flutter_email_sender: ^11.1.0
   url_launcher: ^6.3.2
-  pinput: ^6.0.1
+  pinput: ^7.0.0
   path_provider: ^2.1.5
   local_auth: ^3.0.1
   intl: ^0.20.2
@@ -37,7 +39,7 @@ dependencies:
   flutter_dotenv: ^6.0.0
   flutter_slidable: ^4.0.3
   timeline_tile: ^2.0.0
-  flutter_local_notifications: ^22.0.1
+  flutter_local_notifications: ^23.0.0-dev.3
   timezone: ^0.11.0
   flutter_timezone: ^5.0.1
   shared_preferences: ^2.5.4
@@ -50,6 +52,7 @@ dependencies:
   flutter_displaymode: ^0.7.0
   visibility_detector: ^0.4.0+2
   sqlite3: ^2.9.4
+  material_ui: ^1.6.0
   
   
 

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
@@ -129,7 +129,7 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
 
                 Align(
                   alignment: Alignment.centerRight,
-                  child: ElevatedButton.icon(
+                  child: FilledButton.icon(
                     icon: Icon(
                       s.isRunning
                           ? Icons.cloud_upload

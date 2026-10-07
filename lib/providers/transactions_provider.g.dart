@@ -195,7 +195,7 @@ final class TransactionsNotifierProvider
 }
 
 String _$transactionsNotifierHash() =>
-    r'2d8c36d465197829eb7b16ad75bca709de08798d';
+    r'b158bc090afe61ed4cdc9416aecdfc4efc49d400';
 
 abstract class _$TransactionsNotifier
     extends $AsyncNotifier<List<TrxWithCustomer>> {

@@ -1,5 +1,5 @@
 import 'package:currency_picker/currency_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
