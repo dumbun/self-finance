@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="widget_bg">#FFFFFF</color>
+    <color name="widget_text_primary">#0F172A</color>
+    <color name="widget_text_secondary">#64748B</color>
+    <color name="widget_accent">#027DFC</color>
+    <color name="widget_in">#16A34A</color>
+    <color name="widget_out">#DC2626</color>
+
+    <string name="widget_description">Today\'s collections and outstanding loans</string>
+</resources>
