@@ -174,7 +174,10 @@ final transactionsProvider = TransactionsNotifierProvider._();
 
 final class TransactionsNotifierProvider
     extends
-        $AsyncNotifierProvider<TransactionsNotifier, List<TrxWithCustomer>> {
+        $AsyncNotifierProvider<
+          TransactionsNotifier,
+          TransactionsPaginationState
+        > {
   TransactionsNotifierProvider._()
     : super(
         from: null,
@@ -195,25 +198,28 @@ final class TransactionsNotifierProvider
 }
 
 String _$transactionsNotifierHash() =>
-    r'b158bc090afe61ed4cdc9416aecdfc4efc49d400';
+    r'ebf015bc8680b18bb079514d2417c88ebba024cc';
 
 abstract class _$TransactionsNotifier
-    extends $AsyncNotifier<List<TrxWithCustomer>> {
-  FutureOr<List<TrxWithCustomer>> build();
+    extends $AsyncNotifier<TransactionsPaginationState> {
+  FutureOr<TransactionsPaginationState> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final ref =
         this.ref
-            as $Ref<AsyncValue<List<TrxWithCustomer>>, List<TrxWithCustomer>>;
+            as $Ref<
+              AsyncValue<TransactionsPaginationState>,
+              TransactionsPaginationState
+            >;
     final element =
         ref.element
             as $ClassProviderElement<
               AnyNotifier<
-                AsyncValue<List<TrxWithCustomer>>,
-                List<TrxWithCustomer>
+                AsyncValue<TransactionsPaginationState>,
+                TransactionsPaginationState
               >,
-              AsyncValue<List<TrxWithCustomer>>,
+              AsyncValue<TransactionsPaginationState>,
               Object?,
               Object?
             >;

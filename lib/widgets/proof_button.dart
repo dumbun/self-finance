@@ -1,31 +1,27 @@
-import 'dart:io';
-
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path/path.dart' as p;
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
-import 'package:self_finance/providers/app_dir_provider.dart';
+import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
 
 class ProofButton extends ConsumerWidget {
-  const ProofButton({super.key, required this.proofImagePath});
+  const ProofButton({super.key, required this.customerId});
 
-  final String proofImagePath;
+  final int customerId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final String appDir = ref.watch(appDirProvider);
-
     return GestureDetector(
       onTap: () {
-        final String b = p.join(appDir, proofImagePath);
-        if (context.mounted && File(b).existsSync()) {
+        final String? proofFullPath =
+            ref.read(customerProofPathProvider(customerId));
+        if (proofFullPath != null && context.mounted) {
           Routes.navigateToImageView(
             context: context,
-            imagePath: b,
+            imagePath: proofFullPath,
             titile: "proof",
           );
         } else if (context.mounted) {

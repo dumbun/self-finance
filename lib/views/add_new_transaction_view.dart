@@ -59,12 +59,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   }
 
   bool _validateAndSave() {
-    final FormState? form = _formKey.currentState;
-    if (form!.validate()) {
-      return true;
-    } else {
-      return false;
-    }
+    return _formKey.currentState?.validate() ?? false;
   }
 
   @override
@@ -168,16 +163,25 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   }
 
   void _save() async {
+    if (!_validateAndSave()) return;
+
     final DateTime? userPickedDate = ref.read(dateProvider);
+    if (userPickedDate == null) {
+      SnackBarWidget.snackBarWidget(
+        context: context,
+        message: "Please select the transaction date",
+      );
+      return;
+    }
 
-    if (_validateAndSave() && userPickedDate != null) {
-      final double? pawnAmount = _doubleCheck(_amount.text);
-      final double? rateOfIntrest = _doubleCheck(_rateOfIntrest.text);
+    final double? pawnAmount = _doubleCheck(_amount.text);
+    final double? rateOfIntrest = _doubleCheck(_rateOfIntrest.text);
 
-      // Bail out if either value failed to parse — dialog was already shown.
-      if (pawnAmount == null || rateOfIntrest == null) return;
+    // Bail out if either value failed to parse — dialog was already shown.
+    if (pawnAmount == null || rateOfIntrest == null) return;
 
-      setState(() => _isloading = true);
+    setState(() => _isloading = true);
+    try {
       final bool res = await ref
           .read(transactionsProvider.notifier)
           .addNewTransactoion(
@@ -190,7 +194,17 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
             rateOfIntrest: rateOfIntrest,
             signatureController: _signatureController,
           );
-      res ? _safeSuccuse() : _saveUnSuccessfull();
+      if (!mounted) return;
+      if (res) {
+        ref.read(itemFileProvider.notifier).clear();
+        ref.read(dateProvider.notifier).clear();
+        _safeSuccuse();
+      } else {
+        _saveUnSuccessfull();
+      }
+    } catch (e) {
+      if (!mounted) return;
+      _saveUnSuccessfull();
     }
   }
 

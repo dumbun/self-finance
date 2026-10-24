@@ -102,12 +102,7 @@ class _ContactEditingViewState extends State<ContactEditingView> {
   }
 
   bool _validateAndSave() {
-    final FormState? form = _formKey.currentState;
-    if (form!.validate()) {
-      return true;
-    } else {
-      return false;
-    }
+    return _formKey.currentState?.validate() ?? false;
   }
 
   Widget _buidImages({
@@ -166,6 +161,7 @@ class _ContactEditingViewState extends State<ContactEditingView> {
                                 camera: true,
                                 customer: widget.contact,
                               );
+                          if (!mounted) return;
                           setState(() {
                             imagePath = newCustomerImage;
                           });
@@ -181,6 +177,7 @@ class _ContactEditingViewState extends State<ContactEditingView> {
                                 camera: true,
                                 customer: widget.contact,
                               );
+                          if (!mounted) return;
                           setState(() {
                             proofPath = newProofPath;
                           });
@@ -204,7 +201,7 @@ class _ContactEditingViewState extends State<ContactEditingView> {
                           onPressed: () async {
                             if (_validateAndSave()) {
                               final Customer newCustomer = Customer(
-                                userID: 1,
+                                userID: widget.contact.userID,
                                 id: widget.contact.id,
                                 name: _customerName.text,
                                 guardianName: _gaurdianName.text,
@@ -223,10 +220,10 @@ class _ContactEditingViewState extends State<ContactEditingView> {
                                   )
                                   .updateCustomer(customer: newCustomer);
 
+                              if (!context.mounted) return;
                               if (response != 0) {
                                 _navigateToContactsView();
-                              }
-                              if (response == 0) {
+                              } else {
                                 _showError();
                               }
                             }

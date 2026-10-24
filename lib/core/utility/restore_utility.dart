@@ -215,7 +215,7 @@ class RestoreUtility {
       }
     } catch (e, st) {
       debugPrint('❌ Restore failed: $e\n$st');
-      if (context!.mounted) {
+      if (context != null && context.mounted) {
         AlertDilogs.alertDialogWithOneAction(
           context,
           'Restore Error',

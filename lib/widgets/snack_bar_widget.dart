@@ -10,7 +10,18 @@ class SnackBarWidget {
         duration: Durations.short3,
         showCloseIcon: true,
         backgroundColor: AppColors.getPrimaryColor,
-        content: Row(children: [BodyTwoDefaultText(text: message, bold: true)]),
+        content: Row(
+          children: [
+            Expanded(
+              child: BodyTwoDefaultText(
+                text: message,
+                bold: true,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

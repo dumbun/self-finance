@@ -144,6 +144,7 @@ class ImageSavingUtility {
         "photo_${DateTime.now().millisecondsSinceEpoch}_${uuid.v1()}_${DateTime.now()}.jpg";
     final String newPath = '${customerDir.path}/$newImageName';
     await File(newImage.path).copy(newPath);
-    return p.join('Images', 'user', newPath);
+    final String returned = p.join('Images', 'user', newPath);
+    return returned;
   }
 }

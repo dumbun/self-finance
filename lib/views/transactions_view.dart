@@ -19,6 +19,7 @@ class TransactionsView extends HookConsumerWidget {
       ref.read(transactionsDateSearchQueryProvider.notifier).clear();
       ref.read(transactionsSearchQueryProvider.notifier).clear();
       ref.invalidate(transactionsProvider);
+      await ref.read(transactionsProvider.future);
     }
 
     return RefreshIndicator(

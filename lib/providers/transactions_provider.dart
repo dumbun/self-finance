@@ -97,14 +97,57 @@ class TransactionsDateSearchQuery extends _$TransactionsDateSearchQuery {
   void clear() => state = null;
 }
 
+class TransactionsPaginationState {
+  final List<TrxWithCustomer> transactions;
+  final bool hasMore;
+  final bool isLoadingMore;
+  final Object? loadMoreError;
+
+  const TransactionsPaginationState({
+    this.transactions = const [],
+    this.hasMore = true,
+    this.isLoadingMore = false,
+    this.loadMoreError,
+  });
+
+  TransactionsPaginationState copyWith({
+    List<TrxWithCustomer>? transactions,
+    bool? hasMore,
+    bool? isLoadingMore,
+    Object? loadMoreError,
+    bool clearLoadMoreError = false,
+  }) {
+    return TransactionsPaginationState(
+      transactions: transactions ?? this.transactions,
+      hasMore: hasMore ?? this.hasMore,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      loadMoreError:
+          clearLoadMoreError ? null : (loadMoreError ?? this.loadMoreError),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is TransactionsPaginationState &&
+        other.transactions == transactions &&
+        other.hasMore == hasMore &&
+        other.isLoadingMore == isLoadingMore &&
+        other.loadMoreError == loadMoreError;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    transactions,
+    hasMore,
+    isLoadingMore,
+    loadMoreError,
+  );
+}
+
 @riverpod
 class TransactionsNotifier extends _$TransactionsNotifier {
   static const int _pageSize = 30;
-
-  final List<TrxWithCustomer> _transactions = [];
-  int? _lastTransactionId;
-  bool _hasMore = true;
-  bool _isLoadingMore = false;
 
   String _searchQuery = '';
   DateTime? _dateQuery;
@@ -114,11 +157,11 @@ class TransactionsNotifier extends _$TransactionsNotifier {
   /// filters changed compare against this and are discarded.
   int _generation = 0;
 
-  bool get hasMore => _hasMore;
-  bool get isLoadingMore => _isLoadingMore;
+  bool get hasMore => state.value?.hasMore ?? false;
+  bool get isLoadingMore => state.value?.isLoadingMore ?? false;
 
   @override
-  Future<List<TrxWithCustomer>> build() async {
+  Future<TransactionsPaginationState> build() async {
     final int gen = ++_generation;
 
     final String query = ref
@@ -134,7 +177,6 @@ class TransactionsNotifier extends _$TransactionsNotifier {
     _searchQuery = query;
     _dateQuery = dateQuery;
     _ageMonths = ageMonths;
-    _isLoadingMore = false;
 
     final List<TrxWithCustomer> firstPage = await BackEnd.fetchTransactionsPage(
       searchQuery: query,
@@ -142,57 +184,86 @@ class TransactionsNotifier extends _$TransactionsNotifier {
       ageMonths: ageMonths,
     );
 
-    // A newer build started while we were waiting: don't touch shared state.
+    // A newer build started while we were waiting: discard stale results.
     if (gen != _generation) {
-      return List<TrxWithCustomer>.unmodifiable(firstPage);
+      return state.value ??
+          const TransactionsPaginationState(
+            hasMore: false,
+          );
     }
 
-    _transactions
-      ..clear()
-      ..addAll(firstPage);
-    _lastTransactionId = firstPage.isEmpty ? null : firstPage.last.id;
-    _hasMore = firstPage.length >= _pageSize;
-
-    return List<TrxWithCustomer>.unmodifiable(_transactions);
+    return TransactionsPaginationState(
+      transactions: List<TrxWithCustomer>.unmodifiable(firstPage),
+      hasMore: firstPage.length >= _pageSize,
+    );
   }
 
   // ---------------------------------------------------------------------------
   // Pagination
   // ---------------------------------------------------------------------------
 
-  Future<void> loadMore() async {
-    if (_isLoadingMore || !_hasMore) return;
-    if (!state.hasValue) return; // first page still loading
+  Future<void> loadMore({bool isRetry = false}) async {
+    final TransactionsPaginationState? currentState = state.value;
+    if (currentState == null ||
+        state.isLoading ||
+        state.isRefreshing ||
+        currentState.isLoadingMore ||
+        !currentState.hasMore) {
+      return;
+    }
+
+    if (!isRetry && currentState.loadMoreError != null) {
+      return;
+    }
 
     final int gen = _generation;
-    _isLoadingMore = true;
+
+    // Immediately emit loading state so UI updates and displays footer spinner.
+    state = AsyncData(
+      currentState.copyWith(
+        isLoadingMore: true,
+        clearLoadMoreError: true,
+      ),
+    );
 
     try {
+      final int? lastId = currentState.transactions.isNotEmpty
+          ? currentState.transactions.last.id
+          : null;
+
       final List<TrxWithCustomer> nextPage =
           await BackEnd.fetchTransactionsPage(
-            beforeTransactionId: _lastTransactionId,
+            beforeTransactionId: lastId,
             searchQuery: _searchQuery,
             dateQuery: _dateQuery,
             ageMonths: _ageMonths,
           );
 
-      if (gen != _generation) return; // filters changed, discard
+      if (gen != _generation) return; // filters or search changed, discard
 
-      _transactions.addAll(nextPage);
-      if (nextPage.isNotEmpty) _lastTransactionId = nextPage.last.id;
-      _hasMore = nextPage.length >= _pageSize;
+      final List<TrxWithCustomer> updatedList = [
+        ...currentState.transactions,
+        ...nextPage,
+      ];
+
+      state = AsyncData(
+        currentState.copyWith(
+          transactions: List<TrxWithCustomer>.unmodifiable(updatedList),
+          hasMore: nextPage.length >= _pageSize,
+          isLoadingMore: false,
+          clearLoadMoreError: true,
+        ),
+      );
     } catch (e, st) {
       if (gen != _generation) return;
-      // Stop auto-retrying; pull-to-refresh resets this.
-      _hasMore = false;
       debugPrint('Failed to load more transactions: $e');
       debugPrintStack(stackTrace: st);
-    } finally {
-      if (gen == _generation) {
-        _isLoadingMore = false;
-        // Always publish so the footer spinner updates.
-        state = AsyncData(List<TrxWithCustomer>.unmodifiable(_transactions));
-      }
+      state = AsyncData(
+        currentState.copyWith(
+          isLoadingMore: false,
+          loadMoreError: e,
+        ),
+      );
     }
   }
 

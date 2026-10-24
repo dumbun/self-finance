@@ -21,7 +21,7 @@ import 'package:self_finance/views/splash_screen.dart';
 import 'package:self_finance/views/user_creating_view.dart';
 
 class Routes {
-  static Map<String, Widget Function(BuildContext)> namedRoutes = {
+  static final Map<String, Widget Function(BuildContext)> namedRoutes = {
     Constant.splashView: (BuildContext context) => const SplashScreen(),
     Constant.pinAuthView: (BuildContext context) => const PinAuthView(),
     Constant.dashboardView: (BuildContext context) => const DashboardView(),

@@ -8,11 +8,12 @@ import 'package:self_finance/self_finance.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final appDir = await getApplicationDocumentsDirectory();
-  runApp(BetterFeedback(
+  runApp(
+    BetterFeedback(
       child: ProviderScope(
-    overrides: [
-      appDirProvider.overrideWithValue(appDir.path),
-    ],
-    child: const SelfFinance(),
-  )));
+        overrides: [appDirProvider.overrideWithValue(appDir.path)],
+        child: const SelfFinance(),
+      ),
+    ),
+  );
 }

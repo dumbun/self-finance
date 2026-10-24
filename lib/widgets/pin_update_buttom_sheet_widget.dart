@@ -70,8 +70,7 @@ class _PinUpdatebuttomSheetWidgetState
                 _buildActionButton(
                   onPressed: () {
                     if (validateAndSave()) {
-                      if (widget.userPin != _pin.text &&
-                          widget.userPin != _conformPin.text) {
+                      if (widget.userPin != _pin.text) {
                         update();
                       }
                       Navigator.pop(context);
