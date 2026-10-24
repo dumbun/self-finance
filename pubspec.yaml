@@ -53,6 +53,7 @@ dependencies:
   visibility_detector: ^0.4.0+2
   sqlite3: ^2.9.4
   material_ui: ^1.6.0
+  home_widget: ^0.10.0
   
   
 

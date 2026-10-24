@@ -15,6 +15,7 @@ import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/backend/user_database.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
+import 'package:self_finance/core/utility/home_widget_service.dart';
 import 'package:self_finance/core/utility/notification_service.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:signature/signature.dart';
@@ -45,6 +46,9 @@ class Utility {
       } catch (error) {
         debugPrint(error.toString());
       }
+      try {
+        await HomeWidgetService.start();
+      } catch (_) {}
     });
   }
 

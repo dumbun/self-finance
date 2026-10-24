@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="widget_bg">#F8FAFC</color>
+    <color name="widget_surface">#FFFFFF</color>
+    <color name="widget_surface_subtle">#F1F5F9</color>
+    <color name="widget_border">#E2E8F0</color>
+    <color name="widget_pill_bg">#EFF6FF</color>
+    <color name="widget_text_primary">#0F172A</color>
+    <color name="widget_text_secondary">#64748B</color>
+    <color name="widget_text_muted">#94A3B8</color>
+    <color name="widget_accent">#027DFC</color>
+    <color name="widget_in">#10B981</color>
+    <color name="widget_in_bg">#ECFDF5</color>
+    <color name="widget_out">#F43F5E</color>
+    <color name="widget_out_bg">#FFF1F2</color>
+    <color name="widget_chart_track">#E2E8F0</color>
+
+    <string name="widget_description">Today\'s collections, loans and weekly cashflow trend</string>
+</resources>

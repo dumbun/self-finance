@@ -1,3 +1,4 @@
+import 'package:flutter/widget_previews.dart';
 import 'package:material_ui/material_ui.dart';
 
 class SectionHeaderWidget extends StatelessWidget {
@@ -19,4 +20,11 @@ class SectionHeaderWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+@Preview(name: 'Section Header', group: 'Headers')
+Widget previewSectionHeader() {
+  return const Material(
+    child: SectionHeaderWidget(label: 'Security Settings'),
+  );
 }
