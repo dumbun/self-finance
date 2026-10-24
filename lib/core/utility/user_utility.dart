@@ -121,6 +121,21 @@ class Utility {
     }
   }
 
+  // send sms
+  static Future<bool> sendSms({required String phoneNumber}) async {
+    final Uri launchUri = Uri(scheme: 'sms', path: phoneNumber);
+    if (await canLaunchUrl(launchUri)) {
+      return await launchUrl(launchUri);
+    }
+    return false;
+  }
+
+  // copy to clipboard with haptic feedback
+  static Future<void> copyToClipboard({required String text}) async {
+    await Clipboard.setData(ClipboardData(text: text));
+    HapticFeedback.lightImpact();
+  }
+
   static Future<void> launchInBrowserView(String url) async {
     final Uri toLaunch = Uri.parse(url);
     if (!await launchUrl(toLaunch, mode: LaunchMode.inAppBrowserView)) {

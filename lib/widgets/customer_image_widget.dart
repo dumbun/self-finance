@@ -23,13 +23,13 @@ class CustomerImageWidget extends ConsumerWidget {
               );
             }
             return CircularImageWidget(
-              errorBuilder: const DefaultUserImage(),
+              errorBuilder: DefaultUserImage(userName: customer.name),
               customeSize: size ?? 120,
               imageData: customer.photo,
               titile: customer.name,
             );
           },
-          loading: () => DefaultUserImage(height: size),
+          loading: () => DefaultUserImage(height: size, width: size),
           error: (_, _) => DefaultUserImage(height: size, width: size),
         );
   }

@@ -119,44 +119,55 @@ class _CustomerConformationViewState
 
   void _alertDilog({required String title, required String content}) {
     AlertDilogs.alertDialogWithOneAction(context, title, content);
-    setState(() {
-      _isloading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isloading = false;
+      });
+    }
   }
 
   void _afterSuccess() {
-    setState(() {
-      _isloading = false;
-    });
-
-    SnackBarWidget.snackBarWidget(
-      context: context,
-      message: Constant.savedSuccessfullyText,
-    );
-    Routes.navigateToDashboard(context: context);
+    if (mounted) {
+      setState(() {
+        _isloading = false;
+      });
+      SnackBarWidget.snackBarWidget(
+        context: context,
+        message: Constant.savedSuccessfullyText,
+      );
+      Routes.navigateToDashboard(context: context);
+    }
   }
 
   void _afterFail() {
-    _alertDilog(title: Constant.error, content: Constant.pleaseTryAgain);
-    Navigator.pop(context);
+    if (mounted) {
+      _alertDilog(title: Constant.error, content: Constant.pleaseTryAgain);
+      Navigator.pop(context);
+    }
   }
 
   Future<void> _save() async {
     setState(() => _isloading = true);
 
-    final bool res = await ref
-        .read(contactsProvider.notifier)
-        .createNewCustomer(
-          customerName: widget.customerName,
-          guardianName: widget.gaurdianName,
-          address: widget.address,
-          number: widget.mobileNumber,
-          discription: widget.itemDescription,
-          takenAmount: widget.takenAmount,
-          rateOfIntrest: widget.rateOfIntrest,
-          signatureController: _signatureGlobalKey,
-        );
-    res ? _afterSuccess() : _afterFail();
+    try {
+      final bool res = await ref
+          .read(contactsProvider.notifier)
+          .createNewCustomer(
+            customerName: widget.customerName,
+            guardianName: widget.gaurdianName,
+            address: widget.address,
+            number: widget.mobileNumber,
+            discription: widget.itemDescription,
+            takenAmount: widget.takenAmount,
+            rateOfIntrest: widget.rateOfIntrest,
+            signatureController: _signatureGlobalKey,
+          );
+      if (!mounted) return;
+      res ? _afterSuccess() : _afterFail();
+    } catch (e) {
+      if (!mounted) return;
+      _afterFail();
+    }
   }
 
   @override

@@ -345,11 +345,12 @@ class InvoiceGenerator {
     Customer customer,
     String customerPhotoPath,
   ) {
-    late Uint8List imageBytes;
-    late pw.MemoryImage pdfImage;
+    pw.MemoryImage? pdfImage;
     if (customerPhotoPath.isNotEmpty && File(customerPhotoPath).existsSync()) {
-      imageBytes = File(customerPhotoPath).readAsBytesSync();
-      pdfImage = pw.MemoryImage(imageBytes);
+      try {
+        final Uint8List imageBytes = File(customerPhotoPath).readAsBytesSync();
+        pdfImage = pw.MemoryImage(imageBytes);
+      } catch (_) {}
     }
     return pw.Container(
       padding: const pw.EdgeInsets.all(12),
@@ -392,8 +393,7 @@ class InvoiceGenerator {
                   ],
                 ),
               ),
-              if (customerPhotoPath.isNotEmpty &&
-                  File(customerPhotoPath).existsSync())
+              if (pdfImage != null)
                 pw.Image(pdfImage, height: 80, width: 80),
             ],
           ),
@@ -490,11 +490,12 @@ class InvoiceGenerator {
   }
 
   static pw.Widget _buildTermsAndConditions(String signaturePath) {
-    late Uint8List imageBytes;
-    late pw.MemoryImage pdfImage;
+    pw.MemoryImage? pdfImage;
     if (signaturePath.isNotEmpty && File(signaturePath).existsSync()) {
-      imageBytes = File(signaturePath).readAsBytesSync();
-      pdfImage = pw.MemoryImage(imageBytes);
+      try {
+        final Uint8List imageBytes = File(signaturePath).readAsBytesSync();
+        pdfImage = pw.MemoryImage(imageBytes);
+      } catch (_) {}
     }
     return pw.Container(
       padding: const pw.EdgeInsets.all(10),
@@ -539,7 +540,7 @@ class InvoiceGenerator {
           ),
           pw.Column(
             children: [
-              if (signaturePath.isNotEmpty && File(signaturePath).existsSync())
+              if (pdfImage != null)
                 pw.Image(pdfImage, height: 48, width: 48),
               pw.Text('Signature'),
             ],

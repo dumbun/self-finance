@@ -33,6 +33,7 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
     try {
       final zipPath = await BackupUtility.startBackup(
         onProgress: (progress, currentFile) {
+          if (!mounted) return;
           final eta = _eta.update(progress);
           _state.value = BackupState.running(
             progress: progress.clamp(0.0, 1.0),
@@ -42,14 +43,14 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
         },
       );
 
+      if (!mounted) return;
       _state.value = BackupState.success(zipPath: zipPath);
     } catch (e) {
+      if (!mounted) return;
       _state.value = BackupState.error(message: e.toString());
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Backup failed: $e')));
-      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Backup failed: $e')));
     }
   }
 

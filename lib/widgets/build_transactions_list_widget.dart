@@ -27,6 +27,10 @@ class _BuildTransactionsListWidgetState
   static const double _loadMoreThreshold = 300;
   late final ScrollController _scrollController;
 
+  /// Prevents multiple postFrameCallbacks from stacking up across consecutive
+  /// build() calls during a single async cycle.
+  bool _viewportFillPending = false;
+
   @override
   void initState() {
     super.initState();
@@ -41,11 +45,20 @@ class _BuildTransactionsListWidgetState
     }
   }
 
-  /// If the loaded items don't fill the viewport there is nothing to scroll,
-  /// so keep loading until they do (or until there is no more data).
-  void _fillViewportIfNeeded() {
+  void _scheduleViewportFill() {
+    if (_viewportFillPending) return;
+    _viewportFillPending = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _viewportFillPending = false;
       if (!mounted || !_scrollController.hasClients) return;
+      final TransactionsPaginationState? state =
+          ref.read(transactionsProvider).value;
+      if (state == null ||
+          !state.hasMore ||
+          state.isLoadingMore ||
+          state.loadMoreError != null) {
+        return;
+      }
       if (_scrollController.position.maxScrollExtent <= 0) {
         ref.read(transactionsProvider.notifier).loadMore();
       }
@@ -62,92 +75,136 @@ class _BuildTransactionsListWidgetState
 
   @override
   Widget build(BuildContext context) {
-    return ref
-        .watch(transactionsProvider)
-        .when(
-          data: (List<TrxWithCustomer> data) {
-            if (data.isEmpty) {
-              return const Center(
-                child: BodyOneDefaultText(
-                  bold: true,
-                  text: 'No Transactons to view',
-                ),
-              );
-            }
+    return ref.watch(transactionsProvider).when(
+      data: (TransactionsPaginationState state) {
+        final List<TrxWithCustomer> data = state.transactions;
+        final bool hasMore = state.hasMore;
+        final bool isLoadingMore = state.isLoadingMore;
+        final Object? loadMoreError = state.loadMoreError;
 
-            final bool hasMore = ref
-                .read(transactionsProvider.notifier)
-                .hasMore;
-
-            if (hasMore) _fillViewportIfNeeded();
-
-            return ListView.builder(
-              controller: _scrollController,
+        if (data.isEmpty) {
+          return LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) =>
+                SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: data.length + (hasMore ? 1 : 0),
-              itemBuilder: (BuildContext context, int index) {
-                if (index >= data.length) {
-                  return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    child: Center(child: CircularProgressIndicator.adaptive()),
-                  );
-                }
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: const Center(
+                  child: BodyOneDefaultText(
+                    bold: true,
+                    text: 'No Transactions to view',
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
 
-                final TrxWithCustomer txn = data[index];
-                return SlidableWidget(
-                  key: ValueKey(txn.id),
-                  customerId: txn.customerId,
-                  transactionId: txn.id,
-                  child: ListTile(
-                    onTap: () => Routes.navigateToTransactionDetailsView(
-                      transacrtionId: txn.id,
-                      customerId: txn.customerId,
-                      context: context,
-                    ),
-                    leading: txn.customerPhoto.isNotEmpty
-                        ? CircularImageWidget(
-                            errorBuilder: const DefaultUserImage(),
-                            customeSize: 44,
-                            imageData: txn.customerPhoto,
-                            titile: txn.customerName,
-                            heroTag: '${txn.customerName}-${txn.id}',
-                          )
-                        : const DefaultUserImage(height: 44, width: 44),
-                    title: CurrencyWidget(
-                      amount: Utility.doubleFormate(txn.amount),
-                    ),
-                    subtitle: BodySmallText(
-                      text: txn.customerName.isNotEmpty
-                          ? txn.customerName
-                          : 'Unknown',
-                      bold: true,
-                      overflow: TextOverflow.ellipsis,
-                      color: AppColors.getLigthGreyColor,
-                    ),
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+        // Only trigger viewport fill if there is more data, not already loading, and no error.
+        if (hasMore && !isLoadingMore && loadMoreError == null) {
+          _scheduleViewportFill();
+        }
+
+        final bool showFooter = isLoadingMore || loadMoreError != null;
+
+        return ListView.builder(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          itemCount: data.length + (showFooter ? 1 : 0),
+          itemBuilder: (BuildContext context, int index) {
+            if (index >= data.length) {
+              if (loadMoreError != null) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        BodySmallText(
-                          text: Utility.formatDate(date: txn.transactionDate),
-                          bold: true,
+                        const BodySmallText(
+                          text: 'Failed to load more transactions',
                           color: AppColors.getLigthGreyColor,
                         ),
-                        StatusChipWidget(
-                          smallText: true,
-                          status: txn.transactionType,
+                        const SizedBox(height: 8),
+                        TextButton.icon(
+                          onPressed: () => ref
+                              .read(transactionsProvider.notifier)
+                              .loadMore(isRetry: true),
+                          icon: const Icon(Icons.refresh, size: 18),
+                          label: const Text('Retry'),
                         ),
                       ],
                     ),
                   ),
                 );
-              },
+              }
+
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Center(child: CircularProgressIndicator.adaptive()),
+              );
+            }
+
+            final TrxWithCustomer txn = data[index];
+            return SlidableWidget(
+              key: ValueKey(txn.id),
+              customerId: txn.customerId,
+              transactionId: txn.id,
+              child: ListTile(
+                onTap: () => Routes.navigateToTransactionDetailsView(
+                  transacrtionId: txn.id,
+                  customerId: txn.customerId,
+                  context: context,
+                ),
+                leading: txn.customerPhoto.isNotEmpty
+                    ? CircularImageWidget(
+                        errorBuilder: DefaultUserImage(
+                          userName: txn.customerName,
+                        ),
+                        customeSize: 44,
+                        imageData: txn.customerPhoto,
+                        titile: txn.customerName,
+                        heroTag: '${txn.customerName}-${txn.id}',
+                      )
+                    : DefaultUserImage(
+                        userName: txn.customerName,
+                        height: 44,
+                        width: 44,
+                      ),
+                title: CurrencyWidget(
+                  amount: Utility.doubleFormate(txn.amount),
+                ),
+                subtitle: BodySmallText(
+                  text: txn.customerName.isNotEmpty
+                      ? txn.customerName
+                      : 'Unknown',
+                  bold: true,
+                  overflow: TextOverflow.ellipsis,
+                  color: AppColors.getLigthGreyColor,
+                ),
+                trailing: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    BodySmallText(
+                      text: Utility.formatDate(date: txn.transactionDate),
+                      bold: true,
+                      color: AppColors.getLigthGreyColor,
+                    ),
+                    StatusChipWidget(
+                      smallText: true,
+                      status: txn.transactionType,
+                    ),
+                  ],
+                ),
+              ),
             );
           },
-          error: (Object error, StackTrace stackTrace) =>
-              BodyTwoDefaultText(text: error.toString()),
-          loading: () =>
-              const Center(child: CircularProgressIndicator.adaptive()),
         );
+      },
+      error: (Object error, StackTrace stackTrace) =>
+          BodyTwoDefaultText(text: error.toString()),
+      loading: () =>
+          const Center(child: CircularProgressIndicator.adaptive()),
+    );
   }
 }

@@ -1,8 +1,10 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
+import 'package:self_finance/backend/user_database.dart';
 import 'package:self_finance/core/utility/image_saving_utility.dart';
 import 'package:self_finance/models/contacts_model.dart';
 import 'package:self_finance/models/customer_model.dart';
+import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/date_provider.dart';
 import 'package:self_finance/providers/image_providers.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
@@ -70,11 +72,12 @@ class ContactsNotifier extends _$ContactsNotifier {
     required String address,
     required String number,
   }) async {
-    ref.keepAlive();
+    final keepAlive = ref.keepAlive();
 
-    //saving images
-    final DateTime? userPickedDate = ref.read(dateProvider);
-    if (userPickedDate != null) {
+    try {
+      final DateTime? userPickedDate = ref.read(dateProvider);
+      if (userPickedDate == null) return false;
+
       // saving image to storage
       final String imagePath = await ImageSavingUtility.saveImage(
         location: 'customers',
@@ -86,8 +89,11 @@ class ContactsNotifier extends _$ContactsNotifier {
         image: ref.read(proofFileProvider),
       );
 
+      final User user = await UserBackEnd.fetchUserData();
+      final int activeUserId = (user.id != null && user.id! > 0) ? user.id! : 1;
+
       final Customer c = Customer(
-        userID: 1,
+        userID: activeUserId,
         name: customerName,
         guardianName: guardianName,
         address: address,
@@ -112,9 +118,19 @@ class ContactsNotifier extends _$ContactsNotifier {
               rateOfIntrest: rateOfIntrest,
               signatureController: signatureController,
             );
+
+        if (createNewTransaction) {
+          ref.read(imageFileProvider.notifier).clear();
+          ref.read(proofFileProvider.notifier).clear();
+          ref.read(itemFileProvider.notifier).clear();
+          ref.read(dateProvider.notifier).clear();
+        }
+
         return createNewTransaction;
       }
+      return false;
+    } finally {
+      keepAlive.close();
     }
-    return false;
   }
 }

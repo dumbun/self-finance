@@ -28,8 +28,20 @@ class ImageWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (imagePath.isEmpty) {
+      return SizedBox(height: height, width: width, child: errorBuilder);
+    }
+
     final String appDirPath = ref.watch(appDirProvider);
-    final String fullPath = p.join(appDirPath, imagePath);
+    final String fullPath =
+        p.isAbsolute(imagePath) ? imagePath : p.join(appDirPath, imagePath);
+
+    final double devicePixelRatio =
+        MediaQuery.maybeDevicePixelRatioOf(context) ?? 2.0;
+    final int? cacheDimension = (width > 0 && width.isFinite)
+        ? (width * devicePixelRatio).round()
+        : null;
+
 
     return GestureDetector(
       onTap: showImage
@@ -45,6 +57,7 @@ class ImageWidget extends ConsumerWidget {
         File(fullPath),
         height: height,
         width: width,
+        cacheWidth: cacheDimension,
         fit: fit,
         gaplessPlayback: true,
         errorBuilder: (_, _, _) =>

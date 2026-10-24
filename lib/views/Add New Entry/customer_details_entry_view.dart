@@ -36,12 +36,7 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
   }
 
   bool _validateAndSave() {
-    final FormState? form = _formKey.currentState;
-    if (form!.validate()) {
-      return true;
-    } else {
-      return false;
-    }
+    return _formKey.currentState?.validate() ?? false;
   }
 
   @override
@@ -57,16 +52,15 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
         child: Fab(
           icon: Icons.navigate_next_rounded,
           onPressed: () async {
-            setState(() {
-              _isLoading = !_isLoading;
-            });
-            if (_validateAndSave()) {
-              if (await Utility.isNumberPresent(_mobileNumber.text) &&
-                  context.mounted) {
-                setState(() {
-                  _isLoading = !_isLoading;
-                });
+            if (!_validateAndSave()) return;
 
+            setState(() => _isLoading = true);
+            try {
+              final bool exists =
+                  await Utility.isNumberPresent(_mobileNumber.text);
+              if (!context.mounted) return;
+
+              if (exists) {
                 await AlertDilogs.alertDialogWithOneAction(
                   context,
                   "Sorry",
@@ -74,20 +68,21 @@ class _CustomerDetailsEntryViewState extends State<CustomerDetailsEntryView> {
                 );
                 return;
               }
-              setState(() {
-                _isLoading = !_isLoading;
-              });
+
+              final String alias = _gaurdianAlias.text.trim();
+              final String gName = _gaurdianName.text.trim();
+              final String fullGuardian =
+                  alias.isNotEmpty ? "$alias $gName" : gName;
+
               Routes.navigateToCustomerLoneEntryView(
                 context: context,
                 customerName: _customerName.text,
                 mobileNumber: _mobileNumber.text,
-                gaurdianName: "${_gaurdianAlias.text}  ${_gaurdianName.text}",
+                gaurdianName: fullGuardian,
                 address: _address.text,
               );
-            } else {
-              setState(() {
-                _isLoading = false;
-              });
+            } finally {
+              if (mounted) setState(() => _isLoading = false);
             }
           },
         ),

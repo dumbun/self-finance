@@ -34,6 +34,10 @@ class CircularImageWidget extends StatelessWidget {
         ),
       );
     }
-    return DefaultUserImage(height: customeSize, width: customeSize);
+    return DefaultUserImage(
+      userName: titile,
+      height: customeSize,
+      width: customeSize,
+    );
   }
 }

@@ -54,12 +54,14 @@ class _DashboardViewState extends State<DashboardView> {
       body: SafeArea(
         child: PageView.builder(
           itemCount: 4,
-          itemBuilder: (context, index) => switch (index) {
-            0 => const HomeScreen(),
-            1 => const TransactionsView(),
-            2 => const EMICalculatorView(),
-            3 => const HistoryView(),
-            _ => const HomeScreen(),
+          itemBuilder: (context, index) {
+            return switch (index) {
+              0 => const HomeScreen(),
+              1 => const TransactionsView(),
+              2 => const EMICalculatorView(),
+              3 => const HistoryView(),
+              _ => const HomeScreen(),
+            };
           },
           controller: _pageController,
           onPageChanged: (int index) {

@@ -16,6 +16,7 @@ import 'package:self_finance/models/user_history_model.dart';
 import 'package:self_finance/threads/threads.dart';
 import 'package:self_finance/models/trx_with_customer_model.dart';
 
+
 import 'db_paths.dart';
 
 part 'backend.g.dart';
@@ -1756,6 +1757,7 @@ class BackEnd {
         'received': receivedByMonth[k] ?? 0.0,
       });
     }
+
 
     return results;
   }
