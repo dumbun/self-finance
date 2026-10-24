@@ -51,7 +51,6 @@ dependencies:
   hooks_riverpod: ^3.1.0
   flutter_displaymode: ^0.7.0
   visibility_detector: ^0.4.0+2
-  sqlite3: ^2.9.4
   material_ui: ^1.6.0
   home_widget: ^0.10.0
   
