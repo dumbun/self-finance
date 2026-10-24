@@ -153,6 +153,22 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView>
     SnackBarWidget.snackBarWidget(context: context, message: message);
   }
 
+  Widget _buildScrollablePlaceholder({required Widget child}) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Center(child: child),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -195,26 +211,37 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView>
       ),
       body: SafeArea(
         child: RefreshIndicator.adaptive(
-          onRefresh: () async =>
-              await ref.refresh(transactionByIDProvider(widget.transactionId)),
+          onRefresh: () async {
+            ref.invalidate(
+              paymentByTrxIdProvider(transactionId: widget.transactionId),
+            );
+            ref.invalidate(transactionByIDProvider(widget.transactionId));
+            await ref.read(transactionByIDProvider(widget.transactionId).future);
+          },
           child: trxAsync.when(
-            loading: () => const Center(
-              child: CircularProgressIndicator.adaptive(),
+            loading: () => _buildScrollablePlaceholder(
+              child: const CircularProgressIndicator.adaptive(),
             ),
-            error: (err, _) => Center(
-              child: BodyTwoDefaultText(
-                bold: true,
-                error: true,
-                text: "Error loading transaction: $err",
+            error: (err, _) => _buildScrollablePlaceholder(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: BodyTwoDefaultText(
+                  bold: true,
+                  error: true,
+                  text: "Error loading transaction: $err",
+                ),
               ),
             ),
             data: (Trx? transaction) {
               if (transaction == null) {
-                return const Center(
-                  child: BodyTwoDefaultText(
-                    bold: true,
-                    error: true,
-                    text: Constant.errorFetchingTransactionMessage,
+                return _buildScrollablePlaceholder(
+                  child: const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: BodyTwoDefaultText(
+                      bold: true,
+                      error: true,
+                      text: Constant.errorFetchingTransactionMessage,
+                    ),
                   ),
                 );
               }
@@ -224,13 +251,16 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView>
               );
 
               return paymentAsync.when(
-                loading: () => const Center(
-                  child: CircularProgressIndicator.adaptive(),
+                loading: () => _buildScrollablePlaceholder(
+                  child: const CircularProgressIndicator.adaptive(),
                 ),
-                error: (err, _) => Center(
-                  child: BodyTwoDefaultText(
-                    error: true,
-                    text: "Error loading payment history: $err",
+                error: (err, _) => _buildScrollablePlaceholder(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: BodyTwoDefaultText(
+                      error: true,
+                      text: "Error loading payment history: $err",
+                    ),
                   ),
                 ),
                 data: (List<Payment> payments) {
