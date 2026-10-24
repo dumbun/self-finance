@@ -34,6 +34,7 @@ class HomeWidgetService {
   static Future<void> start() async {
     if (_sub != null) return;
     await HomeWidget.setAppGroupId(appGroupId);
+    unawaited(refresh());
 
     _sub = BackEnd.watchAnalyticsData().listen((Map<String, num> analytics) {
       // Debounce: a single DB write can fire several stream events.
@@ -69,8 +70,22 @@ class HomeWidgetService {
       final Map<String, num> a =
           analytics ?? await BackEnd.watchAnalyticsData().first;
       final Map<String, dynamic> today = await BackEnd.fetchTodayChartData();
+      final List<Map<String, dynamic>> weekly =
+          await BackEnd.fetchWeeklyChartData();
       final User user = await UserBackEnd.fetchUserData();
       final bool hide = await isHidingAmounts();
+
+      final num recVal = (today['received'] as num?) ?? 0;
+      final num disbVal = (today['disbursed'] as num?) ?? 0;
+
+      final String weeklyReceived =
+          weekly.map((d) => (d['received'] as num?) ?? 0).join(',');
+      final String weeklyDisbursed =
+          weekly.map((d) => (d['disbursed'] as num?) ?? 0).join(',');
+      final String weeklyDays = weekly.map((d) {
+        final String m = d['month'] as String? ?? '';
+        return m.isNotEmpty ? m[0] : '';
+      }).join(',');
 
       String money(num v) =>
           hide ? '••••' : Utility.compactNumber(v.toDouble());
@@ -88,13 +103,27 @@ class HomeWidgetService {
           'updated',
           DateFormat('HH:mm').format(now),
         ),
+        HomeWidget.saveWidgetData<String>('today_received', money(recVal)),
+        HomeWidget.saveWidgetData<String>('today_disbursed', money(disbVal)),
         HomeWidget.saveWidgetData<String>(
-          'today_received',
-          money((today['received'] as num?) ?? 0),
+          'today_received_raw',
+          recVal.toString(),
         ),
         HomeWidget.saveWidgetData<String>(
-          'today_disbursed',
-          money((today['disbursed'] as num?) ?? 0),
+          'today_disbursed_raw',
+          disbVal.toString(),
+        ),
+        HomeWidget.saveWidgetData<String>(
+          'weekly_received',
+          hide ? '' : weeklyReceived,
+        ),
+        HomeWidget.saveWidgetData<String>(
+          'weekly_disbursed',
+          hide ? '' : weeklyDisbursed,
+        ),
+        HomeWidget.saveWidgetData<String>(
+          'weekly_days',
+          hide ? '' : weeklyDays,
         ),
         HomeWidget.saveWidgetData<String>(
           'outstanding',
