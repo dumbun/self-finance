@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
@@ -33,26 +33,22 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
   final TextEditingController _itemDescription = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  double _doubleCheck(String text, {String errorString = Constant.error}) {
+  double? _doubleCheck(String text, {String errorString = Constant.error}) {
     try {
       return double.parse(text);
     } catch (e) {
-      return AlertDilogs.alertDialogWithOneAction(
+      AlertDilogs.alertDialogWithOneAction(
         context,
         errorString,
         e.toString(),
       );
+      return null;
     }
   }
 
   // for validating the form
   bool _validateAndSave() {
-    final FormState? form = _formKey.currentState;
-    if (form!.validate()) {
-      return true;
-    } else {
-      return false;
-    }
+    return _formKey.currentState?.validate() ?? false;
   }
 
   @override
@@ -74,6 +70,10 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
       floatingActionButton: Fab(
         onPressed: () {
           if (_validateAndSave()) {
+            final double? rate = _doubleCheck(_rateOfIntrest.text);
+            final double? amount = _doubleCheck(_takenAmount.text);
+            if (rate == null || amount == null) return;
+
             Routes.navigateToCustomerConformationView(
               context: context,
               customerName: widget.customerName,
@@ -81,8 +81,8 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
               gaurdianName: widget.gaurdianName,
               address: widget.address,
               itemDescription: _itemDescription.text,
-              rateOfIntrest: _doubleCheck(_rateOfIntrest.text),
-              takenAmount: _doubleCheck(_takenAmount.text),
+              rateOfIntrest: rate,
+              takenAmount: amount,
               takenDate: _takenDate.text,
             );
           }

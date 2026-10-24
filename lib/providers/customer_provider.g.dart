@@ -50,7 +50,7 @@ final class CustomerNotifierProvider
   }
 }
 
-String _$customerNotifierHash() => r'bd1abaf3a8410d3f8eb1c762fab9989fce28d8d7';
+String _$customerNotifierHash() => r'c7bf77c8bf2f0190cccf23c227347bc9a004a074';
 
 final class CustomerNotifierFamily extends $Family
     with

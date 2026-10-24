@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/views/EMi%20Calculator/emi_calculator_view.dart';
@@ -54,12 +54,14 @@ class _DashboardViewState extends State<DashboardView> {
       body: SafeArea(
         child: PageView.builder(
           itemCount: 4,
-          itemBuilder: (context, index) => switch (index) {
-            0 => const HomeScreen(),
-            1 => const TransactionsView(),
-            2 => const EMICalculatorView(),
-            3 => const HistoryView(),
-            _ => const HomeScreen(),
+          itemBuilder: (context, index) {
+            return switch (index) {
+              0 => const HomeScreen(),
+              1 => const TransactionsView(),
+              2 => const EMICalculatorView(),
+              3 => const HistoryView(),
+              _ => const HomeScreen(),
+            };
           },
           controller: _pageController,
           onPageChanged: (int index) {

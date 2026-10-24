@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/core/auth/auth.dart';
 import 'package:self_finance/core/constants/constants.dart';
@@ -138,7 +138,11 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
                         titile: user.userName,
                       )
                     else
-                      const DefaultUserImage(height: 120),
+                      DefaultUserImage(
+                        userName: user.userName,
+                        height: 120,
+                        width: 120,
+                      ),
 
                     const SizedBox(height: 20),
 

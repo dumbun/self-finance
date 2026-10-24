@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 
@@ -19,8 +19,8 @@ class RoundedCornerButton extends StatelessWidget {
     return icon != null
         ? SizedBox(
             width: double.infinity,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
                 backgroundColor: AppColors.getPrimaryColor,
               ),
               icon: Icon(icon),
@@ -37,8 +37,8 @@ class RoundedCornerButton extends StatelessWidget {
           )
         : SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
+            child: FilledButton(
+              style: FilledButton.styleFrom(
                 backgroundColor: AppColors.getPrimaryColor,
               ),
               onPressed: onPressed,

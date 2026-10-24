@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -19,6 +19,7 @@ class TransactionsView extends HookConsumerWidget {
       ref.read(transactionsDateSearchQueryProvider.notifier).clear();
       ref.read(transactionsSearchQueryProvider.notifier).clear();
       ref.invalidate(transactionsProvider);
+      await ref.read(transactionsProvider.future);
     }
 
     return RefreshIndicator(
@@ -29,11 +30,11 @@ class TransactionsView extends HookConsumerWidget {
           children: <Widget>[
             SearchBar(
               controller: searchController,
-              padding: WidgetStateProperty.all(
-                const EdgeInsets.symmetric(horizontal: 12),
+              padding: const WidgetStatePropertyAll(
+                EdgeInsets.symmetric(horizontal: 12),
               ),
-              shape: WidgetStateProperty.all(
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: const WidgetStatePropertyAll(
+                RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
               ),
               elevation: const WidgetStatePropertyAll(0),
               hintText: "Search transaction ID",

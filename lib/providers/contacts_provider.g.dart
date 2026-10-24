@@ -86,7 +86,7 @@ final class ContactsNotifierProvider
   ContactsNotifier create() => ContactsNotifier();
 }
 
-String _$contactsNotifierHash() => r'b385f6cda014652f8ff7a8b93db71a5059341d49';
+String _$contactsNotifierHash() => r'7411005a824ffd50fed73b14aee412e68d880433';
 
 abstract class _$ContactsNotifier extends $StreamNotifier<List<Contact>> {
   Stream<List<Contact>> build();

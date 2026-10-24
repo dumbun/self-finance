@@ -1,5 +1,5 @@
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/widgets/build_history_list_widget.dart';
@@ -9,7 +9,7 @@ class HistoryView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final SearchController searchController = useSearchController();
+    final searchController = useSearchController();
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -22,11 +22,11 @@ class HistoryView extends HookConsumerWidget {
           children: <Widget>[
             SearchBar(
               controller: searchController,
-              padding: WidgetStateProperty.all(
-                const EdgeInsets.symmetric(horizontal: 12),
+              padding: const WidgetStatePropertyAll(
+                EdgeInsets.symmetric(horizontal: 12),
               ),
-              shape: WidgetStateProperty.all(
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: const WidgetStatePropertyAll(
+                RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
               ),
               elevation: const WidgetStatePropertyAll(0),
               hintText: 'phone number or customer name',

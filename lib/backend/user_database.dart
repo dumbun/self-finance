@@ -166,8 +166,10 @@ class UserBackEnd {
   static Future<void> deleteUserProfilePic({required int id}) async {
     final UserDatabase d = await db();
     final User s = await fetchUserData();
-    if (File(s.profilePicture).existsSync() && s.profilePicture.isNotEmpty) {
-      await File(s.profilePicture).delete();
+    if (s.profilePicture.isNotEmpty && await File(s.profilePicture).exists()) {
+      try {
+        await File(s.profilePicture).delete();
+      } catch (_) {}
     }
     await (d.update(d.userTable)..where((t) => t.id.equals(id))).write(
       const UserTableCompanion(profilePicture: Value("")),

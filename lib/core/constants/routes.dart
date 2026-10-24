@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/models/customer_model.dart';
@@ -21,7 +21,7 @@ import 'package:self_finance/views/splash_screen.dart';
 import 'package:self_finance/views/user_creating_view.dart';
 
 class Routes {
-  static Map<String, Widget Function(BuildContext)> namedRoutes = {
+  static final Map<String, Widget Function(BuildContext)> namedRoutes = {
     Constant.splashView: (BuildContext context) => const SplashScreen(),
     Constant.pinAuthView: (BuildContext context) => const PinAuthView(),
     Constant.dashboardView: (BuildContext context) => const DashboardView(),

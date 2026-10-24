@@ -2,7 +2,7 @@
 // Particle value type
 // =============================================================================
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Immutable description of a single particle's orbital parameters.
 @immutable

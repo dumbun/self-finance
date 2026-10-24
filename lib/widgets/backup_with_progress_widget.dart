@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
@@ -33,6 +33,7 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
     try {
       final zipPath = await BackupUtility.startBackup(
         onProgress: (progress, currentFile) {
+          if (!mounted) return;
           final eta = _eta.update(progress);
           _state.value = BackupState.running(
             progress: progress.clamp(0.0, 1.0),
@@ -42,14 +43,14 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
         },
       );
 
+      if (!mounted) return;
       _state.value = BackupState.success(zipPath: zipPath);
     } catch (e) {
+      if (!mounted) return;
       _state.value = BackupState.error(message: e.toString());
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Backup failed: $e')));
-      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Backup failed: $e')));
     }
   }
 
@@ -129,7 +130,7 @@ class _BackupWithProgressWidgetState extends State<BackupWithProgressWidget> {
 
                 Align(
                   alignment: Alignment.centerRight,
-                  child: ElevatedButton.icon(
+                  child: FilledButton.icon(
                     icon: Icon(
                       s.isRunning
                           ? Icons.cloud_upload

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_donation_buttons/donationButtons/buyMeACoffeeButton.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
@@ -55,9 +55,6 @@ class DrawerWidget extends StatelessWidget {
                 ),
 
                 const BuyMeACoffeeButton(
-                  style: ButtonStyle(
-                    maximumSize: WidgetStatePropertyAll(Size.infinite),
-                  ),
                   buyMeACoffeeName: Constant.byeMeACoffee,
                 ),
               ],

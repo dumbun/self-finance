@@ -2,7 +2,7 @@ import 'dart:core';
 import 'dart:io';
 
 import 'package:feedback/feedback.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -119,6 +119,21 @@ class Utility {
     if (!await launchUrl(launchUri)) {
       throw Exception('Could not launch $launchUri');
     }
+  }
+
+  // send sms
+  static Future<bool> sendSms({required String phoneNumber}) async {
+    final Uri launchUri = Uri(scheme: 'sms', path: phoneNumber);
+    if (await canLaunchUrl(launchUri)) {
+      return await launchUrl(launchUri);
+    }
+    return false;
+  }
+
+  // copy to clipboard with haptic feedback
+  static Future<void> copyToClipboard({required String text}) async {
+    await Clipboard.setData(ClipboardData(text: text));
+    HapticFeedback.lightImpact();
   }
 
   static Future<void> launchInBrowserView(String url) async {
