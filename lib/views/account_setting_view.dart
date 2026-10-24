@@ -8,15 +8,18 @@ import 'package:self_finance/core/fonts/title_widget.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/user_model.dart';
+import 'package:self_finance/providers/auth_provider.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/widgets/app_version_widget.dart';
-import 'package:self_finance/widgets/backup_button_widget.dart';
+
 import 'package:self_finance/widgets/biometric_switch_widget.dart';
+import 'package:self_finance/widgets/cloud_sync_tile.dart';
 import 'package:self_finance/widgets/csv_export_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/notification_switch_widget.dart';
 import 'package:self_finance/widgets/pin_update_buttom_sheet_widget.dart';
 import 'package:self_finance/widgets/privacy_policy_button_widget.dart';
+
 import 'package:self_finance/widgets/section_header_widget.dart';
 import 'package:self_finance/widgets/terms_and_condition_widget.dart';
 import 'package:self_finance/widgets/theme_switch_widget.dart';
@@ -112,10 +115,10 @@ class _AccountSettingsBody extends StatelessWidget {
           const BiometricSwitchWidget(),
           gap,
 
-          // ── Data & Backup ────────────────────────────────────────────────
-          const SectionHeaderWidget(label: 'Data & Backup'),
+          // ── Data ─────────────────────────────────────────────────────────
+          const SectionHeaderWidget(label: 'Data'),
           gap,
-          const BackupButtonWidget(),
+          const CloudSyncTile(),
           gap,
           _SettingsTile(
             title: 'Export to CSV',
@@ -139,6 +142,30 @@ class _AccountSettingsBody extends StatelessWidget {
           // ── Account ──────────────────────────────────────────────────────
           const SectionHeaderWidget(label: 'Account'),
           gap,
+          if (ref.watch(currentUserProvider) != null) ...[
+            _SettingsTile(
+              title: 'Sign Out Google Account',
+              semanticsLabel: 'Sign out of connected Google account',
+              icon: const Icon(
+                Icons.person_off_outlined,
+                color: AppColors.getErrorColor,
+              ),
+              onTap: () async {
+                final confirm = await AlertDilogs.alertDialogWithTwoAction(
+                  context,
+                  'Sign Out',
+                  'Are you sure you want to sign out of your Google account?',
+                );
+                if (confirm == 1 && context.mounted) {
+                  await ref.read(supabaseAuthServiceProvider).signOut();
+                  if (context.mounted) {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  }
+                }
+              },
+            ),
+            gap,
+          ],
           _SettingsTile(
             title: Constant.logout,
             semanticsLabel: 'Log out and close the app',

@@ -10,14 +10,12 @@ part 'database_provider.g.dart';
 /// This is kept for backwards compatibility. Prefer using `BackEnd` directly.
 @Riverpod(keepAlive: true)
 ItDataDatabase itDataDatabase(Ref ref) {
-  final db = ItDataDatabase.defaults();
-  ref.onDispose(db.close);
+  final db = BackEnd.activeDatabase ?? ItDataDatabase.defaults();
   return db;
 }
 
 @Riverpod(keepAlive: true)
 UserDatabase userDatabase(Ref ref) {
-  final db = UserDatabase.defaults();
-  ref.onDispose(db.close);
+  final db = UserBackEnd.activeDatabase ?? UserDatabase.defaults();
   return db;
 }

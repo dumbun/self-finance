@@ -7,7 +7,7 @@ import 'package:self_finance/core/fonts/title_widget.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/preferences_helper.dart';
 import 'package:self_finance/models/onboarding_model.dart';
-import 'package:self_finance/views/auth_view.dart';
+import 'package:self_finance/views/account_gate.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
 
 /// First-launch onboarding.
@@ -98,7 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     await Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
-        pageBuilder: (_, _, _) => const AuthView(),
+        pageBuilder: (_, _, _) => const AccountGate(),
         transitionDuration: const Duration(milliseconds: 550),
         transitionsBuilder: (_, Animation<double> animation, _, Widget child) {
           final CurvedAnimation curved = CurvedAnimation(

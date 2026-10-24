@@ -4,7 +4,7 @@ import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/views/EMI%20Calculator/emi_calculator_view.dart';
-import 'package:self_finance/widgets/restore_widget.dart';
+
 
 class TermsAndConditons extends StatefulWidget {
   const TermsAndConditons({super.key});
@@ -19,7 +19,7 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
   bool _termsAccepted = false;
   bool _privacyAccepted = false;
   int _selectedTab = 0; // 0: Onboarding / Terms, 1: EMI Calculator
-  bool _showRestoreSection = false;
+
 
   bool get _canProceed => _termsAccepted && _privacyAccepted;
 
@@ -316,47 +316,6 @@ class _TermsAndConditonsState extends State<TermsAndConditons> {
               ),
             ),
           ],
-
-          const SizedBox(height: 20),
-
-          // Restore Backup Expandable Card with Smooth AnimatedSize
-          Center(
-            child: TextButton.icon(
-              onPressed: () {
-                setState(() => _showRestoreSection = !_showRestoreSection);
-              },
-              icon: Icon(
-                _showRestoreSection
-                    ? Icons.keyboard_arrow_up_rounded
-                    : Icons.restore_rounded,
-                size: 18,
-                color: AppColors.getPrimaryColor,
-              ),
-              label: Text(
-                _showRestoreSection
-                    ? "Hide Restore Options"
-                    : "Existing user? Restore from Backup",
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.getPrimaryColor,
-                ),
-              ),
-            ),
-          ),
-
-          AnimatedSize(
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeInOutCubic,
-            child: _showRestoreSection
-                ? const Column(
-                    children: [
-                      SizedBox(height: 8),
-                      RestoreWithProgressWidget(),
-                    ],
-                  )
-                : const SizedBox.shrink(),
-          ),
 
           const SizedBox(height: 24),
         ],

@@ -5,6 +5,7 @@ import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/providers/settings_provider.dart';
+import 'package:self_finance/views/account_gate.dart';
 import 'package:self_finance/views/splash_screen.dart';
 
 class SelfFinance extends ConsumerWidget {
@@ -22,6 +23,26 @@ class SelfFinance extends ConsumerWidget {
         native_loc.GlobalCupertinoLocalizations.delegate,
       ],
       routes: Routes.namedRoutes,
+      onGenerateRoute: (RouteSettings settings) {
+        final String name = settings.name ?? '';
+        final Uri? uri = Uri.tryParse(name);
+        if (uri != null &&
+            (uri.queryParameters.containsKey('code') ||
+                name.contains('login-callback') ||
+                name.startsWith('/?'))) {
+          return MaterialPageRoute<void>(
+            settings: settings,
+            builder: (_) => const AccountGate(),
+          );
+        }
+        return null;
+      },
+      onUnknownRoute: (RouteSettings settings) {
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const AccountGate(),
+        );
+      },
       color: AppColors.getPrimaryColor,
       title: Constant.appTitle,
       debugShowCheckedModeBanner: false,

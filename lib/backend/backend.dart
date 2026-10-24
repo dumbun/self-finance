@@ -17,6 +17,9 @@ import 'package:self_finance/threads/threads.dart';
 import 'package:self_finance/models/trx_with_customer_model.dart';
 
 
+import 'package:uuid/uuid.dart';
+
+import 'package:self_finance/core/sync/sync_outbox_service.dart';
 import 'db_paths.dart';
 
 part 'backend.g.dart';
@@ -50,6 +53,13 @@ class CustomersTable extends Table {
 
   /// keeping as TEXT (your code uses ISO strings)
   TextColumn get updatedDate => text().named('Updated_Date').nullable()();
+
+  TextColumn get syncId =>
+      text().named('Sync_ID').withDefault(const Constant(''))();
+
+  DateTimeColumn get updatedAt => dateTime().named('Updated_At').nullable()();
+
+  DateTimeColumn get deletedAt => dateTime().named('Deleted_At').nullable()();
 }
 
 @DataClassName('ItemRow')
@@ -81,6 +91,13 @@ class ItemsTable extends Table {
 
   /// keeping as TEXT (your code uses ISO strings)
   TextColumn get updatedDate => text().named('Updated_Date').nullable()();
+
+  TextColumn get syncId =>
+      text().named('Sync_ID').withDefault(const Constant(''))();
+
+  DateTimeColumn get updatedAt => dateTime().named('Updated_At').nullable()();
+
+  DateTimeColumn get deletedAt => dateTime().named('Deleted_At').nullable()();
 }
 
 @DataClassName('TransactionRow')
@@ -117,6 +134,13 @@ class TransactionsTable extends Table {
 
   /// keeping as TEXT (your code uses ISO strings)
   TextColumn get updatedDate => text().named('Updated_Date').nullable()();
+
+  TextColumn get syncId =>
+      text().named('Sync_ID').withDefault(const Constant(''))();
+
+  DateTimeColumn get updatedAt => dateTime().named('Updated_At').nullable()();
+
+  DateTimeColumn get deletedAt => dateTime().named('Deleted_At').nullable()();
 }
 
 @DataClassName('PaymentRow')
@@ -141,6 +165,13 @@ class PaymentsTable extends Table {
   TextColumn get paymentType => text().named('Payment_Type')();
 
   DateTimeColumn get createdDate => dateTime().named('Created_Date')();
+
+  TextColumn get syncId =>
+      text().named('Sync_ID').withDefault(const Constant(''))();
+
+  DateTimeColumn get updatedAt => dateTime().named('Updated_At').nullable()();
+
+  DateTimeColumn get deletedAt => dateTime().named('Deleted_At').nullable()();
 }
 
 @DataClassName('HistoryRow')
@@ -169,6 +200,34 @@ class HistoryTable extends Table {
   DateTimeColumn get eventDate => dateTime().named('Event_Date')();
 
   TextColumn get eventType => text().named('Event_Type')();
+
+  TextColumn get syncId =>
+      text().named('Sync_ID').withDefault(const Constant(''))();
+
+  DateTimeColumn get updatedAt => dateTime().named('Updated_At').nullable()();
+
+  DateTimeColumn get deletedAt => dateTime().named('Deleted_At').nullable()();
+}
+
+@DataClassName('SyncOutboxRow')
+class SyncOutboxTable extends Table {
+  @override
+  String get tableName => 'Sync_Outbox';
+
+  IntColumn get outboxId => integer().named('Outbox_ID').autoIncrement()();
+
+  TextColumn get entityType => text().named('Entity_Type')();
+
+  TextColumn get entitySyncId => text().named('Entity_Sync_ID')();
+
+  TextColumn get operation => text().named('Operation')();
+
+  DateTimeColumn get createdAt => dateTime().named('Created_At')();
+
+  IntColumn get retryCount =>
+      integer().named('Retry_Count').withDefault(const Constant(0))();
+
+  TextColumn get lastError => text().named('Last_Error').nullable()();
 }
 
 // =============================================================================
@@ -182,6 +241,7 @@ class HistoryTable extends Table {
     TransactionsTable,
     PaymentsTable,
     HistoryTable,
+    SyncOutboxTable,
   ],
 )
 class ItDataDatabase extends _$ItDataDatabase {
@@ -200,8 +260,21 @@ class ItDataDatabase extends _$ItDataDatabase {
     );
   }
 
+  factory ItDataDatabase.forAccount(String accountSuffix) {
+    return ItDataDatabase(
+      driftDatabase(
+        name: 'itdata_$accountSuffix',
+        native: DriftNativeOptions(
+          databasePath: () async =>
+              (await legacySqfliteDbFile('itdata_$accountSuffix.db')).path,
+          shareAcrossIsolates: true,
+        ),
+      ),
+    );
+  }
+
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   Future<File> get dbFile async => legacySqfliteDbFile('itdata.db');
 
@@ -214,6 +287,31 @@ class ItDataDatabase extends _$ItDataDatabase {
     onUpgrade: (m, from, to) async {
       if (from < 3) {
         await _coerceLegacyTextDatesOnOpen();
+      }
+      if (from < 5) {
+        await m.addColumn(customersTable, customersTable.syncId);
+        await m.addColumn(customersTable, customersTable.updatedAt);
+        await m.addColumn(customersTable, customersTable.deletedAt);
+
+        await m.addColumn(itemsTable, itemsTable.syncId);
+        await m.addColumn(itemsTable, itemsTable.updatedAt);
+        await m.addColumn(itemsTable, itemsTable.deletedAt);
+
+        await m.addColumn(transactionsTable, transactionsTable.syncId);
+        await m.addColumn(transactionsTable, transactionsTable.updatedAt);
+        await m.addColumn(transactionsTable, transactionsTable.deletedAt);
+
+        await m.addColumn(paymentsTable, paymentsTable.syncId);
+        await m.addColumn(paymentsTable, paymentsTable.updatedAt);
+        await m.addColumn(paymentsTable, paymentsTable.deletedAt);
+
+        await m.addColumn(historyTable, historyTable.syncId);
+        await m.addColumn(historyTable, historyTable.updatedAt);
+        await m.addColumn(historyTable, historyTable.deletedAt);
+
+        await m.createTable(syncOutboxTable);
+
+        await _backfillSyncIds();
       }
       await _ensureIndexes();
     },
@@ -256,6 +354,101 @@ class ItDataDatabase extends _$ItDataDatabase {
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_transactions_date ON Transactions(Transaction_Date)',
     );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_customers_sync_id ON Customers(Sync_ID)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_items_sync_id ON Items(Sync_ID)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_transactions_sync_id ON Transactions(Sync_ID)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_payments_sync_id ON Payments(Sync_ID)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_outbox_created ON Sync_Outbox(Created_At)',
+    );
+  }
+
+  Future<void> _backfillSyncIds() async {
+    const uuid = Uuid();
+    final now = DateTime.now();
+
+    final custs = await customSelect(
+      "SELECT Customer_ID FROM Customers WHERE Sync_ID IS NULL OR Sync_ID = ''",
+    ).get();
+    for (final row in custs) {
+      final id = row.read<int>('Customer_ID');
+      await customUpdate(
+        'UPDATE Customers SET Sync_ID = ?, Updated_At = ? WHERE Customer_ID = ?',
+        variables: [
+          Variable<String>(uuid.v4()),
+          Variable<DateTime>(now),
+          Variable<int>(id),
+        ],
+      );
+    }
+
+    final items = await customSelect(
+      "SELECT Item_ID FROM Items WHERE Sync_ID IS NULL OR Sync_ID = ''",
+    ).get();
+    for (final row in items) {
+      final id = row.read<int>('Item_ID');
+      await customUpdate(
+        'UPDATE Items SET Sync_ID = ?, Updated_At = ? WHERE Item_ID = ?',
+        variables: [
+          Variable<String>(uuid.v4()),
+          Variable<DateTime>(now),
+          Variable<int>(id),
+        ],
+      );
+    }
+
+    final txns = await customSelect(
+      "SELECT Transaction_ID FROM Transactions WHERE Sync_ID IS NULL OR Sync_ID = ''",
+    ).get();
+    for (final row in txns) {
+      final id = row.read<int>('Transaction_ID');
+      await customUpdate(
+        'UPDATE Transactions SET Sync_ID = ?, Updated_At = ? WHERE Transaction_ID = ?',
+        variables: [
+          Variable<String>(uuid.v4()),
+          Variable<DateTime>(now),
+          Variable<int>(id),
+        ],
+      );
+    }
+
+    final pays = await customSelect(
+      "SELECT Payment_ID FROM Payments WHERE Sync_ID IS NULL OR Sync_ID = ''",
+    ).get();
+    for (final row in pays) {
+      final id = row.read<int>('Payment_ID');
+      await customUpdate(
+        'UPDATE Payments SET Sync_ID = ?, Updated_At = ? WHERE Payment_ID = ?',
+        variables: [
+          Variable<String>(uuid.v4()),
+          Variable<DateTime>(now),
+          Variable<int>(id),
+        ],
+      );
+    }
+
+    final hists = await customSelect(
+      "SELECT History_ID FROM History WHERE Sync_ID IS NULL OR Sync_ID = ''",
+    ).get();
+    for (final row in hists) {
+      final id = row.read<int>('History_ID');
+      await customUpdate(
+        'UPDATE History SET Sync_ID = ?, Updated_At = ? WHERE History_ID = ?',
+        variables: [
+          Variable<String>(uuid.v4()),
+          Variable<DateTime>(now),
+          Variable<int>(id),
+        ],
+      );
+    }
   }
 
   Future<void> _coerceLegacyTextDatesOnOpen() async {
@@ -473,6 +666,15 @@ Stream<R> _combineLatest2<A, B, R>(
 
 class BackEnd {
   static ItDataDatabase? _db;
+  static String? _activeAccountId;
+
+  static ItDataDatabase? get activeDatabase => _db;
+  static String? get activeAccountId => _activeAccountId;
+
+  static void setDatabase(ItDataDatabase db, {String? accountId}) {
+    _db = db;
+    _activeAccountId = accountId;
+  }
 
   static Future<ItDataDatabase> db() async {
     _db ??= ItDataDatabase.defaults();
@@ -501,7 +703,8 @@ class BackEnd {
 
     try {
       final d = await db();
-      return await d
+      final syncId = const Uuid().v4();
+      final id = await d
           .into(d.customersTable)
           .insert(
             CustomersTableCompanion.insert(
@@ -513,8 +716,19 @@ class BackEnd {
               customerPhoto: customer.photo,
               proofPhoto: customer.proof,
               createdDate: customer.createdDate,
+              syncId: Value(syncId),
+              updatedAt: Value(DateTime.now()),
             ),
           );
+
+      await SyncOutboxService.recordOperation(
+        db: d,
+        entityType: SyncOutboxService.entityCustomer,
+        entitySyncId: syncId,
+        operation: SyncOutboxService.opCreate,
+      );
+
+      return id;
     } on SqliteException {
       rethrow;
     }
@@ -573,6 +787,19 @@ class BackEnd {
   static Future<void> deleteTheCustomer({required int customerID}) async {
     final d = await db();
     await d.transaction(() async {
+      final customer = await (d.select(d.customersTable)
+            ..where((t) => t.customerId.equals(customerID)))
+          .getSingleOrNull();
+
+      if (customer != null && customer.syncId.isNotEmpty) {
+        await SyncOutboxService.recordOperation(
+          db: d,
+          entityType: SyncOutboxService.entityCustomer,
+          entitySyncId: customer.syncId,
+          operation: SyncOutboxService.opDelete,
+        );
+      }
+
       await (d.delete(
         d.customersTable,
       )..where((t) => t.customerId.equals(customerID))).go();
@@ -598,6 +825,10 @@ class BackEnd {
 
     final d = await db();
     return await d.transaction(() async {
+      final customer = await (d.select(d.customersTable)
+            ..where((t) => t.customerId.equals(customerId)))
+          .getSingleOrNull();
+
       final count =
           await (d.update(
             d.customersTable,
@@ -611,8 +842,18 @@ class BackEnd {
               proofPhoto: Value(newProofPhoto),
               createdDate: Value(newCreatedDate),
               updatedDate: Value(DateTime.now().toIso8601String()),
+              updatedAt: Value(DateTime.now()),
             ),
           );
+
+      if (customer != null && customer.syncId.isNotEmpty) {
+        await SyncOutboxService.recordOperation(
+          db: d,
+          entityType: SyncOutboxService.entityCustomer,
+          entitySyncId: customer.syncId,
+          operation: SyncOutboxService.opUpdate,
+        );
+      }
 
       await (d.update(
         d.historyTable,
@@ -640,7 +881,8 @@ class BackEnd {
     }
 
     final d = await db();
-    return await d
+    final syncId = const Uuid().v4();
+    final id = await d
         .into(d.itemsTable)
         .insert(
           ItemsTableCompanion.insert(
@@ -653,8 +895,19 @@ class BackEnd {
             itemStatus: item.status,
             itemPhoto: item.photo,
             createdDate: item.createdDate,
+            syncId: Value(syncId),
+            updatedAt: Value(DateTime.now()),
           ),
         );
+
+    await SyncOutboxService.recordOperation(
+      db: d,
+      entityType: SyncOutboxService.entityItem,
+      entitySyncId: syncId,
+      operation: SyncOutboxService.opCreate,
+    );
+
+    return id;
   }
 
   static Future<List<Items>> fetchRequriedItem({required int itemId}) async {
@@ -695,7 +948,8 @@ class BackEnd {
     }
 
     final d = await db();
-    return await d
+    final syncId = const Uuid().v4();
+    final id = await d
         .into(d.transactionsTable)
         .insert(
           TransactionsTableCompanion.insert(
@@ -709,8 +963,19 @@ class BackEnd {
             remainingAmount: transaction.remainingAmount,
             signature: transaction.signature,
             createdDate: transaction.createdDate,
+            syncId: Value(syncId),
+            updatedAt: Value(DateTime.now()),
           ),
         );
+
+    await SyncOutboxService.recordOperation(
+      db: d,
+      entityType: SyncOutboxService.entityTransaction,
+      entitySyncId: syncId,
+      operation: SyncOutboxService.opCreate,
+    );
+
+    return id;
   }
 
   static Future<int> createNewTransactionAtomic({
@@ -727,6 +992,7 @@ class BackEnd {
 
     final d = await db();
     return await d.transaction(() async {
+      final itemSyncId = const Uuid().v4();
       final itemId = await d
           .into(d.itemsTable)
           .insert(
@@ -740,6 +1006,8 @@ class BackEnd {
               itemStatus: item.status,
               itemPhoto: item.photo,
               createdDate: item.createdDate,
+              syncId: Value(itemSyncId),
+              updatedAt: Value(DateTime.now()),
             ),
           );
 
@@ -751,6 +1019,7 @@ class BackEnd {
         throw ArgumentError('Interest rate cannot be negative');
       }
 
+      final txnSyncId = const Uuid().v4();
       final transactionId = await d
           .into(d.transactionsTable)
           .insert(
@@ -765,10 +1034,13 @@ class BackEnd {
               remainingAmount: transaction.remainingAmount,
               signature: transaction.signature,
               createdDate: transaction.createdDate,
+              syncId: Value(txnSyncId),
+              updatedAt: Value(DateTime.now()),
             ),
           );
 
       final history = historyBuilder(itemId, transactionId);
+      final historySyncId = const Uuid().v4();
       await d
           .into(d.historyTable)
           .insert(
@@ -782,8 +1054,29 @@ class BackEnd {
               amount: history.amount,
               eventDate: history.eventDate,
               eventType: history.eventType,
+              syncId: Value(historySyncId),
+              updatedAt: Value(DateTime.now()),
             ),
           );
+
+      await SyncOutboxService.recordOperation(
+        db: d,
+        entityType: SyncOutboxService.entityItem,
+        entitySyncId: itemSyncId,
+        operation: SyncOutboxService.opCreate,
+      );
+      await SyncOutboxService.recordOperation(
+        db: d,
+        entityType: SyncOutboxService.entityTransaction,
+        entitySyncId: txnSyncId,
+        operation: SyncOutboxService.opCreate,
+      );
+      await SyncOutboxService.recordOperation(
+        db: d,
+        entityType: SyncOutboxService.entityHistory,
+        entitySyncId: historySyncId,
+        operation: SyncOutboxService.opCreate,
+      );
 
       return transactionId;
     });
@@ -817,15 +1110,31 @@ class BackEnd {
     required double intrestAmount,
   }) async {
     final d = await db();
-    return (d.update(
+    final now = DateTime.now();
+    final updated = await (d.update(
       d.transactionsTable,
     )..where((t) => t.transactionId.equals(id))).write(
       TransactionsTableCompanion(
         transactionType: const Value('Inactive'),
         interestAmount: Value(intrestAmount),
-        updatedDate: Value(DateTime.now().toIso8601String()),
+        updatedDate: Value(now.toIso8601String()),
+        updatedAt: Value(now),
       ),
     );
+
+    final row = await (d.select(d.transactionsTable)
+          ..where((t) => t.transactionId.equals(id))
+          ..limit(1))
+        .getSingleOrNull();
+    if (row != null && row.syncId.isNotEmpty) {
+      await SyncOutboxService.recordOperation(
+        db: d,
+        entityType: SyncOutboxService.entityTransaction,
+        entitySyncId: row.syncId,
+        operation: SyncOutboxService.opUpdate,
+      );
+    }
+    return updated;
   }
 
   static Future<void> markTransactionAsPaidAtomic({
@@ -840,6 +1149,9 @@ class BackEnd {
 
     final d = await db();
     await d.transaction(() async {
+      final now = DateTime.now();
+      final paymentSyncId = const Uuid().v4();
+
       await d
           .into(d.paymentsTable)
           .insert(
@@ -849,6 +1161,8 @@ class BackEnd {
               amountPaid: payment.amountpaid,
               paymentType: payment.type,
               createdDate: payment.createdDate,
+              syncId: Value(paymentSyncId),
+              updatedAt: Value(now),
             ),
           );
 
@@ -858,10 +1172,12 @@ class BackEnd {
         TransactionsTableCompanion(
           transactionType: const Value('Inactive'),
           interestAmount: Value(interestAmount),
-          updatedDate: Value(DateTime.now().toIso8601String()),
+          updatedDate: Value(now.toIso8601String()),
+          updatedAt: Value(now),
         ),
       );
 
+      final historySyncId = const Uuid().v4();
       await d
           .into(d.historyTable)
           .insert(
@@ -875,8 +1191,37 @@ class BackEnd {
               amount: history.amount,
               eventDate: history.eventDate,
               eventType: history.eventType,
+              syncId: Value(historySyncId),
+              updatedAt: Value(now),
             ),
           );
+
+      await SyncOutboxService.recordOperation(
+        db: d,
+        entityType: SyncOutboxService.entityPayment,
+        entitySyncId: paymentSyncId,
+        operation: SyncOutboxService.opCreate,
+      );
+
+      final txnRow = await (d.select(d.transactionsTable)
+            ..where((t) => t.transactionId.equals(transactionId))
+            ..limit(1))
+          .getSingleOrNull();
+      if (txnRow != null && txnRow.syncId.isNotEmpty) {
+        await SyncOutboxService.recordOperation(
+          db: d,
+          entityType: SyncOutboxService.entityTransaction,
+          entitySyncId: txnRow.syncId,
+          operation: SyncOutboxService.opUpdate,
+        );
+      }
+
+      await SyncOutboxService.recordOperation(
+        db: d,
+        entityType: SyncOutboxService.entityHistory,
+        entitySyncId: historySyncId,
+        operation: SyncOutboxService.opCreate,
+      );
     });
   }
 
@@ -910,9 +1255,20 @@ class BackEnd {
           if (await f.exists()) await f.delete();
         }
 
+        final historyRows = await (d.select(d.historyTable)
+              ..where((h) => h.transactionId.equals(transactionId)))
+            .get();
+        final paymentRows = await (d.select(d.paymentsTable)
+              ..where((p) => p.transactionId.equals(transactionId)))
+            .get();
+
         final historyDeleted = await (d.delete(
           d.historyTable,
         )..where((h) => h.transactionId.equals(transactionId))).go();
+
+        final paymentsDeleted = await (d.delete(
+          d.paymentsTable,
+        )..where((p) => p.transactionId.equals(transactionId))).go();
 
         final txnDeleted = await (d.delete(
           d.transactionsTable,
@@ -935,8 +1291,46 @@ class BackEnd {
           )..where((i) => i.itemId.equals(trxRow.itemId))).go();
         }
 
+        if (trxRow.syncId.isNotEmpty) {
+          await SyncOutboxService.recordOperation(
+            db: d,
+            entityType: SyncOutboxService.entityTransaction,
+            entitySyncId: trxRow.syncId,
+            operation: SyncOutboxService.opDelete,
+          );
+        }
+        if (itemRow != null && itemRow.syncId.isNotEmpty) {
+          await SyncOutboxService.recordOperation(
+            db: d,
+            entityType: SyncOutboxService.entityItem,
+            entitySyncId: itemRow.syncId,
+            operation: SyncOutboxService.opDelete,
+          );
+        }
+        for (final h in historyRows) {
+          if (h.syncId.isNotEmpty) {
+            await SyncOutboxService.recordOperation(
+              db: d,
+              entityType: SyncOutboxService.entityHistory,
+              entitySyncId: h.syncId,
+              operation: SyncOutboxService.opDelete,
+            );
+          }
+        }
+        for (final p in paymentRows) {
+          if (p.syncId.isNotEmpty) {
+            await SyncOutboxService.recordOperation(
+              db: d,
+              entityType: SyncOutboxService.entityPayment,
+              entitySyncId: p.syncId,
+              operation: SyncOutboxService.opDelete,
+            );
+          }
+        }
+
         return {
           'historyDeleted': historyDeleted,
+          'paymentsDeleted': paymentsDeleted,
           'transactionDeleted': txnDeleted,
           'itemDeleted': itemDeleted,
         };
@@ -980,7 +1374,10 @@ class BackEnd {
     }
 
     final d = await db();
-    return await d
+    final paymentSyncId = const Uuid().v4();
+    final now = DateTime.now();
+
+    final id = await d
         .into(d.paymentsTable)
         .insert(
           PaymentsTableCompanion.insert(
@@ -989,8 +1386,19 @@ class BackEnd {
             amountPaid: payment.amountpaid,
             paymentType: payment.type,
             createdDate: payment.createdDate,
+            syncId: Value(paymentSyncId),
+            updatedAt: Value(now),
           ),
         );
+
+    await SyncOutboxService.recordOperation(
+      db: d,
+      entityType: SyncOutboxService.entityPayment,
+      entitySyncId: paymentSyncId,
+      operation: SyncOutboxService.opCreate,
+    );
+
+    return id;
   }
 
   // ===========================================================================
@@ -999,7 +1407,10 @@ class BackEnd {
 
   static Future<int> createNewHistory(UserHistory history) async {
     final d = await db();
-    return await d
+    final historySyncId = const Uuid().v4();
+    final now = DateTime.now();
+
+    final id = await d
         .into(d.historyTable)
         .insert(
           HistoryTableCompanion.insert(
@@ -1012,8 +1423,19 @@ class BackEnd {
             amount: history.amount,
             eventDate: history.eventDate,
             eventType: history.eventType,
+            syncId: Value(historySyncId),
+            updatedAt: Value(now),
           ),
         );
+
+    await SyncOutboxService.recordOperation(
+      db: d,
+      entityType: SyncOutboxService.entityHistory,
+      entitySyncId: historySyncId,
+      operation: SyncOutboxService.opCreate,
+    );
+
+    return id;
   }
 
   // ===========================================================================
@@ -1679,6 +2101,7 @@ class BackEnd {
     if (d == null) return;
     await d.close();
     _db = null;
+    _activeAccountId = null;
   }
 
   // ===========================================================================

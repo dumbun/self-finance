@@ -61,7 +61,7 @@ final class ItDataDatabaseProvider
   }
 }
 
-String _$itDataDatabaseHash() => r'1e3779290afc4687e85e71a937a1ce1f1dc503ad';
+String _$itDataDatabaseHash() => r'd1c8fb31fecc0fe987ecad28ec78c5299bf39e96';
 
 @ProviderFor(userDatabase)
 final userDatabaseProvider = UserDatabaseProvider._();
@@ -102,4 +102,4 @@ final class UserDatabaseProvider
   }
 }
 
-String _$userDatabaseHash() => r'18d04895fb15ae14c37bee83294e425a3aea522c';
+String _$userDatabaseHash() => r'74df672cd636c7276288b79b02b8a1789299f6ef';

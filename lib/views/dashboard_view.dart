@@ -8,6 +8,7 @@ import 'package:self_finance/views/transactions_view.dart';
 import 'package:self_finance/widgets/drawer_widget.dart';
 import 'package:self_finance/widgets/expandable_fab.dart';
 import 'package:self_finance/core/fonts/title_widget.dart';
+import 'package:self_finance/widgets/sync_indicator_icon_button.dart';
 import 'package:self_finance/widgets/theme_toggle_icon_button.dart';
 
 class DashboardView extends StatefulWidget {
@@ -33,7 +34,10 @@ class _DashboardViewState extends State<DashboardView> {
     return Scaffold(
       appBar: AppBar(
         actionsPadding: const EdgeInsets.only(right: 12),
-        actions: const [ThemeToggleIconButton()],
+        actions: const [
+          SyncIndicatorIconButton(),
+          ThemeToggleIconButton(),
+        ],
         forceMaterialTransparency: true,
         title: ValueListenableBuilder<int>(
           valueListenable: _selectedIndex,

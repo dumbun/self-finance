@@ -1,12 +1,12 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:self_finance/backend/account_database_manager.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
-import 'package:self_finance/core/utility/preferences_helper.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/providers/user_provider.dart';
-import 'package:self_finance/views/auth_view.dart';
-import 'package:self_finance/views/onboarding_screen.dart';
+import 'package:self_finance/views/account_gate.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -54,24 +54,23 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     final Stopwatch stopwatch = Stopwatch()..start();
 
-    late final bool onboardingComplete;
-
     try {
       await Utility.appInit();
 
-      // Pre-warm user state and appDir while splash screen is active so that
-      // AuthView and PinAuthView can render immediately without flashing a circular loading screen.
-      final List<Object?> results = await Future.wait([
-        ref
-            .read(userProvider.future)
-            .timeout(const Duration(seconds: 2), onTimeout: () => null),
-        PreferencesHelper.isOnboardingComplete(),
-      ]);
+      // Pre-warm the active account database during splash so the app can route
+      // straight into the appropriate gate without an intermediate loading screen.
+      if (Utility.isSupabaseInitialized) {
+        final currentSession = Supabase.instance.client.auth.currentSession;
+        if (currentSession != null) {
+          await AccountDatabaseManager.openForAccount(currentSession.user.id);
+        }
+      }
 
-      onboardingComplete = results[1] as bool;
+      await ref
+          .read(userProvider.future)
+          .timeout(const Duration(seconds: 2), onTimeout: () => null);
     } catch (e) {
       debugPrint('Initialization error: $e');
-      onboardingComplete = false;
     }
 
     // Ensure splash is visible for at least 1200ms so animation is smooth and not a flash
@@ -85,10 +84,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     if (!mounted) return;
 
-    // Route to onboarding for first-time users, or directly to auth for returning users
-    final Widget destination = onboardingComplete
-        ? const AuthView()
-        : const OnboardingScreen();
+    // Route directly to AccountGate (Login / Session restore)
+    const Widget destination = AccountGate();
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
@@ -233,31 +230,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         ),
                       ),
                     ),
-                    const SizedBox(height: 18),
-                    const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.shield_outlined,
-                          size: 13,
-                          color: AppColors.getLigthGreyColor,
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          "100% Offline & Secure",
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 0.2,
-                            color: AppColors.getLigthGreyColor,
-                          ),
-                        ),
-                      ],
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Preparing your workspace...',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.getLigthGreyColor,
+                      ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 28),
             ],
           ),
         ),

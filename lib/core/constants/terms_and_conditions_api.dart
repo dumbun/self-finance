@@ -1,42 +1,47 @@
+/// Short, in-app version of the Terms of Use in terms_and_conditions.md.
 class TermsAndConditions {
   static const List<String> acceptanceOfTerm = [
-    "By downloading, installing, or using the Self-Finance mobile application (the 'App'), you agree to comply with and be bound by these Terms and Conditions. If you do not agree to these Terms, please do not use the App.",
+    "By installing or using Self-Finance (the 'App'), you agree to these Terms. If you do not agree, do not use the App. The App is developed by Kamsali Vamshi Krishna.",
   ];
 
   static const List<String> userData = [
-    "2.1. The App allows you to input and store financial loan data and customer information on your device.",
-    "2.2. We do not collect, store, or transmit any user data to external servers. All data entered by the user is stored locally on the device.",
-    "2.3. It is your responsibility to ensure the security and backup of your data. The App is not liable for any data loss due to device issues, app uninstallation, or other reasons."
+    "The App helps you record customer, loan, item, payment, and transaction information. Records are stored on your device and may be synchronized with Supabase cloud services when you sign in and use sync. See the Privacy Policy for details.",
+    "You are responsible for maintaining copies of records you need. Export or sync information before uninstalling or changing devices. Contact sf.help.vamshi@gmail.com to request deletion of your account and associated cloud data.",
   ];
+
   static const List<String> userResponsibilities = [
-    "3.1. You are responsible for providing accurate customer information, including customer name, customer father name, customer address, finance taken date, assurance for finance acceptance process, and rate of interest.",
-    "3.2. You agree not to use the App for any unlawful or fraudulent purposes."
+    "You are responsible for the information and files you add, including having the rights and permissions required to use other people's personal information, photos, proof images, and signatures.",
+    "Use the App lawfully, keep your device and account reasonably secure, check your records, and do not misuse or interfere with the App.",
   ];
+
   static const List<String> calculationAccuracy = [
-    "4.1. The App provides calculations for dates, times, interest amounts, and finance details based on the data you input.",
-    "4.2. While we strive for accuracy, we do not guarantee the accuracy of the calculations. You should verify all calculations for accuracy and suitability for your specific financial purposes.",
+    "The App is a recordkeeping and calculation tool, not a bank, lender, payment processor, or provider of legal, tax, or financial advice. Calculations depend on the information and settings you enter. Verify all amounts, dates, and documents before relying on or sharing them.",
   ];
+
   static const List<String> appUninstallation = [
-    "5.1. If you uninstall the App, all locally stored data will be permanently deleted. We are not responsible for any data loss resulting from app uninstallation.",
+    "You may stop using the App at any time. Local data may remain on your device until you delete it, clear app data, or uninstall the App. Cloud data deletion requests can be sent to sf.help.vamshi@gmail.com.",
   ];
+
   static const List<String> governingLaw = [
-    "6.1 These Terms shall be governed by and construed in accordance with the laws of India.",
+    "These Terms are governed by the laws of India, subject to any mandatory consumer protections that apply where you live.",
   ];
+
   static const List<String> changesToTerms = [
-    "7.1 We reserve the right to update or modify these Terms at any time. Any changes will be effective immediately upon posting the updated Terms within the App. Your continued use of the App after any such changes constitutes your acceptance of the revised Terms."
+    "We may revise these Terms by publishing an updated version with a new effective date. Continued use after revised Terms take effect means you accept them, to the extent permitted by law.",
   ];
+
   static const List<String> contactInformation = [
-    "8.1 If you have any questions or concerns about these Terms, please contact us at sf.help.vamshi@gmail.com.",
-    "8.2 If you do not agree with any part of these Terms, please discontinue the use of the App."
+    "For questions about these Terms or the Privacy Policy, contact Kamsali Vamshi Krishna at sf.help.vamshi@gmail.com.",
   ];
-  static Map<String, List<String>> termsAndConditionsMap = {
+
+  static const Map<String, List<String>> termsAndConditionsMap = {
     "1. Acceptance of Terms": acceptanceOfTerm,
-    "2. User Data": userData,
-    "3. User Responsibilities": userData,
-    "4. Calculation Accuracy": calculationAccuracy,
-    "5. App Uninstallation": appUninstallation,
+    "2. User Data and Cloud Sync": userData,
+    "3. Your Responsibilities": userResponsibilities,
+    "4. Calculations": calculationAccuracy,
+    "5. Ending Use and Data": appUninstallation,
     "6. Governing Law": governingLaw,
     "7. Changes to Terms": changesToTerms,
-    "8. Contact Information": contactInformation,
+    "8. Contact": contactInformation,
   };
 }

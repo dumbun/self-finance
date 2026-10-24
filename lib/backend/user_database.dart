@@ -40,12 +40,34 @@ class UserDatabase extends _$UserDatabase {
     );
   }
 
+  factory UserDatabase.forAccount(String accountSuffix) {
+    return UserDatabase(
+      driftDatabase(
+        name: 'user_$accountSuffix',
+        native: DriftNativeOptions(
+          databasePath: () async =>
+              (await legacySqfliteDbFile('user_$accountSuffix.db')).path,
+          shareAcrossIsolates: true,
+        ),
+      ),
+    );
+  }
+
   @override
   int get schemaVersion => 1;
 }
 
 class UserBackEnd {
   static UserDatabase? _db;
+  static String? _activeAccountId;
+
+  static UserDatabase? get activeDatabase => _db;
+  static String? get activeAccountId => _activeAccountId;
+
+  static void setDatabase(UserDatabase db, {String? accountId}) {
+    _db = db;
+    _activeAccountId = accountId;
+  }
 
   static Future<UserDatabase> db() async {
     _db ??= UserDatabase.defaults();
@@ -266,5 +288,6 @@ class UserBackEnd {
     if (d == null) return;
     await d.close();
     _db = null;
+    _activeAccountId = null;
   }
 }
