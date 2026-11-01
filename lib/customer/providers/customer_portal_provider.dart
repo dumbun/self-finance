@@ -223,5 +223,13 @@ final customerPortalDataProvider =
   final token = authState.portalToken;
   if (token == null || token.isEmpty) return null;
 
-  return await CustomerPortalService.fetchPortalData(token);
+  try {
+    return await CustomerPortalService.fetchPortalData(token);
+  } catch (e) {
+    if (e.toString().contains('Session expired or invalid') ||
+        e.toString().contains('Session not verified')) {
+      await CustomerPortalService.clearSession();
+    }
+    rethrow;
+  }
 });

@@ -59,26 +59,26 @@ class CustomerPortalService {
           .get();
     }
 
-    if (query.docs.isEmpty && cleanPhone.length > 10) {
+    if (query.docs.isEmpty && cleanPhone.length >= 10) {
       final last10 = cleanPhone.substring(cleanPhone.length - 10);
       query = await firestore
           .collectionGroup('customers')
           .where('contact_number', isEqualTo: last10)
           .limit(1)
           .get();
-    }
-
-    if (query.docs.isEmpty && cleanPhone.length == 10) {
-      query = await firestore
-          .collectionGroup('customers')
-          .where('contact_number', isEqualTo: '+91$cleanPhone')
-          .limit(1)
-          .get();
 
       if (query.docs.isEmpty) {
         query = await firestore
             .collectionGroup('customers')
-            .where('contact_number', isEqualTo: '+91 $cleanPhone')
+            .where('contact_number', isEqualTo: '+91$last10')
+            .limit(1)
+            .get();
+      }
+
+      if (query.docs.isEmpty) {
+        query = await firestore
+            .collectionGroup('customers')
+            .where('contact_number', isEqualTo: '+91 $last10')
             .limit(1)
             .get();
       }
@@ -428,24 +428,24 @@ class CustomerPortalService {
             .get();
       }
 
-      if (custQuery.docs.isEmpty && cleanCustPhone.length > 10) {
+      if (custQuery.docs.isEmpty && cleanCustPhone.length >= 10) {
         final last10 = cleanCustPhone.substring(cleanCustPhone.length - 10);
         custQuery = await firestore
             .collectionGroup('customers')
             .where('contact_number', isEqualTo: last10)
             .get();
-      }
-
-      if (custQuery.docs.isEmpty && cleanCustPhone.length == 10) {
-        custQuery = await firestore
-            .collectionGroup('customers')
-            .where('contact_number', isEqualTo: '+91$cleanCustPhone')
-            .get();
 
         if (custQuery.docs.isEmpty) {
           custQuery = await firestore
               .collectionGroup('customers')
-              .where('contact_number', isEqualTo: '+91 $cleanCustPhone')
+              .where('contact_number', isEqualTo: '+91$last10')
+              .get();
+        }
+
+        if (custQuery.docs.isEmpty) {
+          custQuery = await firestore
+              .collectionGroup('customers')
+              .where('contact_number', isEqualTo: '+91 $last10')
               .get();
         }
       }
