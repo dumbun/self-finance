@@ -393,16 +393,18 @@ class CustomerPortalService {
       final sessionQuery = await firestore
           .collection('customer_portal_sessions')
           .where('portal_token', isEqualTo: portalToken)
-          .where('status', isEqualTo: 'VERIFIED')
           .limit(1)
           .get();
 
       if (sessionQuery.docs.isEmpty) {
-        await clearSession();
         throw StateError('Session expired or invalid. Please sign in again.');
       }
 
       final sessionDoc = sessionQuery.docs.first.data();
+      if (sessionDoc['status'] != 'VERIFIED') {
+        throw StateError('Session not verified. Please sign in again.');
+      }
+
       final tokenExpiry =
           (sessionDoc['token_expires_at'] as Timestamp?)?.toDate();
       if (tokenExpiry != null && DateTime.now().isAfter(tokenExpiry)) {

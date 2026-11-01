@@ -163,7 +163,6 @@ class CustomerPortalAuthNotifier extends Notifier<CustomerPortalAuthState> {
           portalToken: response.portalToken,
           phoneNumber: response.phoneNumber,
         );
-        ref.invalidate(customerPortalDataProvider);
         return true;
       } else {
         state = state.copyWith(
@@ -189,7 +188,6 @@ class CustomerPortalAuthNotifier extends Notifier<CustomerPortalAuthState> {
         portalToken: response.portalToken,
         phoneNumber: response.phoneNumber,
       );
-      ref.invalidate(customerPortalDataProvider);
       return true;
     } else {
       state = state.copyWith(
@@ -205,7 +203,6 @@ class CustomerPortalAuthNotifier extends Notifier<CustomerPortalAuthState> {
   Future<void> signOut() async {
     await CustomerPortalService.clearSession();
     state = const CustomerPortalAuthState();
-    ref.invalidate(customerPortalDataProvider);
   }
 
   /// Clears any visible error message.
