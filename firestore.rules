@@ -8,16 +8,16 @@ service cloud.firestore {
 
     // 2. Collection group query rule for customer portal read access
     match /{path=**}/customers/{customerId} {
-      allow read: if request.auth != null;
+      allow read: if true;
     }
     match /{path=**}/transactions/{transactionId} {
-      allow read: if request.auth != null;
+      allow read: if true;
     }
     match /{path=**}/items/{itemId} {
-      allow read: if request.auth != null;
+      allow read: if true;
     }
     match /{path=**}/payments/{paymentId} {
-      allow read: if request.auth != null;
+      allow read: if true;
     }
 
     // 3. Customer portal OTP authentication sessions
