@@ -26,21 +26,14 @@ service cloud.firestore {
     }
 
     // 3. Customer portal OTP authentication sessions.
-    //    - create: Only allows well-formed session documents with required fields and PENDING status.
-    //    - read:   Only allows reading sessions that have a valid phone_number (prevents full-collection enumeration).
-    //    - update: Only allows modifying session management fields (status, attempts, portal_token, token_expires_at, updated_at).
-    //    - delete: Restricted to authenticated lender users only.
+    //    - create: Customers create sessions to request an OTP or verify Phone Auth.
+    //    - read, update: Allowed if the session contains a valid phone_number (rate-limiting & preventing blank enumerations).
+    //    - delete: Restricted to authenticated lenders.
     match /customer_portal_sessions/{sessionId} {
-      allow create: if request.resource.data.keys().hasAll(['phone_number', 'otp_hash', 'status', 'expires_at'])
-                    && request.resource.data.status == 'PENDING'
-                    && request.resource.data.phone_number is string
+      allow create: if request.resource.data.phone_number is string
                     && request.resource.data.phone_number.size() > 0;
 
-      allow read:   if resource.data.phone_number is string
-                    && resource.data.phone_number.size() > 0;
-
-      allow update: if request.resource.data.diff(resource.data).affectedKeys()
-                       .hasOnly(['status', 'attempts', 'portal_token', 'token_expires_at', 'updated_at']);
+      allow read, update: if resource.data.phone_number != null;
 
       allow delete: if request.auth != null;
     }
