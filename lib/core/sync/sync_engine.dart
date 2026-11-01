@@ -1,29 +1,39 @@
-import 'package:drift/drift.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drift/drift.dart' hide Query;
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/sync/file_sync_service.dart';
 import 'package:self_finance/core/sync/sync_mappers.dart';
 import 'package:self_finance/core/sync/sync_outbox_service.dart';
 
-/// Bidirectional sync engine coordinating local Drift SQLite, Supabase PostgreSQL,
-/// and Supabase Storage file attachments.
+/// Bidirectional sync engine coordinating local Drift SQLite, Cloud Firestore,
+/// and Firebase Storage file attachments.
 class SyncEngine {
   SyncEngine({
-    required this.client,
+    FirebaseFirestore? firestore,
+    dynamic client,
     required this.db,
     required this.userId,
     this.appDirPath,
     FileSyncService? fileSyncService,
-  }) : fileSync = fileSyncService ?? FileSyncService(client: client);
+  })  : firestore = firestore ??
+            (Firebase.apps.isNotEmpty ? FirebaseFirestore.instance : null),
+        fileSync = fileSyncService ?? FileSyncService();
 
-  final SupabaseClient client;
+  final FirebaseFirestore? firestore;
   final ItDataDatabase db;
   final String userId;
   final String? appDirPath;
   final FileSyncService fileSync;
+
+  CollectionReference<Map<String, dynamic>>? _collection(String name) {
+    final fs = firestore;
+    if (fs == null) return null;
+    return fs.collection('users').doc(userId).collection(name);
+  }
 
   static const String _prefLastSyncPrefix = 'last_sync_timestamp_';
 
@@ -206,6 +216,7 @@ class SyncEngine {
       final table = _tableNameForEntity(op.entityType);
       final payload = <String, dynamic>{
         'deleted_at': DateTime.now().toUtc().toIso8601String(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
       };
 
       if (op.entityType == SyncOutboxService.entityCustomer) {
@@ -219,11 +230,10 @@ class SyncEngine {
         payload['signature_path'] = null;
       }
 
-      await client
-          .from(table)
-          .update(payload)
-          .eq('id', syncId)
-          .eq('owner_id', userId);
+      await _collection(table)?.doc(syncId).set(
+            payload,
+            SetOptions(merge: true),
+          );
 
       return;
     }
@@ -272,7 +282,10 @@ class SyncEngine {
             remotePhotoPath: remotePhoto,
             remoteProofPath: remoteProof,
           );
-          await client.from('customers').upsert(payload);
+          await _collection('customers')?.doc(effectiveSyncId).set(
+                payload,
+                SetOptions(merge: true),
+              );
         }
         break;
 
@@ -310,7 +323,10 @@ class SyncEngine {
               userId,
               remotePhotoPath: remotePhoto,
             );
-            await client.from('items').upsert(payload);
+            await _collection('items')?.doc(effectiveSyncId).set(
+                  payload,
+                  SetOptions(merge: true),
+                );
           }
         }
         break;
@@ -355,7 +371,10 @@ class SyncEngine {
               userId,
               remoteSignaturePath: remoteSig,
             );
-            await client.from('transactions').upsert(payload);
+            await _collection('transactions')?.doc(effectiveSyncId).set(
+                  payload,
+                  SetOptions(merge: true),
+                );
           }
         }
         break;
@@ -370,6 +389,8 @@ class SyncEngine {
                     ..where((t) => t.transactionId.equals(row.transactionId) | t.syncId.equals(row.transactionId)))
                   .getSingleOrNull();
           if (txn != null) {
+            final effectiveSyncId =
+                row.syncId.isNotEmpty ? row.syncId : row.paymentId;
             final txnSyncId =
                 txn.syncId.isNotEmpty ? txn.syncId : txn.transactionId;
             final payload = SyncMappers.paymentToSupabase(
@@ -377,7 +398,10 @@ class SyncEngine {
               txnSyncId,
               userId,
             );
-            await client.from('payments').upsert(payload);
+            await _collection('payments')?.doc(effectiveSyncId).set(
+                  payload,
+                  SetOptions(merge: true),
+                );
           }
         }
         break;
@@ -392,6 +416,8 @@ class SyncEngine {
                     ..where((t) => t.customerId.equals(row.customerId) | t.syncId.equals(row.customerId)))
                   .getSingleOrNull();
           if (cust != null) {
+            final effectiveSyncId =
+                row.syncId.isNotEmpty ? row.syncId : row.historyId;
             String? itemSync;
             String? txnSync;
             if (row.itemId.isNotEmpty && row.itemId != '0') {
@@ -423,7 +449,10 @@ class SyncEngine {
               txnSync,
               userId,
             );
-            await client.from('history').upsert(payload);
+            await _collection('history')?.doc(effectiveSyncId).set(
+                  payload,
+                  SetOptions(merge: true),
+                );
           }
         }
         break;
@@ -1136,35 +1165,42 @@ class SyncEngine {
     DateTime since, {
     int pageSize = 500,
   }) async {
-    final all = <Map<String, dynamic>>[];
-    var cursorTs = since.toUtc().toIso8601String();
-    String? cursorId;
+    final col = _collection(table);
+    if (col == null) return [];
 
-    String quote(String ts) => '"${ts.replaceFirst('+00:00', 'Z')}"';
+    final all = <Map<String, dynamic>>[];
+    final sinceIso = since.toUtc().toIso8601String();
+
+    Query<Map<String, dynamic>> query;
+    if (since.millisecondsSinceEpoch > 0) {
+      query = col
+          .where('updated_at', isGreaterThan: sinceIso)
+          .orderBy('updated_at');
+    } else {
+      query = col.orderBy('updated_at');
+    }
+
+    DocumentSnapshot<Map<String, dynamic>>? lastDoc;
 
     while (true) {
-      var query = client.from(table).select().eq('owner_id', userId);
+      Query<Map<String, dynamic>> pagedQuery = query.limit(pageSize);
+      if (lastDoc != null) {
+        pagedQuery = pagedQuery.startAfterDocument(lastDoc);
+      }
 
-      query = cursorId == null
-          ? query.gt('updated_at', cursorTs)
-          : query.or(
-              'updated_at.gt.${quote(cursorTs)},'
-              'and(updated_at.eq.${quote(cursorTs)},id.gt.$cursorId)',
-            );
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+          await pagedQuery.get().timeout(const Duration(seconds: 30));
 
-      final page =
-          (await query
-                  .order('updated_at')
-                  .order('id')
-                  .limit(pageSize)
-                  .timeout(const Duration(seconds: 30)))
-              .cast<Map<String, dynamic>>();
+      if (snapshot.docs.isEmpty) break;
 
-      all.addAll(page); // <-- restore this
-      if (page.length < pageSize) break;
+      for (final doc in snapshot.docs) {
+        final data = Map<String, dynamic>.from(doc.data());
+        data['id'] = data['id'] ?? doc.id;
+        all.add(data);
+      }
 
-      cursorTs = page.last['updated_at'] as String;
-      cursorId = page.last['id'] as String;
+      if (snapshot.docs.length < pageSize) break;
+      lastDoc = snapshot.docs.last;
     }
 
     return all;

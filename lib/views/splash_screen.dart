@@ -1,6 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:self_finance/backend/account_database_manager.dart';
 import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
@@ -76,10 +76,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
       // Pre-warm the active account database during splash so the app can route
       // straight into the appropriate gate without an intermediate loading screen.
-      if (Utility.isSupabaseInitialized) {
-        final currentSession = Supabase.instance.client.auth.currentSession;
-        if (currentSession != null) {
-          await AccountDatabaseManager.openForAccount(currentSession.user.id);
+      if (Utility.isFirebaseInitialized) {
+        final currentFirebaseUser = FirebaseAuth.instance.currentUser;
+        if (currentFirebaseUser != null) {
+          await AccountDatabaseManager.openForAccount(currentFirebaseUser.uid);
         }
       }
 

@@ -1,29 +1,20 @@
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Service responsible for uploading and downloading binary attachments
 /// (customer photos, proof photos, item photos, transaction signatures)
-/// to and from Supabase Storage private bucket `finance-files`.
+/// to and from Firebase Cloud Storage.
 class FileSyncService {
-  FileSyncService({required this.client});
+  FileSyncService({
+    FirebaseStorage? storage,
+    dynamic client,
+  }) : _storage = storage ??
+            (Firebase.apps.isNotEmpty ? FirebaseStorage.instance : null);
 
-  final SupabaseClient client;
-
-  static const String bucketName = 'finance-files';
-
-  static bool _warnedMissingBucket = false;
-
-  static void _logMissingBucketOnce() {
-    if (!_warnedMissingBucket) {
-      _warnedMissingBucket = true;
-      debugPrint(
-        '⚠️ FileSyncService: Storage bucket "$bucketName" not found in Supabase. '
-        'Please run "supabase/migrations/20261024_create_storage_bucket.sql" in your Supabase SQL editor.',
-      );
-    }
-  }
+  final FirebaseStorage? _storage;
 
   static Future<void> deleteLocalFileIfExists(
     String? path, {
@@ -31,9 +22,8 @@ class FileSyncService {
   }) async {
     if (path == null || path.trim().isEmpty) return;
 
-    final String candidate = p.isAbsolute(path)
-        ? path
-        : p.join(appDirPath, path);
+    final String candidate =
+        p.isAbsolute(path) ? path : p.join(appDirPath, path);
 
     final file = File(candidate);
     if (await file.exists()) {
@@ -51,18 +41,14 @@ class FileSyncService {
     if (remotePath == null || remotePath.trim().isEmpty) return;
     if (!isRemoteStoragePath(remotePath)) return;
 
+    final storage = _storage;
+    if (storage == null) return;
+
     try {
-      await client.storage.from(bucketName).remove([remotePath]);
+      await storage.ref(remotePath).delete();
       debugPrint('FileSyncService: Deleted remote file $remotePath');
     } catch (e) {
-      if (e is StorageException &&
-          (e.error == 'NoSuchBucket' ||
-              e.message.toLowerCase().contains('bucket not found') ||
-              e.message.contains('NoSuchBucket'))) {
-        _logMissingBucketOnce();
-      } else {
-        debugPrint('FileSyncService: Delete remote error for $remotePath: $e');
-      }
+      debugPrint('FileSyncService: Delete remote error for $remotePath: $e');
     }
   }
 
@@ -109,7 +95,7 @@ class FileSyncService {
 
   // ── File Operations ──
 
-  /// Uploads a local file to Supabase Storage at [remotePath].
+  /// Uploads a local file to Firebase Cloud Storage at [remotePath].
   ///
   /// [localRelativePath] is relative to [appDirPath] (or absolute).
   /// Returns the [remotePath] on success, or null if the local file does not exist or upload fails.
@@ -120,52 +106,51 @@ class FileSyncService {
   }) async {
     if (localRelativePath.isEmpty) return null;
 
+    final String fullPath = p.isAbsolute(localRelativePath)
+        ? localRelativePath
+        : p.join(appDirPath, localRelativePath);
+
+    final file = File(fullPath);
+    if (!await file.exists()) {
+      return null;
+    }
+
+    final bytes = await file.readAsBytes();
+    if (bytes.isEmpty) {
+      return null;
+    }
+
+    final storage = _storage;
+    if (storage == null) {
+      debugPrint(
+        'FileSyncService: upload skipped, FirebaseStorage unavailable.',
+      );
+      return null;
+    }
+
     try {
-      final String fullPath = p.isAbsolute(localRelativePath)
-          ? localRelativePath
-          : p.join(appDirPath, localRelativePath);
-
-      final file = File(fullPath);
-      if (!await file.exists()) {
-        return null;
-      }
-
-      final bytes = await file.readAsBytes();
-      if (bytes.isEmpty) {
-        return null;
-      }
-
       final String extension = p.extension(fullPath).toLowerCase();
       final String contentType = extension == '.png'
           ? 'image/png'
           : extension == '.webp'
-          ? 'image/webp'
-          : 'image/jpeg';
+              ? 'image/webp'
+              : 'image/jpeg';
 
-      await client.storage
-          .from(bucketName)
-          .uploadBinary(
-            remotePath,
-            bytes,
-            fileOptions: FileOptions(upsert: true, contentType: contentType),
-          );
+      final ref = storage.ref(remotePath);
+      await ref.putData(
+        bytes,
+        SettableMetadata(contentType: contentType),
+      );
 
       debugPrint('FileSyncService: Uploaded $remotePath successfully');
       return remotePath;
     } catch (e) {
-      if (e is StorageException &&
-          (e.error == 'NoSuchBucket' ||
-              e.message.toLowerCase().contains('bucket not found') ||
-              e.message.contains('NoSuchBucket'))) {
-        _logMissingBucketOnce();
-      } else {
-        debugPrint('FileSyncService: Upload error for $remotePath: $e');
-      }
+      debugPrint('FileSyncService: Upload error for $remotePath: $e');
       return null;
     }
   }
 
-  /// Downloads a remote file from Supabase Storage and writes it to [localRelativeDestPath]
+  /// Downloads a remote file from Firebase Storage and writes it to [localRelativeDestPath]
   /// inside [appDirPath].
   ///
   /// If [remotePath] is a local path that already exists on device, returns that path without downloading.
@@ -195,27 +180,29 @@ class FileSyncService {
       return null;
     }
 
+    final String fullDestPath = p.isAbsolute(localRelativeDestPath)
+        ? localRelativeDestPath
+        : p.join(appDirPath, localRelativeDestPath);
+
+    final destFile = File(fullDestPath);
+    if (await destFile.exists() && (await destFile.length()) > 0) {
+      // Already cached locally
+      return localRelativeDestPath;
+    }
+
+    final storage = _storage;
+    if (storage == null) return null;
+
     try {
-      final String fullDestPath = p.isAbsolute(localRelativeDestPath)
-          ? localRelativeDestPath
-          : p.join(appDirPath, localRelativeDestPath);
-
-      final destFile = File(fullDestPath);
-      if (await destFile.exists() && (await destFile.length()) > 0) {
-        // Already cached locally
-        return localRelativeDestPath;
-      }
-
       final parentDir = destFile.parent;
       if (!await parentDir.exists()) {
         await parentDir.create(recursive: true);
       }
 
-      final Uint8List bytes = await client.storage
-          .from(bucketName)
-          .download(remotePath);
+      final ref = storage.ref(remotePath);
+      final Uint8List? bytes = await ref.getData();
 
-      if (bytes.isEmpty) {
+      if (bytes == null || bytes.isEmpty) {
         return null;
       }
 
@@ -225,14 +212,7 @@ class FileSyncService {
       );
       return localRelativeDestPath;
     } catch (e) {
-      if (e is StorageException &&
-          (e.error == 'NoSuchBucket' ||
-              e.message.toLowerCase().contains('bucket not found') ||
-              e.message.contains('NoSuchBucket'))) {
-        _logMissingBucketOnce();
-      } else {
-        debugPrint('FileSyncService: Download error for $remotePath: $e');
-      }
+      debugPrint('FileSyncService: Download error for $remotePath: $e');
       return null;
     }
   }

@@ -9,9 +9,6 @@ import 'package:self_finance/core/sync/file_sync_service.dart';
 import 'package:self_finance/core/sync/sync_engine.dart';
 import 'package:self_finance/core/sync/sync_outbox_service.dart';
 import 'package:self_finance/models/customer_model.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
-class FakeSupabaseClient extends Fake implements SupabaseClient {}
 
 void main() {
   group('Stage D Acceptance Tests — Production Hardening & Full Data Flow', () {
@@ -273,7 +270,7 @@ void main() {
     test(
       'Acceptance 5: File sync paths and attachment mapping round-trip',
       () async {
-        final fileSync = FileSyncService(client: FakeSupabaseClient());
+        final fileSync = FileSyncService();
         const userId = 'user-uuid-999';
         const customerSyncId = 'cust-uuid-888';
 
@@ -328,11 +325,9 @@ void main() {
         final db = ItDataDatabase(NativeDatabase.memory());
         addTearDown(db.close);
 
-        final client = FakeSupabaseClient();
-        final fileSync = FileSyncService(client: client);
+        final fileSync = FileSyncService();
 
         final engine = SyncEngine(
-          client: client,
           db: db,
           userId: 'test-user-id',
           appDirPath: tempDir.path,

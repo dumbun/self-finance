@@ -1,7 +1,12 @@
+import 'dart:convert';
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 /// Exception thrown when cloud verification cannot be performed.
 class CloudOtpException implements Exception {
@@ -12,7 +17,7 @@ class CloudOtpException implements Exception {
   String toString() => message;
 }
 
-/// Result returned from Supabase server OTP verification.
+/// Result returned from server OTP verification.
 class CloudVerificationResult {
   final bool success;
   final String? verificationToken;
@@ -97,53 +102,66 @@ class OtpService {
     );
   }
 
-  /// Requests a cryptographically generated & hashed OTP session from Supabase.
+  /// Requests a cryptographically generated & hashed OTP session from Firestore.
   static Future<OtpSession> requestCloudOtp({
     required String customerName,
     required String phoneNumber,
     required double amount,
   }) async {
-    if (Utility.isSupabaseInitialized &&
-        Supabase.instance.client.auth.currentSession != null) {
+    final user = Firebase.apps.isNotEmpty ? FirebaseAuth.instance.currentUser : null;
+    if (user != null) {
       try {
-        final dynamic response = await Supabase.instance.client.rpc(
-          'request_loan_otp',
-          params: {
-            'p_customer_number': phoneNumber,
-            'p_customer_name': customerName,
-            'p_loan_amount': amount,
-          },
+        final String cleanNumber = phoneNumber.replaceAll(RegExp(r'\s+'), '');
+        final String otp = generateOtp();
+        final String verificationId = const Uuid().v4();
+        final String verificationToken = const Uuid().v4();
+        final DateTime now = DateTime.now();
+        final DateTime expiresAt = now.add(otpValidityDuration);
+
+        // Salt and hash the OTP with customer number and lender user_id
+        final String otpHash = sha256
+            .convert(utf8.encode('$otp$cleanNumber${user.uid}'))
+            .toString();
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('loan_verifications')
+            .doc(verificationId)
+            .set({
+          'id': verificationId,
+          'owner_id': user.uid,
+          'customer_number': cleanNumber,
+          'customer_name': customerName,
+          'loan_amount': amount,
+          'otp_hash': otpHash,
+          'status': 'PENDING',
+          'attempts': 0,
+          'verification_token': verificationToken,
+          'expires_at': Timestamp.fromDate(expiresAt),
+          'created_at': Timestamp.fromDate(now),
+          'updated_at': Timestamp.fromDate(now),
+        });
+
+        return OtpSession(
+          verificationId: verificationId,
+          code: otp,
+          createdAt: now,
+          expiresAt: expiresAt,
+          phoneNumber: phoneNumber,
+          customerName: customerName,
+          amount: amount,
+          isCloudVerified: true,
         );
-
-        if (response is Map) {
-          final map = Map<String, dynamic>.from(response);
-          final String verificationId = map['verification_id'] as String;
-          final String otpCode = map['otp_code'] as String;
-          final DateTime expiresAt = DateTime.tryParse(
-                map['expires_at'] as String? ?? '',
-              ) ??
-              DateTime.now().add(otpValidityDuration);
-
-          return OtpSession(
-            verificationId: verificationId,
-            code: otpCode,
-            createdAt: DateTime.now(),
-            expiresAt: expiresAt,
-            phoneNumber: phoneNumber,
-            customerName: customerName,
-            amount: amount,
-            isCloudVerified: true,
-          );
-        }
       } catch (e) {
-        debugPrint('Supabase request_loan_otp error: $e');
+        debugPrint('Firestore request_loan_otp error: $e');
         throw CloudOtpException(
           'Failed to generate secure OTP from server: $e',
         );
       }
     }
 
-    // In debug/test mode when Supabase is not logged in
+    // In debug/test mode when user is not logged in or Firebase is not initialized
     if (kDebugMode) {
       return createSession(
         customerName: customerName,
@@ -153,37 +171,112 @@ class OtpService {
     }
 
     throw const CloudOtpException(
-      'Active internet connection and Supabase login required for customer OTP verification.',
+      'Active internet connection and login required for customer OTP verification.',
     );
   }
 
-  /// Verifies the entered OTP code against Supabase server-side hash.
+  /// Verifies the entered OTP code against Firestore-stored hash.
   static Future<CloudVerificationResult> verifyCloudOtp({
     required OtpSession session,
     required String enteredPin,
   }) async {
-    if (session.isCloudVerified && session.verificationId != null) {
+    final user = Firebase.apps.isNotEmpty ? FirebaseAuth.instance.currentUser : null;
+    if (session.isCloudVerified && session.verificationId != null && user != null) {
       try {
-        final dynamic response = await Supabase.instance.client.rpc(
-          'verify_loan_otp',
-          params: {
-            'p_verification_id': session.verificationId,
-            'p_entered_otp': enteredPin.trim(),
-          },
-        );
+        final docRef = FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('loan_verifications')
+            .doc(session.verificationId);
 
-        if (response is Map) {
-          final map = Map<String, dynamic>.from(response);
+        final docSnap = await docRef.get();
+        if (!docSnap.exists || docSnap.data() == null) {
+          return const CloudVerificationResult(
+            success: false,
+            error: 'NOT_FOUND',
+            message: 'Verification session not found.',
+          );
+        }
+
+        final data = docSnap.data()!;
+        final String status = data['status'] as String? ?? 'PENDING';
+        final int attempts = data['attempts'] as int? ?? 0;
+        final Timestamp? expiresTimestamp = data['expires_at'] as Timestamp?;
+        final DateTime expiresAt =
+            expiresTimestamp?.toDate() ?? session.expiresAt;
+        final String verificationToken =
+            data['verification_token'] as String? ?? const Uuid().v4();
+
+        if (status == 'EXPIRED' || DateTime.now().isAfter(expiresAt)) {
+          await docRef.update({
+            'status': 'EXPIRED',
+            'updated_at': Timestamp.now(),
+          });
+          return const CloudVerificationResult(
+            success: false,
+            error: 'EXPIRED',
+            message: 'OTP has expired. Please request a new code.',
+          );
+        }
+
+        if (status == 'VERIFIED' || status == 'CONSUMED') {
           return CloudVerificationResult(
-            success: map['success'] == true,
-            verificationToken: map['verification_token'] as String?,
-            error: map['error'] as String?,
-            message: map['message'] as String?,
-            remainingAttempts: map['remaining_attempts'] as int?,
+            success: true,
+            verificationToken: verificationToken,
+            message: 'Already verified.',
+          );
+        }
+
+        if (attempts >= 5) {
+          await docRef.update({
+            'status': 'EXPIRED',
+            'updated_at': Timestamp.now(),
+          });
+          return const CloudVerificationResult(
+            success: false,
+            error: 'MAX_ATTEMPTS',
+            message: 'Too many incorrect attempts. Please request a new code.',
+          );
+        }
+
+        final String cleanNumber =
+            session.phoneNumber.replaceAll(RegExp(r'\s+'), '');
+        final String computedHash = sha256
+            .convert(utf8.encode('${enteredPin.trim()}$cleanNumber${user.uid}'))
+            .toString();
+
+        final String storedHash = data['otp_hash'] as String? ?? '';
+
+        if (computedHash == storedHash) {
+          await docRef.update({
+            'status': 'VERIFIED',
+            'verified_at': Timestamp.now(),
+            'updated_at': Timestamp.now(),
+          });
+          return CloudVerificationResult(
+            success: true,
+            verificationToken: verificationToken,
+            message: 'Verified successfully.',
+          );
+        } else {
+          final int newAttempts = attempts + 1;
+          await docRef.update({
+            'attempts': newAttempts,
+            if (newAttempts >= 5) 'status': 'EXPIRED',
+            'updated_at': Timestamp.now(),
+          });
+
+          return CloudVerificationResult(
+            success: false,
+            error: newAttempts >= 5 ? 'MAX_ATTEMPTS' : 'INVALID_OTP',
+            remainingAttempts: (5 - newAttempts).clamp(0, 5),
+            message: newAttempts >= 5
+                ? 'Too many incorrect attempts. Please request a new code.'
+                : 'Invalid OTP code',
           );
         }
       } catch (e) {
-        debugPrint('Supabase verify_loan_otp error: $e');
+        debugPrint('Firestore verify_loan_otp error: $e');
         return CloudVerificationResult(
           success: false,
           error: 'SERVER_ERROR',

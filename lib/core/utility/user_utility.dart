@@ -17,6 +17,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/core/sync/sync_engine.dart';
 import 'package:self_finance/core/sync/sync_outbox_service.dart';
 import 'package:self_finance/core/sync/sync_provider.dart';
+import 'package:self_finance/core/auth/firebase_auth_service.dart';
 import 'package:self_finance/core/utility/home_widget_service.dart';
 import 'package:self_finance/core/utility/notification_service.dart';
 import 'package:self_finance/core/utility/preferences_helper.dart';
@@ -26,46 +27,36 @@ import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/views/account_gate.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:signature/signature.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:firebase_core/firebase_core.dart';
+import 'package:self_finance/firebase_options.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 class Utility {
   static Future<void> appInit() async {
-    // Load .env first — Supabase init depends on the env vars.
-    await dotenv.load();
+    // Initialize Firebase during splash
+    await _initFirebase();
 
-    // Initialize Supabase (if configured)
-    await _initSupabase();
+    // Load .env if present
+    try {
+      await dotenv.load();
+    } catch (_) {}
   }
 
   static bool get isFirebaseInitialized => Firebase.apps.isNotEmpty;
+  static bool get isSupabaseInitialized => false;
 
-  static bool _isSupabaseInitialized = false;
-  static bool get isSupabaseInitialized => _isSupabaseInitialized;
-
-  /// Initializes Supabase if SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY are
-  /// present in the .env file. Silently skips if not configured so the app
-  /// continues to work fully offline.
-  static Future<void> _initSupabase() async {
-    final String? url = dotenv.env['SUPABASE_URL'];
-    final String? key = dotenv.env['SUPABASE_PUBLISHABLE_KEY'];
-
-    if (url == null || url.isEmpty || key == null || key.isEmpty) {
-      _isSupabaseInitialized = false;
-      debugPrint('Supabase not configured — running in offline-only mode.');
-      return;
-    }
-
+  /// Initializes Firebase using platform options if not already initialized.
+  static Future<void> _initFirebase() async {
+    if (Firebase.apps.isNotEmpty) return;
     try {
-      await Supabase.initialize(url: url, publishableKey: key);
-      _isSupabaseInitialized = true;
-      debugPrint('Supabase initialized successfully.');
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      debugPrint('Firebase initialized successfully during splash.');
     } catch (e) {
-      // Don't crash the app if Supabase init fails — fall back to offline.
-      _isSupabaseInitialized = false;
-      debugPrint('Supabase initialization failed: $e');
+      debugPrint('Firebase initialization failed during splash: $e');
     }
   }
 
@@ -97,11 +88,10 @@ class Utility {
 
     final NavigatorState navigator =
         Navigator.of(context, rootNavigator: true);
-    final SupabaseClient? client = Utility.isSupabaseInitialized
-        ? Supabase.instance.client
-        : null;
     final String? userId =
-        client?.auth.currentUser?.id ??
+        (Utility.isFirebaseInitialized
+            ? fb.FirebaseAuth.instance.currentUser?.uid
+            : null) ??
         AccountDatabaseManager.activeUserId ??
         BackEnd.activeAccountId;
     final ItDataDatabase? db = BackEnd.activeDatabase;
@@ -127,7 +117,7 @@ class Utility {
 
     try {
       // 1. Best-effort sync push — ensure pending mutations are queued and pushed
-      if (userId != null && db != null && client != null) {
+      if (userId != null && db != null && Utility.isFirebaseInitialized) {
         try {
           final needsBackfill = await SyncOutboxService.hasRecordsNeedingSync(
             db,
@@ -142,7 +132,6 @@ class Utility {
         try {
           final Directory appDir = await getApplicationDocumentsDirectory();
           final SyncEngine engine = SyncEngine(
-            client: client,
             db: db,
             userId: userId,
             appDirPath: appDir.path,
@@ -161,15 +150,15 @@ class Utility {
         debugPrint('Failed to delete local data: $e');
       }
 
-      // 3. Sign out from Supabase (guarded for offline mode via auth service)
+      // 3. Sign out from Firebase Auth
       try {
         if (ref != null) {
-          await ref.read(supabaseAuthServiceProvider).signOut();
-        } else if (client != null) {
-          await client.auth.signOut();
+          await ref.read(firebaseAuthServiceProvider).signOut();
+        } else {
+          await FirebaseAuthService().signOut();
         }
       } catch (e) {
-        debugPrint('Supabase sign-out failed: $e');
+        debugPrint('Sign-out failed: $e');
       }
 
       // 4. Clear user preferences (theme, biometrics, onboarding)

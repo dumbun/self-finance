@@ -3,7 +3,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:drift/drift.dart' hide Constant;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/sync/sync_engine.dart';
 import 'package:self_finance/core/sync/sync_outbox_service.dart';
@@ -121,11 +120,10 @@ class SyncNotifier extends Notifier<SyncState> {
 
   void _listenToAuth() {
     ref.listen(authStateProvider, (previous, next) {
-      final Session? prevSession = previous?.asData?.value.session;
-      final Session? currentSession = next.asData?.value.session;
+      final prevUser = previous?.asData?.value;
+      final currentUser = next.asData?.value;
 
-      if (currentSession != null &&
-          prevSession?.user.id != currentSession.user.id) {
+      if (currentUser != null && prevUser?.id != currentUser.id) {
         // User logged in or restored session — trigger full sync
         Future.delayed(const Duration(milliseconds: 600), syncNow);
       }
@@ -169,7 +167,7 @@ class SyncNotifier extends Notifier<SyncState> {
 
   /// Triggers a bidirectional sync.
   Future<void> syncNow() async {
-    final User? user = ref.read(currentUserProvider);
+    final user = ref.read(currentUserProvider);
 
     if (user == null) {
       debugPrint('Sync skipped: user not active.');
@@ -188,11 +186,8 @@ class SyncNotifier extends Notifier<SyncState> {
       return;
     }
 
-    final SupabaseClient? client = Utility.isSupabaseInitialized
-        ? Supabase.instance.client
-        : null;
-    if (client == null) {
-      debugPrint('Sync skipped: Supabase not initialized.');
+    if (!Utility.isFirebaseInitialized && !Utility.isSupabaseInitialized) {
+      debugPrint('Sync skipped: Cloud backend not initialized.');
       return;
     }
 
@@ -214,7 +209,6 @@ class SyncNotifier extends Notifier<SyncState> {
       }
 
       final SyncEngine engine = SyncEngine(
-        client: client,
         db: db,
         userId: user.id,
         appDirPath: appDirPath,

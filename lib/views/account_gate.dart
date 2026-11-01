@@ -15,17 +15,16 @@ class AccountGate extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (!Utility.isSupabaseInitialized) {
+    if (!Utility.isFirebaseInitialized) {
       return const AuthView();
     }
 
     final authState = ref.watch(authStateProvider);
-    final authService = ref.watch(supabaseAuthServiceProvider);
-    final currentSession = authService.currentSession;
-    final session = authState.asData?.value.session ?? currentSession;
+    final authService = ref.watch(firebaseAuthServiceProvider);
+    final currentUser = authState.asData?.value ?? authService.currentUser;
 
-    if (session != null) {
-      final dbInit = ref.watch(accountDatabaseProvider(session.user.id));
+    if (currentUser != null) {
+      final dbInit = ref.watch(accountDatabaseProvider(currentUser.uid));
       return dbInit.when(
         data: (_) => const AuthView(),
         loading: () => const Scaffold(
@@ -40,7 +39,7 @@ class AccountGate extends ConsumerWidget {
       );
     }
 
-    if (authState.isLoading && currentSession == null) {
+    if (authState.isLoading && authService.currentUser == null) {
       return const Scaffold(
         body: Center(
           child: CircularProgressIndicator.adaptive(),

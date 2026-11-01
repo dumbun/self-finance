@@ -64,12 +64,11 @@ class AppLockSetupNotifier extends Notifier<AppLockSetupState> {
   @override
   AppLockSetupState build() {
     final user = ref.watch(currentUserProvider);
-    final metadata = user?.userMetadata;
-    final fullName = metadata?['full_name'] ?? metadata?['name'];
+    final displayName = user?.displayName;
 
     String suggestedName = '';
-    if (fullName is String && fullName.trim().isNotEmpty) {
-      suggestedName = fullName.trim();
+    if (displayName != null && displayName.trim().isNotEmpty) {
+      suggestedName = displayName.trim();
     } else if (user?.email != null && user!.email!.isNotEmpty) {
       suggestedName = user.email!.split('@').first;
     }

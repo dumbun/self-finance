@@ -66,15 +66,13 @@ void main() {
       expect(currentUser, isNull);
     });
 
-    test('supabaseAuthServiceProvider returns unavailable service when offline', () {
+    test('firebaseAuthServiceProvider returns service with null user when offline', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      final authService = container.read(supabaseAuthServiceProvider);
-      expect(authService.isAvailable, isFalse);
+      final authService = container.read(firebaseAuthServiceProvider);
       expect(authService.currentUser, isNull);
       expect(authService.isSignedIn, isFalse);
-      expect(authService.currentSession, isNull);
     });
   });
 }

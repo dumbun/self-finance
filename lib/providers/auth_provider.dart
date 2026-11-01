@@ -1,34 +1,34 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:self_finance/backend/account_database_manager.dart';
-import 'package:self_finance/core/auth/supabase_auth_service.dart';
-import 'package:self_finance/core/utility/user_utility.dart';
+import 'package:self_finance/core/auth/firebase_auth_service.dart';
 
-/// Singleton [SupabaseAuthService] wrapping the global Supabase client.
-final supabaseAuthServiceProvider = Provider<SupabaseAuthService>((ref) {
-  if (!Utility.isSupabaseInitialized) {
-    return SupabaseAuthService(null);
-  }
-  return SupabaseAuthService(Supabase.instance.client);
+export 'package:self_finance/core/auth/firebase_auth_service.dart'
+    show FirebaseUserCompat;
+
+/// Singleton [FirebaseAuthService] wrapping the global Firebase Auth client.
+final firebaseAuthServiceProvider = Provider<FirebaseAuthService>((ref) {
+  return FirebaseAuthService();
 });
 
-final authStateProvider = StreamProvider<AuthState>((ref) {
-  final service = ref.watch(supabaseAuthServiceProvider);
-  return service.authChanges;
+/// Reactive stream of Firebase [User?] auth state changes.
+final authStateProvider = StreamProvider<User?>((ref) {
+  final service = ref.watch(firebaseAuthServiceProvider);
+  return service.authStateChanges;
 });
 
 final isSignedInProvider = Provider<bool>((ref) {
   final authState = ref.watch(authStateProvider);
-  final service = ref.watch(supabaseAuthServiceProvider);
-  return authState.whenOrNull(data: (state) => state.session != null) ??
+  final service = ref.watch(firebaseAuthServiceProvider);
+  return authState.whenOrNull(data: (user) => user != null) ??
       service.isSignedIn;
 });
 
-/// The currently authenticated [User], or `null`.
+/// The currently authenticated Firebase [User], or `null`.
 final currentUserProvider = Provider<User?>((ref) {
   // Re-evaluate whenever auth state changes.
   ref.watch(authStateProvider);
-  final service = ref.watch(supabaseAuthServiceProvider);
+  final service = ref.watch(firebaseAuthServiceProvider);
   return service.currentUser;
 });
 
@@ -60,20 +60,20 @@ class GoogleSignInState {
   }
 }
 
-/// Notifier handling the business logic for Google OAuth sign-in.
+/// Notifier handling the business logic for Google OAuth sign-in via Firebase.
 class GoogleSignInNotifier extends Notifier<GoogleSignInState> {
   @override
   GoogleSignInState build() => const GoogleSignInState();
 
-  /// Initiates Google OAuth via [SupabaseAuthService].
+  /// Initiates Google OAuth via [FirebaseAuthService].
   Future<void> signInWithGoogle() async {
     if (state.isLoading) return;
     state = state.copyWith(isLoading: true, clearError: true);
 
     try {
-      final service = ref.read(supabaseAuthServiceProvider);
+      final service = ref.read(firebaseAuthServiceProvider);
       await service.signInWithGoogle();
-      // Success: auth stream will trigger navigation; reset loading state
+      // Success or prompt dismissed: reset loading state
       state = state.copyWith(isLoading: false);
     } catch (e) {
       state = state.copyWith(
@@ -84,13 +84,13 @@ class GoogleSignInNotifier extends Notifier<GoogleSignInState> {
   }
 
   /// Handles app lifecycle resumption to unfreeze loading if the user cancelled
-  /// the external browser OAuth prompt.
+  /// the external Google account sheet.
   void handleAppResumed() {
     if (!state.isLoading) return;
-    Future.delayed(const Duration(seconds: 2), () {
-      final hasSession =
-          ref.read(supabaseAuthServiceProvider).currentSession != null;
-      if (!hasSession) {
+    Future.delayed(const Duration(seconds: 1), () {
+      final hasUser =
+          ref.read(firebaseAuthServiceProvider).currentUser != null;
+      if (!hasUser) {
         state = state.copyWith(isLoading: false);
       }
     });

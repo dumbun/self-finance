@@ -4,10 +4,6 @@ import 'package:path/path.dart' as p;
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/sync/file_sync_service.dart';
 import 'package:self_finance/core/sync/sync_mappers.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
-// Minimal fake SupabaseClient for testing FileSyncService
-class FakeSupabaseClient extends Fake implements SupabaseClient {}
 
 void main() {
   group('FileSyncService tests', () {
@@ -15,7 +11,7 @@ void main() {
     late Directory tempDir;
 
     setUp(() async {
-      service = FileSyncService(client: FakeSupabaseClient());
+      service = FileSyncService();
       tempDir = await Directory.systemTemp.createTemp('file_sync_test_');
     });
 
