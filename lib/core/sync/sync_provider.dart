@@ -13,6 +13,7 @@ import 'package:self_finance/providers/auth_provider.dart';
 import 'package:self_finance/providers/contacts_provider.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum SyncStatus { idle, syncing, success, error }
 
@@ -166,7 +167,7 @@ class SyncNotifier extends Notifier<SyncState> {
   }
 
   /// Triggers a bidirectional sync.
-  Future<void> syncNow() async {
+  Future<void> syncNow({bool forceFullSync = false}) async {
     final user = ref.read(currentUserProvider);
 
     if (user == null) {
@@ -194,11 +195,20 @@ class SyncNotifier extends Notifier<SyncState> {
     state = state.copyWith(status: SyncStatus.syncing);
 
     try {
-      // Only backfill legacy rows when they genuinely need migration.
-      // This avoids a full-table scan on every sync and keeps normal syncs fast.
+      final prefs = await SharedPreferences.getInstance();
+      final fullSyncKey = 'firebase_full_entities_v3_completed_${user.id}';
+      final hasCompletedInitialUpload = prefs.getBool(fullSyncKey) ?? false;
       final needsBackfill = await SyncOutboxService.hasRecordsNeedingSync(db);
-      if (needsBackfill) {
-        await SyncOutboxService.queueAllExistingRecords(db);
+      final shouldForceAll = forceFullSync || !hasCompletedInitialUpload;
+
+      if (shouldForceAll || needsBackfill) {
+        debugPrint(
+          'Sync: queueing all existing records (forceAll: $shouldForceAll)',
+        );
+        await SyncOutboxService.queueAllExistingRecords(
+          db,
+          forceAll: shouldForceAll,
+        );
       }
 
       String? appDirPath;
@@ -215,6 +225,8 @@ class SyncNotifier extends Notifier<SyncState> {
       );
 
       await engine.sync();
+
+      await prefs.setBool(fullSyncKey, true);
 
       state = state.copyWith(
         status: SyncStatus.success,

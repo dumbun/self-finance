@@ -85,6 +85,20 @@ class SyncEngine {
   Future<void> push([String? appDir]) async {
     final resolvedAppDir = appDir ?? await _resolveAppDir();
 
+    // Ensure the parent user document exists so it appears as a valid document in Firebase Console
+    final fs = firestore;
+    if (fs != null && userId.isNotEmpty) {
+      try {
+        await fs.collection('users').doc(userId).set({
+          'user_id': userId,
+          'last_sync_at': FieldValue.serverTimestamp(),
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        }, SetOptions(merge: true));
+      } catch (e) {
+        debugPrint('Sync Push: note - could not touch parent user doc: $e');
+      }
+    }
+
     while (true) {
       final pending = await SyncOutboxService.getPending(db);
       if (pending.isEmpty) {
@@ -298,36 +312,35 @@ class SyncEngine {
               await (db.select(db.customersTable)
                     ..where((t) => t.customerId.equals(row.customerId) | t.syncId.equals(row.customerId)))
                   .getSingleOrNull();
-          if (cust != null) {
-            String? remotePhoto;
-            final effectiveSyncId =
-                row.syncId.isNotEmpty ? row.syncId : row.itemId;
-            if (resolvedAppDir.isNotEmpty && row.itemPhoto.isNotEmpty) {
-              final remote = fileSync.getItemPhotoRemotePath(
-                userId,
-                effectiveSyncId,
-              );
-              final uploaded = await fileSync.uploadFile(
-                localRelativePath: row.itemPhoto,
-                remotePath: remote,
-                appDirPath: resolvedAppDir,
-              );
-              if (uploaded != null) remotePhoto = uploaded;
-            }
-
-            final custSyncId =
-                cust.syncId.isNotEmpty ? cust.syncId : cust.customerId;
-            final payload = SyncMappers.itemToSupabase(
-              row,
-              custSyncId,
+          final effectiveSyncId =
+              row.syncId.isNotEmpty ? row.syncId : row.itemId;
+          final custSyncId = cust != null
+              ? (cust.syncId.isNotEmpty ? cust.syncId : cust.customerId)
+              : row.customerId;
+          String? remotePhoto;
+          if (resolvedAppDir.isNotEmpty && row.itemPhoto.isNotEmpty) {
+            final remote = fileSync.getItemPhotoRemotePath(
               userId,
-              remotePhotoPath: remotePhoto,
+              effectiveSyncId,
             );
-            await _collection('items')?.doc(effectiveSyncId).set(
-                  payload,
-                  SetOptions(merge: true),
-                );
+            final uploaded = await fileSync.uploadFile(
+              localRelativePath: row.itemPhoto,
+              remotePath: remote,
+              appDirPath: resolvedAppDir,
+            );
+            if (uploaded != null) remotePhoto = uploaded;
           }
+
+          final payload = SyncMappers.itemToSupabase(
+            row,
+            custSyncId,
+            userId,
+            remotePhotoPath: remotePhoto,
+          );
+          await _collection('items')?.doc(effectiveSyncId).set(
+                payload,
+                SetOptions(merge: true),
+              );
         }
         break;
 
@@ -343,39 +356,40 @@ class SyncEngine {
           final item = await (db.select(
             db.itemsTable,
           )..where((t) => t.itemId.equals(row.itemId) | t.syncId.equals(row.itemId))).getSingleOrNull();
-          if (cust != null && item != null) {
-            String? remoteSig;
-            final effectiveSyncId =
-                row.syncId.isNotEmpty ? row.syncId : row.transactionId;
-            if (resolvedAppDir.isNotEmpty && row.signature.isNotEmpty) {
-              final remote = fileSync.getTransactionSignatureRemotePath(
-                userId,
-                effectiveSyncId,
-              );
-              final uploaded = await fileSync.uploadFile(
-                localRelativePath: row.signature,
-                remotePath: remote,
-                appDirPath: resolvedAppDir,
-              );
-              if (uploaded != null) remoteSig = uploaded;
-            }
+          final effectiveSyncId =
+              row.syncId.isNotEmpty ? row.syncId : row.transactionId;
+          final custSyncId = cust != null
+              ? (cust.syncId.isNotEmpty ? cust.syncId : cust.customerId)
+              : row.customerId;
+          final itemSyncId = item != null
+              ? (item.syncId.isNotEmpty ? item.syncId : item.itemId)
+              : row.itemId;
 
-            final custSyncId =
-                cust.syncId.isNotEmpty ? cust.syncId : cust.customerId;
-            final itemSyncId =
-                item.syncId.isNotEmpty ? item.syncId : item.itemId;
-            final payload = SyncMappers.transactionToSupabase(
-              row,
-              custSyncId,
-              itemSyncId,
+          String? remoteSig;
+          if (resolvedAppDir.isNotEmpty && row.signature.isNotEmpty) {
+            final remote = fileSync.getTransactionSignatureRemotePath(
               userId,
-              remoteSignaturePath: remoteSig,
+              effectiveSyncId,
             );
-            await _collection('transactions')?.doc(effectiveSyncId).set(
-                  payload,
-                  SetOptions(merge: true),
-                );
+            final uploaded = await fileSync.uploadFile(
+              localRelativePath: row.signature,
+              remotePath: remote,
+              appDirPath: resolvedAppDir,
+            );
+            if (uploaded != null) remoteSig = uploaded;
           }
+
+          final payload = SyncMappers.transactionToSupabase(
+            row,
+            custSyncId,
+            itemSyncId,
+            userId,
+            remoteSignaturePath: remoteSig,
+          );
+          await _collection('transactions')?.doc(effectiveSyncId).set(
+                payload,
+                SetOptions(merge: true),
+              );
         }
         break;
 
@@ -388,21 +402,20 @@ class SyncEngine {
               await (db.select(db.transactionsTable)
                     ..where((t) => t.transactionId.equals(row.transactionId) | t.syncId.equals(row.transactionId)))
                   .getSingleOrNull();
-          if (txn != null) {
-            final effectiveSyncId =
-                row.syncId.isNotEmpty ? row.syncId : row.paymentId;
-            final txnSyncId =
-                txn.syncId.isNotEmpty ? txn.syncId : txn.transactionId;
-            final payload = SyncMappers.paymentToSupabase(
-              row,
-              txnSyncId,
-              userId,
-            );
-            await _collection('payments')?.doc(effectiveSyncId).set(
-                  payload,
-                  SetOptions(merge: true),
-                );
-          }
+          final effectiveSyncId =
+              row.syncId.isNotEmpty ? row.syncId : row.paymentId;
+          final txnSyncId = txn != null
+              ? (txn.syncId.isNotEmpty ? txn.syncId : txn.transactionId)
+              : row.transactionId;
+          final payload = SyncMappers.paymentToSupabase(
+            row,
+            txnSyncId,
+            userId,
+          );
+          await _collection('payments')?.doc(effectiveSyncId).set(
+                payload,
+                SetOptions(merge: true),
+              );
         }
         break;
 

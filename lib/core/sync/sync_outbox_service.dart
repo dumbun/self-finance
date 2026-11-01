@@ -134,7 +134,10 @@ class SyncOutboxService {
   /// This is intentionally kept as a migration/backfill path; it should not run on
   /// every sync cycle because it does a full table scan and creates outbox items for
   /// every row. Callers should guard with [hasRecordsNeedingSync] first.
-  static Future<int> queueAllExistingRecords(ItDataDatabase db) async {
+  static Future<int> queueAllExistingRecords(
+    ItDataDatabase db, {
+    bool forceAll = false,
+  }) async {
     const uuid = Uuid();
     final now = DateTime.now();
     int queuedCount = 0;
@@ -147,11 +150,10 @@ class SyncOutboxService {
 
     await db.transaction(() async {
       // 1. Customers
-      final custs = await db
-          .customSelect(
-            "SELECT Customer_ID, typeof(Customer_ID) as id_type, Sync_ID FROM Customers WHERE Sync_ID IS NULL OR Sync_ID = ''",
-          )
-          .get();
+      final custsQuery = forceAll
+          ? "SELECT Customer_ID, typeof(Customer_ID) as id_type, Sync_ID FROM Customers WHERE Deleted_At IS NULL"
+          : "SELECT Customer_ID, typeof(Customer_ID) as id_type, Sync_ID FROM Customers WHERE Sync_ID IS NULL OR Sync_ID = ''";
+      final custs = await db.customSelect(custsQuery).get();
       for (final row in custs) {
         final isText = row.read<String>('id_type') == 'text';
         String syncId = row.read<String?>('Sync_ID') ?? '';
@@ -194,11 +196,10 @@ class SyncOutboxService {
       }
 
       // 2. Items
-      final items = await db
-          .customSelect(
-            "SELECT Item_ID, typeof(Item_ID) as id_type, Sync_ID FROM Items WHERE Sync_ID IS NULL OR Sync_ID = ''",
-          )
-          .get();
+      final itemsQuery = forceAll
+          ? "SELECT Item_ID, typeof(Item_ID) as id_type, Sync_ID FROM Items WHERE Deleted_At IS NULL"
+          : "SELECT Item_ID, typeof(Item_ID) as id_type, Sync_ID FROM Items WHERE Sync_ID IS NULL OR Sync_ID = ''";
+      final items = await db.customSelect(itemsQuery).get();
       for (final row in items) {
         final isText = row.read<String>('id_type') == 'text';
         String syncId = row.read<String?>('Sync_ID') ?? '';
@@ -241,11 +242,10 @@ class SyncOutboxService {
       }
 
       // 3. Transactions
-      final txns = await db
-          .customSelect(
-            "SELECT Transaction_ID, typeof(Transaction_ID) as id_type, Sync_ID FROM Transactions WHERE Sync_ID IS NULL OR Sync_ID = ''",
-          )
-          .get();
+      final txnsQuery = forceAll
+          ? "SELECT Transaction_ID, typeof(Transaction_ID) as id_type, Sync_ID FROM Transactions WHERE Deleted_At IS NULL"
+          : "SELECT Transaction_ID, typeof(Transaction_ID) as id_type, Sync_ID FROM Transactions WHERE Sync_ID IS NULL OR Sync_ID = ''";
+      final txns = await db.customSelect(txnsQuery).get();
       for (final row in txns) {
         final isText = row.read<String>('id_type') == 'text';
         String syncId = row.read<String?>('Sync_ID') ?? '';
@@ -288,11 +288,10 @@ class SyncOutboxService {
       }
 
       // 4. Payments
-      final pays = await db
-          .customSelect(
-            "SELECT Payment_ID, typeof(Payment_ID) as id_type, Sync_ID FROM Payments WHERE Sync_ID IS NULL OR Sync_ID = ''",
-          )
-          .get();
+      final paysQuery = forceAll
+          ? "SELECT Payment_ID, typeof(Payment_ID) as id_type, Sync_ID FROM Payments WHERE Deleted_At IS NULL"
+          : "SELECT Payment_ID, typeof(Payment_ID) as id_type, Sync_ID FROM Payments WHERE Sync_ID IS NULL OR Sync_ID = ''";
+      final pays = await db.customSelect(paysQuery).get();
       for (final row in pays) {
         final isText = row.read<String>('id_type') == 'text';
         String syncId = row.read<String?>('Sync_ID') ?? '';
@@ -335,11 +334,10 @@ class SyncOutboxService {
       }
 
       // 5. History
-      final hists = await db
-          .customSelect(
-            "SELECT History_ID, typeof(History_ID) as id_type, Sync_ID FROM History WHERE Sync_ID IS NULL OR Sync_ID = ''",
-          )
-          .get();
+      final histsQuery = forceAll
+          ? "SELECT History_ID, typeof(History_ID) as id_type, Sync_ID FROM History WHERE Deleted_At IS NULL"
+          : "SELECT History_ID, typeof(History_ID) as id_type, Sync_ID FROM History WHERE Sync_ID IS NULL OR Sync_ID = ''";
+      final hists = await db.customSelect(histsQuery).get();
       for (final row in hists) {
         final isText = row.read<String>('id_type') == 'text';
         String syncId = row.read<String?>('Sync_ID') ?? '';
