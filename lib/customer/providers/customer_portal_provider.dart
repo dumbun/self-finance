@@ -6,6 +6,10 @@ class CustomerPortalAuthState {
   final bool isLoading;
   final bool isOtpSent;
   final String? sessionId;
+  final String? verificationId;
+  final int? resendToken;
+  final bool isAutomated;
+  final int codeLength;
   final String? customerName;
   final String? portalToken;
   final String? phoneNumber;
@@ -17,6 +21,10 @@ class CustomerPortalAuthState {
     this.isLoading = false,
     this.isOtpSent = false,
     this.sessionId,
+    this.verificationId,
+    this.resendToken,
+    this.isAutomated = false,
+    this.codeLength = 4,
     this.customerName,
     this.portalToken,
     this.phoneNumber,
@@ -31,6 +39,10 @@ class CustomerPortalAuthState {
     bool? isLoading,
     bool? isOtpSent,
     String? sessionId,
+    String? verificationId,
+    int? resendToken,
+    bool? isAutomated,
+    int? codeLength,
     String? customerName,
     String? portalToken,
     String? phoneNumber,
@@ -43,6 +55,10 @@ class CustomerPortalAuthState {
       isLoading: isLoading ?? this.isLoading,
       isOtpSent: isOtpSent ?? this.isOtpSent,
       sessionId: sessionId ?? this.sessionId,
+      verificationId: verificationId ?? this.verificationId,
+      resendToken: resendToken ?? this.resendToken,
+      isAutomated: isAutomated ?? this.isAutomated,
+      codeLength: codeLength ?? this.codeLength,
       customerName: customerName ?? this.customerName,
       portalToken: portalToken ?? this.portalToken,
       phoneNumber: phoneNumber ?? this.phoneNumber,
@@ -75,7 +91,37 @@ class CustomerPortalAuthNotifier extends Notifier<CustomerPortalAuthState> {
     state = const CustomerPortalAuthState();
   }
 
-  /// Requests a 4-digit OTP for the given phone number.
+  /// Sets state when automated SMS OTP has been dispatched via Firebase Auth.
+  void setAutomatedOtpSent({
+    required String verificationId,
+    required String customerName,
+    required String phoneNumber,
+    int? resendToken,
+  }) {
+    state = state.copyWith(
+      isLoading: false,
+      isOtpSent: true,
+      verificationId: verificationId,
+      customerName: customerName,
+      phoneNumber: phoneNumber,
+      resendToken: resendToken,
+      isAutomated: true,
+      codeLength: 6,
+      clearError: true,
+    );
+  }
+
+  /// Sets loading state during authentication actions.
+  void setLoading(bool loading) {
+    state = state.copyWith(isLoading: loading);
+  }
+
+  /// Sets error message in state.
+  void setError(String message) {
+    state = state.copyWith(isLoading: false, errorMessage: message);
+  }
+
+  /// Requests a 4-digit OTP for the given phone number (fallback/test mode).
   Future<bool> requestOtp(String phoneNumber) async {
     state = state.copyWith(isLoading: true, clearError: true);
     final response = await CustomerPortalService.requestOtp(phoneNumber);
@@ -88,6 +134,8 @@ class CustomerPortalAuthNotifier extends Notifier<CustomerPortalAuthState> {
         customerName: response.customerName,
         phoneNumber: phoneNumber,
         otpCodeForDebug: response.otpCode,
+        isAutomated: false,
+        codeLength: 4,
       );
       return true;
     } else {
@@ -99,8 +147,33 @@ class CustomerPortalAuthNotifier extends Notifier<CustomerPortalAuthState> {
     }
   }
 
-  /// Verifies entered OTP code.
+  /// Verifies entered OTP code (handles both automated Phone Auth and Firestore sessions).
   Future<bool> verifyOtp(String pin) async {
+    if (state.isAutomated && state.verificationId != null) {
+      state = state.copyWith(isLoading: true, clearError: true);
+      final response = await CustomerPortalService.verifyPhoneAuthOtp(
+        verificationId: state.verificationId!,
+        smsCode: pin,
+        phoneNumber: state.phoneNumber ?? '',
+      );
+
+      if (response.success && response.portalToken != null) {
+        state = state.copyWith(
+          isLoading: false,
+          portalToken: response.portalToken,
+          phoneNumber: response.phoneNumber,
+        );
+        ref.invalidate(customerPortalDataProvider);
+        return true;
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: response.message ?? 'Invalid verification code.',
+        );
+        return false;
+      }
+    }
+
     final sessionId = state.sessionId;
     if (sessionId == null) return false;
 

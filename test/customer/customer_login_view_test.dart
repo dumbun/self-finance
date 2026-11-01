@@ -90,4 +90,47 @@ void main() {
     expect(find.text('Verify & View Loans'), findsOneWidget);
     expect(find.text('Change Number'), findsOneWidget);
   });
+
+  testWidgets(
+      'CustomerLoginView renders automated 6-digit SMS verification form when isAutomated is true',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          customerPortalAuthProvider.overrideWith(
+            () => _FakeAuthNotifier(
+              const CustomerPortalAuthState(
+                isOtpSent: true,
+                isAutomated: true,
+                codeLength: 6,
+                customerName: 'Priya Sharma',
+                phoneNumber: '+91 9876543210',
+                verificationId: 'mock-verification-id-456',
+              ),
+            ),
+          ),
+        ],
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: CustomerLoginView(),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    // Verify greeting, automated instructions, and dynamic PIN widget
+    expect(find.text('Hello, Priya Sharma!'), findsOneWidget);
+    expect(find.text('Enter 6-digit verification code'), findsOneWidget);
+    expect(
+      find.text('SMS verification code sent to +91 9876543210'),
+      findsOneWidget,
+    );
+    final pinWidgetFinder = find.byType(PinInputWidget);
+    expect(pinWidgetFinder, findsOneWidget);
+    final pinWidget = tester.widget<PinInputWidget>(pinWidgetFinder);
+    expect(pinWidget.length, 6);
+
+    expect(find.text('Verify & View Loans'), findsOneWidget);
+  });
 }

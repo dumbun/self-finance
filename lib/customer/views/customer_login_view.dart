@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,7 @@ import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/otp_service.dart';
 import 'package:self_finance/customer/providers/customer_portal_provider.dart';
+import 'package:self_finance/customer/services/customer_portal_service.dart';
 import 'package:self_finance/customer/views/customer_dashboard_view.dart';
 import 'package:self_finance/models/country_model.dart';
 import 'package:self_finance/widgets/country_code_picker_widget.dart';
@@ -67,6 +69,54 @@ class _CustomerLoginViewState extends ConsumerState<CustomerLoginView> {
       return;
     }
 
+    final notifier = ref.read(customerPortalAuthProvider.notifier);
+    final currentAuthState = ref.read(customerPortalAuthProvider);
+    notifier.setLoading(true);
+
+    try {
+      await CustomerPortalService.requestPhoneAuthOtp(
+        phoneNumber: _fullPhoneNumber,
+        resendToken: currentAuthState.resendToken,
+        onCodeSent: (verificationId, resendToken, customerName) {
+          if (!mounted) return;
+          notifier.setAutomatedOtpSent(
+            verificationId: verificationId,
+            customerName: customerName,
+            phoneNumber: _fullPhoneNumber,
+            resendToken: resendToken,
+          );
+          _startTimer();
+          final greeting = customerName.isNotEmpty ? ' $customerName' : '';
+          SnackBarWidget.snackBarWidget(
+            context: context,
+            message: '${context.l10n.otpSentSuccessfully}$greeting',
+          );
+        },
+        onVerificationCompleted: (PhoneAuthCredential credential) async {
+          if (!mounted) return;
+          if (credential.smsCode != null && credential.smsCode!.isNotEmpty) {
+            _pinController.text = credential.smsCode!;
+            await _handleVerifyOtp(credential.smsCode!);
+          }
+        },
+        onVerificationFailed: (FirebaseAuthException e) async {
+          if (!mounted) return;
+          debugPrint('CustomerPortal Phone Auth failed: ${e.code} - ${e.message}');
+          // Fall back to direct OTP session if SMS gateway encounters error
+          await _fallbackToSendOtp(fallbackReason: e.message ?? e.code);
+        },
+        onCodeAutoRetrievalTimeout: (String verificationId) {
+          debugPrint('CustomerPortal Auto-retrieval timeout: $verificationId');
+        },
+      );
+    } catch (e) {
+      if (!mounted) return;
+      debugPrint('CustomerPortal send OTP exception: $e');
+      await _fallbackToSendOtp(fallbackReason: e.toString());
+    }
+  }
+
+  Future<void> _fallbackToSendOtp({String? fallbackReason}) async {
     final success = await ref
         .read(customerPortalAuthProvider.notifier)
         .requestOtp(_fullPhoneNumber);
@@ -85,7 +135,8 @@ class _CustomerLoginViewState extends ConsumerState<CustomerLoginView> {
 
   Future<void> _handleVerifyOtp(String pin) async {
     final cleanPin = pin.trim();
-    if (cleanPin.length != 4) return;
+    final authState = ref.read(customerPortalAuthProvider);
+    if (cleanPin.length != authState.codeLength) return;
 
     final success = await ref
         .read(customerPortalAuthProvider.notifier)
@@ -254,23 +305,60 @@ class _CustomerLoginViewState extends ConsumerState<CustomerLoginView> {
                             const SizedBox(height: 6),
                           ],
                           Text(
-                            l10n.enterOtpCode,
+                            authState.isAutomated
+                                ? 'Enter 6-digit verification code'
+                                : l10n.enterOtpCode,
                             style: const TextStyle(
                               fontSize: 13,
                               color: AppColors.getLigthGreyColor,
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
 
-                          // 4-Digit PIN Input Widget
+                          if (authState.isAutomated) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.getPrimaryColor
+                                    .withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.sms_outlined,
+                                    size: 16,
+                                    color: AppColors.getPrimaryColor,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'SMS verification code sent to ${authState.phoneNumber ?? _fullPhoneNumber}',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.getPrimaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+
+                          // Dynamic PIN Input Widget (6 digits for SMS, 4 digits for fallback)
                           PinInputWidget(
                             pinController: _pinController,
                             obscureText: false,
                             autofocus: true,
+                            length: authState.codeLength,
                             onCompleted: _handleVerifyOtp,
                             onChanged: (pin) {
-                              if (pin.length == 4) {
+                              if (pin.length == authState.codeLength) {
                                 _handleVerifyOtp(pin);
                               }
                             },
@@ -328,14 +416,15 @@ class _CustomerLoginViewState extends ConsumerState<CustomerLoginView> {
                             ],
                           ),
 
-                          // Open SMS App button
-                          Center(
-                            child: TextButton.icon(
-                              onPressed: _openSmsApp,
-                              icon: const Icon(Icons.sms_outlined, size: 16),
-                              label: Text(l10n.openSmsApp),
+                          // Open SMS App button (only for manual/fallback sessions)
+                          if (!authState.isAutomated)
+                            Center(
+                              child: TextButton.icon(
+                                onPressed: _openSmsApp,
+                                icon: const Icon(Icons.sms_outlined, size: 16),
+                                label: Text(l10n.openSmsApp),
+                              ),
                             ),
-                          ),
 
                           // Debug quick-fill chip (visible in debug mode)
                           if (kDebugMode &&

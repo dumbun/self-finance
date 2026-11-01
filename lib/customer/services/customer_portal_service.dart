@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:self_finance/core/utility/otp_service.dart';
@@ -36,7 +37,169 @@ class CustomerPortalService {
   static const String _prefPortalTokenKey = 'customer_portal_token';
   static const String _prefCustomerPhoneKey = 'customer_portal_phone';
 
-  /// Requests a 4-digit OTP for the registered customer phone number.
+  /// Checks if a customer record matching [phoneNumber] exists in Firestore
+  /// under any common phone format variation. Returns the document data or null.
+  static Future<Map<String, dynamic>?> checkCustomerExists(
+      String phoneNumber) async {
+    final cleanPhone = phoneNumber.replaceAll(RegExp(r'\s+'), '');
+    if (cleanPhone.isEmpty || Firebase.apps.isEmpty) return null;
+
+    final firestore = FirebaseFirestore.instance;
+    QuerySnapshot<Map<String, dynamic>> query = await firestore
+        .collectionGroup('customers')
+        .where('contact_number', isEqualTo: phoneNumber.trim())
+        .limit(1)
+        .get();
+
+    if (query.docs.isEmpty && cleanPhone != phoneNumber.trim()) {
+      query = await firestore
+          .collectionGroup('customers')
+          .where('contact_number', isEqualTo: cleanPhone)
+          .limit(1)
+          .get();
+    }
+
+    if (query.docs.isEmpty && cleanPhone.length > 10) {
+      final last10 = cleanPhone.substring(cleanPhone.length - 10);
+      query = await firestore
+          .collectionGroup('customers')
+          .where('contact_number', isEqualTo: last10)
+          .limit(1)
+          .get();
+    }
+
+    if (query.docs.isEmpty && cleanPhone.length == 10) {
+      query = await firestore
+          .collectionGroup('customers')
+          .where('contact_number', isEqualTo: '+91$cleanPhone')
+          .limit(1)
+          .get();
+
+      if (query.docs.isEmpty) {
+        query = await firestore
+            .collectionGroup('customers')
+            .where('contact_number', isEqualTo: '+91 $cleanPhone')
+            .limit(1)
+            .get();
+      }
+    }
+
+    if (query.docs.isEmpty) return null;
+    return query.docs.first.data();
+  }
+
+  /// Dispatches an automated SMS to the customer's phone via Firebase Phone Auth.
+  static Future<void> requestPhoneAuthOtp({
+    required String phoneNumber,
+    required void Function(
+            String verificationId, int? resendToken, String customerName)
+        onCodeSent,
+    required void Function(PhoneAuthCredential credential)
+        onVerificationCompleted,
+    required void Function(FirebaseAuthException error) onVerificationFailed,
+    required void Function(String verificationId) onCodeAutoRetrievalTimeout,
+    int? resendToken,
+  }) async {
+    final customer = await checkCustomerExists(phoneNumber);
+    if (customer == null) {
+      throw StateError(
+        'No customer record found with this phone number. Please contact your lender.',
+      );
+    }
+    final customerName = customer['name'] as String? ?? 'Customer';
+
+    await OtpService.sendAutomatedPhoneOtp(
+      phoneNumber: phoneNumber,
+      resendToken: resendToken,
+      onCodeSent: (String verificationId, int? token) {
+        onCodeSent(verificationId, token, customerName);
+      },
+      onVerificationCompleted: onVerificationCompleted,
+      onVerificationFailed: onVerificationFailed,
+      onCodeAutoRetrievalTimeout: onCodeAutoRetrievalTimeout,
+    );
+  }
+
+  /// Verifies an entered 6-digit SMS code against Firebase Phone Auth and saves the session.
+  static Future<CustomerPortalAuthResponse> verifyPhoneAuthOtp({
+    required String verificationId,
+    required String smsCode,
+    required String phoneNumber,
+  }) async {
+    try {
+      final credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: smsCode.trim(),
+      );
+
+      final auth = await OtpService.getSecondaryAuth();
+      final userCredential = await auth.signInWithCredential(credential);
+      await auth.signOut();
+
+      if (userCredential.user != null) {
+        final portalToken = const Uuid().v4();
+        final cleanPhone = phoneNumber.replaceAll(RegExp(r'\s+'), '');
+        final sessionId = const Uuid().v4();
+        final expiresAt = DateTime.now().add(const Duration(days: 30));
+
+        await FirebaseFirestore.instance
+            .collection('customer_portal_sessions')
+            .doc(sessionId)
+            .set({
+          'id': sessionId,
+          'phone_number': cleanPhone,
+          'status': 'VERIFIED',
+          'portal_token': portalToken,
+          'verified_at': Timestamp.now(),
+          'token_expires_at': Timestamp.fromDate(expiresAt),
+          'created_at': Timestamp.now(),
+        });
+
+        await saveSession(portalToken: portalToken, phoneNumber: cleanPhone);
+
+        return CustomerPortalAuthResponse(
+          success: true,
+          portalToken: portalToken,
+          phoneNumber: cleanPhone,
+          sessionId: sessionId,
+        );
+      } else {
+        return CustomerPortalAuthResponse(
+          success: false,
+          error: 'INVALID_OTP',
+          message: 'Invalid verification code.',
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-verification-code') {
+        return CustomerPortalAuthResponse(
+          success: false,
+          error: 'INVALID_OTP',
+          message: 'Invalid verification code. Please check and try again.',
+        );
+      } else if (e.code == 'session-expired') {
+        return CustomerPortalAuthResponse(
+          success: false,
+          error: 'EXPIRED',
+          message: 'Verification code expired. Please request a new code.',
+        );
+      } else {
+        return CustomerPortalAuthResponse(
+          success: false,
+          error: e.code,
+          message: e.message ?? 'Verification failed.',
+        );
+      }
+    } catch (e) {
+      return CustomerPortalAuthResponse(
+        success: false,
+        error: 'SERVER_ERROR',
+        message: e.toString(),
+      );
+    }
+  }
+
+  /// Requests a 4-digit OTP for the registered customer phone number (Firestore fallback).
   static Future<CustomerPortalAuthResponse> requestOtp(String phoneNumber) async {
     if (Firebase.apps.isEmpty) {
       return CustomerPortalAuthResponse(
@@ -56,48 +219,8 @@ class CustomerPortalService {
         );
       }
 
-      // Check for existing customer record under various formatting variations
-      final firestore = FirebaseFirestore.instance;
-      QuerySnapshot<Map<String, dynamic>> query = await firestore
-          .collectionGroup('customers')
-          .where('contact_number', isEqualTo: phoneNumber.trim())
-          .limit(1)
-          .get();
-
-      if (query.docs.isEmpty && cleanPhone != phoneNumber.trim()) {
-        query = await firestore
-            .collectionGroup('customers')
-            .where('contact_number', isEqualTo: cleanPhone)
-            .limit(1)
-            .get();
-      }
-
-      if (query.docs.isEmpty && cleanPhone.length > 10) {
-        final last10 = cleanPhone.substring(cleanPhone.length - 10);
-        query = await firestore
-            .collectionGroup('customers')
-            .where('contact_number', isEqualTo: last10)
-            .limit(1)
-            .get();
-      }
-
-      if (query.docs.isEmpty && cleanPhone.length == 10) {
-        query = await firestore
-            .collectionGroup('customers')
-            .where('contact_number', isEqualTo: '+91$cleanPhone')
-            .limit(1)
-            .get();
-
-        if (query.docs.isEmpty) {
-          query = await firestore
-              .collectionGroup('customers')
-              .where('contact_number', isEqualTo: '+91 $cleanPhone')
-              .limit(1)
-              .get();
-        }
-      }
-
-      if (query.docs.isEmpty) {
+      final customerDoc = await checkCustomerExists(phoneNumber);
+      if (customerDoc == null) {
         return CustomerPortalAuthResponse(
           success: false,
           error: 'CUSTOMER_NOT_FOUND',
@@ -105,7 +228,6 @@ class CustomerPortalService {
         );
       }
 
-      final customerDoc = query.docs.first.data();
       final customerName = customerDoc['name'] as String? ?? 'Customer';
 
       final otpCode = OtpService.generateOtp();
@@ -113,6 +235,7 @@ class CustomerPortalService {
       final otpHash =
           sha256.convert(utf8.encode('$otpCode$cleanPhone')).toString();
       final expiresAt = DateTime.now().add(const Duration(minutes: 5));
+      final firestore = FirebaseFirestore.instance;
 
       await firestore.collection('customer_portal_sessions').doc(sessionId).set({
         'id': sessionId,

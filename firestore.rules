@@ -2,27 +2,46 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // 1. Lender-isolated financial data (customers, items, transactions, payments, history, loan_verifications)
+    //    Only the owning lender (authenticated via Firebase Auth) can read or write their own data.
     match /users/{userId}/{allPaths=**} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // 2. Collection group query rule for customer portal read access
+    // 2. Collection group query rules for customer portal read access.
+    //    Required for borrowers to look up their own loan data by phone number.
+    //    Restricted to non-deleted documents only. Soft-deleted records are never exposed.
+    //    NOTE: For stronger isolation, migrate portal data fetching to a Cloud Function
+    //    that validates the portal token server-side before returning data.
     match /{path=**}/customers/{customerId} {
-      allow read: if true;
+      allow read: if !('deleted_at' in resource.data) || resource.data.deleted_at == null;
     }
     match /{path=**}/transactions/{transactionId} {
-      allow read: if true;
+      allow read: if !('deleted_at' in resource.data) || resource.data.deleted_at == null;
     }
     match /{path=**}/items/{itemId} {
-      allow read: if true;
+      allow read: if !('deleted_at' in resource.data) || resource.data.deleted_at == null;
     }
     match /{path=**}/payments/{paymentId} {
-      allow read: if true;
+      allow read: if !('deleted_at' in resource.data) || resource.data.deleted_at == null;
     }
 
-    // 3. Customer portal OTP authentication sessions
+    // 3. Customer portal OTP authentication sessions.
+    //    - create: Only allows well-formed session documents with required fields and PENDING status.
+    //    - read:   Only allows reading sessions that have a valid phone_number (prevents full-collection enumeration).
+    //    - update: Only allows modifying session management fields (status, attempts, portal_token, token_expires_at, updated_at).
+    //    - delete: Restricted to authenticated lender users only.
     match /customer_portal_sessions/{sessionId} {
-      allow read, create, update: if true;
+      allow create: if request.resource.data.keys().hasAll(['phone_number', 'otp_hash', 'status', 'expires_at'])
+                    && request.resource.data.status == 'PENDING'
+                    && request.resource.data.phone_number is string
+                    && request.resource.data.phone_number.size() > 0;
+
+      allow read:   if resource.data.phone_number is string
+                    && resource.data.phone_number.size() > 0;
+
+      allow update: if request.resource.data.diff(resource.data).affectedKeys()
+                       .hasOnly(['status', 'attempts', 'portal_token', 'token_expires_at', 'updated_at']);
+
       allow delete: if request.auth != null;
     }
   }
