@@ -131,6 +131,23 @@ class CustomerPortalService {
         customerName: customerName,
         otpCode: otpCode,
       );
+    } on FirebaseException catch (e) {
+      debugPrint(
+          'customer_portal_request_otp FirebaseException: ${e.code} - ${e.message}');
+      if (e.code == 'failed-precondition' ||
+          (e.message != null && e.message!.contains('not ready yet'))) {
+        return CustomerPortalAuthResponse(
+          success: false,
+          error: 'INDEX_BUILDING',
+          message:
+              'Database search index is currently building on Firebase. Please wait 1-2 minutes and try again.',
+        );
+      }
+      return CustomerPortalAuthResponse(
+        success: false,
+        error: e.code,
+        message: e.message ?? 'An error occurred while connecting to server.',
+      );
     } catch (e) {
       debugPrint('customer_portal_request_otp error: $e');
       return CustomerPortalAuthResponse(
