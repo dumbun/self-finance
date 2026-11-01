@@ -9,32 +9,25 @@ service cloud.firestore {
 
     // 2. Collection group query rules for customer portal read access.
     //    Required for borrowers to look up their own loan data by phone number.
-    //    Restricted to non-deleted documents only. Soft-deleted records are never exposed.
-    //    NOTE: For stronger isolation, migrate portal data fetching to a Cloud Function
-    //    that validates the portal token server-side before returning data.
+    //    Write access is strictly protected under /users/{userId}/**.
     match /{path=**}/customers/{customerId} {
-      allow read: if !('deleted_at' in resource.data) || resource.data.deleted_at == null;
+      allow read: if true;
     }
     match /{path=**}/transactions/{transactionId} {
-      allow read: if !('deleted_at' in resource.data) || resource.data.deleted_at == null;
+      allow read: if true;
     }
     match /{path=**}/items/{itemId} {
-      allow read: if !('deleted_at' in resource.data) || resource.data.deleted_at == null;
+      allow read: if true;
     }
     match /{path=**}/payments/{paymentId} {
-      allow read: if !('deleted_at' in resource.data) || resource.data.deleted_at == null;
+      allow read: if true;
     }
 
     // 3. Customer portal OTP authentication sessions.
-    //    - create: Customers create sessions to request an OTP or verify Phone Auth.
-    //    - read, update: Allowed if the session contains a valid phone_number (rate-limiting & preventing blank enumerations).
-    //    - delete: Restricted to authenticated lenders.
+    //    - read, create, update: Required for borrowers to create and verify OTP sessions and query portal_token.
+    //    - delete: Strictly restricted to authenticated lenders.
     match /customer_portal_sessions/{sessionId} {
-      allow create: if request.resource.data.phone_number is string
-                    && request.resource.data.phone_number.size() > 0;
-
-      allow read, update: if resource.data.phone_number != null;
-
+      allow read, create, update: if true;
       allow delete: if request.auth != null;
     }
   }
