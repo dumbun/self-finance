@@ -15,10 +15,8 @@ import 'package:self_finance/views/dashboard_view.dart';
 import 'package:self_finance/views/history/history_detailed_view.dart';
 import 'package:self_finance/views/image_view.dart';
 import 'package:self_finance/views/pin_auth_view.dart';
-import 'package:self_finance/views/pin_creating_view.dart';
 import 'package:self_finance/views/transaction_detail_view.dart';
 import 'package:self_finance/views/splash_screen.dart';
-import 'package:self_finance/views/user_creating_view.dart';
 
 class Routes {
   static final Map<String, Widget Function(BuildContext)> namedRoutes = {
@@ -30,12 +28,11 @@ class Routes {
     Constant.contactView: (BuildContext context) => const ContactsView(),
     Constant.accountSettingsView: (BuildContext context) =>
         const AccountSettingsView(),
-    Constant.pinCreatingView: (BuildContext context) => const PinCreatingView(),
   };
 
   static void navigateToTransactionDetailsView({
-    required int transacrtionId,
-    required int customerId,
+    required String transacrtionId,
+    required String customerId,
     required BuildContext context,
   }) {
     Navigator.of(context).push(
@@ -104,7 +101,7 @@ class Routes {
 
   static void navigateToAddNewTransactionToCustomerView({
     required BuildContext context,
-    required int customerID,
+    required String customerID,
   }) async {
     final List<Customer> res = await BackEnd.fetchSingleContactDetails(
       id: customerID,
@@ -138,7 +135,7 @@ class Routes {
 
   static void navigateToContactDetailsView(
     BuildContext context, {
-    required int customerID,
+    required String customerID,
   }) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -149,13 +146,6 @@ class Routes {
 
   static void navigateToContactsView(BuildContext context) {
     Navigator.of(context).pushNamed(Constant.contactView);
-  }
-
-  static void navigateToUserCreationView(BuildContext context, String pin) {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => UserCreatingView(pin: pin)),
-      (route) => false,
-    );
   }
 
   static void navigateToDashboard({required BuildContext context}) {
@@ -194,9 +184,5 @@ class Routes {
 
   static void navigateToAddNewEntry({required BuildContext context}) async {
     Navigator.of(context).pushNamed(Constant.addNewEntryView);
-  }
-
-  static void navigateToPinCreatingView(BuildContext context) {
-    Navigator.of(context).pushNamed(Constant.pinCreatingView);
   }
 }

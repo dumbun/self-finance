@@ -1,0 +1,1140 @@
+{
+  "@@locale": "en",
+  "appTitle": "Self-Finance",
+  "@appTitle": {
+    "description": "Title of the application"
+  },
+  "home": "Home",
+  "@home": {
+    "description": "Home tab title"
+  },
+  "dashboard": "Dashboard",
+  "@dashboard": {
+    "description": "Dashboard title"
+  },
+  "history": "History",
+  "@history": {
+    "description": "History tab title"
+  },
+  "contacts": "Contacts",
+  "@contacts": {
+    "description": "Contacts tab title"
+  },
+  "account": "Account",
+  "@account": {
+    "description": "Account tab title"
+  },
+  "accountSettings": "Account settings",
+  "@accountSettings": {
+    "description": "Account settings screen title"
+  },
+  "newCustomerAndLoan": "New Customer & Loan",
+  "@newCustomerAndLoan": {
+    "description": "New customer and loan screen title"
+  },
+  "newCustomerSubtitle": "Enter customer, loan, item and signature details",
+  "@newCustomerSubtitle": {
+    "description": "Subtitle on customer and loan entry screen"
+  },
+  "addNewTransaction": "Add new transaction",
+  "@addNewTransaction": {
+    "description": "Add new transaction title"
+  },
+  "customerInformation": "Customer Information",
+  "@customerInformation": {
+    "description": "Section header for customer details"
+  },
+  "loanTermsAndInterest": "Loan Terms & Interest",
+  "@loanTermsAndInterest": {
+    "description": "Section header for loan terms"
+  },
+  "collateralAndDocumentation": "Collateral & Documentation",
+  "@collateralAndDocumentation": {
+    "description": "Section header for collateral"
+  },
+  "borrowerAcknowledgement": "Borrower Acknowledgement",
+  "@borrowerAcknowledgement": {
+    "description": "Section header for signature"
+  },
+  "customerName": "Customer full name",
+  "@customerName": {
+    "description": "Label for customer name input"
+  },
+  "guardianName": "Guardian full name",
+  "@guardianName": {
+    "description": "Label for guardian name input"
+  },
+  "mobileNumber": "Customer mobile number",
+  "@mobileNumber": {
+    "description": "Label for mobile number input"
+  },
+  "customerAddress": "Customer address",
+  "@customerAddress": {
+    "description": "Label for customer address input"
+  },
+  "customerPhoto": "Customer photo",
+  "@customerPhoto": {
+    "description": "Label for customer profile photo"
+  },
+  "customerProof": "Customer proof",
+  "@customerProof": {
+    "description": "Label for customer identity proof"
+  },
+  "customerItem": "Customer item",
+  "@customerItem": {
+    "description": "Label for collateral item photo"
+  },
+  "itemDescription": "Item description",
+  "@itemDescription": {
+    "description": "Label for item description"
+  },
+  "takenAmount": "Taken amount",
+  "@takenAmount": {
+    "description": "Label for loan amount taken"
+  },
+  "rateOfIntrest": "Monthly interest rate %",
+  "@rateOfIntrest": {
+    "description": "Label for monthly interest rate percentage"
+  },
+  "takenDate": "Taken date",
+  "@takenDate": {
+    "description": "Label for date the loan was taken"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button label"
+  },
+  "createCustomerAndLoan": "Create Customer & Loan",
+  "@createCustomerAndLoan": {
+    "description": "Primary action button to create customer and loan"
+  },
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout button text"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language settings label"
+  },
+  "selectLanguage": "Select Language",
+  "@selectLanguage": {
+    "description": "Dialog title to select language"
+  },
+  "english": "English",
+  "@english": {
+    "description": "English language name"
+  },
+  "hindi": "Hindi (हिंदी)",
+  "@hindi": {
+    "description": "Hindi language name"
+  },
+  "telugu": "Telugu (తెలుగు)",
+  "@telugu": {
+    "description": "Telugu language name"
+  },
+  "systemDefault": "System Default",
+  "@systemDefault": {
+    "description": "System default language option"
+  },
+  "error": "Error",
+  "@error": {
+    "description": "Error alert title"
+  },
+  "pleaseTryAgain": "Please try again",
+  "@pleaseTryAgain": {
+    "description": "Retry prompt message"
+  },
+  "savedSuccessfully": "Saved successfully ✅",
+  "@savedSuccessfully": {
+    "description": "Success message after saving"
+  },
+  "contactAlreadyExists": "This contact number is already in your database.",
+  "@contactAlreadyExists": {
+    "description": "Validation error when contact number already exists"
+  },
+  "enterValidNumber": "Please enter a valid mobile number",
+  "@enterValidNumber": {
+    "description": "Validation error for invalid mobile number"
+  },
+  "enterValidValue": "Please enter a valid value",
+  "@enterValidValue": {
+    "description": "Validation error for empty required fields"
+  },
+  "enterValidAmount": "Please enter a valid amount",
+  "@enterValidAmount": {
+    "description": "Validation error for invalid amount"
+  },
+  "noTransactionsFound": "Sorry, no transactions found. 🫠",
+  "@noTransactionsFound": {
+    "description": "Empty state message for transactions"
+  },
+  "totalAmountInvested": "Total amount invested",
+  "@totalAmountInvested": {
+    "description": "Analytics label for total invested amount"
+  },
+  "interestAmount": "Interest amount",
+  "@interestAmount": {
+    "description": "Analytics label for total interest amount"
+  },
+  "active": "Active",
+  "@active": {
+    "description": "Active status label"
+  },
+  "completed": "Completed",
+  "@completed": {
+    "description": "Completed status label"
+  },
+  "search": "Search",
+  "@search": {
+    "description": "Search placeholder"
+  },
+  "searchCountry": "Search country name or code...",
+  "@searchCountry": {
+    "description": "Placeholder for country code search"
+  },
+  "selectCountry": "Select Country",
+  "@selectCountry": {
+    "description": "Title for country selection sheet"
+  },
+  "clear": "Clear",
+  "@clear": {
+    "description": "Clear button label"
+  },
+  "signatureRequired": "Customer Signature (Required)",
+  "@signatureRequired": {
+    "description": "Signature label indicating requirement"
+  },
+  "transactions": "Transactions",
+  "@transactions": {
+    "description": "Transactions label"
+  },
+  "calculator": "EMI Calculator",
+  "@calculator": {
+    "description": "EMI Calculator label"
+  },
+  "emiCalculatorTitle": "EMI Calculator",
+  "@emiCalculatorTitle": {
+    "description": "EMI Calculator title"
+  },
+  "homeScreen": "Home",
+  "@homeScreen": {
+    "description": "Home screen label"
+  },
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile section header"
+  },
+  "security": "Security",
+  "@security": {
+    "description": "Security section header"
+  },
+  "preferences": "Preferences",
+  "@preferences": {
+    "description": "Preferences section header"
+  },
+  "data": "Data",
+  "@data": {
+    "description": "Data section header"
+  },
+  "theme": "Theme",
+  "@theme": {
+    "description": "Theme tile label"
+  },
+  "notifications": "Notifications",
+  "@notifications": {
+    "description": "Notifications tile label"
+  },
+  "biometrics": "Biometrics / App Lock",
+  "@biometrics": {
+    "description": "Biometrics tile label"
+  },
+  "cloudSync": "Cloud Sync",
+  "@cloudSync": {
+    "description": "Cloud sync tile label"
+  },
+  "exportToCsv": "Export to CSV",
+  "@exportToCsv": {
+    "description": "Export to CSV tile label"
+  },
+  "feedback": "Feedback",
+  "@feedback": {
+    "description": "Feedback button label"
+  },
+  "rateUs": "Rate Us",
+  "@rateUs": {
+    "description": "Rate us button label"
+  },
+  "totalCustomers": "Total Customers",
+  "@totalCustomers": {
+    "description": "Total customers card title"
+  },
+  "activeLoans": "Active Loans",
+  "@activeLoans": {
+    "description": "Active loans card title"
+  },
+  "outstandingAmount": "Outstanding Amount",
+  "@outstandingAmount": {
+    "description": "Outstanding amount card title"
+  },
+  "outstandingAmountSub": "To be collected",
+  "@outstandingAmountSub": {
+    "description": "Outstanding amount card subtitle"
+  },
+  "interestEarned": "Interest Earned",
+  "@interestEarned": {
+    "description": "Interest earned card title"
+  },
+  "interestEarnedSub": "From completed",
+  "@interestEarnedSub": {
+    "description": "Interest earned card subtitle"
+  },
+  "totalDisbursed": "Total Disbursed",
+  "@totalDisbursed": {
+    "description": "Total disbursed card title"
+  },
+  "paymentsReceived": "Payments Received",
+  "@paymentsReceived": {
+    "description": "Payments received card title"
+  },
+  "changePin": "Change PIN",
+  "@changePin": {
+    "description": "Change PIN tile title"
+  },
+  "currency": "Currency",
+  "@currency": {
+    "description": "Currency tile title"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button label"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button label"
+  },
+  "darkMode": "Dark mode",
+  "@darkMode": {
+    "description": "Dark mode toggle label"
+  },
+  "termsAndConditions": "Terms & Conditions",
+  "@termsAndConditions": {
+    "description": "Terms and conditions label"
+  },
+  "privacyPolicy": "Privacy Policy",
+  "@privacyPolicy": {
+    "description": "Privacy policy label"
+  },
+  "legal": "Legal",
+  "@legal": {
+    "description": "Legal section label"
+  },
+  "about": "About",
+  "@about": {
+    "description": "About section label"
+  },
+  "allTime": "All time",
+  "@allTime": {
+    "description": "All time subtitle"
+  },
+  "totalCollected": "Total collected",
+  "@totalCollected": {
+    "description": "Total collected subtitle"
+  },
+  "changeAppCurrency": "Change App Currency",
+  "@changeAppCurrency": {
+    "description": "Change app currency tile title"
+  },
+  "currencyChangeAlert": "This change affects the entire application. Do you really want to change the application''s currency?",
+  "@currencyChangeAlert": {
+    "description": "Alert message when changing currency"
+  },
+  "alert": "Alert",
+  "@alert": {
+    "description": "Alert dialog title"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button label"
+  },
+  "yearly": "Yearly",
+  "@yearly": {
+    "description": "Yearly chart tab label"
+  },
+  "monthly": "Monthly",
+  "@monthly": {
+    "description": "Monthly chart tab label"
+  },
+  "weekly": "Weekly",
+  "@weekly": {
+    "description": "Weekly chart tab label"
+  },
+  "today": "Today",
+  "@today": {
+    "description": "Today chart tab label"
+  },
+  "last12Months": "Last 12 Months",
+  "@last12Months": {
+    "description": "Chart header for last 12 months"
+  },
+  "last6Months": "Last 6 Months",
+  "@last6Months": {
+    "description": "Chart header for last 6 months"
+  },
+  "last7Days": "Last 7 Days",
+  "@last7Days": {
+    "description": "Chart header for last 7 days"
+  },
+  "todaysOverview": "Today''s Overview",
+  "@todaysOverview": {
+    "description": "Chart header for today's overview"
+  },
+  "received": "Received",
+  "@received": {
+    "description": "Chart received legend label"
+  },
+  "disbursed": "Disbursed",
+  "@disbursed": {
+    "description": "Chart disbursed legend label"
+  },
+  "details": "Details",
+  "@details": {
+    "description": "Details button label"
+  },
+  "couldNotLoadChartData": "Could not load chart data",
+  "@couldNotLoadChartData": {
+    "description": "Error message when chart data fails to load"
+  },
+  "likeOurApp": "If you like our app please",
+  "@likeOurApp": {
+    "description": "Prompt encouraging user to share app"
+  },
+  "inviteFriends": "Invite your friends",
+  "@inviteFriends": {
+    "description": "Invite friends button label"
+  },
+  "createNewContact": "Create new Contact",
+  "@createNewContact": {
+    "description": "Create new contact action button"
+  },
+  "showContacts": "Show Contacts",
+  "@showContacts": {
+    "description": "Show contacts action button"
+  },
+  "searchTransactionId": "Search transaction ID",
+  "@searchTransactionId": {
+    "description": "Hint text for transaction search"
+  },
+  "noTransactionsToView": "No Transactions to view",
+  "@noTransactionsToView": {
+    "description": "Message when transaction list is empty"
+  },
+  "failedToLoadMoreTransactions": "Failed to load more transactions",
+  "@failedToLoadMoreTransactions": {
+    "description": "Message when loading additional transactions fails"
+  },
+  "searchCustomerOrPhone": "Phone number or customer name",
+  "@searchCustomerOrPhone": {
+    "description": "Hint text for searching customer or phone number"
+  },
+  "zeroContacts": "0 contacts found 🫠",
+  "@zeroContacts": {
+    "description": "Empty state message for contacts"
+  },
+  "noHistoryToView": "No history to view",
+  "@noHistoryToView": {
+    "description": "Message when history list is empty"
+  },
+  "loanPrincipalAmount": "Loan Principal Amount",
+  "@loanPrincipalAmount": {
+    "description": "Loan principal amount header in calculator"
+  },
+  "enterAmountHint": "Enter amount (e.g. 50,000)",
+  "@enterAmountHint": {
+    "description": "Placeholder hint for loan amount input"
+  },
+  "monthlyInterestRate": "Monthly Interest Rate (% per month)",
+  "@monthlyInterestRate": {
+    "description": "Monthly interest rate label in calculator"
+  },
+  "calculateRepayment": "Calculate Repayment",
+  "@calculateRepayment": {
+    "description": "Calculate repayment button label"
+  },
+  "totalRepaymentAmount": "TOTAL REPAYMENT AMOUNT",
+  "@totalRepaymentAmount": {
+    "description": "Total repayment amount card title"
+  },
+  "compound": "COMPOUND",
+  "@compound": {
+    "description": "Compound interest badge"
+  },
+  "simple": "SIMPLE",
+  "@simple": {
+    "description": "Simple interest badge"
+  },
+  "tenureDuration": "Tenure Duration",
+  "@tenureDuration": {
+    "description": "Loan tenure duration metric title"
+  },
+  "monthlyInterest": "Monthly Interest",
+  "@monthlyInterest": {
+    "description": "Monthly interest metric title"
+  },
+  "dailyInterest": "Daily Interest",
+  "@dailyInterest": {
+    "description": "Daily interest metric title"
+  },
+  "totalInterest": "Total Interest",
+  "@totalInterest": {
+    "description": "Total interest metric title"
+  },
+  "copySummary": "Copy Summary",
+  "@copySummary": {
+    "description": "Copy summary button label"
+  },
+  "share": "Share",
+  "@share": {
+    "description": "Share button label"
+  },
+  "filterOneMonth": "1 Month +",
+  "@filterOneMonth": {
+    "description": "1 Month plus filter chip label"
+  },
+  "filterThreeMonths": "3 Months +",
+  "@filterThreeMonths": {
+    "description": "3 Months plus filter chip label"
+  },
+  "filterSixMonths": "6 Months +",
+  "@filterSixMonths": {
+    "description": "6 Months plus filter chip label"
+  },
+  "filterTwelveMonths": "12 Months +",
+  "@filterTwelveMonths": {
+    "description": "12 Months plus filter chip label"
+  },
+  "errorUserFetch": "Error fetching user data",
+  "@errorUserFetch": {
+    "description": "Error message when user data fetch fails"
+  },
+  "selectDataToExport": "Select data to export",
+  "@selectDataToExport": {
+    "description": "Subtitle in CSV export sheet"
+  },
+  "allTransactions": "All Transactions",
+  "@allTransactions": {
+    "description": "CSV export type label for all transactions"
+  },
+  "allTransactionsDesc": "Every loan record regardless of status",
+  "@allTransactionsDesc": {
+    "description": "CSV export description for all transactions"
+  },
+  "completedLoans": "Completed Loans",
+  "@completedLoans": {
+    "description": "CSV export type label for completed loans"
+  },
+  "completedLoansDesc": "Fully paid / closed loans",
+  "@completedLoansDesc": {
+    "description": "CSV export description for completed loans"
+  },
+  "paymentHistory": "Payment History",
+  "@paymentHistory": {
+    "description": "CSV export type label for payment history"
+  },
+  "paymentHistoryDesc": "All payment records with amounts",
+  "@paymentHistoryDesc": {
+    "description": "CSV export description for payment history"
+  },
+  "activeLoansDesc": "Only currently open/unpaid loans",
+  "@activeLoansDesc": {
+    "description": "CSV export description for active loans"
+  },
+  "pleaseSelectAtLeastOneDataType": "Please select at least one data type.",
+  "@pleaseSelectAtLeastOneDataType": {
+    "description": "Validation message when no export type is selected"
+  },
+  "startingExport": "Starting export…",
+  "@startingExport": {
+    "description": "Progress message when starting CSV export"
+  },
+  "exportCompletedSuccessfully": "Export completed successfully!",
+  "@exportCompletedSuccessfully": {
+    "description": "Success message when CSV export finishes"
+  },
+  "exportFailed": "Export failed.",
+  "@exportFailed": {
+    "description": "Error message when CSV export fails"
+  },
+  "exportAgain": "Export Again",
+  "@exportAgain": {
+    "description": "Button to retry CSV export"
+  },
+  "done": "Done",
+  "@done": {
+    "description": "Done button label"
+  },
+  "exportCountFiles": "Export {count} file(s)",
+  "@exportCountFiles": {
+    "description": "Export button label with count of files",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "presentDate": "Present date",
+  "@presentDate": {
+    "description": "Label for present date"
+  },
+  "paymentDate": "Payment date",
+  "@paymentDate": {
+    "description": "Label for payment date"
+  },
+  "dueDate": "Due time",
+  "@dueDate": {
+    "description": "Label for due time/tenure"
+  },
+  "interestPerMonth": "Interest per month",
+  "@interestPerMonth": {
+    "description": "Label for interest per month"
+  },
+  "totalInterestAmount": "Total interest amount",
+  "@totalInterestAmount": {
+    "description": "Label for total interest amount"
+  },
+  "totalAmount": "Total amount",
+  "@totalAmount": {
+    "description": "Label for total amount"
+  },
+  "customerNoTransactionsRecorded": "This customer currently has no loan transactions recorded.",
+  "@customerNoTransactionsRecorded": {
+    "description": "Empty state subtitle in customer transactions view"
+  },
+  "createFirstTransaction": "Create First Transaction",
+  "@createFirstTransaction": {
+    "description": "Button to create first transaction for customer"
+  },
+  "errorFetchingTransactions": "Error fetching transactions. Please restart the application.",
+  "@errorFetchingTransactions": {
+    "description": "Error message when fetching transactions fails"
+  },
+  "deleteContactQuestion": "Delete Contact?",
+  "@deleteContactQuestion": {
+    "description": "Dialog title for deleting contact"
+  },
+  "contactDeleteMessage": "By pressing ''YES'', you will remove all details of this customer from your database.",
+  "@contactDeleteMessage": {
+    "description": "Confirmation message when deleting contact"
+  },
+  "errorFetchingContacts": "Error fetching customer contacts. Please try again. 😶‍🌫️",
+  "@errorFetchingContacts": {
+    "description": "Error message when fetching customer contacts fails"
+  },
+  "personalAndContactInfo": "Personal & Contact Info",
+  "@personalAndContactInfo": {
+    "description": "Section header for personal and contact details"
+  },
+  "phoneNumber": "Phone Number",
+  "@phoneNumber": {
+    "description": "Phone number field label"
+  },
+  "notProvided": "Not provided",
+  "@notProvided": {
+    "description": "Fallback text when customer info is not provided"
+  },
+  "customerSince": "Customer Since",
+  "@customerSince": {
+    "description": "Label for customer registration date"
+  },
+  "kycAndIdentityProof": "KYC & Identity Proof",
+  "@kycAndIdentityProof": {
+    "description": "Section header for KYC and identity proof"
+  },
+  "contactActions": "Contact Actions",
+  "@contactActions": {
+    "description": "Section header for contact action tiles"
+  },
+  "editContactDetails": "Edit Contact Details",
+  "@editContactDetails": {
+    "description": "Action tile title for editing contact details"
+  },
+  "updateContactSubtitle": "Update name, number, address, or photos",
+  "@updateContactSubtitle": {
+    "description": "Subtitle for editing contact details"
+  },
+  "shareContactInfo": "Share Contact Info",
+  "@shareContactInfo": {
+    "description": "Action tile title for sharing contact info"
+  },
+  "shareContactSubtitle": "Share customer profile details",
+  "@shareContactSubtitle": {
+    "description": "Subtitle for sharing contact info"
+  },
+  "deleteCustomer": "Delete Customer",
+  "@deleteCustomer": {
+    "description": "Action tile title for deleting customer"
+  },
+  "deleteCustomerSubtitle": "Permanently delete this customer and record",
+  "@deleteCustomerSubtitle": {
+    "description": "Subtitle for deleting customer"
+  },
+  "verifiedDocument": "Verified Document",
+  "@verifiedDocument": {
+    "description": "Badge text for verified identity document"
+  },
+  "viewFull": "View Full",
+  "@viewFull": {
+    "description": "Button to view full proof image"
+  },
+  "tapToPreviewKyc": "Tap to preview KYC document",
+  "@tapToPreviewKyc": {
+    "description": "Hint text overlaid on KYC document"
+  },
+  "noIdentityProofAttached": "No Identity Proof Attached",
+  "@noIdentityProofAttached": {
+    "description": "Empty state title when no KYC proof is attached"
+  },
+  "attachKycSubtitle": "Attach an Aadhaar, PAN, voter card, or photo document for KYC verification.",
+  "@attachKycSubtitle": {
+    "description": "Empty state subtitle for attaching KYC proof"
+  },
+  "attachDocument": "Attach Document",
+  "@attachDocument": {
+    "description": "Button label to attach KYC document"
+  },
+  "call": "Call",
+  "@call": {
+    "description": "Tooltip or button label to make a phone call"
+  },
+  "copiedToClipboard": "{label} copied to clipboard",
+  "@copiedToClipboard": {
+    "description": "Snack bar message when text is copied to clipboard",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "editContact": "Edit contact",
+  "@editContact": {
+    "description": "App bar title for editing contact"
+  },
+  "update": "Update",
+  "@update": {
+    "description": "Button label for updating contact"
+  },
+  "contactUpdatedSuccessfully": "Contact updated successfully.",
+  "@contactUpdatedSuccessfully": {
+    "description": "Success message after updating contact"
+  },
+  "errorUpdatingContact": "Error while updating the contact. Please try again later.",
+  "@errorUpdatingContact": {
+    "description": "Error message when contact update fails"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Menu item to edit"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Menu item to delete"
+  },
+  "selectCurrencyType": "Please select a currency type",
+  "@selectCurrencyType": {
+    "description": "Currency selector label"
+  },
+  "showCustomerProof": "Show Customer proof",
+  "@showCustomerProof": {
+    "description": "Button label to show customer proof"
+  },
+  "errorFetchingItem": "Error fetching Item data",
+  "@errorFetchingItem": {
+    "description": "Error message when fetching item data fails"
+  },
+  "inactive": "Inactive",
+  "@inactive": {
+    "description": "Status chip label for inactive state"
+  },
+  "transactionAddedSuccessfully": "Transaction added successfully.",
+  "@transactionAddedSuccessfully": {
+    "description": "Success message after transaction is added"
+  },
+  "errorAddingTransaction": "Error adding transaction. Please try again later.",
+  "@errorAddingTransaction": {
+    "description": "Error message when adding transaction fails"
+  },
+  "enterYourAppPin": "Enter your app PIN",
+  "@enterYourAppPin": {
+    "description": "Heading for enter app PIN"
+  },
+  "enterCorrectPin": "Please enter the correct PIN",
+  "@enterCorrectPin": {
+    "description": "Error snack bar when incorrect PIN is entered"
+  },
+  "login": "Login",
+  "@login": {
+    "description": "Login button text"
+  },
+  "kycAndDetails": "KYC & Details",
+  "@kycAndDetails": {
+    "description": "Tab title for KYC & Details"
+  },
+  "loading": "Please wait",
+  "@loading": {
+    "description": "Loading message"
+  },
+  "customerOtpVerification": "Customer OTP Verification",
+  "@customerOtpVerification": {
+    "description": "Title for the customer OTP verification bottom sheet"
+  },
+  "otpSentMessage": "An OTP has been sent to {customerName} ({phoneNumber}) to confirm this loan transaction.",
+  "@otpSentMessage": {
+    "description": "Message showing who the OTP was sent to",
+    "placeholders": {
+      "customerName": {
+        "type": "String"
+      },
+      "phoneNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "enterVerificationCode": "Enter 4-Digit Verification Code",
+  "@enterVerificationCode": {
+    "description": "Instruction to enter the 4-digit OTP"
+  },
+  "verifyAndConfirm": "Verify & Confirm",
+  "@verifyAndConfirm": {
+    "description": "Button label to verify OTP and confirm transaction"
+  },
+  "resendOtp": "Resend OTP",
+  "@resendOtp": {
+    "description": "Action label to resend OTP"
+  },
+  "resendOtpIn": "Resend OTP in {seconds}s",
+  "@resendOtpIn": {
+    "description": "Countdown timer before OTP can be resent",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "invalidOtpCode": "Invalid OTP code. Please check and try again.",
+  "@invalidOtpCode": {
+    "description": "Error displayed when entered OTP is incorrect"
+  },
+  "otpExpired": "OTP has expired. Please request a new code.",
+  "@otpExpired": {
+    "description": "Error displayed when OTP expires"
+  },
+  "otpSentSuccessfully": "OTP sent successfully to customer",
+  "@otpSentSuccessfully": {
+    "description": "Snack bar message when OTP SMS is triggered"
+  },
+  "openSmsApp": "Open SMS App",
+  "@openSmsApp": {
+    "description": "Button to launch the SMS application"
+  },
+  "otpSmsTemplate": "Your verification code for Self-Finance loan of {amount} is {otp}. Valid for 5 minutes. Do not share with anyone.",
+  "@otpSmsTemplate": {
+    "description": "SMS message template sent to customer",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "otp": {
+        "type": "String"
+      }
+    }
+  },
+  "otpRequiredTitle": "OTP Verification Required",
+  "@otpRequiredTitle": {
+    "description": "Dialog or alert title when OTP is required"
+  },
+  "testOtpCopied": "Test OTP {otp} copied to clipboard",
+  "@testOtpCopied": {
+    "description": "Notification when test OTP is copied",
+    "placeholders": {
+      "otp": {
+        "type": "String"
+      }
+    }
+  },
+  "contactAlreadyExistMessage": "This contact number is already in your database. Please change the number, or if you want to add a transaction to an existing contact, select ''Add transaction to existing contact'' on the Home screen.",
+  "@contactAlreadyExistMessage": {
+    "description": "Error alert dialog message when customer contact already exists"
+  },
+  "sorry": "Sorry",
+  "@sorry": {
+    "description": "Alert title when an action cannot be performed"
+  },
+  "pleaseSelectTransactionDate": "Please select the transaction date",
+  "@pleaseSelectTransactionDate": {
+    "description": "Validation message when transaction date is not selected"
+  },
+  "bought": "Bought",
+  "@bought": {
+    "description": "Timeline label for loan taken"
+  },
+  "paid": "Paid",
+  "@paid": {
+    "description": "Timeline label for payment made"
+  },
+  "activeBalance": "Active Balance",
+  "@activeBalance": {
+    "description": "Financial summary active balance metric title"
+  },
+  "totalBorrowed": "Total Borrowed",
+  "@totalBorrowed": {
+    "description": "Financial summary total borrowed metric title"
+  },
+  "loansCount": "{count} Loans",
+  "@loansCount": {
+    "description": "Count of customer loans",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unableToOpenSms": "Unable to open SMS composer",
+  "@unableToOpenSms": {
+    "description": "Error snackbar when SMS app cannot be launched"
+  },
+  "noProofDocumentAttached": "No proof document attached for this customer",
+  "@noProofDocumentAttached": {
+    "description": "Snackbar when customer has no proof image attached"
+  },
+  "noPhotoAttached": "No photo attached for this customer",
+  "@noPhotoAttached": {
+    "description": "Snackbar when customer has no profile photo attached"
+  },
+  "customerNotFound": "Customer Not Found",
+  "@customerNotFound": {
+    "description": "Title when customer profile is not found"
+  },
+  "customerNotFoundSubtitle": "The requested customer profile could not be found or has been removed.",
+  "@customerNotFoundSubtitle": {
+    "description": "Subtitle when customer profile is not found"
+  },
+  "goBack": "Go Back",
+  "@goBack": {
+    "description": "Button to go back to previous screen"
+  },
+  "setAppLockAndCurrency": "Set App Lock & Currency",
+  "@setAppLockAndCurrency": {
+    "description": "Title for app lock and currency setup"
+  },
+  "appLockSetupSubtitle": "Create a 4-digit PIN to secure your records and select your preferred currency.",
+  "@appLockSetupSubtitle": {
+    "description": "Subtitle for app lock and currency setup"
+  },
+  "yourNameOptional": "Your Name (Optional)",
+  "@yourNameOptional": {
+    "description": "Label for optional name in setup"
+  },
+  "pleaseEnterTheName": "Please enter your name",
+  "@pleaseEnterTheName": {
+    "description": "Hint text for name field"
+  },
+  "primaryCurrency": "Primary Currency",
+  "@primaryCurrency": {
+    "description": "Label for primary currency selection in setup"
+  },
+  "createAppLockPin": "Create 4-Digit App Lock PIN",
+  "@createAppLockPin": {
+    "description": "Section title to create PIN"
+  },
+  "confirmPin": "Confirm 4-Digit PIN",
+  "@confirmPin": {
+    "description": "Section title to confirm PIN"
+  },
+  "pinsDoNotMatch": "* PINs do not match",
+  "@pinsDoNotMatch": {
+    "description": "Validation error when PIN and confirm PIN do not match"
+  },
+  "finishSetupGoToDashboard": "Finish Setup & Go to Dashboard",
+  "@finishSetupGoToDashboard": {
+    "description": "Submit button on app lock setup"
+  },
+  "appLockConfiguredSuccessfully": "App lock and currency configured successfully!",
+  "@appLockConfiguredSuccessfully": {
+    "description": "Snackbar when setup completes"
+  },
+  "newLoan": "New Loan",
+  "@newLoan": {
+    "description": "Action pill label for new loan"
+  },
+  "appSubtitle": "Personal Lending & Finance",
+  "@appSubtitle": {
+    "description": "Subtitle tag line for the app"
+  },
+  "signInToSyncData": "Sign in to sync your data across devices",
+  "@signInToSyncData": {
+    "description": "Prompt on Google sign in view"
+  },
+  "continueWithGoogle": "Continue with Google",
+  "@continueWithGoogle": {
+    "description": "Button label for Google sign-in"
+  },
+  "signingIn": "Signing in...",
+  "@signingIn": {
+    "description": "Button label while signing in"
+  },
+  "yourDataStaysOnDevice": "Your data stays on your device",
+  "@yourDataStaysOnDevice": {
+    "description": "Trust banner on Google sign in view"
+  },
+  "onlineVerificationRequired": "Active internet connection and login required for customer OTP verification.",
+  "@onlineVerificationRequired": {
+    "description": "Error when online connection or login is missing for OTP"
+  },
+  "tooManyOtpAttempts": "Too many incorrect attempts. Please request a new code.",
+  "@tooManyOtpAttempts": {
+    "description": "Error when OTP attempts exceed limit"
+  },
+  "generatingOtp": "Requesting secure OTP from server...",
+  "@generatingOtp": {
+    "description": "Loading status while fetching OTP from Supabase"
+  },
+  "customerPortal": "Customer Portal",
+  "@customerPortal": {
+    "description": "Title for customer portal"
+  },
+  "customerLogin": "Customer / Borrower Login",
+  "@customerLogin": {
+    "description": "Customer login title"
+  },
+  "customerLoginSubtitle": "Enter your registered mobile number to view your loans & transactions",
+  "@customerLoginSubtitle": {
+    "description": "Subtitle on customer login screen"
+  },
+  "customerPortalPrompt": "Borrower or Customer? Access your loan account",
+  "@customerPortalPrompt": {
+    "description": "Prompt on Google sign-in screen to navigate to customer portal"
+  },
+  "enterMobileNumber": "Enter Mobile Number",
+  "@enterMobileNumber": {
+    "description": "Placeholder for mobile number"
+  },
+  "sendVerificationCode": "Send Verification Code",
+  "@sendVerificationCode": {
+    "description": "Button to request customer portal OTP"
+  },
+  "verifyAndViewLoans": "Verify & View Loans",
+  "@verifyAndViewLoans": {
+    "description": "Button to verify customer portal OTP"
+  },
+  "customerDashboard": "My Loans & Transactions",
+  "@customerDashboard": {
+    "description": "Customer dashboard title"
+  },
+  "totalBorrowed": "Total Borrowed",
+  "@totalBorrowed": {
+    "description": "Total borrowed summary label"
+  },
+  "remainingBalance": "Remaining Balance",
+  "@remainingBalance": {
+    "description": "Remaining balance summary label"
+  },
+  "totalPaid": "Total Paid",
+  "@totalPaid": {
+    "description": "Total paid summary label"
+  },
+  "myLoans": "My Loans",
+  "@myLoans": {
+    "description": "My loans tab"
+  },
+  "paymentHistory": "Payment History",
+  "@paymentHistory": {
+    "description": "Payment history tab"
+  },
+  "noLoansFound": "No loans found for this account",
+  "@noLoansFound": {
+    "description": "Empty state when no loans found"
+  },
+  "noPaymentsFound": "No payment records found",
+  "@noPaymentsFound": {
+    "description": "Empty state when no payments found"
+  },
+  "collateralItem": "Collateral Item",
+  "@collateralItem": {
+    "description": "Label for collateral item"
+  },
+  "loanDetails": "Loan Details",
+  "@loanDetails": {
+    "description": "Title for loan details screen"
+  },
+  "pawnedDate": "Pawned Date",
+  "@pawnedDate": {
+    "description": "Label for pawned date"
+  },
+  "dueDate": "Due Date",
+  "@dueDate": {
+    "description": "Label for loan due date"
+  },
+  "logoutCustomer": "Log Out",
+  "@logoutCustomer": {
+    "description": "Customer portal logout button"
+  },
+  "backToLenderLogin": "Back to Lender Login",
+  "@backToLenderLogin": {
+    "description": "Back to lender login link"
+  },
+  "pleaseEnterTheNumber": "Please enter a valid phone number",
+  "@pleaseEnterTheNumber": {
+    "description": "Validation message when phone number is invalid"
+  },
+  "enterOtpCode": "Enter 4-digit verification code",
+  "@enterOtpCode": {
+    "description": "Prompt to enter 4-digit OTP"
+  },
+  "changeNumber": "Change Number",
+  "@changeNumber": {
+    "description": "Action to change entered phone number"
+  },
+  "portfolioOverview": "Portfolio Overview",
+  "@portfolioOverview": {
+    "description": "Dashboard portfolio overview header"
+  },
+  "activePortfolioBalance": "Active Portfolio Balance",
+  "@activePortfolioBalance": {
+    "description": "Active portfolio balance label"
+  },
+  "quickActions": "Quick Actions",
+  "@quickActions": {
+    "description": "Quick actions section title"
+  },
+  "recentActivity": "Recent Activity",
+  "@recentActivity": {
+    "description": "Recent activity section title"
+  },
+  "viewAll": "View All",
+  "@viewAll": {
+    "description": "View all action link"
+  },
+  "noRecentActivity": "No recent transactions found",
+  "@noRecentActivity": {
+    "description": "Empty state when no recent transactions exist"
+  },
+  "newLoanAction": "New Loan",
+  "@newLoanAction": {
+    "description": "Quick action label for creating a new loan"
+  },
+  "borrowersAction": "Borrowers",
+  "@borrowersAction": {
+    "description": "Quick action label for borrowers list"
+  },
+  "ledgerAction": "Ledger",
+  "@ledgerAction": {
+    "description": "Quick action label for transactions ledger"
+  },
+  "businessBreakdown": "Business Breakdown",
+  "@businessBreakdown": {
+    "description": "Section title for analytics metrics"
+  },
+  "cashflowAnalytics": "Cashflow Analytics",
+  "@cashflowAnalytics": {
+    "description": "Section title for cashflow trends chart"
+  }
+}

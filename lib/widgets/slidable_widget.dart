@@ -15,8 +15,8 @@ class SlidableWidget extends ConsumerWidget {
     this.phoneNumber,
   });
 
-  final int transactionId;
-  final int customerId;
+  final String transactionId;
+  final String customerId;
   final String? phoneNumber;
   final Widget child;
 
@@ -44,7 +44,7 @@ class SlidableWidget extends ConsumerWidget {
     const double iconSize = 22;
 
     return Slidable(
-      key: ValueKey<int>(transactionId),
+      key: ValueKey<String>(transactionId),
       startActionPane: phoneNumber != null
           ? ActionPane(
               motion: const StretchMotion(),
@@ -61,7 +61,7 @@ class SlidableWidget extends ConsumerWidget {
           : null,
       endActionPane: ActionPane(
         dragDismissible: false,
-        key: ValueKey<int>(transactionId),
+        key: ValueKey<String>(transactionId),
         motion: const StretchMotion(),
         extentRatio: 0.45,
         children: [

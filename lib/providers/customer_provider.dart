@@ -10,13 +10,14 @@ import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/providers/app_dir_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
+import 'package:self_finance/core/sync/sync_provider.dart';
 
 part 'customer_provider.g.dart';
 
 @riverpod
 class CustomerNotifier extends _$CustomerNotifier {
   @override
-  Stream<Customer?> build(int id) => BackEnd.watchSingleCustomer(id: id);
+  Stream<Customer?> build(String id) => BackEnd.watchSingleCustomer(id: id);
 
   Future<int> updateCustomer({required Customer customer}) async {
     final int res = await BackEnd.updateCustomerDetails(
@@ -27,18 +28,20 @@ class CustomerNotifier extends _$CustomerNotifier {
       newContactNumber: customer.number,
       newCustomerPhoto: customer.photo,
       newProofPhoto: customer.proof,
-      newCreatedDate: DateTime.now(),
+      newCreatedDate: customer.createdDate,
     );
 
     if (res != 0) {
       ref.invalidate(transactionsProvider);
+      ref.read(syncProvider.notifier).triggerAutoSync();
     }
     return res;
   }
 
-  Future<void> deleteCustomer(int customerID) async {
+  Future<void> deleteCustomer(String customerID) async {
     await BackEnd.deleteTheCustomer(customerID: customerID);
     ref.invalidate(transactionsProvider);
+    ref.read(syncProvider.notifier).triggerAutoSync();
   }
 
   Future<void> shareCustomerDetails(Customer customer) async {
@@ -87,7 +90,7 @@ class CustomerFinancialSummary {
 
 /// Memoized provider for customer financial calculations
 final customerFinancialSummaryProvider = Provider.family
-    .autoDispose<CustomerFinancialSummary, int>((ref, customerId) {
+    .autoDispose<CustomerFinancialSummary, String>((ref, customerId) {
   final transactionsAsync =
       ref.watch(requriedCustomerTransactionsProvider(customerId));
   final List<Trx> transactions = transactionsAsync.asData?.value ?? [];
@@ -121,9 +124,16 @@ final customerFinancialSummaryProvider = Provider.family
   );
 });
 
+final Set<String> _verifiedFilePaths = <String>{};
+
+/// Clears the verified file path cache to prevent cross-account memory leaks.
+void clearVerifiedFilePathsCache() {
+  _verifiedFilePaths.clear();
+}
+
 /// Memoized provider to resolve customer KYC proof file path without blocking UI
 final customerProofPathProvider =
-    Provider.family.autoDispose<String?, int>((ref, customerId) {
+    Provider.family.autoDispose<String?, String>((ref, customerId) {
   final Customer? customer =
       ref.watch(customerProvider(customerId)).asData?.value;
   if (customer == null || customer.proof.isEmpty) return null;
@@ -131,12 +141,18 @@ final customerProofPathProvider =
   final String appDir = ref.watch(appDirProvider);
   final String fullPath = p.join(appDir, customer.proof);
 
-  return File(fullPath).existsSync() ? fullPath : null;
+  if (_verifiedFilePaths.contains(fullPath)) return fullPath;
+
+  if (File(fullPath).existsSync()) {
+    _verifiedFilePaths.add(fullPath);
+    return fullPath;
+  }
+  return null;
 });
 
 /// Memoized provider to resolve customer avatar file path without blocking UI
 final customerPhotoPathProvider =
-    Provider.family.autoDispose<String?, int>((ref, customerId) {
+    Provider.family.autoDispose<String?, String>((ref, customerId) {
   final Customer? customer =
       ref.watch(customerProvider(customerId)).asData?.value;
   if (customer == null || customer.photo.isEmpty) return null;
@@ -144,5 +160,11 @@ final customerPhotoPathProvider =
   final String appDir = ref.watch(appDirProvider);
   final String fullPath = p.join(appDir, customer.photo);
 
-  return File(fullPath).existsSync() ? fullPath : null;
+  if (_verifiedFilePaths.contains(fullPath)) return fullPath;
+
+  if (File(fullPath).existsSync()) {
+    _verifiedFilePaths.add(fullPath);
+    return fullPath;
+  }
+  return null;
 });

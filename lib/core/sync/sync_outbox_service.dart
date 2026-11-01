@@ -18,6 +18,9 @@ class SyncOutboxService {
   static const String opUpdate = 'update';
   static const String opDelete = 'delete';
 
+  static const String statusPending = 'pending';
+  static const String statusFailed = 'failed';
+
   /// Records an operation to the sync outbox.
   static Future<void> recordOperation({
     required ItDataDatabase db,
@@ -52,6 +55,7 @@ class SyncOutboxService {
     int limit = 100,
   }) async {
     return (db.select(db.syncOutboxTable)
+          ..where((t) => t.status.equals(statusPending))
           ..orderBy([(t) => OrderingTerm(expression: t.createdAt)])
           ..limit(limit))
         .get();
@@ -145,22 +149,36 @@ class SyncOutboxService {
       // 1. Customers
       final custs = await db
           .customSelect(
-            "SELECT Customer_ID, Sync_ID FROM Customers WHERE Sync_ID IS NULL OR Sync_ID = ''",
+            "SELECT Customer_ID, typeof(Customer_ID) as id_type, Sync_ID FROM Customers WHERE Sync_ID IS NULL OR Sync_ID = ''",
           )
           .get();
       for (final row in custs) {
-        final id = row.read<int>('Customer_ID');
+        final isText = row.read<String>('id_type') == 'text';
         String syncId = row.read<String?>('Sync_ID') ?? '';
         if (syncId.isEmpty || syncId.length < 30) {
-          syncId = uuid.v4();
-          await db.customUpdate(
-            'UPDATE Customers SET Sync_ID = ?, Updated_At = ? WHERE Customer_ID = ?',
-            variables: [
-              Variable<String>(syncId),
-              Variable<DateTime>(now),
-              Variable<int>(id),
-            ],
-          );
+          if (isText) {
+            final id = row.read<String>('Customer_ID');
+            syncId = (id.length >= 30) ? id : uuid.v7();
+            await db.customUpdate(
+              'UPDATE Customers SET Sync_ID = ?, Updated_At = ? WHERE Customer_ID = ?',
+              variables: [
+                Variable<String>(syncId),
+                Variable<DateTime>(now),
+                Variable<String>(id),
+              ],
+            );
+          } else {
+            final id = row.read<int>('Customer_ID');
+            syncId = uuid.v7();
+            await db.customUpdate(
+              'UPDATE Customers SET Sync_ID = ?, Updated_At = ? WHERE Customer_ID = ?',
+              variables: [
+                Variable<String>(syncId),
+                Variable<DateTime>(now),
+                Variable<int>(id),
+              ],
+            );
+          }
         }
         final key = '$entityCustomer:$syncId';
         if (!queuedKeys.contains(key)) {
@@ -178,22 +196,36 @@ class SyncOutboxService {
       // 2. Items
       final items = await db
           .customSelect(
-            "SELECT Item_ID, Sync_ID FROM Items WHERE Sync_ID IS NULL OR Sync_ID = ''",
+            "SELECT Item_ID, typeof(Item_ID) as id_type, Sync_ID FROM Items WHERE Sync_ID IS NULL OR Sync_ID = ''",
           )
           .get();
       for (final row in items) {
-        final id = row.read<int>('Item_ID');
+        final isText = row.read<String>('id_type') == 'text';
         String syncId = row.read<String?>('Sync_ID') ?? '';
         if (syncId.isEmpty || syncId.length < 30) {
-          syncId = uuid.v4();
-          await db.customUpdate(
-            'UPDATE Items SET Sync_ID = ?, Updated_At = ? WHERE Item_ID = ?',
-            variables: [
-              Variable<String>(syncId),
-              Variable<DateTime>(now),
-              Variable<int>(id),
-            ],
-          );
+          if (isText) {
+            final id = row.read<String>('Item_ID');
+            syncId = (id.length >= 30) ? id : uuid.v7();
+            await db.customUpdate(
+              'UPDATE Items SET Sync_ID = ?, Updated_At = ? WHERE Item_ID = ?',
+              variables: [
+                Variable<String>(syncId),
+                Variable<DateTime>(now),
+                Variable<String>(id),
+              ],
+            );
+          } else {
+            final id = row.read<int>('Item_ID');
+            syncId = uuid.v7();
+            await db.customUpdate(
+              'UPDATE Items SET Sync_ID = ?, Updated_At = ? WHERE Item_ID = ?',
+              variables: [
+                Variable<String>(syncId),
+                Variable<DateTime>(now),
+                Variable<int>(id),
+              ],
+            );
+          }
         }
         final key = '$entityItem:$syncId';
         if (!queuedKeys.contains(key)) {
@@ -211,22 +243,36 @@ class SyncOutboxService {
       // 3. Transactions
       final txns = await db
           .customSelect(
-            "SELECT Transaction_ID, Sync_ID FROM Transactions WHERE Sync_ID IS NULL OR Sync_ID = ''",
+            "SELECT Transaction_ID, typeof(Transaction_ID) as id_type, Sync_ID FROM Transactions WHERE Sync_ID IS NULL OR Sync_ID = ''",
           )
           .get();
       for (final row in txns) {
-        final id = row.read<int>('Transaction_ID');
+        final isText = row.read<String>('id_type') == 'text';
         String syncId = row.read<String?>('Sync_ID') ?? '';
         if (syncId.isEmpty || syncId.length < 30) {
-          syncId = uuid.v4();
-          await db.customUpdate(
-            'UPDATE Transactions SET Sync_ID = ?, Updated_At = ? WHERE Transaction_ID = ?',
-            variables: [
-              Variable<String>(syncId),
-              Variable<DateTime>(now),
-              Variable<int>(id),
-            ],
-          );
+          if (isText) {
+            final id = row.read<String>('Transaction_ID');
+            syncId = (id.length >= 30) ? id : uuid.v7();
+            await db.customUpdate(
+              'UPDATE Transactions SET Sync_ID = ?, Updated_At = ? WHERE Transaction_ID = ?',
+              variables: [
+                Variable<String>(syncId),
+                Variable<DateTime>(now),
+                Variable<String>(id),
+              ],
+            );
+          } else {
+            final id = row.read<int>('Transaction_ID');
+            syncId = uuid.v7();
+            await db.customUpdate(
+              'UPDATE Transactions SET Sync_ID = ?, Updated_At = ? WHERE Transaction_ID = ?',
+              variables: [
+                Variable<String>(syncId),
+                Variable<DateTime>(now),
+                Variable<int>(id),
+              ],
+            );
+          }
         }
         final key = '$entityTransaction:$syncId';
         if (!queuedKeys.contains(key)) {
@@ -244,22 +290,36 @@ class SyncOutboxService {
       // 4. Payments
       final pays = await db
           .customSelect(
-            "SELECT Payment_ID, Sync_ID FROM Payments WHERE Sync_ID IS NULL OR Sync_ID = ''",
+            "SELECT Payment_ID, typeof(Payment_ID) as id_type, Sync_ID FROM Payments WHERE Sync_ID IS NULL OR Sync_ID = ''",
           )
           .get();
       for (final row in pays) {
-        final id = row.read<int>('Payment_ID');
+        final isText = row.read<String>('id_type') == 'text';
         String syncId = row.read<String?>('Sync_ID') ?? '';
         if (syncId.isEmpty || syncId.length < 30) {
-          syncId = uuid.v4();
-          await db.customUpdate(
-            'UPDATE Payments SET Sync_ID = ?, Updated_At = ? WHERE Payment_ID = ?',
-            variables: [
-              Variable<String>(syncId),
-              Variable<DateTime>(now),
-              Variable<int>(id),
-            ],
-          );
+          if (isText) {
+            final id = row.read<String>('Payment_ID');
+            syncId = (id.length >= 30) ? id : uuid.v7();
+            await db.customUpdate(
+              'UPDATE Payments SET Sync_ID = ?, Updated_At = ? WHERE Payment_ID = ?',
+              variables: [
+                Variable<String>(syncId),
+                Variable<DateTime>(now),
+                Variable<String>(id),
+              ],
+            );
+          } else {
+            final id = row.read<int>('Payment_ID');
+            syncId = uuid.v7();
+            await db.customUpdate(
+              'UPDATE Payments SET Sync_ID = ?, Updated_At = ? WHERE Payment_ID = ?',
+              variables: [
+                Variable<String>(syncId),
+                Variable<DateTime>(now),
+                Variable<int>(id),
+              ],
+            );
+          }
         }
         final key = '$entityPayment:$syncId';
         if (!queuedKeys.contains(key)) {
@@ -277,22 +337,36 @@ class SyncOutboxService {
       // 5. History
       final hists = await db
           .customSelect(
-            "SELECT History_ID, Sync_ID FROM History WHERE Sync_ID IS NULL OR Sync_ID = ''",
+            "SELECT History_ID, typeof(History_ID) as id_type, Sync_ID FROM History WHERE Sync_ID IS NULL OR Sync_ID = ''",
           )
           .get();
       for (final row in hists) {
-        final id = row.read<int>('History_ID');
+        final isText = row.read<String>('id_type') == 'text';
         String syncId = row.read<String?>('Sync_ID') ?? '';
         if (syncId.isEmpty || syncId.length < 30) {
-          syncId = uuid.v4();
-          await db.customUpdate(
-            'UPDATE History SET Sync_ID = ?, Updated_At = ? WHERE History_ID = ?',
-            variables: [
-              Variable<String>(syncId),
-              Variable<DateTime>(now),
-              Variable<int>(id),
-            ],
-          );
+          if (isText) {
+            final id = row.read<String>('History_ID');
+            syncId = (id.length >= 30) ? id : uuid.v7();
+            await db.customUpdate(
+              'UPDATE History SET Sync_ID = ?, Updated_At = ? WHERE History_ID = ?',
+              variables: [
+                Variable<String>(syncId),
+                Variable<DateTime>(now),
+                Variable<String>(id),
+              ],
+            );
+          } else {
+            final id = row.read<int>('History_ID');
+            syncId = uuid.v7();
+            await db.customUpdate(
+              'UPDATE History SET Sync_ID = ?, Updated_At = ? WHERE History_ID = ?',
+              variables: [
+                Variable<String>(syncId),
+                Variable<DateTime>(now),
+                Variable<int>(id),
+              ],
+            );
+          }
         }
         final key = '$entityHistory:$syncId';
         if (!queuedKeys.contains(key)) {

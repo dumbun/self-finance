@@ -42,14 +42,16 @@ class DrillItem {
   });
 
   factory DrillItem.fromMap(Map<String, dynamic> m) => DrillItem(
-    id: (m['id'] as num).toInt(),
-    amount: (m['amount'] as num).toDouble(),
-    date: m['date'] as String,
-    type: m['type'] as String? ?? '',
-    kind: m['kind'] as String,
+    id: m['id']?.toString() ?? '',
+    amount: (m['amount'] is num)
+        ? (m['amount'] as num).toDouble()
+        : double.tryParse(m['amount']?.toString() ?? '0.0') ?? 0.0,
+    date: m['date']?.toString() ?? '',
+    type: m['type']?.toString() ?? '',
+    kind: m['kind']?.toString() ?? '',
   );
 
-  final int id;
+  final String id;
   final double amount;
   final String date;
   final String type;
@@ -80,11 +82,11 @@ class TodayState {
   );
 
   factory TodayState.fromMap(Map<String, dynamic> m) => TodayState(
-    disbursed: (m['disbursed'] as num).toDouble(),
-    disbursedCount: (m['disbursedCount'] as num).toInt(),
-    received: (m['received'] as num).toDouble(),
-    receivedCount: (m['receivedCount'] as num).toInt(),
-    net: (m['net'] as num).toDouble(),
+    disbursed: (m['disbursed'] as num?)?.toDouble() ?? 0.0,
+    disbursedCount: (m['disbursedCount'] as num?)?.toInt() ?? 0,
+    received: (m['received'] as num?)?.toDouble() ?? 0.0,
+    receivedCount: (m['receivedCount'] as num?)?.toInt() ?? 0,
+    net: (m['net'] as num?)?.toDouble() ?? 0.0,
   );
 
   final double disbursed;
@@ -107,9 +109,9 @@ class ChartData {
 
   factory ChartData.fromMap(Map<String, dynamic> map) {
     return ChartData(
-      month: map['month'] as String,
-      disbursed: (map['disbursed'] as num).toDouble(),
-      received: (map['received'] as num).toDouble(),
+      month: map['month']?.toString() ?? '',
+      disbursed: (map['disbursed'] as num?)?.toDouble() ?? 0.0,
+      received: (map['received'] as num?)?.toDouble() ?? 0.0,
     );
   }
 

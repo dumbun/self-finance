@@ -6,8 +6,14 @@ import 'package:self_finance/core/constants/constants.dart';
 typedef MenuEntry = DropdownMenuEntry<String>;
 
 class DropDownGardianSelection extends StatefulWidget {
-  const DropDownGardianSelection({super.key, required this.controller});
+  const DropDownGardianSelection({
+    super.key,
+    required this.controller,
+    this.width,
+  });
   final TextEditingController controller;
+  final double? width;
+
   @override
   State<DropDownGardianSelection> createState() =>
       _DropDownGardianSelectionState();
@@ -23,16 +29,24 @@ class _DropDownGardianSelectionState extends State<DropDownGardianSelection> {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownMenu<String>(
-      controller: widget.controller,
-      initialSelection: Constant.guardianList.first,
-      onSelected: (String? value) {
-        // This is called when the user selects an item.
-        setState(() {
-          dropdownValue = value!;
-        });
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double? effectiveWidth = widget.width ??
+            (constraints.maxWidth.isFinite ? constraints.maxWidth : null);
+
+        return DropdownMenu<String>(
+          width: effectiveWidth,
+          controller: widget.controller,
+          initialSelection: Constant.guardianList.first,
+          onSelected: (String? value) {
+            // This is called when the user selects an item.
+            setState(() {
+              dropdownValue = value!;
+            });
+          },
+          dropdownMenuEntries: menuEntries,
+        );
       },
-      dropdownMenuEntries: menuEntries,
     );
   }
 }

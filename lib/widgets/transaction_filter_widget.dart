@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 
@@ -27,6 +28,19 @@ enum TransactionsFilters {
     }
   }
 
+  String getLocalizedLabel(BuildContext context) {
+    switch (this) {
+      case TransactionsFilters.oneMonth:
+        return context.l10n.filterOneMonth;
+      case TransactionsFilters.threeMonths:
+        return context.l10n.filterThreeMonths;
+      case TransactionsFilters.sixMonths:
+        return context.l10n.filterSixMonths;
+      case TransactionsFilters.moreThanAYear:
+        return context.l10n.filterTwelveMonths;
+    }
+  }
+
   int get months {
     return value; // Simplified - just return the value directly!
   }
@@ -48,7 +62,7 @@ class TransactionFilterWidget extends ConsumerWidget {
             child: FilterChip(
               checkmarkColor: AppColors.getPrimaryColor,
               selected: filters.contains(filter),
-              label: BodyTwoDefaultText(text: filter.label),
+              label: BodyTwoDefaultText(text: filter.getLocalizedLabel(context)),
               onSelected: (bool selected) =>
                   ref.read(filterProvider.notifier).setFilter(filter, selected),
             ),

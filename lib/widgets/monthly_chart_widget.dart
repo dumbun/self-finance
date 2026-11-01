@@ -11,6 +11,7 @@ import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/chart_model.dart';
 import 'package:self_finance/providers/chart_tab_providers.dart';
 import 'package:self_finance/providers/monthly_chart_provider.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/drill_sheet_widget.dart';
 
@@ -67,6 +68,7 @@ class _Content extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ChartTab tab = ref.watch(activeChartTabProvider);
+    final l10n = context.l10n;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,16 +79,16 @@ class _Content extends ConsumerWidget {
           child: Row(
             children: [
               Expanded(
-                child: BodyTwoDefaultText(text: _title(tab), bold: true),
+                child: BodyTwoDefaultText(text: _title(tab, context), bold: true),
               ),
-              const _LegendDot(
+              _LegendDot(
                 color: AppColors.getPrimaryColor,
-                label: 'Received',
+                label: l10n.received,
               ),
               const SizedBox(width: 14),
-              const _LegendDot(
+              _LegendDot(
                 color: AppColors.getErrorColor,
-                label: 'Disbursed',
+                label: l10n.disbursed,
               ),
             ],
           ),
@@ -134,11 +136,11 @@ class _Content extends ConsumerWidget {
     );
   }
 
-  String _title(ChartTab t) => switch (t) {
-    ChartTab.yearly => 'Last 12 Months',
-    ChartTab.monthly => 'Last 6 Months',
-    ChartTab.weekly => 'Last 7 Days',
-    ChartTab.today => "Today's Overview",
+  String _title(ChartTab t, BuildContext context) => switch (t) {
+    ChartTab.yearly => context.l10n.last12Months,
+    ChartTab.monthly => context.l10n.last6Months,
+    ChartTab.weekly => context.l10n.last7Days,
+    ChartTab.today => context.l10n.todaysOverview,
   };
 }
 
@@ -152,12 +154,14 @@ class _TabBar extends StatelessWidget {
   final ChartTab active;
   final ValueChanged<ChartTab> onChanged;
 
-  static const _labels = {
-    ChartTab.yearly: 'Yearly',
-    ChartTab.monthly: 'Monthly',
-    ChartTab.weekly: 'Weekly',
-    ChartTab.today: 'Today',
-  };
+  String _getLabel(BuildContext context, ChartTab tab) {
+    return switch (tab) {
+      ChartTab.yearly => context.l10n.yearly,
+      ChartTab.monthly => context.l10n.monthly,
+      ChartTab.weekly => context.l10n.weekly,
+      ChartTab.today => context.l10n.today,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -194,7 +198,7 @@ class _TabBar extends StatelessWidget {
                 ),
                 child: BodySmallText(
                   color: isActive ? AppColors.getBackgroundColor : null,
-                  text: _labels[tab]!,
+                  text: _getLabel(context, tab),
                   textAlign: TextAlign.center,
                   bold: isActive,
                 ),
@@ -263,8 +267,12 @@ class _YearlyBody extends ConsumerWidget {
                     now.month - offset,
                   );
 
-                  final int month = raw?['_monthNum'] as int? ?? date.month;
-                  final int year = raw?['_year'] as int? ?? date.year;
+                  final int month = (raw?['_monthNum'] is num)
+                      ? (raw!['_monthNum'] as num).toInt()
+                      : date.month;
+                  final int year = (raw?['_year'] is num)
+                      ? (raw!['_year'] as num).toInt()
+                      : date.year;
 
                   _openDrill(
                     context,
@@ -331,8 +339,8 @@ class _WeeklyBody extends ConsumerWidget {
                 context,
                 ref,
                 DrillDay(
-                  txnDate: raw['_txnDate'] as String,
-                  payDate: raw['_payDate'] as String,
+                  txnDate: raw['_txnDate']?.toString() ?? '',
+                  payDate: raw['_payDate']?.toString() ?? '',
                 ),
                 data.month, // e.g. 'Mon'
               );
@@ -812,11 +820,11 @@ class _Tooltip extends StatelessWidget {
                 color: AppColors.getPrimaryColor.withAlpha(30),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   BodySmallText(
-                    text: 'Details',
+                    text: context.l10n.details,
                     bold: true,
                     color: AppColors.getPrimaryColor,
                   ),
@@ -1262,19 +1270,19 @@ class _Err extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
+    return SizedBox(
       height: 180,
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            const Icon(
               Icons.bar_chart_outlined,
               size: 40,
               color: AppColors.getLigthGreyColor,
             ),
-            SizedBox(height: 8),
-            BodyTwoDefaultText(text: 'Could not load chart data'),
+            const SizedBox(height: 8),
+            BodyTwoDefaultText(text: context.l10n.couldNotLoadChartData),
           ],
         ),
       ),

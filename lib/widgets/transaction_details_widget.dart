@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/logic/logic.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/payment_model.dart';
@@ -19,6 +19,8 @@ class TransactionDetailsWidget extends StatelessWidget {
   final LoanCalculator loanCalculator;
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Card(
       elevation: 2,
       child: Column(
@@ -26,7 +28,7 @@ class TransactionDetailsWidget extends StatelessWidget {
         children: [
           ListTile(
             leading: const Icon(Icons.handshake_rounded),
-            title: const BodyTwoDefaultText(text: Constant.takenAmount),
+            title: BodyTwoDefaultText(text: l10n.takenAmount),
             trailing: CurrencyWidget(
               smallText: true,
               amount: Utility.doubleFormate(transaction.amount),
@@ -34,7 +36,7 @@ class TransactionDetailsWidget extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.percent_rounded),
-            title: const BodyTwoDefaultText(text: Constant.rateOfIntrest),
+            title: BodyTwoDefaultText(text: l10n.rateOfIntrest),
             trailing: BodyTwoDefaultText(
               bold: true,
               text: transaction.intrestRate.toString(),
@@ -42,7 +44,7 @@ class TransactionDetailsWidget extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.calendar_month),
-            title: const BodyTwoDefaultText(text: Constant.takenDate),
+            title: BodyTwoDefaultText(text: l10n.takenDate),
             trailing: BodyTwoDefaultText(
               bold: true,
               text: Utility.formatDate(date: transaction.transacrtionDate),
@@ -53,8 +55,8 @@ class TransactionDetailsWidget extends StatelessWidget {
             leading: const Icon(Icons.date_range),
             title: BodyTwoDefaultText(
               text: payment.isEmpty
-                  ? Constant.presentDate
-                  : Constant.paymentDate,
+                  ? l10n.presentDate
+                  : l10n.paymentDate,
             ),
             trailing: BodyTwoDefaultText(
               bold: true,
@@ -65,7 +67,7 @@ class TransactionDetailsWidget extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.date_range_rounded),
-            title: const BodyTwoDefaultText(text: Constant.duetime),
+            title: BodyTwoDefaultText(text: l10n.dueDate),
             trailing: BodyTwoDefaultText(
               bold: true,
               text: loanCalculator.monthsAndRemainingDays,
@@ -73,7 +75,7 @@ class TransactionDetailsWidget extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.auto_graph_rounded),
-            title: const BodyTwoDefaultText(text: Constant.intrestPerMonth),
+            title: BodyTwoDefaultText(text: l10n.interestPerMonth),
             trailing: CurrencyWidget(
               smallText: true,
               amount: Utility.doubleFormate(loanCalculator.interestPerDay * 30),
@@ -81,7 +83,7 @@ class TransactionDetailsWidget extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.payment_rounded),
-            title: const BodyTwoDefaultText(text: Constant.totalIntrestAmount),
+            title: BodyTwoDefaultText(text: l10n.totalInterestAmount),
             trailing: CurrencyWidget(
               smallText: true,
               amount: Utility.doubleFormate(loanCalculator.totalInterestAmount),
@@ -89,7 +91,7 @@ class TransactionDetailsWidget extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.handshake_rounded),
-            title: const BodyTwoDefaultText(text: Constant.totalAmount),
+            title: BodyTwoDefaultText(text: l10n.totalAmount),
             trailing: CurrencyWidget(
               smallText: true,
               amount: Utility.doubleFormate(loanCalculator.totalAmount),

@@ -8,6 +8,7 @@ import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/fonts/strong_heading_one_text.dart';
 import 'package:self_finance/core/fonts/title_widget.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/logic/logic.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
@@ -26,7 +27,7 @@ import 'package:self_finance/widgets/snack_bar_widget.dart';
 
 class TransactionDetailView extends ConsumerStatefulWidget {
   const TransactionDetailView({super.key, required this.transactionId});
-  final int transactionId;
+  final String transactionId;
 
   @override
   ConsumerState<TransactionDetailView> createState() =>
@@ -76,9 +77,7 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView>
     final bool? confirm = await showDialog<bool>(
       context: context,
       builder: (BuildContext ctx) {
-        final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -86,9 +85,11 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView>
             children: [
               Icon(Icons.check_circle_outline_rounded, color: AppColors.getGreenColor),
               SizedBox(width: 10),
-              StrongHeadingOne(
-                bold: true,
-                text: "Settle Transaction?",
+              Expanded(
+                child: StrongHeadingOne(
+                  bold: true,
+                  text: "Settle Transaction?",
+                ),
               ),
             ],
           ),
@@ -171,12 +172,6 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView>
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final Color borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Colors.black.withValues(alpha: 0.08);
-
     final String? userCurrency = ref.watch(
       userProvider.select((a) => a.asData?.value?.userCurrency),
     );
@@ -187,7 +182,6 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView>
         ref.watch(transactionByIDProvider(widget.transactionId));
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         forceMaterialTransparency: true,
         title: const StrongHeadingOne(
@@ -235,12 +229,12 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView>
             data: (Trx? transaction) {
               if (transaction == null) {
                 return _buildScrollablePlaceholder(
-                  child: const Padding(
-                    padding: EdgeInsets.all(16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
                     child: BodyTwoDefaultText(
                       bold: true,
                       error: true,
-                      text: Constant.errorFetchingTransactionMessage,
+                      text: context.l10n.errorFetchingTransactions,
                     ),
                   ),
                 );
@@ -324,9 +318,6 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView>
                             // 2. Customer Summary Card
                             _CustomerSummaryCard(
                               customerId: transaction.customerId,
-                              isDark: isDark,
-                              cardBg: cardBg,
-                              borderColor: borderColor,
                             ),
 
                             const SizedBox(height: 16),
@@ -337,9 +328,6 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView>
                               transaction: transaction,
                               currencySymbol: currencySymbol,
                               isCompound: _isCompound,
-                              isDark: isDark,
-                              cardBg: cardBg,
-                              borderColor: borderColor,
                             ),
 
                             const SizedBox(height: 16),
@@ -352,9 +340,6 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView>
                               isPaid: isPaid,
                               isCompound: _isCompound,
                               currencySymbol: currencySymbol,
-                              isDark: isDark,
-                              cardBg: cardBg,
-                              borderColor: borderColor,
                               onToggleCompound: (bool value) {
                                 setState(() => _isCompound = value);
                               },
@@ -368,9 +353,6 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView>
                               settlement: settlement,
                               isPaid: isPaid,
                               currencySymbol: currencySymbol,
-                              isDark: isDark,
-                              cardBg: cardBg,
-                              borderColor: borderColor,
                             ),
 
                             const SizedBox(height: 16),
@@ -378,9 +360,6 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView>
                             // 6. Security & Documentation (Pawned Item & Signature)
                             _DocumentationCard(
                               transaction: transaction,
-                              isDark: isDark,
-                              cardBg: cardBg,
-                              borderColor: borderColor,
                             ),
 
                             const SizedBox(height: 24),
@@ -440,7 +419,7 @@ class _TransactionDetailViewState extends ConsumerState<TransactionDetailView>
                               DecoratedBox(
                                 decoration: BoxDecoration(
                                   color: AppColors.getGreenColor.withValues(
-                                    alpha: isDark ? 0.16 : 0.08,
+                                    alpha: 0.12,
                                   ),
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(
@@ -568,7 +547,7 @@ class _HeroBalanceCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: const Color(0x33FFFFFF),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -590,74 +569,85 @@ class _HeroBalanceCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Row(
-                  children: [
-                    if (!isPaid && onToggleCompound != null)
-                      InkWell(
-                        onTap: () => onToggleCompound!(!isCompound),
-                        borderRadius: BorderRadius.circular(16),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(
-                              alpha: isCompound ? 0.3 : 0.2,
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (!isPaid && onToggleCompound != null)
+                        InkWell(
+                          onTap: () => onToggleCompound!(!isCompound),
+                          borderRadius: BorderRadius.circular(16),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 250),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
                             ),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.35),
+                            decoration: BoxDecoration(
+                              color: isCompound
+                                  ? const Color(0x4DFFFFFF)
+                                  : const Color(0x33FFFFFF),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: const Color(0x59FFFFFF),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  isCompound
+                                      ? Icons.auto_graph_rounded
+                                      : Icons.linear_scale_rounded,
+                                  size: 12,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(width: 4),
+                                BodySmallText(
+                                  bold: true,
+                                  color: Colors.white,
+                                  text: isCompound ? "COMPOUND" : "SIMPLE",
+                                ),
+                              ],
                             ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                isCompound
-                                    ? Icons.auto_graph_rounded
-                                    : Icons.linear_scale_rounded,
-                                size: 12,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 4),
-                              BodySmallText(
-                                bold: true,
-                                color: Colors.white,
-                                text: isCompound ? "COMPOUND" : "SIMPLE",
-                              ),
-                            ],
+                        ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: InkWell(
+                          onTap: onCopyId,
+                          borderRadius: BorderRadius.circular(12),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 4,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: BodySmallText(
+                                    bold: true,
+                                    color: const Color(0xE6FFFFFF),
+                                    text: "#${transaction.id}",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                const Icon(
+                                  Icons.copy_rounded,
+                                  size: 13,
+                                  color: Color(0xE6FFFFFF),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    const SizedBox(width: 6),
-                    InkWell(
-                      onTap: onCopyId,
-                      borderRadius: BorderRadius.circular(12),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 4,
-                        ),
-                        child: Row(
-                          children: [
-                            BodySmallText(
-                              bold: true,
-                              color: Colors.white.withValues(alpha: 0.9),
-                              text: "#${transaction.id}",
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              Icons.copy_rounded,
-                              size: 13,
-                              color: Colors.white.withValues(alpha: 0.9),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -795,16 +785,10 @@ class _HeroBalanceCard extends StatelessWidget {
 // 2. CUSTOMER SUMMARY CARD
 // ─────────────────────────────────────────────────────────────────────────────
 class _CustomerSummaryCard extends ConsumerWidget {
-  final int customerId;
-  final bool isDark;
-  final Color cardBg;
-  final Color borderColor;
+  final String customerId;
 
   const _CustomerSummaryCard({
     required this.customerId,
-    required this.isDark,
-    required this.cardBg,
-    required this.borderColor,
   });
 
   void _openProof(BuildContext context, WidgetRef ref) {
@@ -828,25 +812,13 @@ class _CustomerSummaryCard extends ConsumerWidget {
     final AsyncValue<Customer?> customerAsync =
         ref.watch(customerProvider(customerId));
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
+    return Card(
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => Routes.navigateToContactDetailsView(
           context,
           customerID: customerId,
         ),
-        borderRadius: BorderRadius.circular(18),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: customerAsync.when(
@@ -886,9 +858,6 @@ class _CustomerSummaryCard extends ConsumerWidget {
                             BodyTwoDefaultText(
                               bold: true,
                               text: customer.name,
-                              color: isDark
-                                  ? Colors.white
-                                  : AppColors.getPrimaryTextColor,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -914,7 +883,7 @@ class _CustomerSummaryCard extends ConsumerWidget {
                         icon: const Icon(Icons.call_rounded, size: 18),
                         style: IconButton.styleFrom(
                           backgroundColor: AppColors.getPrimaryColor.withValues(
-                            alpha: isDark ? 0.2 : 0.1,
+                            alpha: 0.12,
                           ),
                           foregroundColor: AppColors.getPrimaryColor,
                         ),
@@ -923,7 +892,10 @@ class _CustomerSummaryCard extends ConsumerWidget {
                   ),
                   if (hasProof) ...[
                     const SizedBox(height: 12),
-                    Divider(height: 1, color: borderColor),
+                    Divider(
+                      height: 1,
+                      color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+                    ),
                     const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -988,18 +960,12 @@ class _MetricsGrid extends StatelessWidget {
   final Trx transaction;
   final String currencySymbol;
   final bool isCompound;
-  final bool isDark;
-  final Color cardBg;
-  final Color borderColor;
 
   const _MetricsGrid({
     required this.loanCalc,
     required this.transaction,
     required this.currencySymbol,
     this.isCompound = false,
-    required this.isDark,
-    required this.cardBg,
-    required this.borderColor,
   });
 
   @override
@@ -1018,9 +984,6 @@ class _MetricsGrid extends StatelessWidget {
                 title: "Principal Loan",
                 value: "$currencySymbol ${Utility.doubleFormate(transaction.amount)}",
                 subtitle: "Initial amount taken",
-                isDark: isDark,
-                cardBg: cardBg,
-                borderColor: borderColor,
               ),
             ),
             const SizedBox(width: 10),
@@ -1030,9 +993,6 @@ class _MetricsGrid extends StatelessWidget {
                 title: "Interest Rate",
                 value: "${transaction.intrestRate.toStringAsFixed(1)}% / mo",
                 subtitle: "Annual: ${(transaction.intrestRate * 12).toStringAsFixed(1)}% p.a.",
-                isDark: isDark,
-                cardBg: cardBg,
-                borderColor: borderColor,
               ),
             ),
           ],
@@ -1046,9 +1006,6 @@ class _MetricsGrid extends StatelessWidget {
                 title: "Duration Count",
                 value: loanCalc.monthsAndRemainingDays,
                 subtitle: "${loanCalc.days} Total Counted Days",
-                isDark: isDark,
-                cardBg: cardBg,
-                borderColor: borderColor,
               ),
             ),
             const SizedBox(width: 10),
@@ -1062,9 +1019,6 @@ class _MetricsGrid extends StatelessWidget {
                 subtitle: isCompound
                     ? "Compounded balance"
                     : "$currencySymbol ${Utility.doubleFormate(loanCalc.interestPerMonth)} / mo",
-                isDark: isDark,
-                cardBg: cardBg,
-                borderColor: borderColor,
                 accentColor: isCompound ? const Color(0xFF8B5CF6) : null,
               ),
             ),
@@ -1080,9 +1034,6 @@ class _MetricTile extends StatelessWidget {
   final String title;
   final String value;
   final String subtitle;
-  final bool isDark;
-  final Color cardBg;
-  final Color borderColor;
   final Color? accentColor;
 
   const _MetricTile({
@@ -1090,9 +1041,6 @@ class _MetricTile extends StatelessWidget {
     required this.title,
     required this.value,
     required this.subtitle,
-    required this.isDark,
-    required this.cardBg,
-    required this.borderColor,
     this.accentColor,
   });
 
@@ -1100,19 +1048,7 @@ class _MetricTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color iconColor = accentColor ?? AppColors.getPrimaryColor;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return Card(
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
@@ -1122,7 +1058,7 @@ class _MetricTile extends StatelessWidget {
               padding: const EdgeInsets.all(7),
               decoration: BoxDecoration(
                 color: iconColor.withValues(
-                  alpha: isDark ? 0.16 : 0.1,
+                  alpha: 0.12,
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -1138,7 +1074,6 @@ class _MetricTile extends StatelessWidget {
             BodyTwoDefaultText(
               bold: true,
               text: value,
-              color: isDark ? Colors.white : AppColors.getPrimaryTextColor,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -1166,9 +1101,6 @@ class _BreakdownCard extends StatelessWidget {
   final bool isPaid;
   final bool isCompound;
   final String currencySymbol;
-  final bool isDark;
-  final Color cardBg;
-  final Color borderColor;
   final ValueChanged<bool>? onToggleCompound;
 
   const _BreakdownCard({
@@ -1178,9 +1110,6 @@ class _BreakdownCard extends StatelessWidget {
     required this.isPaid,
     this.isCompound = false,
     required this.currencySymbol,
-    required this.isDark,
-    required this.cardBg,
-    required this.borderColor,
     this.onToggleCompound,
   });
 
@@ -1201,19 +1130,7 @@ class _BreakdownCard extends StatelessWidget {
         ? loanCalc.compoundTotalAmount
         : loanCalc.totalAmount;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -1247,7 +1164,7 @@ class _BreakdownCard extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: (isCompound ? const Color(0xFF6D28D9) : AppColors.getPrimaryColor)
-                            .withValues(alpha: isDark ? 0.25 : 0.12),
+                            .withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: (isCompound ? const Color(0xFF6D28D9) : AppColors.getPrimaryColor)
@@ -1278,38 +1195,35 @@ class _BreakdownCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            Divider(height: 1, color: borderColor),
+            Divider(
+              height: 1,
+              color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+            ),
             const SizedBox(height: 10),
 
             _buildRow(
               "Loan Issue Date",
               startDate,
-              isDark: isDark,
             ),
             _buildRow(
               isPaid ? "Settlement Date" : "Calculation Date",
               endDate,
-              isDark: isDark,
             ),
             _buildRow(
               "Duration Interval",
               "${loanCalc.monthsAndRemainingDays} (${loanCalc.days} days)",
-              isDark: isDark,
             ),
             _buildRow(
               "Base Principal",
               "$currencySymbol ${Utility.doubleFormate(transaction.amount)}",
-              isDark: isDark,
             ),
             _buildRow(
               "Rate of Interest",
               "${transaction.intrestRate.toStringAsFixed(1)}% per month",
-              isDark: isDark,
             ),
             _buildRow(
               isCompound ? "Compound Total Interest" : "Simple Total Interest",
               "$currencySymbol ${Utility.doubleFormate(isCompound ? loanCalc.compoundInterestAmount : loanCalc.totalInterestAmount)}",
-              isDark: isDark,
               highlightColor: const Color(0xFFD97706),
             ),
 
@@ -1319,14 +1233,10 @@ class _BreakdownCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF0F172A).withValues(alpha: 0.6)
-                    : const Color(0xFFF1F5F9),
+                color: AppColors.getLigthGreyColor.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.06)
-                      : Colors.black.withValues(alpha: 0.05),
+                  color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
                 ),
               ),
               child: Column(
@@ -1398,7 +1308,6 @@ class _BreakdownCard extends StatelessWidget {
                         bold: true,
                         text:
                             "$currencySymbol ${Utility.doubleFormate(loanCalc.compoundTotalAmount)}",
-                        color: isDark ? Colors.white : AppColors.getPrimaryTextColor,
                       ),
                     ],
                   ),
@@ -1429,7 +1338,10 @@ class _BreakdownCard extends StatelessWidget {
             ),
 
             const SizedBox(height: 6),
-            Divider(height: 1, color: borderColor),
+            Divider(
+              height: 1,
+              color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+            ),
             const SizedBox(height: 10),
 
             Row(
@@ -1442,7 +1354,6 @@ class _BreakdownCard extends StatelessWidget {
                         : isCompound
                             ? "Total Payable (Compound)"
                             : "Total Payable (Simple)",
-                    color: isDark ? Colors.white : AppColors.getPrimaryTextColor,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -1465,7 +1376,6 @@ class _BreakdownCard extends StatelessWidget {
   Widget _buildRow(
     String label,
     String value, {
-    required bool isDark,
     Color? highlightColor,
   }) {
     return Padding(
@@ -1484,8 +1394,7 @@ class _BreakdownCard extends StatelessWidget {
           BodySmallText(
             bold: true,
             text: value,
-            color: highlightColor ??
-                (isDark ? Colors.white : AppColors.getPrimaryTextColor),
+            color: highlightColor,
           ),
         ],
       ),
@@ -1501,37 +1410,19 @@ class _TimelineCard extends StatelessWidget {
   final Payment? settlement;
   final bool isPaid;
   final String currencySymbol;
-  final bool isDark;
-  final Color cardBg;
-  final Color borderColor;
 
   const _TimelineCard({
     required this.transaction,
     required this.settlement,
     required this.isPaid,
     required this.currencySymbol,
-    required this.isDark,
-    required this.cardBg,
-    required this.borderColor,
   });
 
   @override
   Widget build(BuildContext context) {
     final DateFormat formatter = DateFormat('dd MMM yyyy');
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
+    return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -1562,7 +1453,6 @@ class _TimelineCard extends StatelessWidget {
                   "${formatter.format(transaction.transacrtionDate)} (${Utility.formatDate(date: transaction.transacrtionDate)}) • $currencySymbol ${Utility.doubleFormate(transaction.amount)}",
               isCompleted: true,
               isLast: !isPaid,
-              isDark: isDark,
             ),
 
             // Step 2: Settled or Ongoing
@@ -1575,7 +1465,6 @@ class _TimelineCard extends StatelessWidget {
                     "${formatter.format(settlement!.paymentDate)} (${Utility.formatDate(date: settlement!.paymentDate)}) • Total $currencySymbol ${Utility.doubleFormate(settlement!.amountpaid)}",
                 isCompleted: true,
                 isLast: true,
-                isDark: isDark,
               )
             else
               _buildTimelineStep(
@@ -1585,7 +1474,6 @@ class _TimelineCard extends StatelessWidget {
                 subtitle: "Awaiting final settlement payment",
                 isCompleted: false,
                 isLast: true,
-                isDark: isDark,
               ),
           ],
         ),
@@ -1600,7 +1488,6 @@ class _TimelineCard extends StatelessWidget {
     required String subtitle,
     required bool isCompleted,
     required bool isLast,
-    required bool isDark,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1610,7 +1497,7 @@ class _TimelineCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: isDark ? 0.2 : 0.12),
+                color: iconColor.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, size: 16, color: iconColor),
@@ -1633,7 +1520,6 @@ class _TimelineCard extends StatelessWidget {
                 BodyTwoDefaultText(
                   bold: true,
                   text: title,
-                  color: isDark ? Colors.white : AppColors.getPrimaryTextColor,
                 ),
                 const SizedBox(height: 2),
                 BodySmallText(
@@ -1654,15 +1540,9 @@ class _TimelineCard extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 class _DocumentationCard extends ConsumerWidget {
   final Trx transaction;
-  final bool isDark;
-  final Color cardBg;
-  final Color borderColor;
 
   const _DocumentationCard({
     required this.transaction,
-    required this.isDark,
-    required this.cardBg,
-    required this.borderColor,
   });
 
   @override
@@ -1670,19 +1550,7 @@ class _DocumentationCard extends ConsumerWidget {
     final AsyncValue<Items?> itemAsync =
         ref.watch(itemByIdProvider(transaction.itemId));
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
+    return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -1696,14 +1564,19 @@ class _DocumentationCard extends ConsumerWidget {
                   color: AppColors.getPrimaryColor,
                 ),
                 SizedBox(width: 8),
-                BodyTwoDefaultText(
-                  bold: true,
-                  text: "Collateral Item & Digital Signature",
+                Expanded(
+                  child: BodyTwoDefaultText(
+                    bold: true,
+                    text: "Collateral Item & Digital Signature",
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            Divider(height: 1, color: borderColor),
+            Divider(
+              height: 1,
+              color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+            ),
             const SizedBox(height: 12),
 
             // Pawned Collateral Item
@@ -1742,7 +1615,7 @@ class _DocumentationCard extends ConsumerWidget {
                             height: 54,
                             decoration: BoxDecoration(
                               color: AppColors.getPrimaryColor.withValues(
-                                alpha: isDark ? 0.2 : 0.1,
+                                alpha: 0.12,
                               ),
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -1759,7 +1632,7 @@ class _DocumentationCard extends ConsumerWidget {
                         height: 54,
                         decoration: BoxDecoration(
                           color: AppColors.getPrimaryColor.withValues(
-                            alpha: isDark ? 0.2 : 0.1,
+                            alpha: 0.12,
                           ),
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -1784,9 +1657,6 @@ class _DocumentationCard extends ConsumerWidget {
                             text: item.description.isNotEmpty
                                 ? item.description
                                 : "No description provided",
-                            color: isDark
-                                ? Colors.white
-                                : AppColors.getPrimaryTextColor,
                           ),
                           if (item.photo.isNotEmpty) ...[
                             const SizedBox(height: 2),
@@ -1805,7 +1675,10 @@ class _DocumentationCard extends ConsumerWidget {
 
             if (transaction.signature.isNotEmpty) ...[
               const SizedBox(height: 14),
-              Divider(height: 1, color: borderColor),
+              Divider(
+                height: 1,
+                color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+              ),
               const SizedBox(height: 14),
 
               // Borrower Signature
@@ -1833,11 +1706,11 @@ class _DocumentationCard extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.05)
-                            : Colors.black.withValues(alpha: 0.04),
+                        color: AppColors.getLigthGreyColor.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: borderColor),
+                        border: Border.all(
+                          color: AppColors.getLigthGreyColor.withValues(alpha: 0.2),
+                        ),
                       ),
                       child: ImageWidget(
                         title: "Borrower Signature",

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
@@ -21,16 +22,13 @@ class CustomerTransactionsWidget extends ConsumerWidget {
     this.physics,
   });
 
-  final int customerId;
+  final String customerId;
   final bool shrinkWrap;
   final ScrollPhysics? physics;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final Color borderColor = isDark ? Colors.white12 : const Color(0xFFE2E8F0);
-
+    final l10n = context.l10n;
     return ref.watch(requriedCustomerTransactionsProvider(customerId)).when(
       data: (List<Trx?> transactions) {
         final List<Trx> list = transactions.whereType<Trx>().toList();
@@ -39,7 +37,7 @@ class CustomerTransactionsWidget extends ConsumerWidget {
           return ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             shrinkWrap: shrinkWrap,
-            physics: physics,
+            physics: physics ?? const AlwaysScrollableScrollPhysics(),
             itemCount: list.length,
             separatorBuilder: (_, _) => const SizedBox(height: 12),
             itemBuilder: (BuildContext context, int index) {
@@ -50,20 +48,8 @@ class CustomerTransactionsWidget extends ConsumerWidget {
               return SlidableWidget(
                 transactionId: transaction.id!,
                 customerId: transaction.customerId,
-                child: Material(
-                  color: cardBg,
+                child: Card(
                   clipBehavior: Clip.antiAlias,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(
-                      color: isActive
-                          ? (isDark
-                              ? AppColors.getGreenColor.withValues(alpha: 0.3)
-                              : AppColors.getGreenColor.withValues(alpha: 0.4))
-                          : borderColor,
-                      width: isActive ? 1.2 : 1.0,
-                    ),
-                  ),
                   child: InkWell(
                     onTap: () => Routes.navigateToTransactionDetailsView(
                       transacrtionId: transaction.id!,
@@ -109,7 +95,9 @@ class CustomerTransactionsWidget extends ConsumerWidget {
                                   ),
                                   const SizedBox(width: 6),
                                   BodySmallText(
-                                    text: isActive ? "ACTIVE" : "CLOSED",
+                                    text: isActive
+                                        ? l10n.active.toUpperCase()
+                                        : l10n.completed.toUpperCase(),
                                     bold: true,
                                     color: isActive
                                         ? AppColors.getGreenColor
@@ -118,19 +106,24 @@ class CustomerTransactionsWidget extends ConsumerWidget {
                                 ],
                               ),
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isDark ? Colors.white10 : const Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: BodySmallText(
-                                text: "ID: #${transaction.id}",
-                                bold: true,
-                                color: AppColors.getLigthGreyColor,
+                            Flexible(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.getLigthGreyColor
+                                      .withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: BodySmallText(
+                                  text: "ID: #${transaction.id}",
+                                  bold: true,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  color: AppColors.getLigthGreyColor,
+                                ),
                               ),
                             ),
                           ],
@@ -181,7 +174,11 @@ class CustomerTransactionsWidget extends ConsumerWidget {
                           ],
                         ),
                         const SizedBox(height: 10),
-                        Divider(height: 1, thickness: 1, color: borderColor),
+                        Divider(
+                          height: 1,
+                          color: AppColors.getLigthGreyColor
+                              .withValues(alpha: 0.15),
+                        ),
                         const SizedBox(height: 10),
 
                         // Footer row: Dates & Arrow
@@ -196,7 +193,7 @@ class CustomerTransactionsWidget extends ConsumerWidget {
                             Expanded(
                               child: BodySmallText(
                                 text:
-                                    "${Constant.takenDateSmall}: ${Utility.formatDate(date: transaction.transacrtionDate)}",
+                                    "${l10n.takenDate}: ${Utility.formatDate(date: transaction.transacrtionDate)}",
                                 color: AppColors.getLigthGreyColor,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -223,6 +220,7 @@ class CustomerTransactionsWidget extends ConsumerWidget {
         // Empty state
         return Center(
           child: SingleChildScrollView(
+            physics: physics ?? const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(28.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -240,14 +238,13 @@ class CustomerTransactionsWidget extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const TitleWidget(
-                  text: Constant.noTransactionMessage,
+                TitleWidget(
+                  text: l10n.noTransactionsFound,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
-                const BodySmallText(
-                  text:
-                      "This customer currently has no loan transactions recorded.",
+                BodySmallText(
+                  text: l10n.customerNoTransactionsRecorded,
                   textAlign: TextAlign.center,
                   color: AppColors.getLigthGreyColor,
                 ),
@@ -259,8 +256,8 @@ class CustomerTransactionsWidget extends ConsumerWidget {
                     customerID: customerId,
                   ),
                   icon: const Icon(Icons.add_rounded),
-                  label: const BodyTwoDefaultText(
-                    text: "Create First Transaction",
+                  label: BodyTwoDefaultText(
+                    text: l10n.createFirstTransaction,
                     bold: true,
                     color: Colors.white,
                   ),
@@ -280,12 +277,12 @@ class CustomerTransactionsWidget extends ConsumerWidget {
           ),
         );
       },
-      error: (error, _) => const Center(
+      error: (error, _) => Center(
         child: Padding(
-          padding: EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24.0),
           child: BodyOneDefaultText(
             error: true,
-            text: Constant.errorFetchingTransactionMessage,
+            text: l10n.errorFetchingTransactions,
           ),
         ),
       ),

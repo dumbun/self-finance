@@ -22,7 +22,7 @@ class Threads {
         .toList();
   }
 
-  static List<Contact> mapRowsToContacts(List<(int, String, String)> rows) {
+  static List<Contact> mapRowsToContacts(List<(String, String, String)> rows) {
     return rows
         .map((r) => Contact(id: r.$1, name: r.$2, number: r.$3))
         .toList();

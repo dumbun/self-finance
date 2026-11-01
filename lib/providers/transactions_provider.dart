@@ -22,6 +22,7 @@ import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/trx_with_customer_model.dart';
 import 'package:self_finance/models/user_history_model.dart';
 import 'package:self_finance/providers/image_providers.dart';
+import 'package:self_finance/core/sync/sync_provider.dart';
 import 'package:self_finance/widgets/transaction_filter_widget.dart';
 import 'package:signature/signature.dart';
 
@@ -227,7 +228,7 @@ class TransactionsNotifier extends _$TransactionsNotifier {
     );
 
     try {
-      final int? lastId = currentState.transactions.isNotEmpty
+      final String? lastId = currentState.transactions.isNotEmpty
           ? currentState.transactions.last.id
           : null;
 
@@ -275,7 +276,7 @@ class TransactionsNotifier extends _$TransactionsNotifier {
   // ---------------------------------------------------------------------------
 
   Future<bool> addNewTransactoion({
-    required int customerId,
+    required String customerId,
     required String customerName,
     required String customerNumber,
     required String discription,
@@ -283,6 +284,7 @@ class TransactionsNotifier extends _$TransactionsNotifier {
     required double pawnAmount,
     required double rateOfIntrest,
     required SignatureController signatureController,
+    String? verificationToken,
   }) async {
     final keepAlive = ref.keepAlive();
 
@@ -303,7 +305,7 @@ class TransactionsNotifier extends _$TransactionsNotifier {
       final User user = await UserBackEnd.fetchUserData();
       final int activeUserId = (user.id != null && user.id! > 0) ? user.id! : 1;
 
-      final int transacrtionId = await BackEnd.createNewTransactionAtomic(
+      final String transacrtionId = await BackEnd.createNewTransactionAtomic(
         item: Items(
           customerid: customerId,
           name: discription,
@@ -326,6 +328,7 @@ class TransactionsNotifier extends _$TransactionsNotifier {
           remainingAmount: 0.0,
           signature: signaturePath,
           createdDate: DateTime.now(),
+          verificationToken: verificationToken,
         ),
         historyBuilder: (itemId, txnId) => UserHistory(
           userID: activeUserId,
@@ -340,7 +343,7 @@ class TransactionsNotifier extends _$TransactionsNotifier {
         ),
       );
 
-      if (transacrtionId != 0) {
+      if (transacrtionId.isNotEmpty) {
         final bool notificationsEnabled =
             await PreferencesHelper.areNotificationsEnabled();
 
@@ -354,6 +357,7 @@ class TransactionsNotifier extends _$TransactionsNotifier {
 
         // Show the new transaction at the top of the list.
         refreshTransactions();
+        ref.read(syncProvider.notifier).triggerAutoSync();
         return true;
       }
       return false;
@@ -383,7 +387,7 @@ class TransactionsNotifier extends _$TransactionsNotifier {
   // ---------------------------------------------------------------------------
 
   Future<Map<String, int>> deleteTransaction({
-    required int transactionId,
+    required String transactionId,
   }) async {
     await NotificationService().cancelTransactionReminder(
       transactionId: transactionId,
@@ -393,6 +397,7 @@ class TransactionsNotifier extends _$TransactionsNotifier {
     );
     if (ref.mounted) {
       refreshTransactions();
+      ref.read(syncProvider.notifier).triggerAutoSync();
     }
     return result;
   }
@@ -401,11 +406,11 @@ class TransactionsNotifier extends _$TransactionsNotifier {
 @Riverpod()
 class TransactionByID extends _$TransactionByID {
   @override
-  Stream<Trx?> build(int transactionId) {
+  Stream<Trx?> build(String transactionId) {
     return _fetchTransaction(transactionId);
   }
 
-  Stream<Trx?> _fetchTransaction(int transactionId) {
+  Stream<Trx?> _fetchTransaction(String transactionId) {
     return BackEnd.watchRequriedTransaction(transactionId: transactionId);
   }
 
@@ -456,6 +461,7 @@ class TransactionByID extends _$TransactionByID {
       // The list is no longer a live stream, so refresh it manually
       // so the Active/Inactive chip updates.
       ref.invalidate(transactionsProvider);
+      ref.read(syncProvider.notifier).triggerAutoSync();
 
       await ReviewHelper.requestAppReview();
     }
@@ -470,6 +476,6 @@ class TransactionByID extends _$TransactionByID {
 }
 
 final requriedCustomerTransactionsProvider = StreamProvider.family
-    .autoDispose<List<Trx>, int>((ref, customerId) {
+    .autoDispose<List<Trx>, String>((ref, customerId) {
       return BackEnd.watchRequriedCustomerTransactions(customerId: customerId);
     });

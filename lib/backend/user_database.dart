@@ -76,7 +76,7 @@ class UserBackEnd {
 
   static Future<bool> createNewUser(User user) async {
     try {
-      final d = await db();
+      final UserDatabase d = await db();
       await d
           .into(d.userTable)
           .insert(
@@ -169,7 +169,7 @@ class UserBackEnd {
     required int id,
     required String currency,
   }) async {
-    final d = await db();
+    final UserDatabase d = await db();
     return (d.update(d.userTable)..where((t) => t.id.equals(id))).write(
       UserTableCompanion(userCurrency: Value(currency)),
     );
@@ -249,43 +249,55 @@ class UserBackEnd {
 
   /// Watches the first (or only) user row.
   static Stream<User?> watchUserData() {
-    return Stream.fromFuture(db()).asyncExpand((d) {
-      final q = (d.select(d.userTable)..limit(1)).watch();
-      return q.map((rows) {
-        if (rows.isEmpty) {
-          return null;
-        }
-        final r = rows.first;
-        return User(
-          id: r.id,
-          userName: r.userName,
-          userPin: r.userPin,
-          userCurrency: r.userCurrency,
-          profilePicture: r.profilePicture,
-        );
-      });
-    });
+    return Stream.fromFuture(db())
+        .asyncExpand((d) {
+          final q = (d.select(d.userTable)..limit(1)).watch();
+          return q
+              .map((rows) {
+                if (rows.isEmpty) {
+                  return null;
+                }
+                final r = rows.first;
+                return User(
+                  id: r.id,
+                  userName: r.userName,
+                  userPin: r.userPin,
+                  userCurrency: r.userCurrency,
+                  profilePicture: r.profilePicture,
+                );
+              })
+              .handleError((_) => null);
+        })
+        .handleError((_) => null);
   }
 
   static Stream<String> watchPin({int id = 1}) {
-    return Stream.fromFuture(db()).asyncExpand((d) {
-      final q =
-          (d.selectOnly(d.userTable)
-                ..addColumns([d.userTable.userPin])
-                ..where(d.userTable.id.equals(id))
-                ..limit(1))
-              .watch();
+    return Stream.fromFuture(db())
+        .asyncExpand((d) {
+          final q =
+              (d.selectOnly(d.userTable)
+                    ..addColumns([d.userTable.userPin])
+                    ..where(d.userTable.id.equals(id))
+                    ..limit(1))
+                  .watch();
 
-      return q.map(
-        (rows) =>
-            rows.isEmpty ? '' : (rows.first.read(d.userTable.userPin) ?? ''),
-      );
-    });
+          return q
+              .map(
+                (rows) => rows.isEmpty
+                    ? ''
+                    : (rows.first.read(d.userTable.userPin) ?? ''),
+              )
+              .handleError((_) => '');
+        })
+        .handleError((_) => '');
   }
 
   static Future<void> close() async {
     final d = _db;
     if (d == null) return;
+    try {
+      await d.customStatement('PRAGMA wal_checkpoint(TRUNCATE)');
+    } catch (_) {}
     await d.close();
     _db = null;
     _activeAccountId = null;

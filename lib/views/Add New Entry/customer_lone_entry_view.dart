@@ -1,13 +1,15 @@
+import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
-import 'package:self_finance/core/fonts/body_small_text.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/widgets/fab.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/input_date_picker.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 
+@Deprecated('Use CustomerDetailsEntryView for the unified entry view')
 class CustomerLoneEntryView extends StatefulWidget {
   const CustomerLoneEntryView({
     super.key,
@@ -33,13 +35,19 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
   final TextEditingController _itemDescription = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  double? _doubleCheck(String text, {String errorString = Constant.error}) {
+  @override
+  void initState() {
+    super.initState();
+    _takenDate.text = DateFormat('dd-MM-yyyy').format(DateTime.now());
+  }
+
+  double? _doubleCheck(String text, {String? errorString}) {
     try {
       return double.parse(text);
     } catch (e) {
       AlertDilogs.alertDialogWithOneAction(
         context,
-        errorString,
+        errorString ?? context.l10n.error,
         e.toString(),
       );
       return null;
@@ -65,13 +73,13 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const BodySmallText(text: "Lone Amount", bold: true),
+        title: const BodyTwoDefaultText(text: "Loan Details", bold: true),
       ),
       floatingActionButton: Fab(
         onPressed: () {
           if (_validateAndSave()) {
-            final double? rate = _doubleCheck(_rateOfIntrest.text);
-            final double? amount = _doubleCheck(_takenAmount.text);
+            final double? rate = _doubleCheck(_rateOfIntrest.text.trim());
+            final double? amount = _doubleCheck(_takenAmount.text.trim());
             if (rate == null || amount == null) return;
 
             Routes.navigateToCustomerConformationView(
@@ -80,14 +88,14 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
               mobileNumber: widget.mobileNumber,
               gaurdianName: widget.gaurdianName,
               address: widget.address,
-              itemDescription: _itemDescription.text,
+              itemDescription: _itemDescription.text.trim(),
               rateOfIntrest: rate,
               takenAmount: amount,
               takenDate: _takenDate.text,
             );
           }
         },
-        icon: Icons.save,
+        icon: Icons.navigate_next_rounded,
       ),
       body: SafeArea(
         child: Padding(
@@ -102,7 +110,7 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
                   const SizedBox(height: 20),
                   InputTextField(
                     keyboardType: TextInputType.number,
-                    hintText: Constant.takenAmount,
+                    hintText: context.l10n.takenAmount,
                     validator: (String? value) =>
                         Utility.amountValidation(value: value),
                     controller: _takenAmount,
@@ -113,7 +121,7 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
                   InputTextField(
                     validator: (String? value) =>
                         Utility.amountValidation(value: value),
-                    hintText: Constant.rateOfIntrest,
+                    hintText: context.l10n.rateOfIntrest,
                     controller: _rateOfIntrest,
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
@@ -124,7 +132,7 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
                   const SizedBox(height: 20),
                   InputDatePicker(
                     controller: _takenDate,
-                    labelText: Constant.takenDate,
+                    labelText: context.l10n.takenDate,
                     firstDate: DateTime(1000),
                     lastDate: DateTime.now(),
                     initialDate: DateTime.now(),
@@ -134,7 +142,7 @@ class _CustomerLoneEntryViewState extends State<CustomerLoneEntryView> {
                   const SizedBox(height: 20),
                   InputTextField(
                     controller: _itemDescription,
-                    hintText: Constant.itemDescription,
+                    hintText: context.l10n.itemDescription,
                   ),
                 ],
               ),

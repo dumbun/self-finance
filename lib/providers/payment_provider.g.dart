@@ -16,7 +16,7 @@ final class PaymentByTrxIdProvider
     extends $StreamNotifierProvider<PaymentByTrxId, List<Payment>> {
   PaymentByTrxIdProvider._({
     required PaymentByTrxIdFamily super.from,
-    required int super.argument,
+    required String super.argument,
   }) : super(
          retry: null,
          name: r'paymentByTrxIdProvider',
@@ -50,7 +50,7 @@ final class PaymentByTrxIdProvider
   }
 }
 
-String _$paymentByTrxIdHash() => r'e6924a26e863b80c1ec87bbfc474dcbf5b0d6d95';
+String _$paymentByTrxIdHash() => r'fae6d614cfe9a63049ad7026ef32bb0b6c37a288';
 
 final class PaymentByTrxIdFamily extends $Family
     with
@@ -59,7 +59,7 @@ final class PaymentByTrxIdFamily extends $Family
           AsyncValue<List<Payment>>,
           List<Payment>,
           Stream<List<Payment>>,
-          int
+          String
         > {
   PaymentByTrxIdFamily._()
     : super(
@@ -70,7 +70,7 @@ final class PaymentByTrxIdFamily extends $Family
         isAutoDispose: true,
       );
 
-  PaymentByTrxIdProvider call({required int transactionId}) =>
+  PaymentByTrxIdProvider call({required String transactionId}) =>
       PaymentByTrxIdProvider._(argument: transactionId, from: this);
 
   @override
@@ -78,10 +78,10 @@ final class PaymentByTrxIdFamily extends $Family
 }
 
 abstract class _$PaymentByTrxId extends $StreamNotifier<List<Payment>> {
-  late final _$args = ref.$arg as int;
-  int get transactionId => _$args;
+  late final _$args = ref.$arg as String;
+  String get transactionId => _$args;
 
-  Stream<List<Payment>> build({required int transactionId});
+  Stream<List<Payment>> build({required String transactionId});
   @$mustCallSuper
   @override
   void runBuild() {

@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/utility/invite_link_utility.dart';
 import 'package:self_finance/widgets/app_icon_widget.dart';
 
@@ -9,10 +10,10 @@ class InviteButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Row(
+        const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AppIconWidget(height: 42, width: 42),
@@ -21,13 +22,13 @@ class InviteButtonWidget extends StatelessWidget {
           ],
         ),
 
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
 
-        BodyTwoDefaultText(text: "If you like our app please"),
+        BodyTwoDefaultText(text: context.l10n.likeOurApp),
 
         TextButton(
           onPressed: Invite.shareAppLink,
-          child: BodyTwoDefaultText(text: "Invite your friends", bold: true),
+          child: BodyTwoDefaultText(text: context.l10n.inviteFriends, bold: true),
         ),
       ],
     );

@@ -125,6 +125,25 @@ class PreferencesHelper {
     };
   }
 
+  // ─── Locale ──────────────────────────────────────────────────────────────
+  static const String _keyLocale = 'app_locale';
+
+  /// Returns the saved locale language code (e.g. 'en', 'hi', 'te') or null for system default.
+  static Future<String?> getLocaleCode() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyLocale);
+  }
+
+  /// Saves the user's preferred locale language code. Pass null to reset to system default.
+  static Future<void> setLocaleCode(String? languageCode) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (languageCode == null || languageCode.isEmpty) {
+      await prefs.remove(_keyLocale);
+    } else {
+      await prefs.setString(_keyLocale, languageCode);
+    }
+  }
+
   /// Resets all preferences to their default values.
   static Future<void> resetAll() async {
     final prefs = await SharedPreferences.getInstance();
@@ -132,6 +151,7 @@ class PreferencesHelper {
     await prefs.remove(_keyNotifications);
     await prefs.remove(_keyBiometrics);
     await prefs.remove(_keyOnboardingComplete);
+    await prefs.remove(_keyLocale);
   }
 }
 

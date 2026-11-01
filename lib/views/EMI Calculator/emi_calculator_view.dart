@@ -3,7 +3,12 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:self_finance/core/fonts/body_small_text.dart';
+import 'package:self_finance/core/fonts/body_text.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/fonts/title_widget.dart';
 import 'package:self_finance/core/logic/logic.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/providers/user_provider.dart';
@@ -83,8 +88,8 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
       if (!auto) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(
-              "Please enter a valid loan amount and interest rate.",
+            content: BodyTwoDefaultText(
+              text: "Please enter a valid loan amount and interest rate.",
             ),
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
@@ -181,29 +186,6 @@ class _EMICalculatorViewState extends ConsumerState<EMICalculatorView> {
     return '$symbol ${Utility.doubleFormate(amount)}';
   }
 
-  String _formatAmountInWords(double amount) {
-    if (amount >= 10000000) {
-      final double cr = amount / 10000000;
-      final String formatted = cr.truncateToDouble() == cr
-          ? cr.toStringAsFixed(0)
-          : cr.toStringAsFixed(2);
-      return '$formatted Crore';
-    } else if (amount >= 100000) {
-      final double lk = amount / 100000;
-      final String formatted = lk.truncateToDouble() == lk
-          ? lk.toStringAsFixed(0)
-          : lk.toStringAsFixed(2);
-      return '$formatted Lakh';
-    } else if (amount >= 1000) {
-      final double k = amount / 1000;
-      final String formatted = k.truncateToDouble() == k
-          ? k.toStringAsFixed(0)
-          : k.toStringAsFixed(1);
-      return '$formatted Thousand';
-    }
-    return '';
-  }
-
   void _copySummary(String currencySymbol) {
     if (_loanCalculator == null) return;
 
@@ -239,7 +221,9 @@ Calculated via Self Finance App
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Detailed loan summary copied to clipboard!'),
+        content: BodyTwoDefaultText(
+          text: 'Detailed loan summary copied to clipboard!',
+        ),
         behavior: SnackBarBehavior.floating,
         duration: Duration(seconds: 2),
       ),
@@ -283,24 +267,12 @@ Calculated via Self Finance App
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final Color borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Colors.black.withValues(alpha: 0.08);
-
     final String? userCurrency = ref.watch(
       userProvider.select((a) => a.asData?.value?.userCurrency),
     );
     final String currencySymbol =
         (userCurrency != null && userCurrency.isNotEmpty) ? userCurrency : '₹';
 
-    final double? parsedAmount = double.tryParse(
-      _amountController.text.replaceAll(',', '').trim(),
-    );
-    final String amountWords = parsedAmount != null
-        ? _formatAmountInWords(parsedAmount)
-        : '';
     final double? parsedRate = double.tryParse(_rateController.text.trim());
 
     return GestureDetector(
@@ -312,19 +284,12 @@ Calculated via Self Finance App
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header Card with Actions (Isolated with RepaintBoundary)
-            _EmiHeader(
-              isDark: isDark,
-              cardBg: cardBg,
-              borderColor: borderColor,
-              onDemo: _loadDemoData,
-              onReset: _resetAll,
-            ),
+            _EmiHeader(onDemo: _loadDemoData, onReset: _resetAll),
 
             const SizedBox(height: 14),
 
             // Mode Selector (Simple vs Compound)
             _EmiModeSelector(
-              isDark: isDark,
               isCompound: _isCompound,
               onModeChanged: (val) {
                 setState(() => _isCompound = val);
@@ -335,59 +300,17 @@ Calculated via Self Finance App
             const SizedBox(height: 14),
 
             // Main Input Container
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: cardBg,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: borderColor),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-                    blurRadius: 16,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
+            Card(
               child: Padding(
                 padding: const EdgeInsets.all(18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 1. Principal Amount Field
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Loan Principal Amount",
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white70 : Colors.black87,
-                          ),
-                        ),
-                        if (amountWords.isNotEmpty)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.getPrimaryColor.withValues(
-                                alpha: isDark ? 0.2 : 0.1,
-                              ),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              amountWords,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.getPrimaryColor,
-                              ),
-                            ),
-                          ),
-                      ],
+                    BodyTwoDefaultText(
+                      text: context.l10n.loanPrincipalAmount,
+                      bold: true,
                     ),
+
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _amountController,
@@ -405,37 +328,42 @@ Calculated via Self Finance App
                           padding: const EdgeInsets.symmetric(horizontal: 14),
                           child: Center(
                             widthFactor: 0,
-                            child: Text(
-                              currencySymbol,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.getPrimaryColor,
-                              ),
+                            child: BodyOneDefaultText(
+                              text: currencySymbol,
+                              bold: true,
+                              color: AppColors.getPrimaryColor,
                             ),
                           ),
                         ),
-                        hintText: "Enter amount (e.g. 50,000)",
+                        hintText: context.l10n.enterAmountHint,
                         hintStyle: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.normal,
                           color: AppColors.getLigthGreyColor,
                         ),
                         filled: true,
-                        fillColor: isDark
-                            ? Colors.black.withValues(alpha: 0.2)
-                            : const Color(0xFFF8FAFC),
+                        fillColor: AppColors.getLigthGreyColor.withValues(
+                          alpha: 0.08,
+                        ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 14,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(color: borderColor),
+                          borderSide: BorderSide(
+                            color: AppColors.getLigthGreyColor.withValues(
+                              alpha: 0.2,
+                            ),
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(color: borderColor),
+                          borderSide: BorderSide(
+                            color: AppColors.getLigthGreyColor.withValues(
+                              alpha: 0.2,
+                            ),
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -461,34 +389,29 @@ Calculated via Self Finance App
                       child: Row(
                         children: [
                           _QuickChip(
-                            label: "+${currencySymbol}5K",
+                            label: "+ ${currencySymbol}5K",
                             isSelected: false,
                             onTap: () => _addAmount(5000),
-                            isDark: isDark,
                           ),
                           _QuickChip(
-                            label: "+${currencySymbol}10K",
+                            label: "+ ${currencySymbol}10K",
                             isSelected: false,
                             onTap: () => _addAmount(10000),
-                            isDark: isDark,
                           ),
                           _QuickChip(
-                            label: "+${currencySymbol}25K",
+                            label: "+ ${currencySymbol}25K",
                             isSelected: false,
                             onTap: () => _addAmount(25000),
-                            isDark: isDark,
                           ),
                           _QuickChip(
-                            label: "+${currencySymbol}50K",
+                            label: "+ ${currencySymbol}50K",
                             isSelected: false,
                             onTap: () => _addAmount(50000),
-                            isDark: isDark,
                           ),
                           _QuickChip(
-                            label: "+${currencySymbol}1L",
+                            label: "+ ${currencySymbol}1L",
                             isSelected: false,
                             onTap: () => _addAmount(100000),
-                            isDark: isDark,
                           ),
                         ],
                       ),
@@ -500,22 +423,16 @@ Calculated via Self Finance App
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "Monthly Interest Rate (% per month)",
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white70 : Colors.black87,
-                          ),
+                        BodySmallText(
+                          text: context.l10n.monthlyInterestRate,
+                          bold: true,
                         ),
+
                         if (parsedRate != null)
-                          Text(
-                            "Annual: ${(parsedRate * 12).toStringAsFixed(1)}% p.a.",
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.getLigthGreyColor,
-                            ),
+                          BodySmallText(
+                            text:
+                                "Annual: ${(parsedRate * 12).toStringAsFixed(1)}% p.a.",
+                            color: AppColors.getLigthGreyColor,
                           ),
                       ],
                     ),
@@ -559,20 +476,28 @@ Calculated via Self Finance App
                           color: AppColors.getLigthGreyColor,
                         ),
                         filled: true,
-                        fillColor: isDark
-                            ? Colors.black.withValues(alpha: 0.2)
-                            : const Color(0xFFF8FAFC),
+                        fillColor: AppColors.getLigthGreyColor.withValues(
+                          alpha: 0.08,
+                        ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 14,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(color: borderColor),
+                          borderSide: BorderSide(
+                            color: AppColors.getLigthGreyColor.withValues(
+                              alpha: 0.2,
+                            ),
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(color: borderColor),
+                          borderSide: BorderSide(
+                            color: AppColors.getLigthGreyColor.withValues(
+                              alpha: 0.2,
+                            ),
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -592,31 +517,26 @@ Calculated via Self Finance App
                           label: "1.0%",
                           isSelected: parsedRate == 1.0,
                           onTap: () => _setRate(1.0),
-                          isDark: isDark,
                         ),
                         _QuickChip(
                           label: "1.5%",
                           isSelected: parsedRate == 1.5,
                           onTap: () => _setRate(1.5),
-                          isDark: isDark,
                         ),
                         _QuickChip(
                           label: "2.0%",
                           isSelected: parsedRate == 2.0,
                           onTap: () => _setRate(2.0),
-                          isDark: isDark,
                         ),
                         _QuickChip(
                           label: "2.5%",
                           isSelected: parsedRate == 2.5,
                           onTap: () => _setRate(2.5),
-                          isDark: isDark,
                         ),
                         _QuickChip(
                           label: "3.0%",
                           isSelected: parsedRate == 3.0,
                           onTap: () => _setRate(3.0),
-                          isDark: isDark,
                         ),
                       ],
                     ),
@@ -627,13 +547,9 @@ Calculated via Self Finance App
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "Loan Period & Duration",
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white70 : Colors.black87,
-                          ),
+                        const BodySmallText(
+                          text: "Loan Period & Duration",
+                          bold: true,
                         ),
                         if (_loanCalculator != null)
                           Container(
@@ -642,18 +558,15 @@ Calculated via Self Finance App
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: isDark
-                                  ? Colors.white.withValues(alpha: 0.08)
-                                  : Colors.black.withValues(alpha: 0.05),
+                              color: AppColors.getPrimaryColor.withValues(
+                                alpha: 0.12,
+                              ),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: Text(
-                              "${_loanCalculator!.days} Days Total",
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.getPrimaryColor,
-                              ),
+                            child: BodySmallText(
+                              text: "${_loanCalculator!.days} Days Total",
+                              bold: true,
+                              color: AppColors.getPrimaryColor,
                             ),
                           ),
                       ],
@@ -666,8 +579,6 @@ Calculated via Self Finance App
                             title: "Loan Given",
                             date: _takenDate,
                             onTap: _pickStartDate,
-                            isDark: isDark,
-                            borderColor: borderColor,
                           ),
                         ),
                         Padding(
@@ -675,9 +586,9 @@ Calculated via Self Finance App
                           child: Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: isDark
-                                  ? Colors.white.withValues(alpha: 0.06)
-                                  : Colors.black.withValues(alpha: 0.04),
+                              color: AppColors.getLigthGreyColor.withValues(
+                                alpha: 0.1,
+                              ),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -692,8 +603,6 @@ Calculated via Self Finance App
                             title: "Settlement Due",
                             date: _tenureDate,
                             onTap: _pickEndDate,
-                            isDark: isDark,
-                            borderColor: borderColor,
                           ),
                         ),
                       ],
@@ -711,21 +620,18 @@ Calculated via Self Finance App
                             isSelected:
                                 _tenureDate == _addMonthsClamped(_takenDate, 1),
                             onTap: () => _setDurationMonths(1),
-                            isDark: isDark,
                           ),
                           _QuickChip(
                             label: "3 Months",
                             isSelected:
                                 _tenureDate == _addMonthsClamped(_takenDate, 3),
                             onTap: () => _setDurationMonths(3),
-                            isDark: isDark,
                           ),
                           _QuickChip(
                             label: "6 Months",
                             isSelected:
                                 _tenureDate == _addMonthsClamped(_takenDate, 6),
                             onTap: () => _setDurationMonths(6),
-                            isDark: isDark,
                           ),
                           _QuickChip(
                             label: "1 Year",
@@ -733,7 +639,6 @@ Calculated via Self Finance App
                                 _tenureDate ==
                                 _addMonthsClamped(_takenDate, 12),
                             onTap: () => _setDurationMonths(12),
-                            isDark: isDark,
                           ),
                         ],
                       ),
@@ -744,11 +649,15 @@ Calculated via Self Finance App
                     // 4. Include End Date Toggle Tile
                     DecoratedBox(
                       decoration: BoxDecoration(
-                        color: isDark
-                            ? Colors.black.withValues(alpha: 0.15)
-                            : const Color(0xFFF8FAFC),
+                        color: AppColors.getLigthGreyColor.withValues(
+                          alpha: 0.08,
+                        ),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: borderColor),
+                        border: Border.all(
+                          color: AppColors.getLigthGreyColor.withValues(
+                            alpha: 0.15,
+                          ),
+                        ),
                       ),
                       child: InkWell(
                         onTap: () {
@@ -784,26 +693,18 @@ Calculated via Self Finance App
                                 ),
                               ),
                               const SizedBox(width: 10),
-                              Expanded(
+                              const Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      "Include Settlement Day",
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                        color: isDark
-                                            ? Colors.white
-                                            : AppColors.getPrimaryTextColor,
-                                      ),
+                                    BodyTwoDefaultText(
+                                      text: "Include Settlement Day",
+                                      bold: true,
                                     ),
-                                    const Text(
-                                      "Count the last calendar day in interest calculation",
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: AppColors.getLigthGreyColor,
-                                      ),
+                                    BodySmallText(
+                                      text:
+                                          "Count the last calendar day in interest calculation",
+                                      color: AppColors.getLigthGreyColor,
                                     ),
                                   ],
                                 ),
@@ -826,13 +727,10 @@ Calculated via Self Finance App
                           _recalculate();
                         },
                         icon: const Icon(Icons.calculate_rounded, size: 20),
-                        label: const Text(
-                          "Calculate Repayment",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.3,
-                          ),
+                        label: BodyTwoDefaultText(
+                          text: context.l10n.calculateRepayment,
+                          bold: true,
+                          whiteColor: true,
                         ),
                         style: FilledButton.styleFrom(
                           backgroundColor: AppColors.getPrimaryColor,
@@ -863,9 +761,6 @@ Calculated via Self Finance App
                       child: _EmiResultsSection(
                         calc: _loanCalculator!,
                         isCompound: _isCompound,
-                        isDark: isDark,
-                        cardBg: cardBg,
-                        borderColor: borderColor,
                         currencySymbol: currencySymbol,
                         rateText: _rateController.text,
                         onCopy: () => _copySummary(currencySymbol),
@@ -874,12 +769,7 @@ Calculated via Self Finance App
                     )
                   : RepaintBoundary(
                       key: const ValueKey('empty_view'),
-                      child: _EmptyCalculatorView(
-                        isDark: isDark,
-                        cardBg: cardBg,
-                        borderColor: borderColor,
-                        onDemo: _loadDemoData,
-                      ),
+                      child: _EmptyCalculatorView(onDemo: _loadDemoData),
                     ),
             ),
 
@@ -892,36 +782,15 @@ Calculated via Self Finance App
 }
 
 class _EmiHeader extends StatelessWidget {
-  final bool isDark;
-  final Color cardBg;
-  final Color borderColor;
   final VoidCallback onDemo;
   final VoidCallback onReset;
 
-  const _EmiHeader({
-    required this.isDark,
-    required this.cardBg,
-    required this.borderColor,
-    required this.onDemo,
-    required this.onReset,
-  });
+  const _EmiHeader({required this.onDemo, required this.onReset});
 
   @override
   Widget build(BuildContext context) {
     return RepaintBoundary(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: cardBg,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: borderColor),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+      child: Card(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
@@ -929,9 +798,7 @@ class _EmiHeader extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppColors.getPrimaryColor.withValues(
-                    alpha: isDark ? 0.2 : 0.1,
-                  ),
+                  color: AppColors.getPrimaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -941,27 +808,18 @@ class _EmiHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Expanded(
+              const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "EMI & Interest Calculator",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? Colors.white
-                            : AppColors.getPrimaryTextColor,
-                      ),
+                    BodyTwoDefaultText(
+                      text: "EMI & Interest Calculator",
+                      bold: true,
                     ),
-                    const SizedBox(height: 2),
-                    const Text(
-                      "Accurate daily & monthly loan tracker",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.getLigthGreyColor,
-                      ),
+                    SizedBox(height: 2),
+                    BodySmallText(
+                      text: "Accurate daily & monthly loan tracker",
+                      color: AppColors.getLigthGreyColor,
                     ),
                   ],
                 ),
@@ -981,13 +839,10 @@ class _EmiHeader extends StatelessWidget {
                   size: 14,
                   color: AppColors.getPrimaryColor,
                 ),
-                label: const Text(
-                  "Demo",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.getPrimaryColor,
-                  ),
+                label: const BodySmallText(
+                  text: "Demo",
+                  bold: true,
+                  color: AppColors.getPrimaryColor,
                 ),
               ),
               const SizedBox(width: 4),
@@ -1010,12 +865,10 @@ class _EmiHeader extends StatelessWidget {
 }
 
 class _EmiModeSelector extends StatelessWidget {
-  final bool isDark;
   final bool isCompound;
   final ValueChanged<bool> onModeChanged;
 
   const _EmiModeSelector({
-    required this.isDark,
     required this.isCompound,
     required this.onModeChanged,
   });
@@ -1024,9 +877,7 @@ class _EmiModeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF1E293B)
-            : Colors.black.withValues(alpha: 0.05),
+        color: AppColors.getLigthGreyColor.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(14),
       ),
       padding: const EdgeInsets.all(4),
@@ -1066,14 +917,12 @@ class _EmiModeSelector extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
         decoration: BoxDecoration(
-          color: isSelected
-              ? (isDark ? AppColors.getPrimaryColor : Colors.white)
-              : Colors.transparent,
+          color: isSelected ? AppColors.getPrimaryColor : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
+                    color: AppColors.getPrimaryColor.withValues(alpha: 0.25),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -1082,27 +931,17 @@ class _EmiModeSelector extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                color: isSelected
-                    ? (isDark ? Colors.white : AppColors.getPrimaryTextColor)
-                    : AppColors.getLigthGreyColor,
-              ),
+            BodySmallText(
+              text: title,
+              bold: isSelected,
+              color: isSelected ? Colors.white : null,
             ),
             const SizedBox(height: 2),
-            Text(
-              subtitle,
-              style: TextStyle(
-                fontSize: 10,
-                color: isSelected
-                    ? (isDark
-                          ? Colors.white.withValues(alpha: 0.8)
-                          : AppColors.getLigthGreyColor)
-                    : AppColors.getLigthGreyColor.withValues(alpha: 0.7),
-              ),
+            BodySmallText(
+              text: subtitle,
+              color: isSelected
+                  ? Colors.white.withValues(alpha: 0.8)
+                  : AppColors.getLigthGreyColor,
             ),
           ],
         ),
@@ -1115,13 +954,11 @@ class _QuickChip extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
-  final bool isDark;
 
   const _QuickChip({
     required this.label,
     required this.isSelected,
     required this.onTap,
-    required this.isDark,
   });
 
   @override
@@ -1130,25 +967,16 @@ class _QuickChip extends StatelessWidget {
       padding: const EdgeInsets.only(right: 6),
       child: ActionChip(
         onPressed: onTap,
-        label: Text(label),
-        labelStyle: TextStyle(
-          fontSize: 11,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-          color: isSelected
-              ? Colors.white
-              : (isDark ? Colors.white70 : Colors.black87),
+        label: BodySmallText(
+          text: label,
+          bold: isSelected,
+          color: isSelected ? Colors.white : null,
         ),
-        backgroundColor: isSelected
-            ? AppColors.getPrimaryColor
-            : (isDark
-                  ? Colors.white.withValues(alpha: 0.06)
-                  : Colors.black.withValues(alpha: 0.04)),
+        backgroundColor: isSelected ? AppColors.getPrimaryColor : null,
         side: BorderSide(
           color: isSelected
               ? AppColors.getPrimaryColor
-              : (isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.black.withValues(alpha: 0.08)),
+              : AppColors.getLigthGreyColor.withValues(alpha: 0.15),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -1162,15 +990,11 @@ class _DateTile extends StatelessWidget {
   final String title;
   final DateTime date;
   final VoidCallback onTap;
-  final bool isDark;
-  final Color borderColor;
 
   const _DateTile({
     required this.title,
     required this.date,
     required this.onTap,
-    required this.isDark,
-    required this.borderColor,
   });
 
   @override
@@ -1184,54 +1008,39 @@ class _DateTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: isDark
-              ? Colors.black.withValues(alpha: 0.2)
-              : const Color(0xFFF8FAFC),
+          color: AppColors.getLigthGreyColor.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: borderColor),
+          border: Border.all(
+            color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.calendar_today_rounded,
                   size: 13,
-                  color: isDark ? Colors.white54 : AppColors.getLigthGreyColor,
+                  color: AppColors.getLigthGreyColor,
                 ),
                 const SizedBox(width: 5),
                 Expanded(
-                  child: Text(
-                    title,
+                  child: BodySmallText(
+                    text: title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: isDark
-                          ? Colors.white54
-                          : AppColors.getLigthGreyColor,
-                    ),
+                    bold: true,
+                    color: AppColors.getLigthGreyColor,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 6),
-            Text(
-              displayFormat.format(date),
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : AppColors.getPrimaryTextColor,
-              ),
-            ),
-            Text(
-              weekdayFormat.format(date),
-              style: const TextStyle(
-                fontSize: 10,
-                color: AppColors.getLigthGreyColor,
-              ),
+            BodyTwoDefaultText(text: displayFormat.format(date), bold: true),
+            BodySmallText(
+              text: weekdayFormat.format(date),
+              color: AppColors.getLigthGreyColor,
             ),
           ],
         ),
@@ -1243,9 +1052,6 @@ class _DateTile extends StatelessWidget {
 class _EmiResultsSection extends StatelessWidget {
   final LoanCalculator calc;
   final bool isCompound;
-  final bool isDark;
-  final Color cardBg;
-  final Color borderColor;
   final String currencySymbol;
   final String rateText;
   final VoidCallback onCopy;
@@ -1254,9 +1060,6 @@ class _EmiResultsSection extends StatelessWidget {
   const _EmiResultsSection({
     required this.calc,
     required this.isCompound,
-    required this.isDark,
-    required this.cardBg,
-    required this.borderColor,
     required this.currencySymbol,
     required this.rateText,
     required this.onCopy,
@@ -1317,14 +1120,10 @@ class _EmiResultsSection extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "TOTAL REPAYMENT AMOUNT",
-                      style: TextStyle(
-                        fontSize: 11,
-                        letterSpacing: 1.1,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white.withValues(alpha: 0.8),
-                      ),
+                    BodySmallText(
+                      text: context.l10n.totalRepaymentAmount,
+                      bold: true,
+                      color: Colors.white.withValues(alpha: 0.8),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -1335,26 +1134,21 @@ class _EmiResultsSection extends StatelessWidget {
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Text(
-                        isCompound ? "COMPOUND" : "SIMPLE",
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                      child: BodySmallText(
+                        text: isCompound
+                            ? context.l10n.compound
+                            : context.l10n.simple,
+                        bold: true,
+                        whiteColor: true,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  _formatCurrency(totalAmount),
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.5,
-                    color: Colors.white,
-                  ),
+                TitleWidget(
+                  text: _formatCurrency(totalAmount),
+                  bold: true,
+                  whiteColor: true,
                 ),
                 const SizedBox(height: 16),
 
@@ -1394,13 +1188,11 @@ class _EmiResultsSection extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        Text(
-                          "Principal: ${_formatCurrency(principal)} (${(principalRatio * 100).toStringAsFixed(1)}%)",
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white.withValues(alpha: 0.9),
-                          ),
+                        BodySmallText(
+                          text:
+                              "Principal: ${_formatCurrency(principal)} (${(principalRatio * 100).toStringAsFixed(1)}%)",
+                          bold: true,
+                          color: Colors.white.withValues(alpha: 0.9),
                         ),
                       ],
                     ),
@@ -1415,13 +1207,11 @@ class _EmiResultsSection extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        Text(
-                          "Interest: ${_formatCurrency(totalInterest)} (${(interestRatio * 100).toStringAsFixed(1)}%)",
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white.withValues(alpha: 0.9),
-                          ),
+                        BodySmallText(
+                          text:
+                              "Interest: ${_formatCurrency(totalInterest)} (${(interestRatio * 100).toStringAsFixed(1)}%)",
+                          bold: true,
+                          color: Colors.white.withValues(alpha: 0.9),
                         ),
                       ],
                     ),
@@ -1440,24 +1230,18 @@ class _EmiResultsSection extends StatelessWidget {
             Expanded(
               child: _MetricTile(
                 icon: Icons.calendar_month_rounded,
-                title: "Tenure Duration",
+                title: context.l10n.tenureDuration,
                 value: calc.monthsAndRemainingDays,
                 subtitle: "${calc.days} Total Counted Days",
-                isDark: isDark,
-                cardBg: cardBg,
-                borderColor: borderColor,
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: _MetricTile(
                 icon: Icons.percent_rounded,
-                title: "Monthly Interest",
+                title: context.l10n.monthlyInterest,
                 value: _formatCurrency(calc.interestPerMonth),
                 subtitle: "$rateText% per month",
-                isDark: isDark,
-                cardBg: cardBg,
-                borderColor: borderColor,
               ),
             ),
           ],
@@ -1470,24 +1254,18 @@ class _EmiResultsSection extends StatelessWidget {
             Expanded(
               child: _MetricTile(
                 icon: Icons.today_rounded,
-                title: "Daily Interest",
+                title: context.l10n.dailyInterest,
                 value: _formatCurrency(calc.interestPerDay),
                 subtitle: "Calculated per day",
-                isDark: isDark,
-                cardBg: cardBg,
-                borderColor: borderColor,
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: _MetricTile(
                 icon: Icons.add_chart_rounded,
-                title: "Total Interest",
+                title: context.l10n.totalInterest,
                 value: _formatCurrency(totalInterest),
                 subtitle: isCompound ? "Compounded Total" : "Simple Total",
-                isDark: isDark,
-                cardBg: cardBg,
-                borderColor: borderColor,
                 accentColor: const Color(0xFFF59E0B),
               ),
             ),
@@ -1499,11 +1277,11 @@ class _EmiResultsSection extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.04)
-                  : Colors.black.withValues(alpha: 0.03),
+              color: AppColors.getLigthGreyColor.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: borderColor),
+              border: Border.all(
+                color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+              ),
             ),
             child: Row(
               children: [
@@ -1514,13 +1292,10 @@ class _EmiResultsSection extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(
-                    "Equivalent monthly payback over $totalMonthsCount months: ${_formatCurrency(averageMonthlyPayback)} / mo",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white70 : Colors.black87,
-                    ),
+                  child: BodySmallText(
+                    text:
+                        "Equivalent monthly payback over $totalMonthsCount months: ${_formatCurrency(averageMonthlyPayback)} / mo",
+                    bold: true,
                   ),
                 ),
               ],
@@ -1537,13 +1312,15 @@ class _EmiResultsSection extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: onCopy,
                 icon: const Icon(Icons.copy_rounded, size: 16),
-                label: const Text("Copy Summary"),
+                label: BodyTwoDefaultText(
+                  text: context.l10n.copySummary,
+                  bold: true,
+                ),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  foregroundColor: isDark
-                      ? Colors.white
-                      : AppColors.getPrimaryTextColor,
-                  side: BorderSide(color: borderColor),
+                  side: BorderSide(
+                    color: AppColors.getLigthGreyColor.withValues(alpha: 0.25),
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -1555,7 +1332,11 @@ class _EmiResultsSection extends StatelessWidget {
               child: FilledButton.icon(
                 onPressed: onShare,
                 icon: const Icon(Icons.share_rounded, size: 16),
-                label: const Text("Share"),
+                label: BodyTwoDefaultText(
+                  text: context.l10n.share,
+                  bold: true,
+                  whiteColor: true,
+                ),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   backgroundColor: AppColors.getPrimaryColor,
@@ -1579,9 +1360,6 @@ class _MetricTile extends StatelessWidget {
   final String title;
   final String value;
   final String subtitle;
-  final bool isDark;
-  final Color cardBg;
-  final Color borderColor;
   final Color? accentColor;
 
   const _MetricTile({
@@ -1589,9 +1367,6 @@ class _MetricTile extends StatelessWidget {
     required this.title,
     required this.value,
     required this.subtitle,
-    required this.isDark,
-    required this.cardBg,
-    required this.borderColor,
     this.accentColor,
   });
 
@@ -1599,141 +1374,100 @@ class _MetricTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color tintColor = accentColor ?? AppColors.getPrimaryColor;
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: tintColor.withValues(alpha: isDark ? 0.2 : 0.1),
-              borderRadius: BorderRadius.circular(8),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: tintColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, size: 16, color: tintColor),
             ),
-            child: Icon(icon, size: 16, color: tintColor),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.getLigthGreyColor,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : AppColors.getPrimaryTextColor,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            subtitle,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 10,
+            const SizedBox(height: 10),
+            BodySmallText(
+              text: title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               color: AppColors.getLigthGreyColor,
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            BodyTwoDefaultText(
+              text: value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              bold: true,
+            ),
+            const SizedBox(height: 2),
+            BodySmallText(
+              text: subtitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              color: AppColors.getLigthGreyColor,
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _EmptyCalculatorView extends StatelessWidget {
-  final bool isDark;
-  final Color cardBg;
-  final Color borderColor;
   final VoidCallback onDemo;
 
-  const _EmptyCalculatorView({
-    required this.isDark,
-    required this.cardBg,
-    required this.borderColor,
-    required this.onDemo,
-  });
+  const _EmptyCalculatorView({required this.onDemo});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: borderColor),
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.getPrimaryColor.withValues(
-                alpha: isDark ? 0.16 : 0.08,
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.getPrimaryColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
               ),
-              shape: BoxShape.circle,
+              child: const Icon(
+                Icons.trending_up_rounded,
+                size: 32,
+                color: AppColors.getPrimaryColor,
+              ),
             ),
-            child: const Icon(
-              Icons.trending_up_rounded,
-              size: 32,
-              color: AppColors.getPrimaryColor,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            "Ready to Calculate",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : AppColors.getPrimaryTextColor,
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            "Enter a principal amount and interest rate above to view instant payment breakdown and tenure schedule.",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
+            const SizedBox(height: 16),
+            const BodyTwoDefaultText(text: "Ready to Calculate", bold: true),
+            const SizedBox(height: 6),
+            const BodySmallText(
+              text:
+                  "Enter a principal amount and interest rate above to view instant payment breakdown and tenure schedule.",
+              textAlign: TextAlign.center,
               color: AppColors.getLigthGreyColor,
-              height: 1.4,
             ),
-          ),
-          const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: onDemo,
-            icon: const Icon(Icons.flash_on_rounded, size: 16),
-            label: const Text("Load Example (50,000 @ 2%)"),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.getPrimaryColor,
-              side: const BorderSide(color: AppColors.getPrimaryColor),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: onDemo,
+              icon: const Icon(Icons.flash_on_rounded, size: 16),
+              label: const BodySmallText(
+                text: "Load Example (50,000 @ 2%)",
+                bold: true,
+                color: AppColors.getPrimaryColor,
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.getPrimaryColor,
+                side: const BorderSide(color: AppColors.getPrimaryColor),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

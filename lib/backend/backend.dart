@@ -33,9 +33,13 @@ class CustomersTable extends Table {
   @override
   String get tableName => 'Customers';
 
+  @override
+  Set<Column> get primaryKey => {customerId};
+
   IntColumn get userId => integer().named('User_ID')();
 
-  IntColumn get customerId => integer().named('Customer_ID').autoIncrement()();
+  TextColumn get customerId =>
+      text().named('Customer_ID').clientDefault(() => const Uuid().v7())();
 
   TextColumn get customerName => text().named('Customer_Name')();
 
@@ -67,9 +71,13 @@ class ItemsTable extends Table {
   @override
   String get tableName => 'Items';
 
-  IntColumn get itemId => integer().named('Item_ID').autoIncrement()();
+  @override
+  Set<Column> get primaryKey => {itemId};
 
-  IntColumn get customerId => integer()
+  TextColumn get itemId =>
+      text().named('Item_ID').clientDefault(() => const Uuid().v7())();
+
+  TextColumn get customerId => text()
       .named('Customer_ID')
       .references(CustomersTable, #customerId, onDelete: KeyAction.cascade)();
 
@@ -105,14 +113,18 @@ class TransactionsTable extends Table {
   @override
   String get tableName => 'Transactions';
 
-  IntColumn get transactionId =>
-      integer().named('Transaction_ID').autoIncrement()();
+  TextColumn get transactionId => text()
+      .named('Transaction_ID')
+      .clientDefault(() => const Uuid().v7())();
 
-  IntColumn get customerId => integer()
+  @override
+  Set<Column> get primaryKey => {transactionId};
+
+  TextColumn get customerId => text()
       .named('Customer_ID')
       .references(CustomersTable, #customerId, onDelete: KeyAction.cascade)();
 
-  IntColumn get itemId => integer()
+  TextColumn get itemId => text()
       .named('Item_ID')
       .references(ItemsTable, #itemId, onDelete: KeyAction.cascade)();
 
@@ -141,6 +153,9 @@ class TransactionsTable extends Table {
   DateTimeColumn get updatedAt => dateTime().named('Updated_At').nullable()();
 
   DateTimeColumn get deletedAt => dateTime().named('Deleted_At').nullable()();
+
+  TextColumn get verificationToken =>
+      text().named('Verification_Token').nullable()();
 }
 
 @DataClassName('PaymentRow')
@@ -148,9 +163,14 @@ class PaymentsTable extends Table {
   @override
   String get tableName => 'Payments';
 
-  IntColumn get paymentId => integer().named('Payment_ID').autoIncrement()();
+  TextColumn get paymentId => text()
+      .named('Payment_ID')
+      .clientDefault(() => const Uuid().v7())();
 
-  IntColumn get transactionId => integer()
+  @override
+  Set<Column> get primaryKey => {paymentId};
+
+  TextColumn get transactionId => text()
       .named('Transaction_ID')
       .references(
         TransactionsTable,
@@ -179,11 +199,16 @@ class HistoryTable extends Table {
   @override
   String get tableName => 'History';
 
-  IntColumn get historyId => integer().named('History_ID').autoIncrement()();
+  TextColumn get historyId => text()
+      .named('History_ID')
+      .clientDefault(() => const Uuid().v7())();
+
+  @override
+  Set<Column> get primaryKey => {historyId};
 
   IntColumn get userId => integer().named('User_ID')();
 
-  IntColumn get customerId => integer()
+  TextColumn get customerId => text()
       .named('Customer_ID')
       .references(CustomersTable, #customerId, onDelete: KeyAction.cascade)();
 
@@ -191,9 +216,9 @@ class HistoryTable extends Table {
 
   TextColumn get contactNumber => text().named('Contact_Number')();
 
-  IntColumn get itemId => integer().named('Item_ID')();
+  TextColumn get itemId => text().named('Item_ID')();
 
-  IntColumn get transactionId => integer().named('Transaction_ID')();
+  TextColumn get transactionId => text().named('Transaction_ID')();
 
   RealColumn get amount => real().named('Amount')();
 
@@ -228,6 +253,9 @@ class SyncOutboxTable extends Table {
       integer().named('Retry_Count').withDefault(const Constant(0))();
 
   TextColumn get lastError => text().named('Last_Error').nullable()();
+
+  TextColumn get status =>
+      text().named('Status').withDefault(const Constant('pending'))();
 }
 
 // =============================================================================
@@ -274,7 +302,7 @@ class ItDataDatabase extends _$ItDataDatabase {
   }
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 10;
 
   Future<File> get dbFile async => legacySqfliteDbFile('itdata.db');
 
@@ -313,6 +341,27 @@ class ItDataDatabase extends _$ItDataDatabase {
 
         await _backfillSyncIds();
       }
+      if (from < 6) {
+        await _migrateToV6Uuid();
+      }
+      if (from < 7) {
+        await _migrateToV7Uuid();
+      }
+      if (from < 8) {
+        await _migrateToV8Uuid();
+      }
+      if (from < 9) {
+        try {
+          await customStatement(
+            "ALTER TABLE Sync_Outbox ADD COLUMN Status TEXT NOT NULL DEFAULT 'pending'",
+          );
+        } catch (_) {}
+      }
+      if (from < 10) {
+        try {
+          await m.addColumn(transactionsTable, transactionsTable.verificationToken);
+        } catch (_) {}
+      }
       await _ensureIndexes();
     },
     beforeOpen: (details) async {
@@ -322,6 +371,336 @@ class ItDataDatabase extends _$ItDataDatabase {
       await _ensureIndexes();
     },
   );
+
+  Future<void> _migrateToV6Uuid() async {
+    await customStatement('PRAGMA foreign_keys = OFF');
+    try {
+      await _backfillSyncIds();
+
+      await customStatement('''
+        CREATE TABLE Customers_v6 (
+          Customer_ID TEXT NOT NULL PRIMARY KEY,
+          User_ID INTEGER NOT NULL,
+          Customer_Name TEXT NOT NULL,
+          Gaurdian_Name TEXT NOT NULL,
+          Customer_Address TEXT NOT NULL,
+          Contact_Number TEXT NOT NULL UNIQUE,
+          Customer_Photo TEXT NOT NULL,
+          Proof_Photo TEXT NOT NULL,
+          Created_Date INTEGER NOT NULL,
+          Updated_Date TEXT,
+          Sync_ID TEXT NOT NULL DEFAULT '',
+          Updated_At INTEGER,
+          Deleted_At INTEGER
+        )
+      ''');
+
+      await customStatement('''
+        INSERT INTO Customers_v6 (
+          Customer_ID, User_ID, Customer_Name, Gaurdian_Name, Customer_Address,
+          Contact_Number, Customer_Photo, Proof_Photo, Created_Date, Updated_Date,
+          Sync_ID, Updated_At, Deleted_At
+        )
+        SELECT 
+          COALESCE(NULLIF(Sync_ID, ''), CAST(Customer_ID AS TEXT)),
+          User_ID, Customer_Name, Gaurdian_Name, Customer_Address,
+          Contact_Number, Customer_Photo, Proof_Photo, Created_Date, Updated_Date,
+          COALESCE(NULLIF(Sync_ID, ''), CAST(Customer_ID AS TEXT)),
+          Updated_At, Deleted_At
+        FROM Customers
+      ''');
+
+      await customStatement('''
+        CREATE TABLE Items_v6 (
+          Item_ID TEXT NOT NULL PRIMARY KEY,
+          Customer_ID TEXT NOT NULL REFERENCES Customers(Customer_ID) ON DELETE CASCADE,
+          Item_Name TEXT NOT NULL,
+          Item_Description TEXT NOT NULL,
+          Pawned_Date INTEGER NOT NULL,
+          Expiry_Date INTEGER NOT NULL,
+          Pawn_Amount REAL NOT NULL,
+          Item_Status TEXT NOT NULL,
+          Item_Photo TEXT NOT NULL,
+          Created_Date INTEGER NOT NULL,
+          Updated_Date TEXT,
+          Sync_ID TEXT NOT NULL DEFAULT '',
+          Updated_At INTEGER,
+          Deleted_At INTEGER
+        )
+      ''');
+
+      await customStatement('''
+        INSERT INTO Items_v6 (
+          Item_ID, Customer_ID, Item_Name, Item_Description, Pawned_Date,
+          Expiry_Date, Pawn_Amount, Item_Status, Item_Photo, Created_Date,
+          Updated_Date, Sync_ID, Updated_At, Deleted_At
+        )
+        SELECT 
+          COALESCE(NULLIF(i.Sync_ID, ''), CAST(i.Item_ID AS TEXT)),
+          COALESCE(NULLIF(c.Sync_ID, ''), CAST(c.Customer_ID AS TEXT)),
+          i.Item_Name, i.Item_Description, i.Pawned_Date,
+          i.Expiry_Date, i.Pawn_Amount, i.Item_Status, i.Item_Photo, i.Created_Date,
+          i.Updated_Date,
+          COALESCE(NULLIF(i.Sync_ID, ''), CAST(i.Item_ID AS TEXT)),
+          i.Updated_At, i.Deleted_At
+        FROM Items i
+        JOIN Customers c ON i.Customer_ID = c.Customer_ID
+      ''');
+
+      await customStatement('''
+        CREATE TABLE Transactions_v6 (
+          Transaction_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          Customer_ID TEXT NOT NULL REFERENCES Customers(Customer_ID) ON DELETE CASCADE,
+          Item_ID TEXT NOT NULL REFERENCES Items(Item_ID) ON DELETE CASCADE,
+          Transaction_Date INTEGER NOT NULL,
+          Transaction_Type TEXT NOT NULL,
+          Amount REAL NOT NULL,
+          Interest_Rate REAL NOT NULL,
+          Interest_Amount REAL NOT NULL,
+          Remaining_Amount REAL NOT NULL,
+          Signature TEXT NOT NULL,
+          Created_Date INTEGER NOT NULL,
+          Updated_Date TEXT,
+          Sync_ID TEXT NOT NULL DEFAULT '',
+          Updated_At INTEGER,
+          Deleted_At INTEGER
+        )
+      ''');
+
+      await customStatement('''
+        INSERT INTO Transactions_v6 (
+          Transaction_ID, Customer_ID, Item_ID, Transaction_Date, Transaction_Type,
+          Amount, Interest_Rate, Interest_Amount, Remaining_Amount, Signature,
+          Created_Date, Updated_Date, Sync_ID, Updated_At, Deleted_At
+        )
+        SELECT 
+          t.Transaction_ID,
+          COALESCE(NULLIF(c.Sync_ID, ''), CAST(c.Customer_ID AS TEXT)),
+          COALESCE(NULLIF(i.Sync_ID, ''), CAST(i.Item_ID AS TEXT)),
+          t.Transaction_Date, t.Transaction_Type,
+          t.Amount, t.Interest_Rate, t.Interest_Amount, t.Remaining_Amount, t.Signature,
+          t.Created_Date, t.Updated_Date, t.Sync_ID, t.Updated_At, t.Deleted_At
+        FROM Transactions t
+        JOIN Customers c ON t.Customer_ID = c.Customer_ID
+        JOIN Items i ON t.Item_ID = i.Item_ID
+      ''');
+
+      await customStatement('''
+        CREATE TABLE History_v6 (
+          History_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+          User_ID INTEGER NOT NULL,
+          Customer_ID TEXT NOT NULL REFERENCES Customers(Customer_ID) ON DELETE CASCADE,
+          Customer_Name TEXT NOT NULL,
+          Contact_Number TEXT NOT NULL,
+          Item_ID TEXT NOT NULL,
+          Transaction_ID INTEGER NOT NULL,
+          Amount REAL NOT NULL,
+          Event_Date INTEGER NOT NULL,
+          Event_Type TEXT NOT NULL,
+          Sync_ID TEXT NOT NULL DEFAULT '',
+          Updated_At INTEGER,
+          Deleted_At INTEGER
+        )
+      ''');
+
+      await customStatement('''
+        INSERT INTO History_v6 (
+          History_ID, User_ID, Customer_ID, Customer_Name, Contact_Number,
+          Item_ID, Transaction_ID, Amount, Event_Date, Event_Type,
+          Sync_ID, Updated_At, Deleted_At
+        )
+        SELECT 
+          h.History_ID, h.User_ID,
+          COALESCE(NULLIF(c.Sync_ID, ''), CAST(h.Customer_ID AS TEXT)),
+          h.Customer_Name, h.Contact_Number,
+          COALESCE(NULLIF(i.Sync_ID, ''), CAST(h.Item_ID AS TEXT)),
+          h.Transaction_ID, h.Amount, h.Event_Date, h.Event_Type,
+          h.Sync_ID, h.Updated_At, h.Deleted_At
+        FROM History h
+        LEFT JOIN Customers c ON h.Customer_ID = c.Customer_ID
+        LEFT JOIN Items i ON h.Item_ID = i.Item_ID
+      ''');
+
+      await customStatement('DROP TABLE History');
+      await customStatement('ALTER TABLE History_v6 RENAME TO History');
+
+      await customStatement('DROP TABLE Transactions');
+      await customStatement('ALTER TABLE Transactions_v6 RENAME TO Transactions');
+
+      await customStatement('DROP TABLE Items');
+      await customStatement('ALTER TABLE Items_v6 RENAME TO Items');
+
+      await customStatement('DROP TABLE Customers');
+      await customStatement('ALTER TABLE Customers_v6 RENAME TO Customers');
+    } finally {
+      await customStatement('PRAGMA foreign_keys = ON');
+    }
+  }
+
+  Future<void> _migrateToV7Uuid() async {
+    await customStatement('PRAGMA foreign_keys = OFF');
+    try {
+      await _backfillSyncIds();
+
+      await customStatement('''
+        CREATE TABLE Transactions_v7 (
+          Transaction_ID TEXT NOT NULL PRIMARY KEY,
+          Customer_ID TEXT NOT NULL REFERENCES Customers (Customer_ID) ON DELETE CASCADE,
+          Item_ID TEXT NOT NULL REFERENCES Items (Item_ID) ON DELETE CASCADE,
+          Transaction_Date INTEGER NOT NULL,
+          Transaction_Type TEXT NOT NULL,
+          Amount REAL NOT NULL,
+          Interest_Rate REAL NOT NULL,
+          Interest_Amount REAL NOT NULL,
+          Remaining_Amount REAL NOT NULL,
+          Signature TEXT NOT NULL,
+          Created_Date INTEGER NOT NULL,
+          Updated_Date TEXT,
+          Sync_ID TEXT NOT NULL DEFAULT '',
+          Updated_At INTEGER,
+          Deleted_At INTEGER
+        )
+      ''');
+
+      await customStatement('''
+        INSERT INTO Transactions_v7 (
+          Transaction_ID, Customer_ID, Item_ID, Transaction_Date, Transaction_Type,
+          Amount, Interest_Rate, Interest_Amount, Remaining_Amount, Signature,
+          Created_Date, Updated_Date, Sync_ID, Updated_At, Deleted_At
+        )
+        SELECT 
+          COALESCE(NULLIF(Sync_ID, ''), CAST(Transaction_ID AS TEXT)),
+          Customer_ID, Item_ID, Transaction_Date, Transaction_Type,
+          Amount, Interest_Rate, Interest_Amount, Remaining_Amount, Signature,
+          Created_Date, Updated_Date,
+          COALESCE(NULLIF(Sync_ID, ''), CAST(Transaction_ID AS TEXT)),
+          Updated_At, Deleted_At
+        FROM Transactions;
+      ''');
+
+      await customStatement('''
+        CREATE TABLE Payments_v7 (
+          Payment_ID TEXT NOT NULL PRIMARY KEY,
+          Transaction_ID TEXT NOT NULL REFERENCES Transactions (Transaction_ID) ON DELETE CASCADE,
+          Payment_Date INTEGER NOT NULL,
+          Amount_Paid REAL NOT NULL,
+          Payment_Type TEXT NOT NULL,
+          Created_Date INTEGER NOT NULL,
+          Sync_ID TEXT NOT NULL DEFAULT '',
+          Updated_At INTEGER,
+          Deleted_At INTEGER
+        )
+      ''');
+
+      await customStatement('''
+        INSERT INTO Payments_v7 (
+          Payment_ID, Transaction_ID, Payment_Date, Amount_Paid, Payment_Type,
+          Created_Date, Sync_ID, Updated_At, Deleted_At
+        )
+        SELECT 
+          COALESCE(NULLIF(p.Sync_ID, ''), CAST(p.Payment_ID AS TEXT)),
+          COALESCE(NULLIF(t.Sync_ID, ''), CAST(p.Transaction_ID AS TEXT)),
+          p.Payment_Date, p.Amount_Paid, p.Payment_Type,
+          p.Created_Date,
+          COALESCE(NULLIF(p.Sync_ID, ''), CAST(p.Payment_ID AS TEXT)),
+          p.Updated_At, p.Deleted_At
+        FROM Payments p
+        LEFT JOIN Transactions t ON p.Transaction_ID = t.Transaction_ID;
+      ''');
+
+      await customStatement('''
+        CREATE TABLE History_v7 (
+          History_ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+          User_ID INTEGER NOT NULL,
+          Customer_ID TEXT NOT NULL REFERENCES Customers (Customer_ID) ON DELETE CASCADE,
+          Customer_Name TEXT NOT NULL,
+          Contact_Number TEXT NOT NULL,
+          Item_ID TEXT NOT NULL,
+          Transaction_ID TEXT NOT NULL,
+          Amount REAL NOT NULL,
+          Event_Date INTEGER NOT NULL,
+          Event_Type TEXT NOT NULL,
+          Sync_ID TEXT NOT NULL DEFAULT '',
+          Updated_At INTEGER,
+          Deleted_At INTEGER
+        )
+      ''');
+
+      await customStatement('''
+        INSERT INTO History_v7 (
+          History_ID, User_ID, Customer_ID, Customer_Name, Contact_Number,
+          Item_ID, Transaction_ID, Amount, Event_Date, Event_Type,
+          Sync_ID, Updated_At, Deleted_At
+        )
+        SELECT 
+          h.History_ID, h.User_ID, h.Customer_ID, h.Customer_Name, h.Contact_Number,
+          h.Item_ID,
+          COALESCE(NULLIF(t.Sync_ID, ''), CASE WHEN h.Transaction_ID = 0 OR h.Transaction_ID = '0' THEN '' ELSE CAST(h.Transaction_ID AS TEXT) END),
+          h.Amount, h.Event_Date, h.Event_Type,
+          h.Sync_ID, h.Updated_At, h.Deleted_At
+        FROM History h
+        LEFT JOIN Transactions t ON h.Transaction_ID = t.Transaction_ID;
+      ''');
+
+      await customStatement('DROP TABLE Payments');
+      await customStatement('ALTER TABLE Payments_v7 RENAME TO Payments');
+
+      await customStatement('DROP TABLE Transactions');
+      await customStatement('ALTER TABLE Transactions_v7 RENAME TO Transactions');
+
+      await customStatement('DROP TABLE History');
+      await customStatement('ALTER TABLE History_v7 RENAME TO History');
+    } finally {
+      await customStatement('PRAGMA foreign_keys = ON');
+    }
+  }
+
+  Future<void> _migrateToV8Uuid() async {
+    await customStatement('PRAGMA foreign_keys = OFF');
+    try {
+      await _backfillSyncIds();
+
+      await customStatement('''
+        CREATE TABLE History_v8 (
+          History_ID TEXT NOT NULL PRIMARY KEY,
+          User_ID INTEGER NOT NULL,
+          Customer_ID TEXT NOT NULL REFERENCES Customers (Customer_ID) ON DELETE CASCADE,
+          Customer_Name TEXT NOT NULL,
+          Contact_Number TEXT NOT NULL,
+          Item_ID TEXT NOT NULL,
+          Transaction_ID TEXT NOT NULL,
+          Amount REAL NOT NULL,
+          Event_Date INTEGER NOT NULL,
+          Event_Type TEXT NOT NULL,
+          Sync_ID TEXT NOT NULL DEFAULT '',
+          Updated_At INTEGER,
+          Deleted_At INTEGER
+        )
+      ''');
+
+      await customStatement('''
+        INSERT INTO History_v8 (
+          History_ID, User_ID, Customer_ID, Customer_Name, Contact_Number,
+          Item_ID, Transaction_ID, Amount, Event_Date, Event_Type,
+          Sync_ID, Updated_At, Deleted_At
+        )
+        SELECT 
+          COALESCE(NULLIF(Sync_ID, ''), CAST(History_ID AS TEXT)),
+          User_ID, Customer_ID, Customer_Name, Contact_Number,
+          CASE WHEN Item_ID = '0' THEN '' ELSE Item_ID END,
+          CASE WHEN Transaction_ID = '0' THEN '' ELSE Transaction_ID END,
+          Amount, Event_Date, Event_Type,
+          COALESCE(NULLIF(Sync_ID, ''), CAST(History_ID AS TEXT)),
+          Updated_At, Deleted_At
+        FROM History;
+      ''');
+
+      await customStatement('DROP TABLE History');
+      await customStatement('ALTER TABLE History_v8 RENAME TO History');
+    } finally {
+      await customStatement('PRAGMA foreign_keys = ON');
+    }
+  }
 
   Future<void> _ensureIndexes() async {
     await customStatement(
@@ -367,7 +746,19 @@ class ItDataDatabase extends _$ItDataDatabase {
       'CREATE INDEX IF NOT EXISTS idx_payments_sync_id ON Payments(Sync_ID)',
     );
     await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_history_sync_id ON History(Sync_ID)',
+    );
+    await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_outbox_created ON Sync_Outbox(Created_At)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_outbox_status_created ON Sync_Outbox(Status, Created_At)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_payments_date ON Payments(Payment_Date)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_transactions_created_date ON Transactions(Created_Date)',
     );
   }
 
@@ -376,78 +767,148 @@ class ItDataDatabase extends _$ItDataDatabase {
     final now = DateTime.now();
 
     final custs = await customSelect(
-      "SELECT Customer_ID FROM Customers WHERE Sync_ID IS NULL OR Sync_ID = ''",
+      "SELECT Customer_ID, typeof(Customer_ID) as id_type FROM Customers WHERE Sync_ID IS NULL OR Sync_ID = ''",
     ).get();
     for (final row in custs) {
-      final id = row.read<int>('Customer_ID');
-      await customUpdate(
-        'UPDATE Customers SET Sync_ID = ?, Updated_At = ? WHERE Customer_ID = ?',
-        variables: [
-          Variable<String>(uuid.v4()),
-          Variable<DateTime>(now),
-          Variable<int>(id),
-        ],
-      );
+      final isText = row.read<String>('id_type') == 'text';
+      if (isText) {
+        final id = row.read<String>('Customer_ID');
+        final syncVal = (id.length >= 30) ? id : uuid.v7();
+        await customUpdate(
+          'UPDATE Customers SET Sync_ID = ?, Updated_At = ? WHERE Customer_ID = ?',
+          variables: [
+            Variable<String>(syncVal),
+            Variable<DateTime>(now),
+            Variable<String>(id),
+          ],
+        );
+      } else {
+        final id = row.read<int>('Customer_ID');
+        await customUpdate(
+          'UPDATE Customers SET Sync_ID = ?, Updated_At = ? WHERE Customer_ID = ?',
+          variables: [
+            Variable<String>(uuid.v7()),
+            Variable<DateTime>(now),
+            Variable<int>(id),
+          ],
+        );
+      }
     }
 
     final items = await customSelect(
-      "SELECT Item_ID FROM Items WHERE Sync_ID IS NULL OR Sync_ID = ''",
+      "SELECT Item_ID, typeof(Item_ID) as id_type FROM Items WHERE Sync_ID IS NULL OR Sync_ID = ''",
     ).get();
     for (final row in items) {
-      final id = row.read<int>('Item_ID');
-      await customUpdate(
-        'UPDATE Items SET Sync_ID = ?, Updated_At = ? WHERE Item_ID = ?',
-        variables: [
-          Variable<String>(uuid.v4()),
-          Variable<DateTime>(now),
-          Variable<int>(id),
-        ],
-      );
+      final isText = row.read<String>('id_type') == 'text';
+      if (isText) {
+        final id = row.read<String>('Item_ID');
+        final syncVal = (id.length >= 30) ? id : uuid.v7();
+        await customUpdate(
+          'UPDATE Items SET Sync_ID = ?, Updated_At = ? WHERE Item_ID = ?',
+          variables: [
+            Variable<String>(syncVal),
+            Variable<DateTime>(now),
+            Variable<String>(id),
+          ],
+        );
+      } else {
+        final id = row.read<int>('Item_ID');
+        await customUpdate(
+          'UPDATE Items SET Sync_ID = ?, Updated_At = ? WHERE Item_ID = ?',
+          variables: [
+            Variable<String>(uuid.v7()),
+            Variable<DateTime>(now),
+            Variable<int>(id),
+          ],
+        );
+      }
     }
 
     final txns = await customSelect(
-      "SELECT Transaction_ID FROM Transactions WHERE Sync_ID IS NULL OR Sync_ID = ''",
+      "SELECT Transaction_ID, typeof(Transaction_ID) as id_type FROM Transactions WHERE Sync_ID IS NULL OR Sync_ID = ''",
     ).get();
     for (final row in txns) {
-      final id = row.read<int>('Transaction_ID');
-      await customUpdate(
-        'UPDATE Transactions SET Sync_ID = ?, Updated_At = ? WHERE Transaction_ID = ?',
-        variables: [
-          Variable<String>(uuid.v4()),
-          Variable<DateTime>(now),
-          Variable<int>(id),
-        ],
-      );
+      final isText = row.read<String>('id_type') == 'text';
+      if (isText) {
+        final id = row.read<String>('Transaction_ID');
+        final syncVal = (id.length >= 30) ? id : uuid.v7();
+        await customUpdate(
+          'UPDATE Transactions SET Sync_ID = ?, Updated_At = ? WHERE Transaction_ID = ?',
+          variables: [
+            Variable<String>(syncVal),
+            Variable<DateTime>(now),
+            Variable<String>(id),
+          ],
+        );
+      } else {
+        final id = row.read<int>('Transaction_ID');
+        await customUpdate(
+          'UPDATE Transactions SET Sync_ID = ?, Updated_At = ? WHERE Transaction_ID = ?',
+          variables: [
+            Variable<String>(uuid.v7()),
+            Variable<DateTime>(now),
+            Variable<int>(id),
+          ],
+        );
+      }
     }
 
     final pays = await customSelect(
-      "SELECT Payment_ID FROM Payments WHERE Sync_ID IS NULL OR Sync_ID = ''",
+      "SELECT Payment_ID, typeof(Payment_ID) as id_type FROM Payments WHERE Sync_ID IS NULL OR Sync_ID = ''",
     ).get();
     for (final row in pays) {
-      final id = row.read<int>('Payment_ID');
-      await customUpdate(
-        'UPDATE Payments SET Sync_ID = ?, Updated_At = ? WHERE Payment_ID = ?',
-        variables: [
-          Variable<String>(uuid.v4()),
-          Variable<DateTime>(now),
-          Variable<int>(id),
-        ],
-      );
+      final isText = row.read<String>('id_type') == 'text';
+      if (isText) {
+        final id = row.read<String>('Payment_ID');
+        final syncVal = (id.length >= 30) ? id : uuid.v7();
+        await customUpdate(
+          'UPDATE Payments SET Sync_ID = ?, Updated_At = ? WHERE Payment_ID = ?',
+          variables: [
+            Variable<String>(syncVal),
+            Variable<DateTime>(now),
+            Variable<String>(id),
+          ],
+        );
+      } else {
+        final id = row.read<int>('Payment_ID');
+        await customUpdate(
+          'UPDATE Payments SET Sync_ID = ?, Updated_At = ? WHERE Payment_ID = ?',
+          variables: [
+            Variable<String>(uuid.v7()),
+            Variable<DateTime>(now),
+            Variable<int>(id),
+          ],
+        );
+      }
     }
 
     final hists = await customSelect(
-      "SELECT History_ID FROM History WHERE Sync_ID IS NULL OR Sync_ID = ''",
+      "SELECT History_ID, typeof(History_ID) as id_type FROM History WHERE Sync_ID IS NULL OR Sync_ID = ''",
     ).get();
     for (final row in hists) {
-      final id = row.read<int>('History_ID');
-      await customUpdate(
-        'UPDATE History SET Sync_ID = ?, Updated_At = ? WHERE History_ID = ?',
-        variables: [
-          Variable<String>(uuid.v4()),
-          Variable<DateTime>(now),
-          Variable<int>(id),
-        ],
-      );
+      final isText = row.read<String>('id_type') == 'text';
+      if (isText) {
+        final id = row.read<String>('History_ID');
+        final syncVal = (id.length >= 30) ? id : uuid.v7();
+        await customUpdate(
+          'UPDATE History SET Sync_ID = ?, Updated_At = ? WHERE History_ID = ?',
+          variables: [
+            Variable<String>(syncVal),
+            Variable<DateTime>(now),
+            Variable<String>(id),
+          ],
+        );
+      } else {
+        final id = row.read<int>('History_ID');
+        await customUpdate(
+          'UPDATE History SET Sync_ID = ?, Updated_At = ? WHERE History_ID = ?',
+          variables: [
+            Variable<String>(uuid.v7()),
+            Variable<DateTime>(now),
+            Variable<int>(id),
+          ],
+        );
+      }
     }
   }
 
@@ -693,7 +1154,7 @@ class BackEnd {
   // CUSTOMERS
   // ===========================================================================
 
-  static Future<int> createNewCustomer(Customer customer) async {
+  static Future<String> createNewCustomer(Customer customer) async {
     if (customer.name.trim().isEmpty) {
       throw ArgumentError('Customer name cannot be empty');
     }
@@ -703,11 +1164,14 @@ class BackEnd {
 
     try {
       final d = await db();
-      final syncId = const Uuid().v4();
-      final id = await d
+      final id = (customer.id != null && customer.id!.isNotEmpty)
+          ? customer.id!
+          : const Uuid().v7();
+      await d
           .into(d.customersTable)
           .insert(
             CustomersTableCompanion.insert(
+              customerId: Value(id),
               userId: customer.userID,
               customerName: customer.name.trim(),
               gaurdianName: customer.guardianName.trim(),
@@ -716,7 +1180,7 @@ class BackEnd {
               customerPhoto: customer.photo,
               proofPhoto: customer.proof,
               createdDate: customer.createdDate,
-              syncId: Value(syncId),
+              syncId: Value(id),
               updatedAt: Value(DateTime.now()),
             ),
           );
@@ -724,7 +1188,7 @@ class BackEnd {
       await SyncOutboxService.recordOperation(
         db: d,
         entityType: SyncOutboxService.entityCustomer,
-        entitySyncId: syncId,
+        entitySyncId: id,
         operation: SyncOutboxService.opCreate,
       );
 
@@ -757,8 +1221,22 @@ class BackEnd {
     return rows.map((r) => r.read(d.customersTable.contactNumber)!).toList();
   }
 
+  static Future<bool> isCustomerNumberPresent({
+    required String contactNumber,
+  }) async {
+    final trimmed = contactNumber.trim();
+    if (trimmed.isEmpty) return false;
+    final d = await db();
+    final row = await (d.selectOnly(d.customersTable)
+          ..addColumns([d.customersTable.contactNumber])
+          ..where(d.customersTable.contactNumber.equals(trimmed))
+          ..limit(1))
+        .getSingleOrNull();
+    return row != null;
+  }
+
   static Future<List<Customer>> fetchSingleContactDetails({
-    required int id,
+    required String id,
   }) async {
     final d = await db();
     final row =
@@ -784,7 +1262,7 @@ class BackEnd {
     ];
   }
 
-  static Future<void> deleteTheCustomer({required int customerID}) async {
+  static Future<void> deleteTheCustomer({required String customerID}) async {
     final d = await db();
     await d.transaction(() async {
       final customer = await (d.select(d.customersTable)
@@ -807,7 +1285,7 @@ class BackEnd {
   }
 
   static Future<int> updateCustomerDetails({
-    required int customerId,
+    required String customerId,
     required String newCustomerName,
     required String newGuardianName,
     required String newCustomerAddress,
@@ -872,7 +1350,7 @@ class BackEnd {
   // ITEMS
   // ===========================================================================
 
-  static Future<int> createNewItem(Items item) async {
+  static Future<String> createNewItem(Items item) async {
     if (item.name.trim().isEmpty) {
       throw ArgumentError('Item name cannot be empty');
     }
@@ -881,11 +1359,14 @@ class BackEnd {
     }
 
     final d = await db();
-    final syncId = const Uuid().v4();
-    final id = await d
+    final id = (item.id != null && item.id!.isNotEmpty)
+        ? item.id!
+        : const Uuid().v7();
+    await d
         .into(d.itemsTable)
         .insert(
           ItemsTableCompanion.insert(
+            itemId: Value(id),
             customerId: item.customerid,
             itemName: item.name.trim(),
             itemDescription: item.description.trim(),
@@ -895,7 +1376,7 @@ class BackEnd {
             itemStatus: item.status,
             itemPhoto: item.photo,
             createdDate: item.createdDate,
-            syncId: Value(syncId),
+            syncId: Value(id),
             updatedAt: Value(DateTime.now()),
           ),
         );
@@ -903,14 +1384,14 @@ class BackEnd {
     await SyncOutboxService.recordOperation(
       db: d,
       entityType: SyncOutboxService.entityItem,
-      entitySyncId: syncId,
+      entitySyncId: id,
       operation: SyncOutboxService.opCreate,
     );
 
     return id;
   }
 
-  static Future<List<Items>> fetchRequriedItem({required int itemId}) async {
+  static Future<List<Items>> fetchRequriedItem({required String itemId}) async {
     final d = await db();
     final row =
         await (d.select(d.itemsTable)
@@ -939,7 +1420,7 @@ class BackEnd {
   // TRANSACTIONS
   // ===========================================================================
 
-  static Future<int> createNewTransaction(Trx transaction) async {
+  static Future<String> createNewTransaction(Trx transaction) async {
     if (transaction.amount <= 0) {
       throw ArgumentError('Transaction amount must be greater than 0');
     }
@@ -948,11 +1429,14 @@ class BackEnd {
     }
 
     final d = await db();
-    final syncId = const Uuid().v4();
-    final id = await d
+    final id = (transaction.id != null && transaction.id!.isNotEmpty)
+        ? transaction.id!
+        : const Uuid().v7();
+    await d
         .into(d.transactionsTable)
         .insert(
           TransactionsTableCompanion.insert(
+            transactionId: Value(id),
             customerId: transaction.customerId,
             itemId: transaction.itemId,
             transactionDate: transaction.transacrtionDate,
@@ -963,25 +1447,27 @@ class BackEnd {
             remainingAmount: transaction.remainingAmount,
             signature: transaction.signature,
             createdDate: transaction.createdDate,
-            syncId: Value(syncId),
+            syncId: Value(id),
             updatedAt: Value(DateTime.now()),
+            verificationToken: Value(transaction.verificationToken),
           ),
         );
 
     await SyncOutboxService.recordOperation(
       db: d,
       entityType: SyncOutboxService.entityTransaction,
-      entitySyncId: syncId,
+      entitySyncId: id,
       operation: SyncOutboxService.opCreate,
     );
 
     return id;
   }
 
-  static Future<int> createNewTransactionAtomic({
+  static Future<String> createNewTransactionAtomic({
     required Items item,
-    required Trx Function(int itemId) transactionBuilder,
-    required UserHistory Function(int itemId, int transactionId) historyBuilder,
+    required Trx Function(String itemId) transactionBuilder,
+    required UserHistory Function(String itemId, String transactionId)
+        historyBuilder,
   }) async {
     if (item.name.trim().isEmpty) {
       throw ArgumentError('Item name cannot be empty');
@@ -992,11 +1478,14 @@ class BackEnd {
 
     final d = await db();
     return await d.transaction(() async {
-      final itemSyncId = const Uuid().v4();
-      final itemId = await d
+      final itemId = (item.id != null && item.id!.isNotEmpty)
+          ? item.id!
+          : const Uuid().v7();
+      await d
           .into(d.itemsTable)
           .insert(
             ItemsTableCompanion.insert(
+              itemId: Value(itemId),
               customerId: item.customerid,
               itemName: item.name.trim(),
               itemDescription: item.description.trim(),
@@ -1006,7 +1495,7 @@ class BackEnd {
               itemStatus: item.status,
               itemPhoto: item.photo,
               createdDate: item.createdDate,
-              syncId: Value(itemSyncId),
+              syncId: Value(itemId),
               updatedAt: Value(DateTime.now()),
             ),
           );
@@ -1019,11 +1508,15 @@ class BackEnd {
         throw ArgumentError('Interest rate cannot be negative');
       }
 
-      final txnSyncId = const Uuid().v4();
-      final transactionId = await d
+      final transactionId =
+          (transaction.id != null && transaction.id!.isNotEmpty)
+              ? transaction.id!
+              : const Uuid().v7();
+      await d
           .into(d.transactionsTable)
           .insert(
             TransactionsTableCompanion.insert(
+              transactionId: Value(transactionId),
               customerId: transaction.customerId,
               itemId: itemId,
               transactionDate: transaction.transacrtionDate,
@@ -1034,17 +1527,19 @@ class BackEnd {
               remainingAmount: transaction.remainingAmount,
               signature: transaction.signature,
               createdDate: transaction.createdDate,
-              syncId: Value(txnSyncId),
+              syncId: Value(transactionId),
               updatedAt: Value(DateTime.now()),
+              verificationToken: Value(transaction.verificationToken),
             ),
           );
 
       final history = historyBuilder(itemId, transactionId);
-      final historySyncId = const Uuid().v4();
+      final historySyncId = const Uuid().v7();
       await d
           .into(d.historyTable)
           .insert(
             HistoryTableCompanion.insert(
+              historyId: Value(historySyncId),
               userId: history.userID,
               customerId: history.customerID,
               customerName: history.customerName,
@@ -1062,13 +1557,13 @@ class BackEnd {
       await SyncOutboxService.recordOperation(
         db: d,
         entityType: SyncOutboxService.entityItem,
-        entitySyncId: itemSyncId,
+        entitySyncId: itemId,
         operation: SyncOutboxService.opCreate,
       );
       await SyncOutboxService.recordOperation(
         db: d,
         entityType: SyncOutboxService.entityTransaction,
-        entitySyncId: txnSyncId,
+        entitySyncId: transactionId,
         operation: SyncOutboxService.opCreate,
       );
       await SyncOutboxService.recordOperation(
@@ -1092,7 +1587,7 @@ class BackEnd {
   }
 
   static Future<List<Trx>> fetchRequriedTransaction({
-    required int transacrtionId,
+    required String transacrtionId,
   }) async {
     final d = await db();
     final row =
@@ -1106,7 +1601,7 @@ class BackEnd {
   }
 
   static Future<int> updateTransactionAsPaid({
-    required int id,
+    required String id,
     required double intrestAmount,
   }) async {
     final d = await db();
@@ -1139,7 +1634,7 @@ class BackEnd {
 
   static Future<void> markTransactionAsPaidAtomic({
     required Payment payment,
-    required int transactionId,
+    required String transactionId,
     required double interestAmount,
     required UserHistory history,
   }) async {
@@ -1150,18 +1645,21 @@ class BackEnd {
     final d = await db();
     await d.transaction(() async {
       final now = DateTime.now();
-      final paymentSyncId = const Uuid().v4();
+      final paymentId = (payment.id != null && payment.id!.isNotEmpty)
+          ? payment.id!
+          : const Uuid().v7();
 
       await d
           .into(d.paymentsTable)
           .insert(
             PaymentsTableCompanion.insert(
-              transactionId: payment.transactionId,
+              paymentId: Value(paymentId),
+              transactionId: transactionId,
               paymentDate: payment.paymentDate,
               amountPaid: payment.amountpaid,
               paymentType: payment.type,
               createdDate: payment.createdDate,
-              syncId: Value(paymentSyncId),
+              syncId: Value(paymentId),
               updatedAt: Value(now),
             ),
           );
@@ -1177,11 +1675,12 @@ class BackEnd {
         ),
       );
 
-      final historySyncId = const Uuid().v4();
+      final historySyncId = const Uuid().v7();
       await d
           .into(d.historyTable)
           .insert(
             HistoryTableCompanion.insert(
+              historyId: Value(historySyncId),
               userId: history.userID,
               customerId: history.customerID,
               customerName: history.customerName,
@@ -1199,7 +1698,7 @@ class BackEnd {
       await SyncOutboxService.recordOperation(
         db: d,
         entityType: SyncOutboxService.entityPayment,
-        entitySyncId: paymentSyncId,
+        entitySyncId: paymentId,
         operation: SyncOutboxService.opCreate,
       );
 
@@ -1226,13 +1725,13 @@ class BackEnd {
   }
 
   static Future<Map<String, int>> deleteTransaction({
-    required int transactionId,
+    required String transactionId,
   }) async {
-    if (transactionId <= 0) {
+    if (transactionId.isEmpty) {
       throw ArgumentError.value(
         transactionId,
         'transactionId',
-        'transactionId must be a positive integer',
+        'transactionId must not be empty',
       );
     }
 
@@ -1345,7 +1844,7 @@ class BackEnd {
   // ===========================================================================
 
   static Future<List<Payment>> fetchRequriedPaymentsOfTransaction({
-    required int transactionId,
+    required String transactionId,
   }) async {
     final d = await db();
     final rows =
@@ -1368,25 +1867,48 @@ class BackEnd {
         .toList();
   }
 
-  static Future<int> addPayment({required Payment payment}) async {
+  static Future<List<Payment>> fetchAllPayments() async {
+    final d = await db();
+    final rows = await (d.select(d.paymentsTable)
+          ..orderBy([(t) => OrderingTerm.desc(t.paymentDate)]))
+        .get();
+
+    return rows
+        .map(
+          (r) => Payment(
+            id: r.paymentId,
+            transactionId: r.transactionId,
+            paymentDate: r.paymentDate,
+            amountpaid: r.amountPaid,
+            type: r.paymentType,
+            createdDate: r.createdDate,
+          ),
+        )
+        .toList();
+  }
+
+  static Future<String> addPayment({required Payment payment}) async {
     if (payment.amountpaid <= 0) {
       throw ArgumentError('Payment amount must be greater than 0');
     }
 
     final d = await db();
-    final paymentSyncId = const Uuid().v4();
+    final paymentId = (payment.id != null && payment.id!.isNotEmpty)
+        ? payment.id!
+        : const Uuid().v7();
     final now = DateTime.now();
 
-    final id = await d
+    await d
         .into(d.paymentsTable)
         .insert(
           PaymentsTableCompanion.insert(
+            paymentId: Value(paymentId),
             transactionId: payment.transactionId,
             paymentDate: payment.paymentDate,
             amountPaid: payment.amountpaid,
             paymentType: payment.type,
             createdDate: payment.createdDate,
-            syncId: Value(paymentSyncId),
+            syncId: Value(paymentId),
             updatedAt: Value(now),
           ),
         );
@@ -1394,26 +1916,27 @@ class BackEnd {
     await SyncOutboxService.recordOperation(
       db: d,
       entityType: SyncOutboxService.entityPayment,
-      entitySyncId: paymentSyncId,
+      entitySyncId: paymentId,
       operation: SyncOutboxService.opCreate,
     );
 
-    return id;
+    return paymentId;
   }
 
   // ===========================================================================
   // HISTORY
   // ===========================================================================
 
-  static Future<int> createNewHistory(UserHistory history) async {
+  static Future<String> createNewHistory(UserHistory history) async {
     final d = await db();
-    final historySyncId = const Uuid().v4();
+    final historySyncId = const Uuid().v7();
     final now = DateTime.now();
 
-    final id = await d
+    await d
         .into(d.historyTable)
         .insert(
           HistoryTableCompanion.insert(
+            historyId: Value(history.id ?? historySyncId),
             userId: history.userID,
             customerId: history.customerID,
             customerName: history.customerName,
@@ -1435,7 +1958,7 @@ class BackEnd {
       operation: SyncOutboxService.opCreate,
     );
 
-    return id;
+    return history.id ?? historySyncId;
   }
 
   // ===========================================================================
@@ -1459,7 +1982,7 @@ class BackEnd {
         final raw = rows
             .map(
               (r) => (
-                r.read(d.customersTable.customerId) ?? 0,
+                r.read(d.customersTable.customerId) ?? '',
                 r.read(d.customersTable.customerName) ?? '',
                 r.read(d.customersTable.contactNumber) ?? '',
               ),
@@ -1475,7 +1998,7 @@ class BackEnd {
     });
   }
 
-  static Stream<Customer?> watchSingleCustomer({required int id}) {
+  static Stream<Customer?> watchSingleCustomer({required String id}) {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final q =
           (d.select(d.customersTable)
@@ -1500,7 +2023,7 @@ class BackEnd {
   }
 
   // ITEMS streams
-  static Stream<Items?> watchRequriedItem({required int itemId}) {
+  static Stream<Items?> watchRequriedItem({required String itemId}) {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final q =
           (d.select(d.itemsTable)
@@ -1594,7 +2117,7 @@ class BackEnd {
   ///   * [dateQuery]   : transactions made on that calendar day.
   ///   * [ageMonths]   : transactions older than 1, 3, 6 or 12 months.
   static Future<List<TrxWithCustomer>> fetchTransactionsPage({
-    int? beforeTransactionId,
+    String? beforeTransactionId,
     String searchQuery = '',
     DateTime? dateQuery,
     int? ageMonths,
@@ -1629,13 +2152,7 @@ class BackEnd {
     final String query = searchQuery.trim().toLowerCase();
     if (query.isNotEmpty) {
       final String pattern = '%$query%';
-      final int? idQuery = int.tryParse(query);
-
-      // Exact ID match (same behaviour as the old stream version).
-      final Expression<bool> idMatch = idQuery != null
-          ? t.transactionId.equals(idQuery)
-          : const Constant<bool>(false);
-
+      final Expression<bool> idMatch = t.transactionId.like(pattern);
       final Expression<bool> nameMatch = c.customerName.like(pattern);
       final Expression<bool> amountMatch = t.amount.cast<String>().like(
         pattern,
@@ -1698,7 +2215,7 @@ class BackEnd {
   }
 
   static Stream<List<Trx>> watchRequriedCustomerTransactions({
-    required int customerId,
+    required String customerId,
   }) {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final q =
@@ -1711,7 +2228,7 @@ class BackEnd {
     });
   }
 
-  static Stream<Trx?> watchRequriedTransaction({required int transactionId}) {
+  static Stream<Trx?> watchRequriedTransaction({required String transactionId}) {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final q =
           (d.select(d.transactionsTable)
@@ -1862,7 +2379,7 @@ class BackEnd {
 
   // PAYMENTS streams
   static Stream<List<Payment>> watchRequriedPaymentsOfTransaction({
-    required int transactionId,
+    required String transactionId,
   }) {
     return Stream.fromFuture(db()).asyncExpand((d) {
       final q =
@@ -2099,6 +2616,9 @@ class BackEnd {
   static Future<void> close() async {
     final d = _db;
     if (d == null) return;
+    try {
+      await d.customStatement('PRAGMA wal_checkpoint(TRUNCATE)');
+    } catch (_) {}
     await d.close();
     _db = null;
     _activeAccountId = null;
@@ -2545,7 +3065,7 @@ class BackEnd {
         (t) => {
           'id': t.transactionId,
           'amount': t.amount,
-          'date': DateFormat('yyyy-MM-dd').format(t.transactionDate),
+          'date': DateFormat('dd-MM-yyyy').format(t.transactionDate),
           'type': t.transactionType,
           'kind': 'disbursed',
         },
@@ -2554,7 +3074,7 @@ class BackEnd {
         (p) => {
           'id': p.transactionId,
           'amount': p.amountPaid,
-          'date': DateFormat('yyyy-MM-dd').format(p.paymentDate),
+          'date': DateFormat('dd-MM-yyyy').format(p.paymentDate),
           'type': p.paymentType,
           'kind': 'received',
         },

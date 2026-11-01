@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/payment_model.dart';
@@ -28,7 +28,7 @@ class TimelineWidget extends StatelessWidget {
               BodyTwoDefaultText(
                 color: AppColors.contentColorBlue,
                 bold: true,
-                text: Constant.history.toUpperCase(),
+                text: context.l10n.history.toUpperCase(),
               ),
               const SizedBox(height: 14),
 
@@ -52,7 +52,10 @@ class TimelineWidget extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          const BodyTwoDefaultText(bold: true, text: "Bought "),
+                          BodyTwoDefaultText(
+                            bold: true,
+                            text: "${context.l10n.bought} ",
+                          ),
                           CurrencyWidget(
                             smallText: true,
                             amount: Utility.doubleFormate(transaction.amount),
@@ -82,7 +85,10 @@ class TimelineWidget extends StatelessWidget {
 
                       Row(
                         children: [
-                          const BodyTwoDefaultText(bold: true, text: "Paid "),
+                          BodyTwoDefaultText(
+                            bold: true,
+                            text: "${context.l10n.paid} ",
+                          ),
                           CurrencyWidget(
                             smallText: true,
                             amount: Utility.doubleFormate(payment.amountpaid),

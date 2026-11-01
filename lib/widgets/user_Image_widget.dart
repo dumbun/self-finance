@@ -1,7 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
@@ -25,7 +25,7 @@ class UserImageWidget extends ConsumerWidget {
                 )
               : DefaultUserImage(height: radius, width: radius),
           error: (_, _) =>
-              const BodyTwoDefaultText(text: Constant.errorUserFetch),
+              BodyTwoDefaultText(text: context.l10n.errorUserFetch),
           loading: () =>
               const Center(child: CircularProgressIndicator.adaptive()),
         );

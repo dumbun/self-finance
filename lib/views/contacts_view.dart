@@ -2,8 +2,8 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/providers/contacts_provider.dart';
 import 'package:self_finance/widgets/build_customers_list.dart';
 
@@ -28,7 +28,7 @@ class ContactsView extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
-        title: const BodyTwoDefaultText(text: Constant.contact, bold: true),
+        title: BodyTwoDefaultText(text: context.l10n.contacts, bold: true),
       ),
       body: SafeArea(
         child: RefreshIndicator(
@@ -55,7 +55,7 @@ class ContactsView extends HookConsumerWidget {
                   ),
                   leading: const Icon(Icons.search),
                   elevation: const WidgetStatePropertyAll(0),
-                  hintText: "phone no. or name",
+                  hintText: context.l10n.searchCustomerOrPhone,
                 ),
 
                 const SizedBox(height: 12),

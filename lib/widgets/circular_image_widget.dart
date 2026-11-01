@@ -9,35 +9,36 @@ class CircularImageWidget extends StatelessWidget {
     required this.titile,
     this.heroTag,
     this.customeSize = 120,
-    this.errorBuilder = const SizedBox.shrink(),
+    this.errorBuilder,
   });
 
   final String imageData;
   final String titile;
   final String? heroTag;
   final double customeSize;
-  final Widget errorBuilder;
+  final Widget? errorBuilder;
 
   @override
   Widget build(BuildContext context) {
+    final Widget fallback =
+        errorBuilder ??
+        DefaultUserImage(
+          userName: titile,
+          height: customeSize,
+          width: customeSize,
+        );
+
     if (imageData.isNotEmpty) {
-      return Hero(
-        tag: heroTag ?? titile,
-        child: ClipOval(
-          child: ImageWidget(
-            errorBuilder: errorBuilder,
-            title: titile,
-            imagePath: imageData,
-            height: customeSize,
-            width: customeSize,
-          ),
+      return ClipOval(
+        child: ImageWidget(
+          errorBuilder: fallback,
+          title: titile,
+          imagePath: imageData,
+          height: customeSize,
+          width: customeSize,
         ),
       );
     }
-    return DefaultUserImage(
-      userName: titile,
-      height: customeSize,
-      width: customeSize,
-    );
+    return fallback;
   }
 }

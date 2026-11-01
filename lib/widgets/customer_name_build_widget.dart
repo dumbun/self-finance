@@ -7,7 +7,7 @@ import 'package:self_finance/providers/customer_provider.dart';
 
 class CustomerNameBuildWidget extends ConsumerWidget {
   const CustomerNameBuildWidget({super.key, required this.customerID});
-  final int customerID;
+  final String customerID;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

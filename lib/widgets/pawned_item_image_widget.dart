@@ -8,7 +8,7 @@ import 'package:self_finance/widgets/snack_bar_widget.dart';
 
 class PawnedItemImageWidget extends StatelessWidget {
   const PawnedItemImageWidget({super.key, required this.itemID});
-  final int itemID;
+  final String itemID;
 
   @override
   Widget build(BuildContext context) {

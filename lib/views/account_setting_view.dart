@@ -1,26 +1,28 @@
 import 'package:currency_picker/currency_picker.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/fonts/title_widget.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
+import 'package:self_finance/l10n/app_localizations.dart';
 import 'package:self_finance/models/user_model.dart';
-import 'package:self_finance/providers/auth_provider.dart';
+import 'package:self_finance/providers/settings_provider.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/widgets/app_version_widget.dart';
 
 import 'package:self_finance/widgets/biometric_switch_widget.dart';
-import 'package:self_finance/widgets/cloud_sync_tile.dart';
 import 'package:self_finance/widgets/csv_export_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/notification_switch_widget.dart';
+import 'package:self_finance/widgets/offline_indicator.dart';
 import 'package:self_finance/widgets/pin_update_buttom_sheet_widget.dart';
 import 'package:self_finance/widgets/privacy_policy_button_widget.dart';
 
 import 'package:self_finance/widgets/section_header_widget.dart';
+import 'package:self_finance/widgets/sync_status_widget.dart';
 import 'package:self_finance/widgets/terms_and_condition_widget.dart';
 import 'package:self_finance/widgets/theme_switch_widget.dart';
 import 'package:self_finance/widgets/user_image_update_widget.dart';
@@ -37,10 +39,13 @@ class AccountSettingsView extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
-        title: const BodyTwoDefaultText(
+        title: BodyTwoDefaultText(
           bold: true,
-          text: Constant.accountSettings,
+          text: context.l10n.accountSettings,
         ),
+        actions: const [
+          OfflineIndicator(margin: EdgeInsets.only(right: 16)),
+        ],
       ),
       body: SafeArea(
         child: ref
@@ -69,11 +74,12 @@ class _AccountSettingsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final User? data = user;
 
     if (data == null || data.id == null) {
-      return const Center(
-        child: BodyTwoDefaultText(text: Constant.errorUserFetch),
+      return Center(
+        child: BodyTwoDefaultText(text: l10n.errorUserFetch),
       );
     }
 
@@ -85,7 +91,7 @@ class _AccountSettingsBody extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         children: [
           // ── Profile ──────────────────────────────────────────────────────
-          const SectionHeaderWidget(label: 'Profile'),
+          SectionHeaderWidget(label: l10n.profile),
           gap,
           UserImageUpdateWidget(userImageString: data.profilePicture),
           gap,
@@ -93,7 +99,7 @@ class _AccountSettingsBody extends StatelessWidget {
           gap,
 
           // ── Security ─────────────────────────────────────────────────────
-          const SectionHeaderWidget(label: 'Security'),
+          SectionHeaderWidget(label: l10n.security),
           gap,
           _PinTile(context: context, userId: userId, userPin: data.userPin),
           gap,
@@ -106,7 +112,7 @@ class _AccountSettingsBody extends StatelessWidget {
           gap,
 
           // ── Preferences ──────────────────────────────────────────────────
-          const SectionHeaderWidget(label: 'Preferences'),
+          SectionHeaderWidget(label: l10n.preferences),
           gap,
           const ThemeSwitchWidget(),
           gap,
@@ -114,14 +120,16 @@ class _AccountSettingsBody extends StatelessWidget {
           gap,
           const BiometricSwitchWidget(),
           gap,
+          const _LanguageTile(),
+          gap,
 
           // ── Data ─────────────────────────────────────────────────────────
-          const SectionHeaderWidget(label: 'Data'),
+          SectionHeaderWidget(label: l10n.data),
           gap,
-          const CloudSyncTile(),
+          const SyncStatusWidget(),
           gap,
           _SettingsTile(
-            title: 'Export to CSV',
+            title: l10n.exportToCsv,
             semanticsLabel: 'Export transactions to CSV file',
             icon: const Icon(
               Icons.file_download_outlined,
@@ -132,7 +140,7 @@ class _AccountSettingsBody extends StatelessWidget {
           gap,
 
           // ── Legal ────────────────────────────────────────────────────────
-          const SectionHeaderWidget(label: 'Legal'),
+          SectionHeaderWidget(label: l10n.legal),
           gap,
           const TermsAndConditionWidget(),
           gap,
@@ -140,37 +148,13 @@ class _AccountSettingsBody extends StatelessWidget {
           gap,
 
           // ── Account ──────────────────────────────────────────────────────
-          const SectionHeaderWidget(label: 'Account'),
+          SectionHeaderWidget(label: l10n.account),
           gap,
-          if (ref.watch(currentUserProvider) != null) ...[
-            _SettingsTile(
-              title: 'Sign Out Google Account',
-              semanticsLabel: 'Sign out of connected Google account',
-              icon: const Icon(
-                Icons.person_off_outlined,
-                color: AppColors.getErrorColor,
-              ),
-              onTap: () async {
-                final confirm = await AlertDilogs.alertDialogWithTwoAction(
-                  context,
-                  'Sign Out',
-                  'Are you sure you want to sign out of your Google account?',
-                );
-                if (confirm == 1 && context.mounted) {
-                  await ref.read(supabaseAuthServiceProvider).signOut();
-                  if (context.mounted) {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                  }
-                }
-              },
-            ),
-            gap,
-          ],
           _SettingsTile(
-            title: Constant.logout,
-            semanticsLabel: 'Log out and close the app',
+            title: l10n.logout,
+            semanticsLabel: 'Log out ',
             icon: const Icon(Icons.logout, color: AppColors.getErrorColor),
-            onTap: () => Utility.closeApp(context: context),
+            onTap: () async => await Utility.logout(context, ref),
           ),
           gap,
 
@@ -258,7 +242,7 @@ class _PinTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SettingsTile(
-      title: 'Change App Pin',
+      title: context.l10n.changePin,
       semanticsLabel: 'Change your 4-digit app PIN',
       icon: const Icon(Icons.lock, color: AppColors.getPrimaryColor),
       onTap: () => showBottomSheet(
@@ -287,8 +271,8 @@ class _CurrencyTile extends StatelessWidget {
   Future<void> _onTap(BuildContext context) async {
     final int result = await AlertDilogs.alertDialogWithTwoAction(
       context,
-      Constant.alert,
-      Constant.currencyChangeAlert,
+      context.l10n.alert,
+      context.l10n.currencyChangeAlert,
     );
 
     // Guard against unmounted context after async gap.
@@ -309,7 +293,7 @@ class _CurrencyTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SettingsTile(
-      title: 'Change App Currency',
+      title: context.l10n.changeAppCurrency,
       semanticsLabel: 'Current currency: $currency. Tap to change.',
       icon: TitleWidget(
         bold: true,
@@ -346,7 +330,7 @@ class _ShimmerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color base = Theme.of(context).colorScheme.surfaceContainerHighest;
+    final Color base = AppColors.getLigthGreyColor.withValues(alpha: 0.15);
     return Card(
       child: ListTile(
         title: Container(
@@ -382,21 +366,124 @@ class _SettingsErrorView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          const Icon(
             Icons.error_outline,
             size: 48,
-            color: Theme.of(context).colorScheme.error,
+            color: AppColors.getErrorColor,
           ),
           const SizedBox(height: 12),
-          const BodyOneDefaultText(text: Constant.errorUserFetch, bold: true),
+          BodyOneDefaultText(text: context.l10n.errorUserFetch, bold: true),
           const SizedBox(height: 16),
           FilledButton.icon(
             onPressed: onRetry,
             icon: const Icon(Icons.refresh),
-            label: const Text('Retry'),
+            label: Text(context.l10n.retry),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _LanguageTile extends ConsumerWidget {
+  const _LanguageTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localeAsync = ref.watch(localeProvider);
+    final Locale? currentLocale = localeAsync.value;
+    final l10n = AppLocalizations.of(context);
+
+    String currentLanguageName = l10n?.systemDefault ?? 'System Default';
+    if (currentLocale?.languageCode == 'en') {
+      currentLanguageName = l10n?.english ?? 'English';
+    } else if (currentLocale?.languageCode == 'hi') {
+      currentLanguageName = l10n?.hindi ?? 'Hindi (हिंदी)';
+    } else if (currentLocale?.languageCode == 'te') {
+      currentLanguageName = l10n?.telugu ?? 'Telugu (తెలుగు)';
+    }
+
+    return _SettingsTile(
+      title: l10n?.language ?? 'Language',
+      semanticsLabel: 'Change application language. Current: $currentLanguageName',
+      icon: const Icon(Icons.language, color: AppColors.getPrimaryColor),
+      onTap: () => _showLanguageDialog(context, ref, currentLocale),
+    );
+  }
+
+  void _showLanguageDialog(
+    BuildContext context,
+    WidgetRef ref,
+    Locale? currentLocale,
+  ) {
+    final l10n = AppLocalizations.of(context);
+
+    showModalBottomSheet<void>(
+      context: context,
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (ctx) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: BodyOneDefaultText(
+                  text: l10n?.selectLanguage ?? 'Select Language',
+                  bold: true,
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.settings_suggest_outlined),
+                title: Text(l10n?.systemDefault ?? 'System Default'),
+                trailing: currentLocale == null
+                    ? const Icon(Icons.check_circle, color: AppColors.getPrimaryColor)
+                    : null,
+                onTap: () {
+                  ref.read(localeProvider.notifier).setLocale(null);
+                  Navigator.of(ctx).pop();
+                },
+              ),
+              ListTile(
+                leading: const Text('🇬🇧', style: TextStyle(fontSize: 22)),
+                title: Text(l10n?.english ?? 'English'),
+                trailing: currentLocale?.languageCode == 'en'
+                    ? const Icon(Icons.check_circle, color: AppColors.getPrimaryColor)
+                    : null,
+                onTap: () {
+                  ref.read(localeProvider.notifier).setLocale(const Locale('en'));
+                  Navigator.of(ctx).pop();
+                },
+              ),
+              ListTile(
+                leading: const Text('🇮🇳', style: TextStyle(fontSize: 22)),
+                title: Text(l10n?.hindi ?? 'Hindi (हिंदी)'),
+                trailing: currentLocale?.languageCode == 'hi'
+                    ? const Icon(Icons.check_circle, color: AppColors.getPrimaryColor)
+                    : null,
+                onTap: () {
+                  ref.read(localeProvider.notifier).setLocale(const Locale('hi'));
+                  Navigator.of(ctx).pop();
+                },
+              ),
+              ListTile(
+                leading: const Text('🇮🇳', style: TextStyle(fontSize: 22)),
+                title: Text(l10n?.telugu ?? 'Telugu (తెలుగు)'),
+                trailing: currentLocale?.languageCode == 'te'
+                    ? const Icon(Icons.check_circle, color: AppColors.getPrimaryColor)
+                    : null,
+                onTap: () {
+                  ref.read(localeProvider.notifier).setLocale(const Locale('te'));
+                  Navigator.of(ctx).pop();
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
     );
   }
 }

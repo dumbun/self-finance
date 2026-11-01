@@ -1,10 +1,11 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/csv_export_utility.dart';
+import 'package:self_finance/l10n/app_localizations.dart';
 import 'package:self_finance/models/csv_model.dart';
 import 'package:self_finance/widgets/csv_export_status_banner_widget.dart';
 import 'package:self_finance/widgets/csv_type_selection_tile_widget.dart';
@@ -40,18 +41,52 @@ class _CsvExportWidgetState extends State<CsvExportWidget> {
     super.dispose();
   }
 
+  (IconData, String, String) _getTypeInfo(
+    CsvExportType type,
+    AppLocalizations l10n,
+  ) {
+    switch (type) {
+      case CsvExportType.allTransactions:
+        return (
+          Icons.receipt_long_rounded,
+          l10n.allTransactions,
+          l10n.allTransactionsDesc,
+        );
+      case CsvExportType.activeLoans:
+        return (
+          Icons.pending_actions_rounded,
+          l10n.activeLoans,
+          l10n.activeLoansDesc,
+        );
+      case CsvExportType.completedLoans:
+        return (
+          Icons.check_circle_outline_rounded,
+          l10n.completedLoans,
+          l10n.completedLoansDesc,
+        );
+      case CsvExportType.paymentHistory:
+        return (
+          Icons.history_rounded,
+          l10n.paymentHistory,
+          l10n.paymentHistoryDesc,
+        );
+    }
+  }
+
   Future<void> _startExport() async {
+    final l10n = context.l10n;
     if (_selectedTypes.isEmpty) {
       Navigator.pop(context);
       SnackBarWidget.snackBarWidget(
         context: context,
-        message: 'Please select at least one data type.',
+        message: l10n.pleaseSelectAtLeastOneDataType,
       );
+      return;
     }
 
-    _state.value = const ExportState.running(
+    _state.value = ExportState.running(
       progress: 0,
-      message: 'Starting export…',
+      message: l10n.startingExport,
     );
 
     final CsvExportResult result = await CsvExportUtility.export(
@@ -67,7 +102,7 @@ class _CsvExportWidgetState extends State<CsvExportWidget> {
     if (result.success) {
       _state.value = const ExportState.success();
     } else {
-      _state.value = ExportState.error(result.errorMessage ?? 'Unknown error');
+      _state.value = ExportState.error(result.errorMessage ?? l10n.exportFailed);
     }
   }
 
@@ -77,6 +112,8 @@ class _CsvExportWidgetState extends State<CsvExportWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
       child: Column(
@@ -99,18 +136,17 @@ class _CsvExportWidgetState extends State<CsvExportWidget> {
                 ),
               ),
               const SizedBox(width: 12),
-              const BodyOneDefaultText(text: 'Export to CSV', bold: true),
+              BodyOneDefaultText(text: l10n.exportToCsv, bold: true),
             ],
           ),
 
           const SizedBox(height: 20),
 
           // Data type selection
-          const BodyTwoDefaultText(text: 'Select data to export', bold: true),
+          BodyTwoDefaultText(text: l10n.selectDataToExport, bold: true),
           const SizedBox(height: 10),
-          ...Constant.typeInfo.entries.map((entry) {
-            final CsvExportType type = entry.key;
-            final (icon, label, desc) = entry.value;
+          ...CsvExportType.values.map((type) {
+            final (icon, label, desc) = _getTypeInfo(type, l10n);
             final bool selected = _selectedTypes.contains(type);
 
             return CsvTypeSelectionTileWidget(
@@ -189,17 +225,17 @@ class _CsvExportWidgetState extends State<CsvExportWidget> {
                 );
               }
               if (state.isSuccess) {
-                return const StatusBanner(
+                return StatusBanner(
                   icon: Icons.check_circle_rounded,
                   color: AppColors.getGreenColor,
-                  message: 'Export completed successfully!',
+                  message: l10n.exportCompletedSuccessfully,
                 );
               }
               if (state.isError) {
                 return StatusBanner(
                   icon: Icons.error_rounded,
                   color: AppColors.getErrorColor,
-                  message: state.errorMessage ?? 'Export failed.',
+                  message: state.errorMessage ?? l10n.exportFailed,
                 );
               }
               return const SizedBox.shrink();
@@ -221,7 +257,7 @@ class _CsvExportWidgetState extends State<CsvExportWidget> {
                       child: OutlinedButton.icon(
                         onPressed: _reset,
                         icon: const Icon(Icons.refresh_rounded),
-                        label: const Text('Export Again'),
+                        label: Text(l10n.exportAgain),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -232,7 +268,7 @@ class _CsvExportWidgetState extends State<CsvExportWidget> {
                           backgroundColor: AppColors.getPrimaryColor,
                         ),
                         icon: const Icon(Icons.done_rounded),
-                        label: const Text('Done'),
+                        label: Text(l10n.done),
                       ),
                     ),
                   ],
@@ -250,7 +286,7 @@ class _CsvExportWidgetState extends State<CsvExportWidget> {
                   ),
                   icon: const Icon(Icons.download_rounded),
                   label: Text(
-                    'Export ${_selectedTypes.length} file${_selectedTypes.length == 1 ? '' : 's'}',
+                    l10n.exportCountFiles(_selectedTypes.length),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

@@ -1,21 +1,27 @@
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:self_finance/core/theme/app_colors.dart';
-import 'package:self_finance/providers/date_provider.dart';
-import 'package:self_finance/providers/transactions_provider.dart';
-import 'package:self_finance/providers/image_providers.dart';
-import 'package:self_finance/widgets/signature_widget.dart';
-import 'package:self_finance/widgets/image_picker_widget.dart';
-import 'package:signature/signature.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/core/fonts/body_small_text.dart';
+import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
+import 'package:self_finance/providers/date_provider.dart';
+import 'package:self_finance/providers/image_providers.dart';
+import 'package:self_finance/providers/transactions_provider.dart';
+import 'package:self_finance/widgets/customer_image_widget.dart';
+import 'package:self_finance/widgets/customer_otp_verification_bottom_sheet.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
+import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:self_finance/widgets/input_date_picker.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/round_corner_button.dart';
+import 'package:self_finance/widgets/section_header_widget.dart';
+import 'package:self_finance/widgets/signature_widget.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
+import 'package:signature/signature.dart';
 
 class AddNewTransactionView extends ConsumerStatefulWidget {
   const AddNewTransactionView({
@@ -25,7 +31,7 @@ class AddNewTransactionView extends ConsumerStatefulWidget {
     required this.customerNumber,
   });
 
-  final int customerID;
+  final String customerID;
   final String customerName;
   final String customerNumber;
 
@@ -49,6 +55,18 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   bool _isloading = false;
 
   @override
+  void initState() {
+    super.initState();
+    final DateTime now = DateTime.now();
+    _transacrtionDate.text = "${now.day}-${now.month}-${now.year}";
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(dateProvider.notifier).set(now);
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _amount.dispose();
     _rateOfIntrest.dispose();
@@ -66,80 +84,72 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const BodyTwoDefaultText(
-          text: Constant.addNewTransaction,
-          bold: true,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BodyTwoDefaultText(
+              text: context.l10n.addNewTransaction,
+              bold: true,
+            ),
+            BodySmallText(
+              text: "Customer: ${widget.customerName}",
+              color: AppColors.getLigthGreyColor,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Padding(
-              padding: const EdgeInsets.all(18),
-              child: Column(
-                children: [
-                  const SizedBox(height: 12),
-                  InputTextField(
-                    validator: (String? value) =>
-                        Utility.amountValidation(value: value),
-                    keyboardType: TextInputType.number,
-                    hintText: Constant.takenAmount,
-                    controller: _amount,
-                  ),
-                  const SizedBox(height: 20),
-                  InputTextField(
-                    validator: (String? value) =>
-                        Utility.amountValidation(value: value),
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    hintText: Constant.rateOfIntrest,
-                    controller: _rateOfIntrest,
-                  ),
-                  const SizedBox(height: 20),
-                  InputDatePicker(
-                    controller: _transacrtionDate,
-                    firstDate: DateTime(1000),
-                    initialDate: DateTime.now(),
-                    lastDate: DateTime.now(),
-                    labelText: Constant.takenDate,
-                  ),
-                  const SizedBox(height: 20),
-                  InputTextField(
-                    keyboardType: TextInputType.multiline,
-                    hintText: Constant.itemDescription,
-                    controller: _description,
-                  ),
-                  const SizedBox(height: 30),
-                  // _buildItemImagePicker(),
-                  ImagePickerWidget(
-                    imageProvider: itemFileProvider,
-                    onSetImage: (XFile? file) =>
-                        ref.read<ItemFile>(itemFileProvider.notifier).set(file),
-                    onClearImage: () =>
-                        ref.read<ItemFile>(itemFileProvider.notifier).clear(),
-                    title: Constant.customerItem,
-                    defaultImage: Constant.defaultItemImagePath,
-                  ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 640),
+            child: SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Customer Profile Summary Card
+                    SectionHeaderWidget(label: context.l10n.customerInformation),
+                    _buildCustomerCard(),
+                    const SizedBox(height: 16),
 
-                  //! Signature Widget that stores signatures on a app data
-                  const SizedBox(height: 30),
-                  SignatureWidget(controller: _signatureController),
+                    // Loan Terms & Amount Card
+                    SectionHeaderWidget(label: context.l10n.loanTermsAndInterest),
+                    _buildLoanTermsCard(),
+                    const SizedBox(height: 16),
 
-                  const SizedBox(height: 30),
-                  Hero(
-                    tag: Constant.saveButtonTag,
-                    child: Visibility(
-                      visible: _isloading,
-                      replacement: RoundedCornerButton(
-                        text: Constant.save,
+                    // Collateral & Documentation Card
+                    SectionHeaderWidget(label: context.l10n.collateralAndDocumentation),
+                    _buildCollateralCard(),
+                    const SizedBox(height: 16),
+
+                    // Digital Signature Card
+                    SectionHeaderWidget(label: context.l10n.borrowerAcknowledgement),
+                    _buildSignatureCard(),
+                    const SizedBox(height: 24),
+
+                    // Primary Action
+                    if (_isloading)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: CircularProgressIndicator.adaptive(),
+                        ),
+                      )
+                    else
+                      RoundedCornerButton(
+                        text: context.l10n.save,
+                        icon: Icons.check_circle_outline_rounded,
                         onPressed: _save,
                       ),
-                      child: const CircularProgressIndicator.adaptive(),
-                    ),
-                  ),
-                ],
+                    const SizedBox(height: 32),
+                  ],
+                ),
               ),
             ),
           ),
@@ -148,14 +158,157 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
     );
   }
 
-  double? _doubleCheck(String text, {String errorString = Constant.error}) {
+  Widget _buildCustomerCard() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            CustomerImageWidget(
+              customerId: widget.customerID,
+              size: 52,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BodyOneDefaultText(
+                    text: widget.customerName,
+                    bold: true,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.phone_outlined,
+                        size: 14,
+                        color: AppColors.getLigthGreyColor,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: BodySmallText(
+                          text: widget.customerNumber,
+                          color: AppColors.getLigthGreyColor,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.getLigthGreyColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: BodySmallText(
+                      text: "#${widget.customerID}",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      bold: true,
+                      color: AppColors.getLigthGreyColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoanTermsCard() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            InputTextField(
+              validator: (String? value) =>
+                  Utility.amountValidation(value: value),
+              keyboardType: TextInputType.number,
+              hintText: context.l10n.takenAmount,
+              controller: _amount,
+            ),
+            const SizedBox(height: 16),
+            InputTextField(
+              validator: (String? value) =>
+                  Utility.amountValidation(value: value),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              hintText: context.l10n.rateOfIntrest,
+              controller: _rateOfIntrest,
+            ),
+            const SizedBox(height: 16),
+            InputDatePicker(
+              controller: _transacrtionDate,
+              firstDate: DateTime(1000),
+              initialDate: DateTime.now(),
+              lastDate: DateTime.now(),
+              labelText: context.l10n.takenDate,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCollateralCard() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            InputTextField(
+              keyboardType: TextInputType.multiline,
+              maxLines: 3,
+              hintText: context.l10n.itemDescription,
+              controller: _description,
+            ),
+            const SizedBox(height: 16),
+            ImagePickerWidget(
+              imageProvider: itemFileProvider,
+              onSetImage: (XFile? file) =>
+                  ref.read<ItemFile>(itemFileProvider.notifier).set(file),
+              onClearImage: () =>
+                  ref.read<ItemFile>(itemFileProvider.notifier).clear(),
+              title: context.l10n.customerItem,
+              defaultImage: Constant.defaultItemImagePath,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignatureCard() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SignatureWidget(controller: _signatureController),
+      ),
+    );
+  }
+
+  double? _doubleCheck(String text, {String? errorString}) {
     try {
       return double.parse(text);
     } catch (e) {
       setState(() => _isloading = false);
       AlertDilogs.alertDialogWithOneAction(
         context,
-        errorString,
+        errorString ?? context.l10n.error,
         e.toString(),
       );
       return null;
@@ -163,22 +316,36 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   }
 
   void _save() async {
+    if (_isloading) return;
     if (!_validateAndSave()) return;
 
     final DateTime? userPickedDate = ref.read(dateProvider);
     if (userPickedDate == null) {
       SnackBarWidget.snackBarWidget(
         context: context,
-        message: "Please select the transaction date",
+        message: context.l10n.pleaseSelectTransactionDate,
       );
       return;
     }
 
-    final double? pawnAmount = _doubleCheck(_amount.text);
-    final double? rateOfIntrest = _doubleCheck(_rateOfIntrest.text);
+    final double? pawnAmount = _doubleCheck(_amount.text.trim());
+    final double? rateOfIntrest = _doubleCheck(_rateOfIntrest.text.trim());
 
     // Bail out if either value failed to parse — dialog was already shown.
     if (pawnAmount == null || rateOfIntrest == null) return;
+
+    // Verify customer OTP before creating transaction
+    final String? verificationToken = await CustomerOtpVerificationBottomSheet.show(
+      context: context,
+      customerName: widget.customerName,
+      phoneNumber: widget.customerNumber,
+      loanAmount: pawnAmount,
+    );
+
+    if (!mounted) return;
+    if (verificationToken == null) {
+      return;
+    }
 
     setState(() => _isloading = true);
     try {
@@ -188,11 +355,12 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
             customerName: widget.customerName,
             customerNumber: widget.customerNumber,
             customerId: widget.customerID,
-            discription: _description.text,
+            discription: _description.text.trim(),
             userInputDate: userPickedDate,
             pawnAmount: pawnAmount,
             rateOfIntrest: rateOfIntrest,
             signatureController: _signatureController,
+            verificationToken: verificationToken,
           );
       if (!mounted) return;
       if (res) {
@@ -212,7 +380,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
     setState(() => _isloading = false);
     SnackBarWidget.snackBarWidget(
       context: context,
-      message: Constant.transacrtionAddedSuccessfully,
+      message: context.l10n.transactionAddedSuccessfully,
     );
     Navigator.pop(context);
   }
@@ -221,8 +389,8 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
     setState(() => _isloading = false);
     AlertDilogs.alertDialogWithOneAction(
       context,
-      Constant.error,
-      Constant.errorAddingTransaction,
+      context.l10n.error,
+      context.l10n.errorAddingTransaction,
     );
   }
 }

@@ -17,6 +17,7 @@ class InputTextField extends StatelessWidget {
     this.validator,
     this.initialValue,
     this.inputFormatters,
+    this.maxLines = 1,
   });
 
   final TextEditingController? controller;
@@ -27,6 +28,7 @@ class InputTextField extends StatelessWidget {
   final String? initialValue;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
+  final int? maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +44,11 @@ class InputTextField extends StatelessWidget {
             }
             return null;
           },
+      maxLines: maxLines,
       keyboardType: keyboardType,
-      textInputAction: TextInputAction.done,
+      textInputAction: (maxLines != null && maxLines! > 1)
+          ? TextInputAction.newline
+          : TextInputAction.done,
       controller: controller,
       decoration: InputDecoration(
         labelText: hintText,

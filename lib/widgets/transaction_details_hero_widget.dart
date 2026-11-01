@@ -29,16 +29,27 @@ class TransactionDetailsHeroWidget extends StatelessWidget {
           StatusChipWidget(status: transaction.transacrtionType),
           const SizedBox(height: 12),
           CurrencyWidget(titleText: true, amount: Utility.doubleFormate(value)),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const BodyTwoDefaultText(text: "Transaction ID: "),
-              BodyTwoDefaultText(text: transaction.id.toString(), bold: true),
-              ClipbordWidget(
-                key: ValueKey<int>(transaction.id!),
-                value: transaction.id.toString(),
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const BodyTwoDefaultText(text: "Transaction ID: "),
+                Flexible(
+                  child: BodyTwoDefaultText(
+                    text: transaction.id.toString(),
+                    bold: true,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+                ClipbordWidget(
+                  key: ValueKey<String>(transaction.id!),
+                  value: transaction.id.toString(),
+                ),
+              ],
+            ),
           ),
         ],
       ),

@@ -1,14 +1,11 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' hide User;
-import 'package:self_finance/backend/user_database.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
-import 'package:self_finance/models/user_model.dart';
-import 'package:self_finance/providers/user_provider.dart';
+import 'package:self_finance/providers/app_lock_setup_provider.dart';
 import 'package:self_finance/widgets/currency_type_input_widget.dart';
 import 'package:self_finance/widgets/input_text_field.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
@@ -17,6 +14,9 @@ import 'package:self_finance/widgets/snack_bar_widget.dart';
 
 /// Streamlined setup screen shown immediately after login for any user
 /// who has not yet configured their local App Lock (PIN) and Currency.
+///
+/// Follows MVVM architecture: this View only contains presentation logic,
+/// while state and business validations are handled by [appLockSetupProvider].
 class AppLockSetupView extends ConsumerStatefulWidget {
   const AppLockSetupView({super.key});
 
@@ -26,33 +26,19 @@ class AppLockSetupView extends ConsumerStatefulWidget {
 
 class _AppLockSetupViewState extends ConsumerState<AppLockSetupView> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _currencyController = TextEditingController();
+  late final TextEditingController _nameController;
+  late final TextEditingController _currencyController;
   final TextEditingController _pinController1 = TextEditingController();
   final TextEditingController _pinController2 = TextEditingController();
-
-  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-
-    // Default currency to Rupee
-    _currencyController.text = '₹';
-
-    // Pre-populate name from Supabase user profile if available
-    try {
-      final currentUser = Supabase.instance.client.auth.currentUser;
-      final metadata = currentUser?.userMetadata;
-      final fullName = metadata?['full_name'] ?? metadata?['name'];
-      if (fullName is String && fullName.trim().isNotEmpty) {
-        _nameController.text = fullName.trim();
-      } else if (currentUser?.email != null) {
-        _nameController.text = currentUser!.email!.split('@').first;
-      }
-    } catch (_) {
-      // In offline / uninitialized state
-    }
+    final initialState = ref.read(appLockSetupProvider);
+    _nameController = TextEditingController(text: initialState.initialName);
+    _currencyController = TextEditingController(
+      text: initialState.defaultCurrency,
+    );
   }
 
   @override
@@ -64,91 +50,51 @@ class _AppLockSetupViewState extends ConsumerState<AppLockSetupView> {
     super.dispose();
   }
 
-  Future<void> _handleCompleteSetup() async {
-    if (_isLoading) return;
-
+  void _onSetupSubmitted() {
     final form = _formKey.currentState;
     if (form == null || !form.validate()) {
       return;
     }
 
-    final pin1 = _pinController1.text.trim();
-    final pin2 = _pinController2.text.trim();
-
-    if (pin1.length != 4) {
-      SnackBarWidget.snackBarWidget(
-        context: context,
-        message: 'Please enter a 4-digit PIN',
-      );
-      return;
-    }
-
-    if (pin1 != pin2) {
-      SnackBarWidget.snackBarWidget(
-        context: context,
-        message: 'PINs do not match. Please verify.',
-      );
-      return;
-    }
-
-    final currency = _currencyController.text.trim().isEmpty
-        ? '₹'
-        : _currencyController.text.trim();
-    final name = _nameController.text.trim().isEmpty
-        ? 'User'
-        : _nameController.text.trim();
-
-    setState(() => _isLoading = true);
-
-    try {
-      final success = await UserBackEnd.createNewUser(
-        User(
-          userName: name,
-          userPin: pin1,
-          profilePicture: '',
-          userCurrency: currency,
-        ),
-      );
-
-      if (success) {
-        ref.invalidate(userProvider);
-        if (mounted) {
-          Routes.navigateToDashboard(context: context);
-          SnackBarWidget.snackBarWidget(
-            context: context,
-            message: 'App lock and currency configured successfully!',
-          );
-        }
-      } else {
-        if (mounted) {
-          SnackBarWidget.snackBarWidget(
-            context: context,
-            message: 'Failed to save setup. Please try again.',
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        SnackBarWidget.snackBarWidget(
-          context: context,
-          message: 'Error saving setup: $e',
+    ref
+        .read(appLockSetupProvider.notifier)
+        .completeSetup(
+          name: _nameController.text,
+          currency: _currencyController.text,
+          pin: _pinController1.text,
+          confirmPin: _pinController2.text,
         );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
-    final Color cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    // Listen to state changes to handle navigation and snackbars
+    ref.listen<AppLockSetupState>(appLockSetupProvider, (previous, next) {
+      if (next.errorMessage != null &&
+          next.errorMessage != previous?.errorMessage) {
+        SnackBarWidget.snackBarWidget(
+          context: context,
+          message: next.errorMessage!,
+        );
+      }
+
+      if (next.isSuccess && !(previous?.isSuccess ?? false)) {
+        Routes.navigateToDashboard(context: context);
+        SnackBarWidget.snackBarWidget(
+          context: context,
+          message: context.l10n.appLockConfiguredSuccessfully,
+        );
+      }
+
+      if (_nameController.text.isEmpty && next.initialName.isNotEmpty) {
+        _nameController.text = next.initialName;
+      }
+    });
+
+    final setupState = ref.watch(appLockSetupProvider);
+    final bool isLoading = setupState.isLoading;
 
     return Scaffold(
-      backgroundColor: scaffoldBg,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -165,7 +111,9 @@ class _AppLockSetupViewState extends ConsumerState<AppLockSetupView> {
                       width: 76,
                       height: 76,
                       decoration: BoxDecoration(
-                        color: AppColors.getPrimaryColor.withValues(alpha: 0.12),
+                        color: AppColors.getPrimaryColor.withValues(
+                          alpha: 0.12,
+                        ),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -178,47 +126,36 @@ class _AppLockSetupViewState extends ConsumerState<AppLockSetupView> {
                   const SizedBox(height: 20),
 
                   // Title & Subtitle
-                  const Center(
+                  Center(
                     child: BodyOneDefaultText(
-                      text: 'Set App Lock & Currency',
+                      text: context.l10n.setAppLockAndCurrency,
                       bold: true,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Center(
                     child: BodyTwoDefaultText(
-                      text:
-                          'Create a 4-digit PIN to secure your records and select your preferred currency.',
-                      color: isDark ? Colors.white70 : Colors.black54,
+                      text: context.l10n.appLockSetupSubtitle,
+                      color: AppColors.getLigthGreyColor,
                     ),
                   ),
                   const SizedBox(height: 28),
 
                   // Name Input Card
                   Card(
-                    color: cardBg,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : Colors.black.withValues(alpha: 0.08),
-                      ),
-                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const BodyTwoDefaultText(
-                            text: 'Your Name (Optional)',
+                          BodyTwoDefaultText(
+                            text: context.l10n.yourNameOptional,
                             bold: true,
                           ),
                           const SizedBox(height: 10),
                           InputTextField(
                             controller: _nameController,
-                            hintText: Constant.pleaseEnterTheName,
+                            hintText: context.l10n.pleaseEnterTheName,
                             keyboardType: TextInputType.name,
                           ),
                         ],
@@ -229,23 +166,13 @@ class _AppLockSetupViewState extends ConsumerState<AppLockSetupView> {
 
                   // Currency Selection Card
                   Card(
-                    color: cardBg,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : Colors.black.withValues(alpha: 0.08),
-                      ),
-                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const BodyTwoDefaultText(
-                            text: 'Primary Currency',
+                          BodyTwoDefaultText(
+                            text: context.l10n.primaryCurrency,
                             bold: true,
                           ),
                           const SizedBox(height: 10),
@@ -260,23 +187,13 @@ class _AppLockSetupViewState extends ConsumerState<AppLockSetupView> {
 
                   // PIN Creation Card
                   Card(
-                    color: cardBg,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : Colors.black.withValues(alpha: 0.08),
-                      ),
-                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const BodyTwoDefaultText(
-                            text: 'Create 4-Digit App Lock PIN',
+                          BodyTwoDefaultText(
+                            text: context.l10n.createAppLockPin,
                             bold: true,
                           ),
                           const SizedBox(height: 12),
@@ -287,8 +204,8 @@ class _AppLockSetupViewState extends ConsumerState<AppLockSetupView> {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          const BodyTwoDefaultText(
-                            text: 'Confirm 4-Digit PIN',
+                          BodyTwoDefaultText(
+                            text: context.l10n.confirmPin,
                             bold: true,
                           ),
                           const SizedBox(height: 12),
@@ -299,7 +216,7 @@ class _AppLockSetupViewState extends ConsumerState<AppLockSetupView> {
                               validator: (val) {
                                 if (_pinController1.text !=
                                     _pinController2.text) {
-                                  return '* PINs do not match';
+                                  return context.l10n.pinsDoNotMatch;
                                 }
                                 return null;
                               },
@@ -313,8 +230,10 @@ class _AppLockSetupViewState extends ConsumerState<AppLockSetupView> {
 
                   // Action Button
                   RoundedCornerButton(
-                    onPressed: _isLoading ? null : _handleCompleteSetup,
-                    text: _isLoading ? 'Saving...' : 'Finish Setup & Go to Dashboard',
+                    onPressed: isLoading ? null : _onSetupSubmitted,
+                    text: isLoading
+                        ? context.l10n.loading
+                        : context.l10n.finishSetupGoToDashboard,
                   ),
                   const SizedBox(height: 16),
                 ],

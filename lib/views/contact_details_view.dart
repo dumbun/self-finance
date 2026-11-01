@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/fonts/strong_heading_one_text.dart';
 import 'package:self_finance/core/fonts/title_widget.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/customer_model.dart';
@@ -16,13 +16,12 @@ import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/customer_transactions_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
-import 'package:self_finance/widgets/fab.dart';
 import 'package:self_finance/widgets/loading_popup_widget.dart';
 import 'package:self_finance/widgets/snack_bar_widget.dart';
 
 class ContactDetailsView extends ConsumerStatefulWidget {
   const ContactDetailsView({super.key, required this.customerID});
-  final int customerID;
+  final String customerID;
 
   @override
   ConsumerState<ContactDetailsView> createState() => _ContactDetailsViewState();
@@ -53,8 +52,8 @@ class _ContactDetailsViewState extends ConsumerState<ContactDetailsView>
   Future<void> _handleDelete(BuildContext context, Customer customer) async {
     final int confirmed = await AlertDilogs.alertDialogWithTwoAction(
       context,
-      "Delete Contact?",
-      Constant.contactDeleteMessage,
+      context.l10n.deleteContactQuestion,
+      context.l10n.contactDeleteMessage,
     );
 
     if (confirmed == 1 && context.mounted) {
@@ -76,7 +75,7 @@ class _ContactDetailsViewState extends ConsumerState<ContactDetailsView>
     if (!launched && mounted) {
       SnackBarWidget.snackBarWidget(
         context: context,
-        message: "Unable to open SMS composer",
+        message: context.l10n.unableToOpenSms,
       );
     }
   }
@@ -90,12 +89,12 @@ class _ContactDetailsViewState extends ConsumerState<ContactDetailsView>
       Routes.navigateToImageView(
         context: context,
         imagePath: proofPath,
-        titile: "Customer Proof",
+        titile: context.l10n.customerProof,
       );
     } else {
       SnackBarWidget.snackBarWidget(
         context: context,
-        message: "No proof document attached for this customer",
+        message: context.l10n.noProofDocumentAttached,
       );
     }
   }
@@ -111,20 +110,17 @@ class _ContactDetailsViewState extends ConsumerState<ContactDetailsView>
         imagePath: photoPath,
         titile: customer.name,
       );
+    } else {
+      SnackBarWidget.snackBarWidget(
+        context: context,
+        message: context.l10n.noPhotoAttached,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: Fab(
-        icon: Icons.add_rounded,
-        heroTag: Constant.saveButtonTag,
-        onPressed: () => Routes.navigateToAddNewTransactionToCustomerView(
-          context: context,
-          customerID: widget.customerID,
-        ),
-      ),
       body: ref
           .watch(customerProvider(widget.customerID))
           .when(
@@ -140,208 +136,214 @@ class _ContactDetailsViewState extends ConsumerState<ContactDetailsView>
               );
 
               return NestedScrollView(
-                headerSliverBuilder:
-                    (BuildContext ctx, bool innerBoxIsScrolled) {
-                      return [
-                        // Modern App Bar
-                        SliverAppBar(
-                          pinned: true,
-                          elevation: 0,
-
-                          surfaceTintColor: Colors.transparent,
-                          leading: Padding(
-                            padding: const EdgeInsets.only(left: 12),
-                            child: Center(
-                              child: Material(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                clipBehavior: Clip.antiAlias,
-                                child: InkWell(
-                                  onTap: () => Navigator.of(context).pop(),
-                                  child: const SizedBox(
-                                    height: 38,
-                                    width: 38,
-                                    child: Icon(
-                                      Icons.arrow_back_ios_new_rounded,
-                                      size: 16,
-                                    ),
-                                  ),
+                headerSliverBuilder: (BuildContext ctx, bool innerBoxIsScrolled) {
+                  return [
+                    // Modern App Bar
+                    SliverAppBar(
+                      pinned: true,
+                      elevation: 0,
+                      surfaceTintColor: Colors.transparent,
+                      leading: Padding(
+                        padding: const EdgeInsets.only(left: 12),
+                        child: Center(
+                          child: Material(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: InkWell(
+                              onTap: () => Navigator.of(context).pop(),
+                              child: const SizedBox(
+                                height: 38,
+                                width: 38,
+                                child: Icon(
+                                  Icons.arrow_back_ios_new_rounded,
+                                  size: 16,
                                 ),
                               ),
                             ),
                           ),
-                          title: BodyOneDefaultText(
-                            text: customer.name,
-                            bold: true,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      title: BodyOneDefaultText(
+                        text: customer.name,
+                        bold: true,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      actions: [
+                        IconButton(
+                          icon: const Icon(
+                            Icons.phone_rounded,
+                            color: AppColors.getPrimaryColor,
+                            size: 20,
                           ),
-                          actions: [
-                            IconButton(
-                              icon: const Icon(
-                                Icons.phone_rounded,
-                                color: AppColors.getPrimaryColor,
-                                size: 20,
-                              ),
-                              tooltip: "Call Customer",
-                              onPressed: () => Utility.makeCall(
-                                phoneNumber: customer.number,
+                          tooltip: context.l10n.call,
+                          onPressed: () =>
+                              Utility.makeCall(phoneNumber: customer.number),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit_outlined, size: 20),
+                          tooltip: context.l10n.editContact,
+                          onPressed: () => Routes.navigateToContactEditingView(
+                            context: context,
+                            customer: customer,
+                          ),
+                        ),
+                        PopupMenuButton<String>(
+                          icon: const Icon(Icons.more_vert_rounded, size: 20),
+                          onSelected: (String val) {
+                            if (val == 'share') {
+                              _handleShare(customer);
+                            } else if (val == 'edit') {
+                              Routes.navigateToContactEditingView(
+                                context: context,
+                                customer: customer,
+                              );
+                            } else if (val == 'delete') {
+                              _handleDelete(context, customer);
+                            }
+                          },
+                          itemBuilder: (BuildContext _) => [
+                            PopupMenuItem(
+                              value: 'share',
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.share_rounded,
+                                    color: Color(0xFF3B82F6),
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  BodyTwoDefaultText(
+                                    text: context.l10n.shareContactInfo,
+                                  ),
+                                ],
                               ),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.edit_outlined, size: 20),
-                              tooltip: "Edit Customer",
-                              onPressed: () =>
-                                  Routes.navigateToContactEditingView(
-                                    context: context,
-                                    customer: customer,
+                            PopupMenuItem(
+                              value: 'edit',
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.edit_rounded,
+                                    color: AppColors.getPrimaryColor,
+                                    size: 18,
                                   ),
-                            ),
-                            PopupMenuButton<String>(
-                              icon: const Icon(
-                                Icons.more_vert_rounded,
-                                size: 20,
+                                  const SizedBox(width: 12),
+                                  BodyTwoDefaultText(
+                                    text: context.l10n.editContact,
+                                  ),
+                                ],
                               ),
-                              onSelected: (String val) {
-                                if (val == 'share') {
-                                  _handleShare(customer);
-                                } else if (val == 'edit') {
-                                  Routes.navigateToContactEditingView(
-                                    context: context,
-                                    customer: customer,
-                                  );
-                                } else if (val == 'delete') {
-                                  _handleDelete(context, customer);
-                                }
-                              },
-                              itemBuilder: (BuildContext _) => [
-                                const PopupMenuItem(
-                                  value: 'share',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.share_rounded,
-                                        color: Color(0xFF3B82F6),
-                                        size: 18,
-                                      ),
-                                      SizedBox(width: 12),
-                                      BodyTwoDefaultText(text: "Share Details"),
-                                    ],
-                                  ),
-                                ),
-                                const PopupMenuItem(
-                                  value: 'edit',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.edit_rounded,
-                                        color: AppColors.getPrimaryColor,
-                                        size: 18,
-                                      ),
-                                      SizedBox(width: 12),
-                                      BodyTwoDefaultText(text: "Edit Contact"),
-                                    ],
-                                  ),
-                                ),
-                                const PopupMenuItem(
-                                  value: 'delete',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.delete_outline_rounded,
-                                        color: AppColors.getErrorColor,
-                                        size: 18,
-                                      ),
-                                      SizedBox(width: 12),
-                                      BodyTwoDefaultText(
-                                        text: "Delete Contact",
-                                        color: AppColors.getErrorColor,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
                             ),
-                            const SizedBox(width: 4),
+                            PopupMenuItem(
+                              value: 'delete',
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.delete_outline_rounded,
+                                    color: AppColors.getErrorColor,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  BodyTwoDefaultText(
+                                    text: context.l10n.deleteCustomer,
+                                    color: AppColors.getErrorColor,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
+                        const SizedBox(width: 4),
+                      ],
+                    ),
 
-                        // Hero Profile Card + Financial Summary
-                        SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 6, 16, 12),
-                            child: Column(
-                              children: [
-                                _buildHeroProfileCard(
-                                  context: context,
-                                  customer: customer,
-                                ),
-                                const SizedBox(height: 12),
-                                _CustomerFinancialSummaryWidget(
-                                  customerID: widget.customerID,
-                                ),
-                              ],
+                    // Hero Profile Card + Financial Summary
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 6, 16, 12),
+                        child: Column(
+                          children: [
+                            _buildHeroProfileCard(
+                              context: context,
+                              customer: customer,
                             ),
-                          ),
+                            const SizedBox(height: 12),
+                            _CustomerFinancialSummaryWidget(
+                              customerID: widget.customerID,
+                            ),
+                          ],
                         ),
+                      ),
+                    ),
 
-                        // Pinned Tab Bar
-                        SliverPersistentHeader(
-                          pinned: true,
-                          delegate: _SliverTabBarDelegate(
-                            TabBar(
-                              controller: _tabController,
-                              dividerColor: Colors.transparent,
-                              indicatorSize: TabBarIndicatorSize.tab,
-                              indicator: BoxDecoration(
-                                color: AppColors.getPrimaryColor,
-                                borderRadius: BorderRadius.circular(12),
+                    // Pinned Tab Bar
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _SliverTabBarDelegate(
+                        TabBar(
+                          controller: _tabController,
+                          dividerColor: Colors.transparent,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          indicator: BoxDecoration(
+                            color: AppColors.getPrimaryColor,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          labelColor: Colors.white,
+                          unselectedLabelColor: AppColors.getLigthGreyColor,
+
+                          tabs: [
+                            Tab(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.receipt_long_rounded,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Flexible(
+                                    child: Text(
+                                      "${context.l10n.transactions} ($totalTransactionsCount)",
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              labelColor: Colors.white,
-
-                              tabs: [
-                                Tab(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.receipt_long_rounded,
-                                        size: 18,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        "Transactions ($totalTransactionsCount)",
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const Tab(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.badge_outlined, size: 18),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        "KYC & Details",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
                             ),
-                          ),
+                            Tab(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.badge_outlined, size: 18),
+                                  const SizedBox(width: 8),
+                                  Flexible(
+                                    child: Text(
+                                      context.l10n.kycAndDetails,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ];
-                    },
+                      ),
+                    ),
+                  ];
+                },
                 body: TabBarView(
                   controller: _tabController,
                   children: [
@@ -352,12 +354,12 @@ class _ContactDetailsViewState extends ConsumerState<ContactDetailsView>
               );
             },
             error: (error, _) => Scaffold(
-              appBar: AppBar(title: const Text("Error")),
-              body: const Center(
+              appBar: AppBar(title: Text(context.l10n.error)),
+              body: Center(
                 child: Padding(
-                  padding: EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.all(24.0),
                   child: BodyTwoDefaultText(
-                    text: Constant.errorFetchingContactMessage,
+                    text: context.l10n.errorFetchingContacts,
                     error: true,
                   ),
                 ),
@@ -374,8 +376,7 @@ class _ContactDetailsViewState extends ConsumerState<ContactDetailsView>
     required BuildContext context,
     required Customer customer,
   }) {
-    return Material(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    return Card(
       clipBehavior: Clip.antiAlias,
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -513,7 +514,7 @@ class _ContactDetailsViewState extends ConsumerState<ContactDetailsView>
               children: [
                 _buildActionPill(
                   icon: Icons.phone_rounded,
-                  label: "Call",
+                  label: context.l10n.call,
                   color: AppColors.getPrimaryColor,
                   onTap: () => Utility.makeCall(phoneNumber: customer.number),
                 ),
@@ -525,13 +526,13 @@ class _ContactDetailsViewState extends ConsumerState<ContactDetailsView>
                 ),
                 _buildActionPill(
                   icon: Icons.badge_outlined,
-                  label: "KYC Proof",
+                  label: context.l10n.customerProof,
                   color: const Color(0xFF8B5CF6),
                   onTap: _handleViewProof,
                 ),
                 _buildActionPill(
                   icon: Icons.add_card_rounded,
-                  label: "New Loan",
+                  label: context.l10n.newLoan,
                   color: const Color(0xFFF59E0B),
                   onTap: () => Routes.navigateToAddNewTransactionToCustomerView(
                     context: context,
@@ -599,18 +600,17 @@ class _ContactDetailsViewState extends ConsumerState<ContactDetailsView>
                 color: AppColors.getErrorColor,
               ),
               const SizedBox(height: 16),
-              const TitleWidget(text: "Customer Not Found"),
+              TitleWidget(text: context.l10n.customerNotFound),
               const SizedBox(height: 8),
-              const BodySmallText(
-                text:
-                    "The requested customer profile could not be found or has been removed.",
+              BodySmallText(
+                text: context.l10n.customerNotFoundSubtitle,
                 textAlign: TextAlign.center,
                 color: AppColors.getLigthGreyColor,
               ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text("Go Back"),
+                child: Text(context.l10n.goBack),
               ),
             ],
           ),
@@ -624,7 +624,7 @@ class _ContactDetailsViewState extends ConsumerState<ContactDetailsView>
 class _CustomerFinancialSummaryWidget extends ConsumerWidget {
   const _CustomerFinancialSummaryWidget({required this.customerID});
 
-  final int customerID;
+  final String customerID;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -632,8 +632,7 @@ class _CustomerFinancialSummaryWidget extends ConsumerWidget {
       customerFinancialSummaryProvider(customerID),
     );
 
-    return Material(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    return Card(
       clipBehavior: Clip.antiAlias,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -655,29 +654,33 @@ class _CustomerFinancialSummaryWidget extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 6),
-                      const BodySmallText(
-                        text: "Active",
+                      BodySmallText(
+                        text: context.l10n.active,
                         color: AppColors.getLigthGreyColor,
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
                   TitleWidget(
-                    text: "${summary.activeCount} Loans",
+                    text: context.l10n.loansCount(summary.activeCount),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 36, width: 1),
+            Container(
+              height: 32,
+              width: 1,
+              color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+            ),
 
             // Stat 2: Active Principal
             Expanded(
               child: Column(
                 children: [
-                  const BodySmallText(
-                    text: "Active Balance",
+                  BodySmallText(
+                    text: context.l10n.activeBalance,
                     color: AppColors.getLigthGreyColor,
                   ),
                   const SizedBox(height: 4),
@@ -691,14 +694,18 @@ class _CustomerFinancialSummaryWidget extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 36, width: 1),
+            Container(
+              height: 32,
+              width: 1,
+              color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+            ),
 
             // Stat 3: Total Borrowed
             Expanded(
               child: Column(
                 children: [
-                  const BodySmallText(
-                    text: "Total Borrowed",
+                  BodySmallText(
+                    text: context.l10n.totalBorrowed,
                     color: AppColors.getLigthGreyColor,
                   ),
                   const SizedBox(height: 4),
@@ -733,16 +740,18 @@ class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Container(
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
-          borderRadius: BorderRadius.circular(14),
+    return Material(
+      elevation: overlapsContent ? 1 : 0,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          padding: const EdgeInsets.all(3),
+          child: _tabBar,
         ),
-        padding: const EdgeInsets.all(3),
-        child: _tabBar,
       ),
     );
   }

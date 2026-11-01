@@ -7,7 +7,7 @@ part 'payment_provider.g.dart';
 @Riverpod()
 class PaymentByTrxId extends _$PaymentByTrxId {
   @override
-  Stream<List<Payment>> build({required int transactionId}) {
+  Stream<List<Payment>> build({required String transactionId}) {
     return BackEnd.watchRequriedPaymentsOfTransaction(
       transactionId: transactionId,
     );

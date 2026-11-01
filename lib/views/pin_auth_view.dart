@@ -1,10 +1,10 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/core/auth/auth.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/fonts/strong_heading_one_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/utility/preferences_helper.dart';
 import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/user_provider.dart';
@@ -73,7 +73,7 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text(Constant.enterCorrectPin)));
+        ).showSnackBar(SnackBar(content: Text(context.l10n.enterCorrectPin)));
       }
     } finally {
       if (mounted) {
@@ -108,6 +108,7 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final AsyncValue<User?> userAsync = ref.watch(userProvider);
 
     return Scaffold(
@@ -119,14 +120,11 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
             child: userAsync.when(
               loading: () => const SizedBox.shrink(),
 
-              error: (_, _) =>
-                  const BodyTwoDefaultText(text: Constant.errorUserFetch),
+              error: (_, _) => BodyTwoDefaultText(text: l10n.errorUserFetch),
 
               data: (User? user) {
                 if (user == null) {
-                  return const BodyTwoDefaultText(
-                    text: Constant.errorUserFetch,
-                  );
+                  return BodyTwoDefaultText(text: l10n.errorUserFetch);
                 }
 
                 return Column(
@@ -146,10 +144,7 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
 
                     const SizedBox(height: 20),
 
-                    const StrongHeadingOne(
-                      text: Constant.enterYourAppPin,
-                      bold: true,
-                    ),
+                    StrongHeadingOne(text: l10n.enterYourAppPin, bold: true),
 
                     const SizedBox(height: 20),
 
@@ -158,7 +153,7 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
                       obscureText: true,
                       validator: (String? value) {
                         if (value?.trim().isEmpty ?? true) {
-                          return Constant.enterYourAppPin;
+                          return l10n.enterYourAppPin;
                         }
 
                         return null;
@@ -170,7 +165,7 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 22),
                       child: RoundedCornerButton(
-                        text: _isSubmitting ? "Please wait..." : Constant.login,
+                        text: _isSubmitting ? l10n.loading : l10n.login,
                         onPressed: _isSubmitting
                             ? null
                             : () => _handlePinSubmit(expectedPin: user.userPin),

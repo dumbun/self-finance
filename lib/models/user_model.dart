@@ -57,11 +57,13 @@ class User {
 
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
-      id: map['id'] != null ? map['id'] as int : null,
-      userName: map['userName'] as String,
-      userPin: map['userPin'] as String,
-      profilePicture: map['profilePicture'] as String,
-      userCurrency: map['userCurrency'] as String,
+      id: (map['id'] is num)
+          ? (map['id'] as num).toInt()
+          : (map['id'] != null ? int.tryParse(map['id'].toString()) : null),
+      userName: map['userName']?.toString() ?? '',
+      userPin: map['userPin']?.toString() ?? '',
+      profilePicture: map['profilePicture']?.toString() ?? '',
+      userCurrency: map['userCurrency']?.toString() ?? '',
     );
   }
 

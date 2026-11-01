@@ -2,22 +2,26 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:self_finance/backend/account_database_manager.dart';
-import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/providers/user_provider.dart';
 import 'package:self_finance/views/account_gate.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
-  const SplashScreen({super.key});
+  final bool autoInit;
+
+  const SplashScreen({super.key, this.autoInit = true});
 
   @override
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _animationController;
+  late final AnimationController _glowController;
+  late final Animation<double> _glowAnimation;
   late final Animation<double> _scaleAnimation;
   late final Animation<double> _fadeAnimation;
   bool _isInitialized = false;
@@ -30,8 +34,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       duration: const Duration(milliseconds: 900),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    _glowController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2400),
+    )..repeat(reverse: true);
+
+    _glowAnimation = CurvedAnimation(
+      parent: _glowController,
+      curve: Curves.easeInOut,
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.88, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -39,12 +53,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     );
 
     _animationController.forward();
-    _initApp();
+    if (widget.autoInit) {
+      _initApp();
+    }
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _glowController.dispose();
     super.dispose();
   }
 
@@ -117,134 +134,134 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
-
     return Scaffold(
-      backgroundColor: scaffoldBg,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          color: scaffoldBg,
-          gradient: RadialGradient(
-            radius: 0.9,
-            colors: isDark
-                ? [
-                    AppColors.getPrimaryColor.withValues(alpha: 0.12),
-                    scaffoldBg,
-                  ]
-                : [
-                    AppColors.getPrimaryColor.withValues(alpha: 0.06),
-                    scaffoldBg,
+      body: Stack(
+        children: [
+          // 1. Subtle, elegant ambient top gradient
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    AppColors.getPrimaryColor.withValues(alpha: 0.10),
+                    AppColors.getTransparentColor,
                   ],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              const Spacer(flex: 3),
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(22),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF1E293B)
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(32),
-                          border: Border.all(
-                            color: AppColors.getPrimaryColor.withValues(
-                              alpha: 0.18,
-                            ),
-                            width: 1.5,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.getPrimaryColor.withValues(
-                                alpha: isDark ? 0.28 : 0.15,
-                              ),
-                              blurRadius: 40,
-                              spreadRadius: 4,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        child: Image.asset(
-                          'assets/icon/icon_only.png',
-                          height: 84,
-                          width: 84,
-                        ),
-                      ),
-                      const SizedBox(height: 28),
-                      Text(
-                        Constant.appTitle,
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -0.5,
-                          color: isDark
-                              ? Colors.white
-                              : AppColors.getPrimaryTextColor,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "Personal Lending & Finance",
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.3,
-                          color: AppColors.getLigthGreyColor,
-                        ),
-                      ),
-                    ],
-                  ),
+                  stops: const [0.0, 0.5],
                 ),
               ),
-              const Spacer(flex: 3),
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: 140,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(99),
-                        child: LinearProgressIndicator(
-                          minHeight: 3.5,
-                          backgroundColor: isDark
-                              ? Colors.white.withValues(alpha: 0.08)
-                              : AppColors.getPrimaryColor.withValues(
-                                  alpha: 0.12,
+            ),
+          ),
+
+          // 2. Center ambient radial glow (animated breathing halo)
+          Positioned.fill(
+            child: AnimatedBuilder(
+              animation: _glowAnimation,
+              builder: (context, _) {
+                return DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: const Alignment(0, -0.15),
+                      radius: 0.65 + (_glowAnimation.value * 0.15),
+                      colors: [
+                        AppColors.getPrimaryColor.withValues(
+                          alpha: 0.12 + (_glowAnimation.value * 0.05),
+                        ),
+                        AppColors.getTransparentColor,
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // 3. Foreground Content
+          SafeArea(
+            child: SizedBox.expand(
+              child: Column(
+                children: [
+                  const Spacer(flex: 5),
+
+                  // Animated Logo & Branding
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: ScaleTransition(
+                      scale: _scaleAnimation,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Clean floating brand icon with diffused drop shadow
+                          Container(
+                            width: 88,
+                            height: 88,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(22),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.getPrimaryColor.withValues(
+                                    alpha: 0.22,
+                                  ),
+                                  blurRadius: 30,
+                                  offset: const Offset(0, 10),
                                 ),
-                          valueColor: const AlwaysStoppedAnimation<Color>(
+                              ],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(22),
+                              child: Image.asset(
+                                'assets/icon/icon_only.png',
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 22),
+                          Text(
+                            context.l10n.appTitle,
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            context.l10n.appSubtitle,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                              letterSpacing: 0.2,
+                              color: AppColors.getLigthGreyColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const Spacer(flex: 4),
+
+                  // Subtle, elegant loading indicator
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: const Padding(
+                      padding: EdgeInsets.only(bottom: 24),
+                      child: SizedBox(
+                        width: 100,
+                        child: LinearProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
                             AppColors.getPrimaryColor,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Preparing your workspace...',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.getLigthGreyColor,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

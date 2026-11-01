@@ -34,16 +34,19 @@ class CsvExportUtility {
 
   // Customer lookup -----------------------------------------------------------
 
-  static Future<Map<int, Customer>> _buildCustomerMap() async {
+  static Future<Map<String, Customer>> _buildCustomerMap() async {
     final List<Customer> customers = await BackEnd.fetchAllCustomerData();
-    return {for (final c in customers) c.id!: c};
+    return {
+      for (final c in customers)
+        if (c.id != null) c.id!: c,
+    };
   }
 
   // ─── CSV builders ──────────────────────────────────────────────────────────
 
   static Future<String> _buildTransactionsCsv({
     required List<Trx> transactions,
-    required Map<int, Customer> customerMap,
+    required Map<String, Customer> customerMap,
   }) async {
     final buffer = StringBuffer();
 
@@ -90,8 +93,8 @@ class CsvExportUtility {
 
   static Future<String> _buildPaymentsCsv({
     required List<Payment> payments,
-    required Map<int, Customer> customerMap,
-    required Map<int, Trx> transactionMap,
+    required Map<String, Customer> customerMap,
+    required Map<String, Trx> transactionMap,
   }) async {
     final buffer = StringBuffer();
 
@@ -160,12 +163,13 @@ class CsvExportUtility {
     CsvProgressCallback? onProgress,
   }) async {
     try {
+      await clearExports();
       onProgress?.call(0.05, 'Loading customer data…');
-      final Map<int, Customer> customerMap = await _buildCustomerMap();
+      final Map<String, Customer> customerMap = await _buildCustomerMap();
 
       onProgress?.call(0.15, 'Loading transactions…');
       final List<Trx> allTrx = await BackEnd.fetchAllTransactions();
-      final Map<int, Trx> transactionMap = {
+      final Map<String, Trx> transactionMap = {
         for (final t in allTrx)
           if (t.id != null) t.id!: t,
       };
@@ -214,18 +218,7 @@ class CsvExportUtility {
       // ── Payment History ───────────────────────────────────────────────────
       if (types.contains(CsvExportType.paymentHistory)) {
         onProgress?.call(progress += step, 'Building payment-history CSV…');
-        // Collect all payments across all transactions
-        final List<Payment> allPayments = [];
-        for (final trx in allTrx) {
-          if (trx.id == null) continue;
-          final List<Payment> pays =
-              await BackEnd.fetchRequriedPaymentsOfTransaction(
-                transactionId: trx.id!,
-              );
-          allPayments.addAll(pays);
-        }
-        // Sort by payment date descending
-        allPayments.sort((a, b) => b.paymentDate.compareTo(a.paymentDate));
+        final List<Payment> allPayments = await BackEnd.fetchAllPayments();
 
         final String csv = await _buildPaymentsCsv(
           payments: allPayments,
@@ -249,7 +242,6 @@ class CsvExportUtility {
       }
 
       onProgress?.call(1.0, 'Done!');
-      clearExports();
       return CsvExportResult.success(exportedFiles.map((f) => f.path).toList());
     } catch (e, st) {
       clearExports();

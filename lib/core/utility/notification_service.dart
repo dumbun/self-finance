@@ -177,7 +177,7 @@ class NotificationService {
   }
 
   Future<void> scheduleTransactionDueReminder({
-    required int transactionId,
+    required String transactionId,
     required String customerName,
     required DateTime dueDate,
   }) async {
@@ -211,14 +211,12 @@ class NotificationService {
     }
   }
 
-  // Generates unique notification IDs per transaction
-  // transactionId * 10 + slot (0, 1, 2)
-  // e.g. transactionId=5 → IDs 50, 51, 52
-  int _reminderIdBase(int transactionId, int slot) {
-    return (transactionId * 10) + slot;
+  // Generates unique 32-bit int notification IDs per transaction
+  int _reminderIdBase(String transactionId, int slot) {
+    return ((transactionId.hashCode & 0x7FFFFFFF) % 10000000) * 10 + slot;
   }
 
-  Future<void> cancelTransactionReminder({required int transactionId}) async {
+  Future<void> cancelTransactionReminder({required String transactionId}) async {
     await notificationPlugin.cancel(id: _reminderIdBase(transactionId, 2));
   }
 }

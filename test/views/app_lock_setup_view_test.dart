@@ -1,7 +1,7 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_localizations/flutter_localizations.dart' as native_loc;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:self_finance/l10n/app_localizations.dart';
 import 'package:self_finance/views/app_lock_setup_view.dart';
 import 'package:self_finance/widgets/currency_type_input_widget.dart';
 import 'package:self_finance/widgets/pin_input_widget.dart';
@@ -12,11 +12,8 @@ void main() {
     await tester.pumpWidget(
       const ProviderScope(
         child: MaterialApp(
-          localizationsDelegates: [
-            native_loc.GlobalMaterialLocalizations.delegate,
-            native_loc.GlobalWidgetsLocalizations.delegate,
-            native_loc.GlobalCupertinoLocalizations.delegate,
-          ],
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: AppLockSetupView(),
         ),
       ),

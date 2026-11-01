@@ -1,7 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/providers/settings_provider.dart';
 
@@ -24,7 +24,7 @@ class BiometricButtonWidget extends ConsumerWidget {
                 )
               : const SizedBox.shrink(),
           error: (error, stackTrace) =>
-              const BodyTwoDefaultText(text: Constant.errorUserFetch),
+              BodyTwoDefaultText(text: context.l10n.errorUserFetch),
           loading: () => const CircularProgressIndicator.adaptive(),
         );
   }

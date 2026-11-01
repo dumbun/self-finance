@@ -14,9 +14,9 @@ void main() {
 
     test('copyWith updates fields correctly', () {
       final txn = TrxWithCustomer(
-        id: 1,
-        customerId: 10,
-        itemId: 100,
+        id: '1',
+        customerId: '10',
+        itemId: '100',
         transactionDate: DateTime(2026),
         transactionType: 'Active',
         amount: 5000.0,
@@ -36,7 +36,7 @@ void main() {
       );
 
       expect(state.transactions.length, 1);
-      expect(state.transactions.first.id, 1);
+      expect(state.transactions.first.id, '1');
       expect(state.hasMore, isFalse);
       expect(state.isLoadingMore, isTrue);
       expect(state.loadMoreError, isNull);

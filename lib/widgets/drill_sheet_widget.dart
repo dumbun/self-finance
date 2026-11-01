@@ -24,12 +24,10 @@ class DrillSheet extends ConsumerWidget {
       initialChildSize: 0.55,
       minChildSize: 0.35,
       maxChildSize: 0.92,
-      builder: (_, ScrollController sc) => DecoratedBox(
-        decoration: BoxDecoration(
-          color: Theme.of(
-            context,
-          ).colorScheme.surface, //with out this it will became transaparent
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      builder: (_, ScrollController sc) => Material(
+        clipBehavior: Clip.antiAlias,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           children: [
@@ -76,11 +74,11 @@ class DrillSheet extends ConsumerWidget {
                   }
 
                   final double totalRec = items
-                      .where((e) => e.isReceived)
-                      .fold(0.0, (s, e) => s + e.amount);
+                      .where((DrillItem e) => e.isReceived)
+                      .fold<double>(0.0, (double s, DrillItem e) => s + e.amount);
                   final double totalDis = items
-                      .where((e) => !e.isReceived)
-                      .fold(0.0, (s, e) => s + e.amount);
+                      .where((DrillItem e) => !e.isReceived)
+                      .fold<double>(0.0, (double s, DrillItem e) => s + e.amount);
 
                   return ListView(
                     controller: sc,
@@ -92,11 +90,10 @@ class DrillSheet extends ConsumerWidget {
                           _MiniStat('In', totalRec, AppColors.getPrimaryColor),
                           const SizedBox(width: 12),
                           _MiniStat('Out', totalDis, AppColors.getErrorColor),
-                          const SizedBox(width: 12),
                         ],
                       ),
                       const SizedBox(height: 14),
-                      ...items.map((item) => _DrillRow(item: item)),
+                      ...items.map((DrillItem item) => _DrillRow(item: item)),
                     ],
                   );
                 },
@@ -195,13 +192,15 @@ class _DrillRow extends StatelessWidget {
                 BodySmallText(
                   text: 'ID: ${item.id}  ·  ${item.date}',
                   color: AppColors.getLigthGreyColor,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
           CurrencyWidget(
             amount:
-                '${item.isReceived ? '+' : '-'}\$${Utility.doubleFormate(item.amount)}',
+                '${item.isReceived ? '+' : '-'} ${Utility.doubleFormate(item.amount)}',
             smallText: true,
             color: color,
           ),

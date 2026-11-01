@@ -1,6 +1,6 @@
 class Payment {
-  int? id;
-  final int transactionId;
+  final String? id;
+  final String transactionId;
   final DateTime paymentDate;
   final double amountpaid;
   final String type;
@@ -21,8 +21,8 @@ class Payment {
 
     return data.map((e) {
       return Payment(
-        id: e["Payment_ID"],
-        transactionId: e["Transaction_ID"],
+        id: e["Payment_ID"]?.toString(),
+        transactionId: e["Transaction_ID"]?.toString() ?? '',
         paymentDate: e["Payment_Date"],
         amountpaid: e["Amount_Paid"],
         type: e["Payment_Type"],
@@ -32,8 +32,8 @@ class Payment {
   }
 
   Payment copyWith({
-    int? id,
-    int? transactionId,
+    String? id,
+    String? transactionId,
     DateTime? paymentDate,
     double? amountpaid,
     String? type,
@@ -62,12 +62,20 @@ class Payment {
 
   factory Payment.fromMap(Map<String, dynamic> map) {
     return Payment(
-      id: map['id'] != null ? map['id'] as int : null,
-      transactionId: map['transactionId'] as int,
-      paymentDate: map['paymentDate'] as DateTime,
-      amountpaid: map['amountpaid'] as double,
-      type: map['type'] as String,
-      createdDate: map['createdDate'] as DateTime,
+      id: map['id']?.toString(),
+      transactionId: map['transactionId']?.toString() ?? '',
+      paymentDate: map['paymentDate'] is DateTime
+          ? map['paymentDate'] as DateTime
+          : DateTime.tryParse(map['paymentDate']?.toString() ?? '') ??
+              DateTime.now(),
+      amountpaid: (map['amountpaid'] is num)
+          ? (map['amountpaid'] as num).toDouble()
+          : double.tryParse(map['amountpaid']?.toString() ?? '0.0') ?? 0.0,
+      type: map['type']?.toString() ?? '',
+      createdDate: map['createdDate'] is DateTime
+          ? map['createdDate'] as DateTime
+          : DateTime.tryParse(map['createdDate']?.toString() ?? '') ??
+              DateTime.now(),
     );
   }
 

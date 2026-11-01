@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/models/particles_model.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -232,7 +233,7 @@ class _AnimatedDotPatternState extends State<AnimatedDotPattern>
   Widget build(BuildContext context) {
     final color =
         widget.dotColor ??
-        Theme.of(context).colorScheme.primary.withValues(alpha: 0.85);
+        AppColors.getPrimaryColor.withValues(alpha: 0.85);
 
     return VisibilityDetector(
       key: ValueKey(_visibilityKey),

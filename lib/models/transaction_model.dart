@@ -11,11 +11,12 @@ class Trx {
     required this.remainingAmount,
     required this.signature,
     required this.createdDate,
+    this.verificationToken,
   });
 
-  int? id;
-  final int customerId;
-  final int itemId;
+  final String? id;
+  final String customerId;
+  final String itemId;
   final DateTime transacrtionDate;
   final String transacrtionType;
   final double amount;
@@ -24,6 +25,7 @@ class Trx {
   final double remainingAmount;
   final String signature;
   final DateTime createdDate;
+  final String? verificationToken;
 
   /// [Trx] is a shortform of Transaction class
   /// using this class we can create a [Transaction] which contains the
@@ -44,9 +46,9 @@ class Trx {
 
     return data.map((e) {
       return Trx(
-        id: e["Transaction_ID"],
-        customerId: e["Customer_ID"],
-        itemId: e["Item_ID"],
+        id: e["Transaction_ID"]?.toString(),
+        customerId: e["Customer_ID"]?.toString() ?? '',
+        itemId: e["Item_ID"]?.toString() ?? '',
         transacrtionDate: e["Transaction_Date"],
         transacrtionType: e["Transaction_Type"],
         amount: e["Amount"],
@@ -55,14 +57,15 @@ class Trx {
         remainingAmount: e["Remaining_Amount"],
         signature: e["Signature"],
         createdDate: e["Created_Date"],
+        verificationToken: e["Verification_Token"]?.toString(),
       );
     }).toList();
   }
 
   Trx copyWith({
-    int? id,
-    int? customerId,
-    int? itemId,
+    String? id,
+    String? customerId,
+    String? itemId,
     DateTime? transacrtionDate,
     String? transacrtionType,
     double? amount,
@@ -72,6 +75,7 @@ class Trx {
     String? proofPhoto,
     String? signature,
     DateTime? createdDate,
+    String? verificationToken,
   }) {
     return Trx(
       id: id ?? this.id,
@@ -85,6 +89,7 @@ class Trx {
       remainingAmount: remainingAmount ?? this.remainingAmount,
       signature: signature ?? this.signature,
       createdDate: createdDate ?? this.createdDate,
+      verificationToken: verificationToken ?? this.verificationToken,
     );
   }
 
@@ -101,22 +106,38 @@ class Trx {
       'remainingAmount': remainingAmount,
       'signature': signature,
       'createdDate': createdDate,
+      'verificationToken': verificationToken,
     };
   }
 
   factory Trx.fromMap(Map<String, dynamic> map) {
     return Trx(
-      id: map['id'] != null ? map['id'] as int : null,
-      customerId: map['customerId'] as int,
-      itemId: map['itemId'] as int,
-      transacrtionDate: map['transacrtionDate'] as DateTime,
-      transacrtionType: map['transacrtionType'] as String,
-      amount: map['amount'] as double,
-      intrestRate: map['intrestRate'] as double,
-      intrestAmount: map['intrestAmount'] as double,
-      remainingAmount: map['remainingAmount'] as double,
-      signature: map['signature'] as String,
-      createdDate: map['createdDate'] as DateTime,
+      id: map['id']?.toString(),
+      customerId: map['customerId']?.toString() ?? '',
+      itemId: map['itemId']?.toString() ?? '',
+      transacrtionDate: map['transacrtionDate'] is DateTime
+          ? map['transacrtionDate'] as DateTime
+          : DateTime.tryParse(map['transacrtionDate']?.toString() ?? '') ??
+              DateTime.now(),
+      transacrtionType: map['transacrtionType']?.toString() ?? '',
+      amount: (map['amount'] is num)
+          ? (map['amount'] as num).toDouble()
+          : double.tryParse(map['amount']?.toString() ?? '0.0') ?? 0.0,
+      intrestRate: (map['intrestRate'] is num)
+          ? (map['intrestRate'] as num).toDouble()
+          : double.tryParse(map['intrestRate']?.toString() ?? '0.0') ?? 0.0,
+      intrestAmount: (map['intrestAmount'] is num)
+          ? (map['intrestAmount'] as num).toDouble()
+          : double.tryParse(map['intrestAmount']?.toString() ?? '0.0') ?? 0.0,
+      remainingAmount: (map['remainingAmount'] is num)
+          ? (map['remainingAmount'] as num).toDouble()
+          : double.tryParse(map['remainingAmount']?.toString() ?? '0.0') ?? 0.0,
+      signature: map['signature']?.toString() ?? '',
+      createdDate: map['createdDate'] is DateTime
+          ? map['createdDate'] as DateTime
+          : DateTime.tryParse(map['createdDate']?.toString() ?? '') ??
+              DateTime.now(),
+      verificationToken: map['verificationToken']?.toString(),
     );
   }
 

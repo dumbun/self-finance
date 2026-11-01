@@ -33,11 +33,13 @@ CREATE TABLE IF NOT EXISTS public.customers (
 
 ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can access their own customers" ON public.customers;
 CREATE POLICY "Users can access their own customers"
     ON public.customers FOR ALL
     USING (auth.uid() = owner_id)
     WITH CHECK (auth.uid() = owner_id);
 
+DROP TRIGGER IF EXISTS trg_customers_updated_at ON public.customers;
 CREATE TRIGGER trg_customers_updated_at
     BEFORE UPDATE ON public.customers
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
@@ -66,11 +68,13 @@ CREATE TABLE IF NOT EXISTS public.items (
 
 ALTER TABLE public.items ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can access their own items" ON public.items;
 CREATE POLICY "Users can access their own items"
     ON public.items FOR ALL
     USING (auth.uid() = owner_id)
     WITH CHECK (auth.uid() = owner_id);
 
+DROP TRIGGER IF EXISTS trg_items_updated_at ON public.items;
 CREATE TRIGGER trg_items_updated_at
     BEFORE UPDATE ON public.items
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
@@ -101,11 +105,13 @@ CREATE TABLE IF NOT EXISTS public.transactions (
 
 ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can access their own transactions" ON public.transactions;
 CREATE POLICY "Users can access their own transactions"
     ON public.transactions FOR ALL
     USING (auth.uid() = owner_id)
     WITH CHECK (auth.uid() = owner_id);
 
+DROP TRIGGER IF EXISTS trg_transactions_updated_at ON public.transactions;
 CREATE TRIGGER trg_transactions_updated_at
     BEFORE UPDATE ON public.transactions
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
@@ -132,11 +138,13 @@ CREATE TABLE IF NOT EXISTS public.payments (
 
 ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can access their own payments" ON public.payments;
 CREATE POLICY "Users can access their own payments"
     ON public.payments FOR ALL
     USING (auth.uid() = owner_id)
     WITH CHECK (auth.uid() = owner_id);
 
+DROP TRIGGER IF EXISTS trg_payments_updated_at ON public.payments;
 CREATE TRIGGER trg_payments_updated_at
     BEFORE UPDATE ON public.payments
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
@@ -166,11 +174,13 @@ CREATE TABLE IF NOT EXISTS public.history (
 
 ALTER TABLE public.history ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can access their own history" ON public.history;
 CREATE POLICY "Users can access their own history"
     ON public.history FOR ALL
     USING (auth.uid() = owner_id)
     WITH CHECK (auth.uid() = owner_id);
 
+DROP TRIGGER IF EXISTS trg_history_updated_at ON public.history;
 CREATE TRIGGER trg_history_updated_at
     BEFORE UPDATE ON public.history
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();

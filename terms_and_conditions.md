@@ -1,62 +1,171 @@
-# Self-Finance Terms of Use
+# Self-Finance Terms of Use / Terms & Conditions
 
-**Effective date: 24 October 2026**
+**Effective Date:** 01 November 2026  
+**Last Updated:** 01 November 2026  
 
-These Terms of Use (“Terms”) apply to your access to and use of the Self-Finance mobile application (“App”). The App is developed by Kamsali Vamshi Krishna (“we,” “us,” or “our”). By installing or using the App, you agree to these Terms. If you do not agree, do not use the App.
+These Terms of Use (“Terms,” “Terms and Conditions,” or “Agreement”) constitute a legally binding agreement between you (“User,” “you,” or “your”) and **Kamsali Vamshi Krishna** (“Developer,” “we,” “us,” or “our”), governing your access to and use of the **Self-Finance** mobile application (the “App” or “Service”), available on the Google Play Store and Apple App Store, and all associated cloud synchronization and calculation services.
 
-**Contact:** [sf.help.vamshi@gmail.com](mailto:sf.help.vamshi@gmail.com)
+By installing, accessing, creating an account with, or using the Self-Finance App, you acknowledge that you have read, understood, and agreed to be bound by these Terms and our [Privacy Policy](https://dumbun.github.io/self-finance/privacy_and_policy). If you do not agree to all of these Terms, do not install, access, or use the App.
 
-## 1. What the App does
+* **Developer:** Kamsali Vamshi Krishna
+* **Contact & Support:** [sf.help.vamshi@gmail.com](mailto:sf.help.vamshi@gmail.com)
+* **Application Repository:** [https://github.com/dumbun/self-finance](https://github.com/dumbun/self-finance)
 
-Self-Finance provides tools to record and manage customer, loan, item, payment, and transaction information, and to create reports, calculations, reminders, and exports. The App is a recordkeeping and calculation tool. It is not a bank, lender, payment processor, credit bureau, accounting service, or provider of legal, tax, or financial advice. We do not arrange, approve, or collect loans or payments for you.
+---
 
-## 2. Accounts and cloud sync
+## 1. Description of the Service
 
-Some features use Google sign-in and Supabase-hosted cloud synchronization. You are responsible for keeping access to your account secure and for activity carried out through it. You must provide accurate account details and notify us if you believe your account has been accessed without permission.
+Self-Finance is a digital record-keeping, ledger, customer management, interest calculation, and invoicing application designed for shopkeepers, small finance operators, pawnbrokers, and individuals to track transactions, collateral items, repayments, and customer balances.
 
-Records may be stored locally and synchronized to cloud services when you use the signed-in sync features. You are responsible for maintaining copies of records you need. Before uninstalling the App, changing devices, or deleting an account, export or sync information you want to keep. For account or cloud-data deletion requests, contact us at the email above.
+The App operates in an offline-first architecture on your local device and offers optional cloud backup and synchronization across your devices through our hosted Supabase backend.
 
-## 3. Your content and responsibilities
+---
 
-You retain responsibility for the records and files you add to the App. You confirm that you have the rights and permissions needed to collect, store, and use information about customers and other people, including photos, identification or proof images, signatures, and contact details. You must provide any notices and obtain any consent required by law.
+## 2. CRITICAL FINANCIAL & NON-LENDING DISCLAIMER (Regulatory Notice)
 
-You agree to use the App lawfully, keep your device and account reasonably secure, review your records for accuracy, and not misuse the App or attempt to interfere with its operation or security. Do not use the App to violate another person’s rights or applicable laws.
+**PLEASE READ THIS SECTION CAREFULLY BEFORE USING THE APP:**
 
-## 4. Calculations and records
+1. **Self-Finance is Strictly a Bookkeeping Tool:** Self-Finance is a software utility designed solely to assist you in maintaining internal records and performing mathematical interest calculations. 
+2. **Not a Financial Institution or Lender:** Self-Finance is **NOT** a bank, Non-Banking Financial Company (NBFC), licensed money lender, credit union, microfinance institution, peer-to-peer (P2P) lending platform, credit bureau, or payment processor. We do not provide financial, banking, accounting, legal, credit, or tax advice.
+3. **No Lending, Funding, or Disbursement:** The App does **NOT** offer, issue, originate, broker, underwrite, or disburse loans or credit of any kind. The App does **NOT** collect payments or hold funds in escrow.
+4. **Independent Transactions:** Any loan transactions, pawning/collateral arrangements, interest rates, repayment schedules, or credit agreements recorded in the App represent private, independent agreements entered into solely between you and your customers outside the application. We are not a party to any transaction between you and third parties.
+5. **Compliance with Local Moneylending Laws:** You are solely and exclusively responsible for ensuring that your lending, pawnbroking, and financial record-keeping practices comply with all applicable local, municipal, state, and national laws and regulations. This includes, but is not limited to:
+   * Obtaining required money lending, pawnbroking, or shopkeeper licenses or registrations under applicable state or national legislation (such as state Money Lenders Acts in India or equivalent laws in your jurisdiction).
+   * Adhering to statutory interest rate caps, usury limits, and maximum Annual Percentage Rates (APR).
+   * Providing mandatory statutory loan disclosures and receipts to borrowers.
+   * Complying with fair debt collection practices and consumer protection standards.
+   * Fulfilling all applicable tax obligations, income declarations, and GST/VAT requirements.
 
-Calculations and reports are generated from the information and settings you provide. They are supplied as a convenience and may not reflect every contract term, legal requirement, rounding convention, or real-world circumstance. Check all calculations, dates, balances, and exported documents before relying on or sharing them. You remain responsible for your lending, recordkeeping, compliance, and business decisions.
+We disclaim all liability arising from your failure to comply with statutory money lending, licensing, or consumer protection requirements.
 
-## 5. Device permissions and third-party services
+---
 
-Some optional features need access to device functions such as the camera, photo picker, biometrics, or notifications. You can control permissions in your device settings, though related features may not work without them. Google sign-in and Supabase cloud services are subject to their respective terms and privacy policies. When you export or share a file, the destination service handles it under its own policies.
+## 3. Accuracy of Calculations & Invoicing Disclaimers
 
-## 6. Availability and changes
+1. **Informational Estimates Only:** Interest calculations (monthly rates, simple interest, compounding, and custom formulas), EMI tables, payment balances, and due dates generated by the App are mathematical computations based strictly on data and rates you input. They are provided as a convenience for reference purposes only.
+2. **No Warranty of Precision:** While we endeavor to ensure mathematical correctness, calculations may not reflect custom contractual nuances, local day-count conventions (e.g., actual/360 vs. actual/365), statutory leap-year adjustments, rounding variations, or specific legal mandates.
+3. **Independent Verification Required:** You must independently review, verify, and confirm all interest computations, payment allocations, outstanding balances, and generated PDF invoices or receipts before executing agreements, disbursing funds, or demanding payments from borrowers.
+4. **Generated Invoices & Signatures:** The App enables you to generate PDF receipts and invoices containing customer signatures. You remain solely responsible for ensuring that such receipts satisfy local evidentiary and legal standards for contracts and promissory notes in your jurisdiction.
 
-We may update, change, suspend, or discontinue features to maintain or improve the App, address security or legal needs, or respond to service-provider changes. We will make reasonable efforts to communicate material changes where appropriate. We do not guarantee uninterrupted availability, error-free operation, or that cloud sync will always complete successfully.
+---
 
-## 7. Intellectual property and feedback
+## 4. Accounts, Authentication & Cloud Synchronization
 
-The App and its original content, design, and software are owned by their respective rights holders and are protected by applicable intellectual-property laws. These Terms do not transfer ownership to you. If you send suggestions or feedback, you allow us to use them to improve the App without compensation or restriction, to the extent permitted by law.
+1. **Account Registration:** To enable cloud synchronization across devices, you must sign in using your Google account via our Supabase authentication integration. You agree to provide accurate information and maintain the security of your Google account credentials.
+2. **Device-Level Security:** You are responsible for safeguarding your physical device, configuring a secure 4-digit PIN code within the App, and enabling biometric authentication (Fingerprint / Face ID) to prevent unauthorized access to your ledger records.
+3. **Cloud Sync Operations:** Cloud synchronization transmits and stores encrypted copies of your records, customer files, photos, and signatures on Supabase cloud infrastructure. While we employ industry-standard cloud security and Row-Level Security (RLS), we do not guarantee that cloud synchronization will be uninterrupted, instant, or free from network-induced transmission errors.
+4. **Data Backups & Export:** **You are strictly responsible for maintaining independent backups of your records.** You should regularly export your transaction data using the built-in CSV export tool. We are not responsible for any loss of data resulting from device damage, app uninstallation, lost devices, or network connectivity failures.
 
-## 8. Disclaimer and limitation
+---
 
-To the extent permitted by applicable law, the App is provided “as is” and “as available,” without warranties that cannot be excluded by law. We are not responsible for decisions made using the App, errors in information you enter, inability to access the App or sync, or loss of data caused by your device, third-party services, or circumstances outside our reasonable control. Nothing in these Terms excludes liability that cannot legally be excluded.
+## 5. User Content & Warranties Concerning Customer Data
 
-## 9. Suspension and termination
+The App allows you to input, store, and sync customer information, phone numbers, addresses, government identity proof documents, collateral photographs, and customer digital signatures (“User Content”).
 
-You may stop using the App at any time. We may suspend or restrict access if reasonably necessary to protect the App, its users, or comply with law, including in response to misuse or a security risk. Local data may remain on your device after you stop using the App; cloud data is handled as described in the Privacy Policy.
+1. **Ownership:** You retain full ownership of and legal responsibility for all User Content you enter into Self-Finance.
+2. **Authority and Lawful Consent Warranties:** By adding any information, identity proof images (such as Aadhaar cards, PAN cards, or other IDs), photographs, or signatures of customers or third parties to the App, you represent and warrant that:
+   * You have obtained all necessary, informed, and lawful consents, authorizations, and permissions from the respective individuals to collect, store, upload, and process their personal and sensitive information in the App.
+   * Your collection and use of such data complies fully with applicable data privacy and protection laws, including the Digital Personal Data Protection Act, 2023 (India), GDPR, CCPA, or applicable regional standards.
+   * You will promptly delete or rectify customer records upon receiving a valid request from the individual customer.
+3. **Prohibited Conduct:** You agree that you will not use the App to:
+   * Record false, fraudulent, defamatory, or deceptive transaction records.
+   * Store obscene, unlawful, harassing, or infringing media or documents.
+   * Violate any applicable anti-money laundering (AML), counter-terrorist financing (CTF), or anti-extortion regulations.
+   * Attempt to reverse-engineer, decompile, tamper with, or compromise the security or integrity of the App, its APIs, or Supabase backend systems.
 
-## 10. Governing law
+---
 
-These Terms are governed by the laws of India, without regard to conflict-of-law principles, subject to any mandatory consumer protections that apply where you live.
+## 6. Device Permissions & Third-Party Services
 
-## 11. Changes to these Terms
+1. **Device Permissions:** The App requests access to device features (Camera, Photo Gallery, Biometrics, Notifications, and Phone/SMS launchers) to provide core functionality. You may control these permissions through your device settings, although disabling them may render corresponding features unavailable.
+2. **Third-Party Services:** The App integrates third-party services, including **Google LLC** (Google Sign-In) and **Supabase Inc.** (Cloud database, authentication, and storage). Your use of these third-party services is subject to their respective terms and privacy policies. We are not responsible for the availability, security, or operations of third-party platforms.
+3. **External Communications & Sharing:** When you initiate phone calls, send SMS messages, or export records to external apps (such as WhatsApp, Google Drive, or email clients), those communications and files are handled by the receiving apps under their own separate terms.
 
-We may revise these Terms by publishing an updated version with a new effective date. Your continued use of the App after the revised Terms take effect means you accept them, to the extent permitted by law. If you do not agree, stop using the App.
+---
 
-## 12. Contact
+## 7. Intellectual Property Rights
 
-Questions about these Terms can be sent to:
+1. **Developer Ownership:** All intellectual property rights in the Self-Finance application, including but not limited to the source code, user interface, visual layout, icons, software algorithms, and trademarks, are owned by Kamsali Vamshi Krishna and are protected by applicable intellectual property and copyright laws.
+2. **Limited License:** We grant you a personal, non-exclusive, non-transferable, revocable license to download, install, and use the App on your mobile devices solely for your business bookkeeping or personal record-keeping purposes in accordance with these Terms.
+3. **Feedback:** If you provide suggestions, bug reports, feature requests, or feedback regarding Self-Finance, you grant us an irrevocable, perpetual, royalty-free, worldwide license to use, modify, and incorporate such feedback into the App without compensation or obligation to you.
 
-**Kamsali Vamshi Krishna**<br>
-[sf.help.vamshi@gmail.com](mailto:sf.help.vamshi@gmail.com)
+---
+
+## 8. Disclaimer of Warranties
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW:
+* THE SELF-FINANCE APPLICATION, ITS FEATURES, CLOUD SERVICES, AND ALL CONTENT ARE PROVIDED ON AN **“AS IS”** AND **“AS AVAILABLE”** BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE.
+* WE EXPRESSLY DISCLAIM ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT, AND ACCURACY.
+* WE DO NOT WARRANT THAT THE APP WILL MEET YOUR SPECIFIC BUSINESS REQUIREMENTS, THAT ITS OPERATION WILL BE UNINTERRUPTED, SECURE, OR ERROR-FREE, THAT CALCULATIONS WILL BE FREE FROM DISCREPANCIES, OR THAT DATA TRANSMITTED VIA CLOUD SYNC WILL NEVER BE DELAYED OR SUBJECT TO LOSS.
+
+---
+
+## 9. Limitation of Liability
+
+TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW:
+* IN NO EVENT SHALL THE DEVELOPER (KAMSALI VAMSHI KRISHNA), CONTRIBUTORS, OR AFFILIATES BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES WHATSOEVER, INCLUDING BUT NOT LIMITED TO:
+  * LOSS OF PROFITS, REVENUE, DATA, GOODWILL, OR BUSINESS OPPORTUNITIES;
+  * FINANCIAL LOSSES ARISING FROM BORROWER OR CUSTOMER DEFAULTS, NON-PAYMENT, OR LOAN DISPUTES;
+  * INACCURACIES, CALCULATION ERRORS, OR INVOICING DISCREPANCIES;
+  * UNAUTHORIZED ACCESS TO OR ALTERATION OF YOUR TRANSMISSIONS OR DATA;
+  * DATA LOSS DUE TO DEVICE MALFUNCTION, APP UNINSTALLATION, OR FAILURE TO MAINTAIN INDEPENDENT BACKUPS; OR
+  * REGULATORY FINES, PENALTIES, OR SANCTIONS IMPOSED ON YOUR LENDING OR BOOKKEEPING PRACTICES.
+* OUR TOTAL AGGREGATE LIABILITY ARISING OUT OF OR IN CONNECTION WITH THESE TERMS OR YOUR USE OF THE APP SHALL NOT EXCEED THE TOTAL AMOUNT PAID BY YOU (IF ANY) TO US FOR USING THE APP DURING THE TWELVE (12) MONTHS PRECEDING THE CLAIM, OR INR ₹1,000 (ONE THOUSAND INDIAN RUPEES), WHICHEVER IS LESS.
+
+---
+
+## 10. Indemnification
+
+You agree to defend, indemnify, and hold harmless the Developer (Kamsali Vamshi Krishna) from and against any and all claims, liabilities, damages, losses, costs, demands, and expenses (including reasonable legal fees) arising out of or related to:
+* Your access to or use of the Self-Finance App;
+* Your breach or alleged violation of these Terms or our Privacy Policy;
+* Any financial, lending, interest rate, or debt recovery dispute between you and your customers, borrowers, or third parties;
+* Any violation of third-party privacy, statutory, or consumer rights resulting from customer data, photos, ID documents, or signatures you record in the App; or
+* Your failure to comply with any applicable money lending, licensing, banking, or tax laws.
+
+---
+
+## 11. Suspension, Termination & Account Deletion
+
+1. **Termination by You:** You may terminate these Terms at any time by ceasing to use the App, uninstalling it, and requesting cloud account deletion as detailed below.
+2. **Termination by Us:** We reserve the right to suspend or terminate your access to cloud features or the App at our discretion, without prior notice, if we believe you have breached these Terms, used the App for illegal purposes, or created security risks for our infrastructure.
+3. **Cloud Account & Data Deletion:** You can permanently delete your cloud account and all associated synchronized ledger data, customer records, photos, and signatures by submitting a verified request to [sf.help.vamshi@gmail.com](mailto:sf.help.vamshi@gmail.com). Deletion will be executed within 30 days in accordance with our [Privacy Policy](https://dumbun.github.io/self-finance/privacy_and_policy#account-and-data-deletion) and [Account Deletion Guide](https://dumbun.github.io/self-finance/account_deletion).
+
+---
+
+## 12. Governing Law & Dispute Resolution
+
+These Terms and any dispute or claim arising out of or in connection with them shall be governed by and construed in accordance with the laws of **India**, without giving effect to any principles of conflicts of law.
+
+Subject to mandatory consumer protection laws that apply in your jurisdiction, you agree that any legal action or proceeding arising out of or relating to these Terms or the App shall be instituted exclusively in the competent courts located in **Hyderabad, Telangana, India**, and you hereby consent to the personal jurisdiction and venue of such courts.
+
+---
+
+## 13. Modifications to These Terms
+
+We reserve the right to modify, amend, or replace these Terms at any time. When modifications are made, we will update the “Last Updated” and “Effective Date” at the top of these Terms. If changes are material, we will provide reasonable notice through the App or by updating our published web policy. Your continued use of Self-Finance following the posting of updated Terms constitutes your binding acceptance of the revised Terms. If you do not agree to the revised Terms, you must stop using the App.
+
+---
+
+## 14. Apple App Store Required Addendum (EULA Minimum Terms)
+
+If you downloaded the Self-Finance App from the Apple App Store, the following additional terms apply as required by Apple Inc.’s Minimum Terms of End User License Agreement (Schedule 2 of the Apple Developer Program License Agreement):
+
+1. **Acknowledgment:** You and the Developer acknowledge that these Terms are concluded between you and the Developer only, and not with Apple Inc. (“Apple”). The Developer, not Apple, is solely responsible for the Self-Finance App and the content thereof.
+2. **Scope of License:** The license granted to you for the App is limited to a non-transferable license to use the App on any Apple-branded products that you own or control and as permitted by the Usage Rules set forth in the Apple Media Services Terms and Conditions.
+3. **Maintenance and Support:** The Developer is solely responsible for providing any maintenance and support services with respect to the App as specified in these Terms or required by applicable law. You and the Developer acknowledge that Apple has no obligation whatsoever to furnish any maintenance and support services with respect to the App.
+4. **Warranty:** The Developer is solely responsible for any product warranties, whether express or implied by law, to the extent not effectively disclaimed. In the event of any failure of the App to conform to any applicable warranty, you may notify Apple, and Apple will refund the purchase price (if any) for the App to you. To the maximum extent permitted by applicable law, Apple will have no other warranty obligation whatsoever with respect to the App, and any other claims, losses, liabilities, damages, costs, or expenses attributable to any failure to conform to any warranty will be the Developer’s sole responsibility.
+5. **Product Claims:** You and the Developer acknowledge that the Developer, not Apple, is responsible for addressing any claims of the user or any third party relating to the App or the user’s possession and/or use of the App, including, but not limited to: (i) product liability claims; (ii) any claim that the App fails to conform to any applicable legal or regulatory requirement; and (iii) claims arising under consumer protection, privacy, or similar legislation.
+6. **Intellectual Property Rights:** You and the Developer acknowledge that, in the event of any third-party claim that the App or your possession and use of the App infringes that third party’s intellectual property rights, the Developer, not Apple, will be solely responsible for the investigation, defense, settlement, and discharge of any such intellectual property infringement claim.
+7. **Legal Compliance:** You represent and warrant that: (i) you are not located in a country that is subject to a U.S. Government embargo, or that has been designated by the U.S. Government as a “terrorist supporting” country; and (ii) you are not listed on any U.S. Government list of prohibited or restricted parties.
+8. **Third-Party Beneficiary:** You and the Developer acknowledge and agree that Apple, and Apple’s subsidiaries, are third-party beneficiaries of these Terms, and that, upon your acceptance of the terms and conditions of these Terms, Apple will have the right (and will be deemed to have accepted the right) to enforce these Terms against you as a third-party beneficiary thereof.
+
+---
+
+## 15. Contact Information
+
+If you have questions, feedback, or legal inquiries concerning these Terms of Use, please contact:
+
+* **Developer:** Kamsali Vamshi Krishna
+* **Email:** [sf.help.vamshi@gmail.com](mailto:sf.help.vamshi@gmail.com)
+* **Application Website:** [https://github.com/dumbun/self-finance](https://github.com/dumbun/self-finance)

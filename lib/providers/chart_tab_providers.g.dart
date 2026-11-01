@@ -130,7 +130,7 @@ final class WeeklyChartProvider
   WeeklyChart create() => WeeklyChart();
 }
 
-String _$weeklyChartHash() => r'2d938db45040cb4af361c11e2bc10029d70097f8';
+String _$weeklyChartHash() => r'7328c79517b30e6da5c9c8062d8a2fb885e11c17';
 
 abstract class _$WeeklyChart extends $StreamNotifier<MonthlyChartState> {
   Stream<MonthlyChartState> build();

@@ -1,9 +1,9 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/contacts_model.dart';
@@ -60,17 +60,17 @@ class BuildCustomersListWidget extends ConsumerWidget {
                       );
                     },
                   )
-                : const Center(
+                : Center(
                     child: BodyOneDefaultText(
-                      text: Constant.zeroContacts,
+                      text: context.l10n.zeroContacts,
                       bold: true,
                     ),
                   );
           },
           error: (Object error, StackTrace stackTrace) {
-            return const Center(
+            return Center(
               child: BodyOneDefaultText(
-                text: Constant.errorFetchingContactMessage,
+                text: context.l10n.errorFetchingContacts,
               ),
             );
           },

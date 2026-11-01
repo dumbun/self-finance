@@ -86,6 +86,50 @@ class SyncEngine {
         'Sync Push: Processing batch of ${pending.length} operations.',
       );
 
+      // Group pending operations by entityType and entitySyncId to coalesce redundant mutations
+      final grouped = <String, List<SyncOutboxRow>>{};
+      for (final op in pending) {
+        final key = '${op.entityType}:${op.entitySyncId}';
+        grouped.putIfAbsent(key, () => []).add(op);
+      }
+
+      final coalescedOps = <SyncOutboxRow>[];
+      final immediateDiscardIds = <int>[];
+      final allOutboxIdsByGroupKey = <String, List<int>>{};
+
+      for (final entry in grouped.entries) {
+        final ops = entry.value;
+        final key = entry.key;
+        final ids = ops.map((o) => o.outboxId).toList();
+        allOutboxIdsByGroupKey[key] = ids;
+
+        final hasCreate =
+            ops.any((o) => o.operation == SyncOutboxService.opCreate);
+        final latestOp = ops.last;
+
+        if (hasCreate && latestOp.operation == SyncOutboxService.opDelete) {
+          // Created and deleted offline before ever reaching cloud: discard directly
+          immediateDiscardIds.addAll(ids);
+        } else {
+          final effectiveOperation =
+              hasCreate ? SyncOutboxService.opCreate : latestOp.operation;
+          coalescedOps.add(
+            latestOp.copyWith(operation: effectiveOperation),
+          );
+        }
+      }
+
+      if (immediateDiscardIds.isNotEmpty) {
+        await SyncOutboxService.removeEntries(db, immediateDiscardIds);
+        debugPrint(
+          'Sync Push: Discarded ${immediateDiscardIds.length} ephemeral offline create+delete operations.',
+        );
+      }
+
+      if (coalescedOps.isEmpty) {
+        continue;
+      }
+
       // Sort operations to respect foreign keys:
       // customers -> items -> transactions -> payments -> history
       final order = {
@@ -96,7 +140,7 @@ class SyncEngine {
         SyncOutboxService.entityHistory: 5,
       };
 
-      final sorted = List<SyncOutboxRow>.from(pending)
+      final sorted = List<SyncOutboxRow>.from(coalescedOps)
         ..sort((a, b) {
           final ordA = order[a.entityType] ?? 99;
           final ordB = order[b.entityType] ?? 99;
@@ -106,14 +150,18 @@ class SyncEngine {
       final successfulIds = <int>[];
 
       for (final op in sorted) {
+        final groupKey = '${op.entityType}:${op.entitySyncId}';
+        final groupIds = allOutboxIdsByGroupKey[groupKey] ?? [op.outboxId];
         try {
           await _processOutboxOperation(op, resolvedAppDir);
-          successfulIds.add(op.outboxId);
+          successfulIds.addAll(groupIds);
         } catch (e) {
           debugPrint(
             'Sync Push failed for ${op.entityType} ${op.entitySyncId}: $e',
           );
-          await SyncOutboxService.markFailed(db, op.outboxId, e.toString());
+          for (final outboxId in groupIds) {
+            await SyncOutboxService.markFailed(db, outboxId, e.toString());
+          }
         }
       }
 
@@ -156,35 +204,26 @@ class SyncEngine {
 
     if (op.operation == SyncOutboxService.opDelete) {
       final table = _tableNameForEntity(op.entityType);
-      final remoteRow = await client
-          .from(table)
-          .select()
-          .eq('id', syncId)
-          .eq('owner_id', userId)
-          .maybeSingle();
+      final payload = <String, dynamic>{
+        'deleted_at': DateTime.now().toUtc().toIso8601String(),
+      };
 
-      if (remoteRow != null) {
-        final payload = <String, dynamic>{
-          'deleted_at': DateTime.now().toUtc().toIso8601String(),
-        };
-
-        if (op.entityType == SyncOutboxService.entityCustomer) {
-          payload['photo_path'] = null;
-          payload['proof_path'] = null;
-        }
-        if (op.entityType == SyncOutboxService.entityItem) {
-          payload['photo_path'] = null;
-        }
-        if (op.entityType == SyncOutboxService.entityTransaction) {
-          payload['signature_path'] = null;
-        }
-
-        await client
-            .from(table)
-            .update(payload)
-            .eq('id', syncId)
-            .eq('owner_id', userId);
+      if (op.entityType == SyncOutboxService.entityCustomer) {
+        payload['photo_path'] = null;
+        payload['proof_path'] = null;
       }
+      if (op.entityType == SyncOutboxService.entityItem) {
+        payload['photo_path'] = null;
+      }
+      if (op.entityType == SyncOutboxService.entityTransaction) {
+        payload['signature_path'] = null;
+      }
+
+      await client
+          .from(table)
+          .update(payload)
+          .eq('id', syncId)
+          .eq('owner_id', userId);
 
       return;
     }
@@ -194,15 +233,17 @@ class SyncEngine {
       case SyncOutboxService.entityCustomer:
         final row = await (db.select(
           db.customersTable,
-        )..where((t) => t.syncId.equals(syncId))).getSingleOrNull();
+        )..where((t) => t.syncId.equals(syncId) | t.customerId.equals(syncId))).getSingleOrNull();
         if (row != null) {
           String? remotePhoto;
           String? remoteProof;
+          final effectiveSyncId =
+              row.syncId.isNotEmpty ? row.syncId : row.customerId;
           if (resolvedAppDir.isNotEmpty) {
             if (row.customerPhoto.isNotEmpty) {
               final remote = fileSync.getCustomerPhotoRemotePath(
                 userId,
-                row.syncId,
+                effectiveSyncId,
               );
               final uploaded = await fileSync.uploadFile(
                 localRelativePath: row.customerPhoto,
@@ -214,7 +255,7 @@ class SyncEngine {
             if (row.proofPhoto.isNotEmpty) {
               final remote = fileSync.getCustomerProofRemotePath(
                 userId,
-                row.syncId,
+                effectiveSyncId,
               );
               final uploaded = await fileSync.uploadFile(
                 localRelativePath: row.proofPhoto,
@@ -238,18 +279,20 @@ class SyncEngine {
       case SyncOutboxService.entityItem:
         final row = await (db.select(
           db.itemsTable,
-        )..where((t) => t.syncId.equals(syncId))).getSingleOrNull();
+        )..where((t) => t.syncId.equals(syncId) | t.itemId.equals(syncId))).getSingleOrNull();
         if (row != null) {
           final cust =
               await (db.select(db.customersTable)
-                    ..where((t) => t.customerId.equals(row.customerId)))
+                    ..where((t) => t.customerId.equals(row.customerId) | t.syncId.equals(row.customerId)))
                   .getSingleOrNull();
           if (cust != null) {
             String? remotePhoto;
+            final effectiveSyncId =
+                row.syncId.isNotEmpty ? row.syncId : row.itemId;
             if (resolvedAppDir.isNotEmpty && row.itemPhoto.isNotEmpty) {
               final remote = fileSync.getItemPhotoRemotePath(
                 userId,
-                row.syncId,
+                effectiveSyncId,
               );
               final uploaded = await fileSync.uploadFile(
                 localRelativePath: row.itemPhoto,
@@ -259,9 +302,11 @@ class SyncEngine {
               if (uploaded != null) remotePhoto = uploaded;
             }
 
+            final custSyncId =
+                cust.syncId.isNotEmpty ? cust.syncId : cust.customerId;
             final payload = SyncMappers.itemToSupabase(
               row,
-              cust.syncId,
+              custSyncId,
               userId,
               remotePhotoPath: remotePhoto,
             );
@@ -273,21 +318,23 @@ class SyncEngine {
       case SyncOutboxService.entityTransaction:
         final row = await (db.select(
           db.transactionsTable,
-        )..where((t) => t.syncId.equals(syncId))).getSingleOrNull();
+        )..where((t) => t.syncId.equals(syncId) | t.transactionId.equals(syncId))).getSingleOrNull();
         if (row != null) {
           final cust =
               await (db.select(db.customersTable)
-                    ..where((t) => t.customerId.equals(row.customerId)))
+                    ..where((t) => t.customerId.equals(row.customerId) | t.syncId.equals(row.customerId)))
                   .getSingleOrNull();
           final item = await (db.select(
             db.itemsTable,
-          )..where((t) => t.itemId.equals(row.itemId))).getSingleOrNull();
+          )..where((t) => t.itemId.equals(row.itemId) | t.syncId.equals(row.itemId))).getSingleOrNull();
           if (cust != null && item != null) {
             String? remoteSig;
+            final effectiveSyncId =
+                row.syncId.isNotEmpty ? row.syncId : row.transactionId;
             if (resolvedAppDir.isNotEmpty && row.signature.isNotEmpty) {
               final remote = fileSync.getTransactionSignatureRemotePath(
                 userId,
-                row.syncId,
+                effectiveSyncId,
               );
               final uploaded = await fileSync.uploadFile(
                 localRelativePath: row.signature,
@@ -297,10 +344,14 @@ class SyncEngine {
               if (uploaded != null) remoteSig = uploaded;
             }
 
+            final custSyncId =
+                cust.syncId.isNotEmpty ? cust.syncId : cust.customerId;
+            final itemSyncId =
+                item.syncId.isNotEmpty ? item.syncId : item.itemId;
             final payload = SyncMappers.transactionToSupabase(
               row,
-              cust.syncId,
-              item.syncId,
+              custSyncId,
+              itemSyncId,
               userId,
               remoteSignaturePath: remoteSig,
             );
@@ -312,16 +363,18 @@ class SyncEngine {
       case SyncOutboxService.entityPayment:
         final row = await (db.select(
           db.paymentsTable,
-        )..where((t) => t.syncId.equals(syncId))).getSingleOrNull();
+        )..where((t) => t.syncId.equals(syncId) | t.paymentId.equals(syncId))).getSingleOrNull();
         if (row != null) {
           final txn =
               await (db.select(db.transactionsTable)
-                    ..where((t) => t.transactionId.equals(row.transactionId)))
+                    ..where((t) => t.transactionId.equals(row.transactionId) | t.syncId.equals(row.transactionId)))
                   .getSingleOrNull();
           if (txn != null) {
+            final txnSyncId =
+                txn.syncId.isNotEmpty ? txn.syncId : txn.transactionId;
             final payload = SyncMappers.paymentToSupabase(
               row,
-              txn.syncId,
+              txnSyncId,
               userId,
             );
             await client.from('payments').upsert(payload);
@@ -332,33 +385,40 @@ class SyncEngine {
       case SyncOutboxService.entityHistory:
         final row = await (db.select(
           db.historyTable,
-        )..where((t) => t.syncId.equals(syncId))).getSingleOrNull();
+        )..where((t) => t.syncId.equals(syncId) | t.historyId.equals(syncId))).getSingleOrNull();
         if (row != null) {
           final cust =
               await (db.select(db.customersTable)
-                    ..where((t) => t.customerId.equals(row.customerId)))
+                    ..where((t) => t.customerId.equals(row.customerId) | t.syncId.equals(row.customerId)))
                   .getSingleOrNull();
           if (cust != null) {
             String? itemSync;
             String? txnSync;
-            if (row.itemId > 0) {
+            if (row.itemId.isNotEmpty && row.itemId != '0') {
               final item = await (db.select(
                 db.itemsTable,
-              )..where((t) => t.itemId.equals(row.itemId))).getSingleOrNull();
-              itemSync = item?.syncId;
+              )..where((t) => t.itemId.equals(row.itemId) | t.syncId.equals(row.itemId))).getSingleOrNull();
+              if (item != null) {
+                itemSync = item.syncId.isNotEmpty ? item.syncId : item.itemId;
+              }
             }
-            if (row.transactionId > 0) {
+            if (row.transactionId.isNotEmpty && row.transactionId != '0') {
               final txn =
                   await (db.select(db.transactionsTable)..where(
-                        (t) => t.transactionId.equals(row.transactionId),
+                        (t) => t.transactionId.equals(row.transactionId) | t.syncId.equals(row.transactionId),
                       ))
                       .getSingleOrNull();
-              txnSync = txn?.syncId;
+              if (txn != null) {
+                txnSync =
+                    txn.syncId.isNotEmpty ? txn.syncId : txn.transactionId;
+              }
             }
 
+            final custSyncId =
+                cust.syncId.isNotEmpty ? cust.syncId : cust.customerId;
             final payload = SyncMappers.historyToSupabase(
               row,
-              cust.syncId,
+              custSyncId,
               itemSync,
               txnSync,
               userId,
@@ -475,7 +535,7 @@ class SyncEngine {
     }
 
     await db.transaction(() async {
-      for (final map in remoteRows) {
+      for (final Map<String, dynamic> map in remoteRows) {
         final currentUpdatedAt = _safeParseDateTime(map['updated_at']);
         final currentCreatedAt = _safeParseDateTime(map['created_at']);
         if (currentUpdatedAt == null || currentCreatedAt == null) {
@@ -503,6 +563,7 @@ class SyncEngine {
               .into(db.customersTable)
               .insert(
                 CustomersTableCompanion.insert(
+                  customerId: Value(syncId),
                   userId: 1,
                   customerName: map['name'] as String? ?? '',
                   gaurdianName: map['guardian_name'] as String? ?? '',
@@ -575,7 +636,7 @@ class SyncEngine {
       );
     }
 
-    final customerIdCache = <String, int>{};
+    final customerIdCache = <String, String>{};
 
     await db.transaction(() async {
       for (final map in remoteRows) {
@@ -593,11 +654,11 @@ class SyncEngine {
           continue;
         }
 
-        int? parentCustomerId = customerIdCache[custSyncId];
+        String? parentCustomerId = customerIdCache[custSyncId];
         if (parentCustomerId == null) {
           final parentCustomer = await (db.select(
             db.customersTable,
-          )..where((t) => t.syncId.equals(custSyncId))).getSingleOrNull();
+          )..where((t) => t.syncId.equals(custSyncId) | t.customerId.equals(custSyncId))).getSingleOrNull();
           if (parentCustomer == null) continue;
           parentCustomerId = parentCustomer.customerId;
           customerIdCache[custSyncId] = parentCustomerId;
@@ -622,6 +683,7 @@ class SyncEngine {
               .into(db.itemsTable)
               .insert(
                 ItemsTableCompanion.insert(
+                  itemId: Value(syncId),
                   customerId: parentCustomerId,
                   itemName: map['name'] as String? ?? '',
                   itemDescription: map['description'] as String? ?? '',
@@ -694,8 +756,8 @@ class SyncEngine {
       );
     }
 
-    final customerIdCache = <String, int>{};
-    final itemIdCache = <String, int>{};
+    final customerIdCache = <String, String>{};
+    final itemIdCache = <String, String>{};
 
     await db.transaction(() async {
       for (final map in remoteRows) {
@@ -710,21 +772,21 @@ class SyncEngine {
           continue;
         }
 
-        int? parentCustomerId = customerIdCache[custSyncId];
+        String? parentCustomerId = customerIdCache[custSyncId];
         if (parentCustomerId == null) {
           final parentCustomer = await (db.select(
             db.customersTable,
-          )..where((t) => t.syncId.equals(custSyncId))).getSingleOrNull();
+          )..where((t) => t.syncId.equals(custSyncId) | t.customerId.equals(custSyncId))).getSingleOrNull();
           if (parentCustomer == null) continue;
           parentCustomerId = parentCustomer.customerId;
           customerIdCache[custSyncId] = parentCustomerId;
         }
 
-        int? parentItemId = itemIdCache[itemSyncId];
+        String? parentItemId = itemIdCache[itemSyncId];
         if (parentItemId == null) {
           final parentItem = await (db.select(
             db.itemsTable,
-          )..where((t) => t.syncId.equals(itemSyncId))).getSingleOrNull();
+          )..where((t) => t.syncId.equals(itemSyncId) | t.itemId.equals(itemSyncId))).getSingleOrNull();
           if (parentItem == null) continue;
           parentItemId = parentItem.itemId;
           itemIdCache[itemSyncId] = parentItemId;
@@ -753,6 +815,7 @@ class SyncEngine {
               .into(db.transactionsTable)
               .insert(
                 TransactionsTableCompanion.insert(
+                  transactionId: Value(syncId),
                   customerId: parentCustomerId,
                   itemId: parentItemId,
                   transactionDate: txnDate,
@@ -806,7 +869,7 @@ class SyncEngine {
       syncIds,
     );
 
-    final txnIdCache = <String, int>{};
+    final txnIdCache = <String, String>{};
 
     await db.transaction(() async {
       for (final json in remoteRows) {
@@ -821,11 +884,11 @@ class SyncEngine {
           continue;
         }
 
-        int? parentTxnId = txnIdCache[txnSyncId];
+        String? parentTxnId = txnIdCache[txnSyncId];
         if (parentTxnId == null) {
           final parentTxn = await (db.select(
             db.transactionsTable,
-          )..where((t) => t.syncId.equals(txnSyncId))).getSingleOrNull();
+          )..where((t) => t.syncId.equals(txnSyncId) | t.transactionId.equals(txnSyncId))).getSingleOrNull();
           if (parentTxn == null) continue;
           parentTxnId = parentTxn.transactionId;
           txnIdCache[txnSyncId] = parentTxnId;
@@ -849,6 +912,7 @@ class SyncEngine {
               .into(db.paymentsTable)
               .insert(
                 PaymentsTableCompanion.insert(
+                  paymentId: Value(syncId),
                   transactionId: parentTxnId,
                   paymentDate: paymentDate,
                   amountPaid: amountPaid,
@@ -890,7 +954,7 @@ class SyncEngine {
       syncIds,
     );
 
-    final custIdCache = <String, int>{};
+    final custIdCache = <String, String>{};
 
     await db.transaction(() async {
       for (final json in remoteRows) {
@@ -904,11 +968,11 @@ class SyncEngine {
           continue;
         }
 
-        int? parentCustId = custIdCache[custSyncId];
+        String? parentCustId = custIdCache[custSyncId];
         if (parentCustId == null) {
           final parentCust = await (db.select(
             db.customersTable,
-          )..where((t) => t.syncId.equals(custSyncId))).getSingleOrNull();
+          )..where((t) => t.syncId.equals(custSyncId) | t.customerId.equals(custSyncId))).getSingleOrNull();
           if (parentCust == null) continue;
           parentCustId = parentCust.customerId;
           custIdCache[custSyncId] = parentCustId;
@@ -926,18 +990,40 @@ class SyncEngine {
         }
 
         final amount = (map['amount'] as num).toDouble();
+        final txnSyncId = map['transaction_sync_id'] as String?;
+        String resolvedTxnId = '';
+        if (txnSyncId != null && txnSyncId.isNotEmpty && txnSyncId != '0') {
+          final txn = await (db.select(
+            db.transactionsTable,
+          )..where((t) => t.syncId.equals(txnSyncId) | t.transactionId.equals(txnSyncId))).getSingleOrNull();
+          if (txn != null) {
+            resolvedTxnId = txn.transactionId;
+          }
+        }
+
+        final itemSyncId = map['item_sync_id'] as String?;
+        String resolvedItemId = '';
+        if (itemSyncId != null && itemSyncId.isNotEmpty && itemSyncId != '0') {
+          final item = await (db.select(
+            db.itemsTable,
+          )..where((t) => t.syncId.equals(itemSyncId) | t.itemId.equals(itemSyncId))).getSingleOrNull();
+          if (item != null) {
+            resolvedItemId = item.itemId;
+          }
+        }
 
         if (existing == null) {
           await db
               .into(db.historyTable)
               .insert(
                 HistoryTableCompanion.insert(
+                  historyId: Value(syncId),
                   userId: 1,
                   customerId: parentCustId,
                   customerName: map['customer_name'] as String? ?? '',
                   contactNumber: map['contact_number'] as String? ?? '',
-                  itemId: 0,
-                  transactionId: 0,
+                  itemId: resolvedItemId,
+                  transactionId: resolvedTxnId,
                   amount: amount,
                   eventDate: eventDate,
                   eventType: map['event_type'] as String? ?? 'Default',
@@ -957,6 +1043,12 @@ class SyncEngine {
                 amount: Value(amount),
                 eventDate: Value(eventDate),
                 eventType: Value(map['event_type'] as String? ?? 'Default'),
+                itemId: resolvedItemId.isNotEmpty
+                    ? Value(resolvedItemId)
+                    : const Value.absent(),
+                transactionId: resolvedTxnId.isNotEmpty
+                    ? Value(resolvedTxnId)
+                    : const Value.absent(),
                 updatedAt: Value(updatedAt),
               ),
             );
@@ -973,35 +1065,67 @@ class SyncEngine {
     final ids = syncIds.where((id) => id.isNotEmpty).toList();
     if (ids.isEmpty) return {};
 
-    switch (entityType) {
-      case SyncOutboxService.entityCustomer:
-        final rows = await (db.select(
-          db.customersTable,
-        )..where((t) => t.syncId.isIn(ids))).get();
-        return {for (final row in rows) row.syncId: row};
-      case SyncOutboxService.entityItem:
-        final rows = await (db.select(
-          db.itemsTable,
-        )..where((t) => t.syncId.isIn(ids))).get();
-        return {for (final row in rows) row.syncId: row};
-      case SyncOutboxService.entityTransaction:
-        final rows = await (db.select(
-          db.transactionsTable,
-        )..where((t) => t.syncId.isIn(ids))).get();
-        return {for (final row in rows) row.syncId: row};
-      case SyncOutboxService.entityPayment:
-        final rows = await (db.select(
-          db.paymentsTable,
-        )..where((t) => t.syncId.isIn(ids))).get();
-        return {for (final row in rows) row.syncId: row};
-      case SyncOutboxService.entityHistory:
-        final rows = await (db.select(
-          db.historyTable,
-        )..where((t) => t.syncId.isIn(ids))).get();
-        return {for (final row in rows) row.syncId: row};
-      default:
-        return {};
+    final map = <String, dynamic>{};
+    const chunkSize = 200;
+
+    for (var i = 0; i < ids.length; i += chunkSize) {
+      final chunk = ids.sublist(
+        i,
+        (i + chunkSize > ids.length) ? ids.length : i + chunkSize,
+      );
+
+      switch (entityType) {
+        case SyncOutboxService.entityCustomer:
+          final rows = await (db.select(
+            db.customersTable,
+          )..where((t) => t.syncId.isIn(chunk) | t.customerId.isIn(chunk))).get();
+          for (final row in rows) {
+            if (row.syncId.isNotEmpty) map[row.syncId] = row;
+            map[row.customerId] = row;
+          }
+          break;
+        case SyncOutboxService.entityItem:
+          final rows = await (db.select(
+            db.itemsTable,
+          )..where((t) => t.syncId.isIn(chunk) | t.itemId.isIn(chunk))).get();
+          for (final row in rows) {
+            if (row.syncId.isNotEmpty) map[row.syncId] = row;
+            map[row.itemId] = row;
+          }
+          break;
+        case SyncOutboxService.entityTransaction:
+          final rows = await (db.select(
+            db.transactionsTable,
+          )..where((t) => t.syncId.isIn(chunk) | t.transactionId.isIn(chunk))).get();
+          for (final row in rows) {
+            if (row.syncId.isNotEmpty) map[row.syncId] = row;
+            map[row.transactionId] = row;
+          }
+          break;
+        case SyncOutboxService.entityPayment:
+          final rows = await (db.select(
+            db.paymentsTable,
+          )..where((t) => t.syncId.isIn(chunk) | t.paymentId.isIn(chunk))).get();
+          for (final row in rows) {
+            if (row.syncId.isNotEmpty) map[row.syncId] = row;
+            map[row.paymentId] = row;
+          }
+          break;
+        case SyncOutboxService.entityHistory:
+          final rows = await (db.select(
+            db.historyTable,
+          )..where((t) => t.syncId.isIn(chunk) | t.historyId.isIn(chunk))).get();
+          for (final row in rows) {
+            if (row.syncId.isNotEmpty) map[row.syncId] = row;
+            map[row.historyId] = row;
+          }
+          break;
+        default:
+          return {};
+      }
     }
+
+    return map;
   }
 
   // ===========================================================================

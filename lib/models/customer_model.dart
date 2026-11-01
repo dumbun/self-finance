@@ -1,5 +1,5 @@
 class Customer {
-  final int? id;
+  final String? id;
   final int userID;
   final String name;
   final String guardianName;
@@ -27,7 +27,7 @@ class Customer {
     }
     return data.map((e) {
       return Customer(
-        id: e["Customer_ID"] as int,
+        id: e["Customer_ID"]?.toString(),
         userID: e["User_ID"] as int,
         name: e["Customer_Name"] as String,
         guardianName: e["Gaurdian_Name"] as String,
@@ -41,7 +41,7 @@ class Customer {
   }
 
   Customer copyWith({
-    int? id,
+    String? id,
     int? userID,
     String? name,
     String? guardianName,
@@ -79,15 +79,20 @@ class Customer {
 
   factory Customer.fromMap(Map<String, dynamic> map) {
     return Customer(
-      id: map['id'] != null ? map['id'] as int : null,
-      name: map['name'] as String,
-      guardianName: map['guardianName'] as String,
-      address: map['address'] as String,
-      number: map['number'] as String,
-      photo: map['photo'] as String,
-      proof: map['proof'] as String,
-      createdDate: map['createdDate'] as DateTime,
-      userID: map['userID'] as int,
+      id: map['id']?.toString(),
+      name: map['name']?.toString() ?? '',
+      guardianName: map['guardianName']?.toString() ?? '',
+      address: map['address']?.toString() ?? '',
+      number: map['number']?.toString() ?? '',
+      photo: map['photo']?.toString() ?? '',
+      proof: map['proof']?.toString() ?? '',
+      createdDate: map['createdDate'] is DateTime
+          ? map['createdDate'] as DateTime
+          : DateTime.tryParse(map['createdDate']?.toString() ?? '') ??
+              DateTime.now(),
+      userID: (map['userID'] is num)
+          ? (map['userID'] as num).toInt()
+          : int.tryParse(map['userID']?.toString() ?? '1') ?? 1,
     );
   }
 

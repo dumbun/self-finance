@@ -1,17 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
-import 'package:self_finance/core/fonts/strong_heading_one_text.dart';
 import 'package:self_finance/core/fonts/title_widget.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/providers/customer_provider.dart';
-import 'package:self_finance/widgets/circular_image_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
 import 'package:self_finance/widgets/image_widget.dart';
 import 'package:self_finance/widgets/loading_popup_widget.dart';
@@ -21,31 +19,33 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
   const BuildCustomerDetailsWidget({
     super.key,
     required this.customerID,
-    this.showHero = false,
+    this.physics,
   });
 
-  final int customerID;
-  final bool showHero;
+  final String customerID;
+  final ScrollPhysics? physics;
 
   Future<void> _handleCopy(
     BuildContext context,
     String text,
     String label,
   ) async {
+    final l10n = context.l10n;
     await Utility.copyToClipboard(text: text);
     if (context.mounted) {
       SnackBarWidget.snackBarWidget(
         context: context,
-        message: "$label copied to clipboard",
+        message: l10n.copiedToClipboard(label),
       );
     }
   }
 
   Future<void> _handleDelete(BuildContext context, WidgetRef ref) async {
+    final l10n = context.l10n;
     final int confirmed = await AlertDilogs.alertDialogWithTwoAction(
       context,
-      "Delete Contact?",
-      Constant.contactDeleteMessage,
+      l10n.deleteContactQuestion,
+      l10n.contactDeleteMessage,
     );
 
     if (confirmed == 1 && context.mounted) {
@@ -70,18 +70,15 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final Color borderColor = isDark ? Colors.white12 : const Color(0xFFE2E8F0);
-
+    final l10n = context.l10n;
     return ref.watch(customerProvider(customerID)).when(
       data: (Customer? customer) {
         if (customer == null) {
-          return const Center(
+          return Center(
             child: Padding(
-              padding: EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(24.0),
               child: BodyTwoDefaultText(
-                text: Constant.errorFetchingContactMessage,
+                text: l10n.errorFetchingContacts,
                 error: true,
               ),
             ),
@@ -89,50 +86,26 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
         }
 
         return SingleChildScrollView(
+          physics: physics ?? const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (showHero) ...[
-                const SizedBox(height: 12),
-                Center(
-                  child: CircularImageWidget(
-                    imageData: customer.photo,
-                    titile: customer.name,
-                    customeSize: 100,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Center(
-                  child: StrongHeadingOne(
-                    text: customer.name,
-                    bold: true,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
-
               // Contact & Personal Information Card
               _buildSectionHeader(
                 icon: Icons.person_outline_rounded,
-                title: "Personal & Contact Info",
+                title: l10n.personalAndContactInfo,
               ),
               const SizedBox(height: 8),
-              Material(
-                color: cardBg,
+              Card(
                 clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: borderColor),
-                ),
                 child: Column(
                   children: [
                     _buildInfoRow(
                       context: context,
                       icon: Icons.phone_rounded,
                       iconColor: AppColors.getPrimaryColor,
-                      label: "Phone Number",
+                      label: l10n.phoneNumber,
                       value: customer.number,
                       onTapValue: () =>
                           Utility.makeCall(phoneNumber: customer.number),
@@ -141,17 +114,17 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                         children: [
                           IconButton(
                             icon: const Icon(Icons.copy_rounded, size: 18),
-                            tooltip: "Copy Number",
+                            tooltip: l10n.copiedToClipboard(l10n.phoneNumber),
                             color: AppColors.getLigthGreyColor,
                             onPressed: () => _handleCopy(
                               context,
                               customer.number,
-                              "Phone number",
+                              l10n.phoneNumber,
                             ),
                           ),
                           IconButton(
                             icon: const Icon(Icons.call_rounded, size: 20),
-                            tooltip: "Call",
+                            tooltip: l10n.call,
                             color: AppColors.getPrimaryColor,
                             onPressed: () =>
                                 Utility.makeCall(phoneNumber: customer.number),
@@ -159,56 +132,68 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    Divider(height: 1, thickness: 1, color: borderColor),
+                    Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+                    ),
                     _buildInfoRow(
                       context: context,
                       icon: Icons.family_restroom_rounded,
                       iconColor: const Color(0xFF8B5CF6),
-                      label: Constant.guardianName,
+                      label: l10n.guardianName,
                       value: customer.guardianName.isNotEmpty
                           ? customer.guardianName
-                          : "Not provided",
+                          : l10n.notProvided,
                       action: customer.guardianName.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.copy_rounded, size: 18),
-                              tooltip: "Copy Guardian",
+                              tooltip: l10n.copiedToClipboard(l10n.guardianName),
                               color: AppColors.getLigthGreyColor,
                               onPressed: () => _handleCopy(
                                 context,
                                 customer.guardianName,
-                                "Guardian name",
+                                l10n.guardianName,
                               ),
                             )
                           : null,
                     ),
-                    Divider(height: 1, thickness: 1, color: borderColor),
+                    Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+                    ),
                     _buildInfoRow(
                       context: context,
                       icon: Icons.location_on_rounded,
                       iconColor: const Color(0xFFF59E0B),
-                      label: Constant.customerAddress,
+                      label: l10n.customerAddress,
                       value: customer.address.isNotEmpty
                           ? customer.address
-                          : "Not provided",
+                          : l10n.notProvided,
                       action: customer.address.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.copy_rounded, size: 18),
-                              tooltip: "Copy Address",
+                              tooltip: l10n.copiedToClipboard(l10n.customerAddress),
                               color: AppColors.getLigthGreyColor,
                               onPressed: () => _handleCopy(
                                 context,
                                 customer.address,
-                                "Address",
+                                l10n.customerAddress,
                               ),
                             )
                           : null,
                     ),
-                    Divider(height: 1, thickness: 1, color: borderColor),
+                    Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+                    ),
                     _buildInfoRow(
                       context: context,
                       icon: Icons.calendar_today_rounded,
                       iconColor: const Color(0xFF10B981),
-                      label: "Customer Since",
+                      label: l10n.customerSince,
                       value: Utility.formatDate(date: customer.createdDate),
                     ),
                   ],
@@ -219,25 +204,20 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
               // KYC & Proof Document Card
               _buildSectionHeader(
                 icon: Icons.badge_outlined,
-                title: "KYC & Identity Proof",
+                title: l10n.kycAndIdentityProof,
               ),
               const SizedBox(height: 8),
-              _buildProofSection(context, ref, customer, cardBg, borderColor),
+              _buildProofSection(context, ref, customer),
               const SizedBox(height: 20),
 
               // Management Actions Card
               _buildSectionHeader(
                 icon: Icons.settings_outlined,
-                title: "Contact Actions",
+                title: l10n.contactActions,
               ),
               const SizedBox(height: 8),
-              Material(
-                color: cardBg,
+              Card(
                 clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: borderColor),
-                ),
                 child: Column(
                   children: [
                     ListTile(
@@ -255,12 +235,12 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                           size: 20,
                         ),
                       ),
-                      title: const BodyOneDefaultText(
-                        text: "Edit Contact Details",
+                      title: BodyOneDefaultText(
+                        text: l10n.editContactDetails,
                         bold: true,
                       ),
-                      subtitle: const BodySmallText(
-                        text: "Update name, number, address, or photos",
+                      subtitle: BodySmallText(
+                        text: l10n.updateContactSubtitle,
                       ),
                       trailing: const Icon(
                         Icons.arrow_forward_ios_rounded,
@@ -271,7 +251,11 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                         customer: customer,
                       ),
                     ),
-                    Divider(height: 1, thickness: 1, color: borderColor),
+                    Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+                    ),
                     ListTile(
                       leading: Container(
                         padding: const EdgeInsets.all(8),
@@ -285,12 +269,12 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                           size: 20,
                         ),
                       ),
-                      title: const BodyOneDefaultText(
-                        text: "Share Contact Info",
+                      title: BodyOneDefaultText(
+                        text: l10n.shareContactInfo,
                         bold: true,
                       ),
-                      subtitle: const BodySmallText(
-                        text: "Share customer profile details",
+                      subtitle: BodySmallText(
+                        text: l10n.shareContactSubtitle,
                       ),
                       trailing: const Icon(
                         Icons.arrow_forward_ios_rounded,
@@ -298,7 +282,11 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                       ),
                       onTap: () => _handleShare(ref, customer),
                     ),
-                    Divider(height: 1, thickness: 1, color: borderColor),
+                    Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+                    ),
                     ListTile(
                       leading: Container(
                         padding: const EdgeInsets.all(8),
@@ -314,13 +302,13 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                           size: 20,
                         ),
                       ),
-                      title: const BodyOneDefaultText(
-                        text: "Delete Customer",
+                      title: BodyOneDefaultText(
+                        text: l10n.deleteCustomer,
                         bold: true,
                         color: AppColors.getErrorColor,
                       ),
-                      subtitle: const BodySmallText(
-                        text: "Permanently delete this customer and record",
+                      subtitle: BodySmallText(
+                        text: l10n.deleteCustomerSubtitle,
                       ),
                       trailing: const Icon(
                         Icons.arrow_forward_ios_rounded,
@@ -337,11 +325,11 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
           ),
         );
       },
-      error: (error, _) => const Center(
+      error: (error, _) => Center(
         child: Padding(
-          padding: EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24.0),
           child: BodyTwoDefaultText(
-            text: Constant.errorFetchingContactMessage,
+            text: l10n.errorFetchingContacts,
             error: true,
           ),
         ),
@@ -428,18 +416,13 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     Customer customer,
-    Color cardBg,
-    Color borderColor,
   ) {
     final String? resolvedProofPath = ref.watch(customerProofPathProvider(customerID));
 
+    final l10n = context.l10n;
+
     if (resolvedProofPath != null) {
-      return Material(
-        color: cardBg,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: borderColor),
-        ),
+      return Card(
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(
@@ -455,17 +438,17 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                       color: AppColors.getGreenColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.check_circle_rounded,
                           size: 14,
                           color: AppColors.getGreenColor,
                         ),
-                        SizedBox(width: 6),
+                        const SizedBox(width: 6),
                         BodySmallText(
-                          text: "Verified Document",
+                          text: l10n.verifiedDocument,
                           color: AppColors.getGreenColor,
                           bold: true,
                         ),
@@ -478,12 +461,12 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                       Routes.navigateToImageView(
                         context: context,
                         imagePath: resolvedProofPath,
-                        titile: "Customer Proof",
+                        titile: l10n.customerProof,
                       );
                     },
                     icon: const Icon(Icons.fullscreen_rounded, size: 18),
-                    label: const BodyTwoDefaultText(
-                      text: "View Full",
+                    label: BodyTwoDefaultText(
+                      text: l10n.viewFull,
                       color: AppColors.getPrimaryColor,
                       bold: true,
                     ),
@@ -496,7 +479,7 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                   Routes.navigateToImageView(
                     context: context,
                     imagePath: resolvedProofPath,
-                    titile: "Customer Proof",
+                    titile: l10n.customerProof,
                   );
                 },
                 child: ClipRRect(
@@ -509,7 +492,7 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                       children: [
                         ImageWidget(
                           imagePath: customer.proof,
-                          title: "Customer Proof",
+                          title: l10n.customerProof,
                           height: 180,
                           width: double.infinity,
                         ),
@@ -529,17 +512,17 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                                 colors: [Colors.black87, Colors.transparent],
                               ),
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.zoom_in_rounded,
                                   color: Colors.white,
                                   size: 16,
                                 ),
-                                SizedBox(width: 6),
+                                const SizedBox(width: 6),
                                 Expanded(
                                   child: BodySmallText(
-                                    text: "Tap to preview KYC document",
+                                    text: l10n.tapToPreviewKyc,
                                     color: Colors.white,
                                   ),
                                 ),
@@ -558,12 +541,7 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
       );
     }
 
-    return Material(
-      color: cardBg,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: borderColor),
-      ),
+    return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -581,11 +559,10 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 10),
-            const TitleWidget(text: "No Identity Proof Attached"),
+            TitleWidget(text: l10n.noIdentityProofAttached),
             const SizedBox(height: 4),
-            const BodySmallText(
-              text:
-                  "Attach an Aadhaar, PAN, voter card, or photo document for KYC verification.",
+            BodySmallText(
+              text: l10n.attachKycSubtitle,
               textAlign: TextAlign.center,
               color: AppColors.getLigthGreyColor,
             ),
@@ -596,8 +573,8 @@ class BuildCustomerDetailsWidget extends ConsumerWidget {
                 customer: customer,
               ),
               icon: const Icon(Icons.add_photo_alternate_rounded, size: 18),
-              label: const BodyTwoDefaultText(
-                text: "Attach Document",
+              label: BodyTwoDefaultText(
+                text: l10n.attachDocument,
                 bold: true,
               ),
               style: OutlinedButton.styleFrom(

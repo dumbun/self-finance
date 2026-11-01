@@ -11,18 +11,21 @@ class ImageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isNetwork = imagePath.startsWith('http://') ||
+        imagePath.startsWith('https://');
+    final ImageProvider provider = isNetwork
+        ? NetworkImage(imagePath)
+        : FileImage(File(imagePath)) as ImageProvider;
+
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
         title: BodyTwoDefaultText(text: titile),
       ),
-      body: Hero(
-        tag: titile,
-        child: PhotoView(
-          imageProvider: FileImage(File(imagePath)),
-          errorBuilder: (_, _, _) =>
-              const Center(child: Icon(Icons.broken_image_outlined, size: 48)),
-        ),
+      body: PhotoView(
+        imageProvider: provider,
+        errorBuilder: (_, _, _) =>
+            const Center(child: Icon(Icons.broken_image_outlined, size: 48)),
       ),
     );
   }

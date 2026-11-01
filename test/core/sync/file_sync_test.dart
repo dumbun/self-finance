@@ -156,7 +156,7 @@ void main() {
       final now = DateTime.utc(2026, 10, 24, 12);
       final customer = CustomerRow(
         userId: 1,
-        customerId: 1,
+        customerId: 'cust-uuid-1',
         customerName: 'Alice',
         gaurdianName: 'Bob',
         contactNumber: '1234567890',
@@ -182,8 +182,8 @@ void main() {
     test('SyncMappers itemToSupabase uses remotePhotoPath when provided', () {
       final now = DateTime.utc(2026, 10, 24, 12);
       final item = ItemRow(
-        itemId: 1,
-        customerId: 1,
+        itemId: 'item-uuid-1',
+        customerId: 'cust-uuid-1',
         itemName: 'Ring',
         itemDescription: 'Gold',
         pawnedDate: now,
@@ -209,9 +209,9 @@ void main() {
     test('SyncMappers transactionToSupabase uses remoteSignaturePath when provided', () {
       final now = DateTime.utc(2026, 10, 24, 12);
       final txn = TransactionRow(
-        transactionId: 1,
-        customerId: 1,
-        itemId: 1,
+        transactionId: 'txn-uuid-1',
+        customerId: 'cust-uuid-1',
+        itemId: 'item-uuid-1',
         transactionDate: now,
         transactionType: 'Active',
         amount: 1000,

@@ -1,6 +1,6 @@
 class Items {
-  final int? id;
-  final int customerid;
+  final String? id;
+  final String customerid;
   final String name;
   final String description;
   final DateTime pawnedDate;
@@ -29,8 +29,8 @@ class Items {
     }
     return data.map((e) {
       return Items(
-        id: e["Item_ID"] as int,
-        customerid: e["Customer_ID"] as int,
+        id: e["Item_ID"]?.toString(),
+        customerid: e["Customer_ID"]?.toString() ?? '',
         name: e["Item_Name"] as String,
         description: e["Item_Description"] as String,
         pawnedDate: e["Pawned_Date"] as DateTime,
@@ -44,8 +44,8 @@ class Items {
   }
 
   Items copyWith({
-    int? id,
-    int? customerid,
+    String? id,
+    String? customerid,
     String? name,
     String? description,
     DateTime? pawnedDate,
@@ -86,16 +86,27 @@ class Items {
 
   factory Items.fromMap(Map<String, dynamic> map) {
     return Items(
-      id: map['id'] != null ? map['id'] as int : null,
-      customerid: map['customerid'] as int,
-      name: map['name'] as String,
-      description: map['description'] as String,
-      pawnedDate: map['pawnedDate'] as DateTime,
-      expiryDate: map['expiryDate'] as DateTime,
-      pawnAmount: map['pawnAmount'] as double,
-      status: map['status'] as String,
-      photo: map['photo'] as String,
-      createdDate: map['createdDate'] as DateTime,
+      id: map['id']?.toString(),
+      customerid: map['customerid']?.toString() ?? '',
+      name: map['name']?.toString() ?? '',
+      description: map['description']?.toString() ?? '',
+      pawnedDate: map['pawnedDate'] is DateTime
+          ? map['pawnedDate'] as DateTime
+          : DateTime.tryParse(map['pawnedDate']?.toString() ?? '') ??
+              DateTime.now(),
+      expiryDate: map['expiryDate'] is DateTime
+          ? map['expiryDate'] as DateTime
+          : DateTime.tryParse(map['expiryDate']?.toString() ?? '') ??
+              DateTime.now(),
+      pawnAmount: (map['pawnAmount'] is num)
+          ? (map['pawnAmount'] as num).toDouble()
+          : double.tryParse(map['pawnAmount']?.toString() ?? '0.0') ?? 0.0,
+      status: map['status']?.toString() ?? '',
+      photo: map['photo']?.toString() ?? '',
+      createdDate: map['createdDate'] is DateTime
+          ? map['createdDate'] as DateTime
+          : DateTime.tryParse(map['createdDate']?.toString() ?? '') ??
+              DateTime.now(),
     );
   }
 

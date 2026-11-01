@@ -1,11 +1,14 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/fonts/title_widget.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/models/customer_model.dart';
@@ -15,6 +18,7 @@ import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/customer_image_widget.dart';
+import 'package:self_finance/widgets/snack_bar_widget.dart';
 import 'package:self_finance/widgets/status_chip_widget.dart';
 
 class HistoryDetailedView extends ConsumerWidget {
@@ -22,222 +26,632 @@ class HistoryDetailedView extends ConsumerWidget {
 
   final UserHistory history;
 
-  String _formatDate(DateTime date) {
-    return "${DateFormat.yMMMMEEEEd().format(date)} ${DateFormat.Hm().format(date)}";
+  static final DateFormat _timeFormat = DateFormat.jm();
+
+  String _formatDateTime(DateTime date) {
+    return "${DateFormat.yMMMMEEEEd().format(date)} • ${_timeFormat.format(date)}";
+  }
+
+  Future<void> _handleShare(BuildContext context, WidgetRef ref) async {
+    try {
+      if (history.transactionID.isNotEmpty && history.transactionID != '0') {
+        try {
+          await ref
+              .read(transactionByIDProvider(history.transactionID).notifier)
+              .shareTransaction();
+          return;
+        } catch (_) {
+          // If invoice sharing fails, fall through to text receipt
+        }
+      }
+
+      final bool isDebit = history.eventType == Constant.debited;
+      final String typeText = isDebit
+          ? "Debit (Paid Out)"
+          : "Credit (Received)";
+      final String formattedAmount =
+          '${isDebit ? '-' : '+'} ₹${Utility.doubleFormate(history.amount)}';
+
+      await SharePlus.instance.share(
+        ShareParams(
+          subject: "Transaction Receipt - ${history.customerName}",
+          text:
+              "Self Finance - Transaction Receipt\n\n"
+              "Customer: ${history.customerName}\n"
+              "Contact: ${history.customerNumber}\n"
+              "Amount: $formattedAmount\n"
+              "Type: $typeText\n"
+              "Date: ${_formatDateTime(history.eventDate)}\n"
+              "History Reference: #${history.id}",
+        ),
+      );
+    } catch (e) {
+      if (context.mounted) {
+        SnackBarWidget.snackBarWidget(
+          context: context,
+          message: "Unable to share receipt: $e",
+        );
+      }
+    }
+  }
+
+  void _navigateToContact(BuildContext context) {
+    if (history.customerID.isNotEmpty) {
+      Routes.navigateToContactDetailsView(
+        context,
+        customerID: history.customerID,
+      );
+    } else {
+      SnackBarWidget.snackBarWidget(
+        context: context,
+        message: "No customer profile linked to this record",
+      );
+    }
+  }
+
+  void _navigateToTransaction(
+    BuildContext context, {
+    String? transactionId,
+    String? customerId,
+  }) {
+    final String txnId = transactionId ?? history.transactionID;
+    final String custId = customerId ?? history.customerID;
+    if (txnId.isNotEmpty && txnId != '0') {
+      Routes.navigateToTransactionDetailsView(
+        context: context,
+        transacrtionId: txnId,
+        customerId: custId,
+      );
+    } else {
+      SnackBarWidget.snackBarWidget(
+        context: context,
+        message: "No transaction linked to this record",
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final String formattedDate = _formatDate(history.eventDate);
     final bool isDebit = history.eventType == Constant.debited;
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => ref
-            .read(transactionByIDProvider(history.transactionID).notifier)
-            .shareTransaction(),
-        child: const Icon(Icons.share_rounded),
-      ),
       appBar: AppBar(
         forceMaterialTransparency: true,
-        title: BodyTwoDefaultText(
+        title: const BodyTwoDefaultText(
+          text: "History Details",
           bold: true,
-          text: 'History ID: ${history.id!.toString()}',
         ),
       ),
-      body: SingleChildScrollView(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _handleShare(context, ref),
+        icon: const Icon(Icons.share_rounded),
+        label: const Text(
+          "Share Receipt",
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        backgroundColor: AppColors.getPrimaryColor,
+        foregroundColor: Colors.white,
+      ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Hero Amount Card
+                _buildHeroAmountCard(
+                  context: context,
+                  isDebit: isDebit,
+                ),
+                const SizedBox(height: 16),
+
+                // Linked Customer Card
+                _buildCustomerCard(
+                  context: context,
+                  ref: ref,
+                ),
+                const SizedBox(height: 16),
+
+                // Linked Transaction / Loan Card
+                _buildTransactionSection(
+                  context: context,
+                  ref: ref,
+                ),
+
+                const SizedBox(height: 80), // Padding for extended FAB
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeroAmountCard({
+    required BuildContext context,
+    required bool isDebit,
+  }) {
+    final Color statusColor = isDebit
+        ? AppColors.getErrorColor
+        : AppColors.getGreenColor;
+    final String statusLabel = isDebit
+        ? "PAID OUT (DEBIT)"
+        : "RECEIVED (CREDIT)";
+    final IconData statusIcon = isDebit
+        ? Icons.arrow_upward_rounded
+        : Icons.arrow_downward_rounded;
+    final String formattedAmount =
+        '${isDebit ? '-' : '+'} ${Utility.doubleFormate(history.amount)}';
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Status Chip & Category
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(statusIcon, color: statusColor, size: 16),
+                      const SizedBox(width: 6),
+                      BodySmallText(
+                        text: statusLabel,
+                        bold: true,
+                        color: statusColor,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: history.id ?? ''));
+                      HapticFeedback.lightImpact();
+                      SnackBarWidget.snackBarWidget(
+                        context: context,
+                        message: "Reference ID copied to clipboard",
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color:
+                            AppColors.getLigthGreyColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: BodySmallText(
+                              text: "Reference #${history.id}",
+                              bold: true,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              color: AppColors.getLigthGreyColor,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(
+                            Icons.copy_rounded,
+                            size: 12,
+                            color: AppColors.getLigthGreyColor,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+
+            // Main Currency Amount Display
+            CurrencyWidget(
+              titleText: true,
+              color: statusColor,
+              amount: formattedAmount,
+            ),
+            const SizedBox(height: 14),
+            Divider(
+              height: 1,
+              color: AppColors.getLigthGreyColor.withValues(alpha: 0.15),
+            ),
+            const SizedBox(height: 14),
+
+            // Date & Timestamp
+            Row(
+              children: [
+                const Icon(
+                  Icons.event_note_rounded,
+                  size: 16,
+                  color: AppColors.getLigthGreyColor,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: BodySmallText(
+                    text: _formatDateTime(history.eventDate),
+                    color: AppColors.getLigthGreyColor,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomerCard({
+    required BuildContext context,
+    required WidgetRef ref,
+  }) {
+    final customerAsync = ref.watch(customerProvider(history.customerID));
+    final Customer? customer = customerAsync.asData?.value;
+    final String displayName =
+        customer != null ? customer.name : history.customerName;
+    final String displayNumber =
+        customer != null ? customer.number : history.customerNumber;
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => _navigateToContact(context),
         child: Padding(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _HeaderSection(
-                history: history,
-                formattedDate: formattedDate,
-                isDebit: isDebit,
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.person_outline_rounded,
+                        size: 18,
+                        color: AppColors.getLigthGreyColor,
+                      ),
+                      SizedBox(width: 8),
+                      BodyTwoDefaultText(
+                        text: "Customer Details",
+                        bold: true,
+                        color: AppColors.getLigthGreyColor,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      BodySmallText(
+                        text: "View Profile",
+                        bold: true,
+                        color: AppColors.getPrimaryColor,
+                      ),
+                      SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 12,
+                        color: AppColors.getPrimaryColor,
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              _TransactionSection(transactionId: history.transactionID),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  CustomerImageWidget(customerId: history.customerID, size: 56),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        BodyOneDefaultText(
+                          text: displayName,
+                          bold: true,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.phone_rounded,
+                              size: 14,
+                              color: AppColors.getLigthGreyColor,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: BodySmallText(
+                                text: displayNumber.isNotEmpty
+                                    ? displayNumber
+                                    : "No phone number",
+                                color: AppColors.getLigthGreyColor,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (displayNumber.isNotEmpty) ...[
+                    IconButton(
+                      style: IconButton.styleFrom(
+                        backgroundColor:
+                            AppColors.getPrimaryColor.withValues(alpha: 0.12),
+                        foregroundColor: AppColors.getPrimaryColor,
+                      ),
+                      icon: const Icon(Icons.call_rounded, size: 18),
+                      tooltip: "Call Customer",
+                      onPressed: () =>
+                          Utility.makeCall(phoneNumber: displayNumber),
+                    ),
+                  ],
+                ],
+              ),
             ],
           ),
         ),
       ),
     );
   }
-}
 
-class _HeaderSection extends StatelessWidget {
-  const _HeaderSection({
-    required this.history,
-    required this.formattedDate,
-    required this.isDebit,
-  });
-
-  final UserHistory history;
-  final String formattedDate;
-  final bool isDebit;
-
-  void _navigateToContact(BuildContext context) {
-    Routes.navigateToContactDetailsView(
-      context,
-      customerID: history.customerID,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final Color amountColor = isDebit
-        ? AppColors.getErrorColor
-        : AppColors.getGreenColor;
-    final String formattedAmount =
-        '${isDebit ? '-' : '+'} ${Utility.doubleFormate(history.amount)}';
-    final String namePrefix = isDebit ? 'To' : 'From';
-
-    return Container(
-      margin: const EdgeInsets.only(top: 18),
-      padding: const EdgeInsets.symmetric(horizontal: 18),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                CurrencyWidget(
-                  titleText: true,
-                  color: amountColor,
-                  amount: formattedAmount,
-                ),
-                GestureDetector(
-                  onTap: () => _navigateToContact(context),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      
-                    ),
-                    child: Consumer(
-                      builder:
-                          (BuildContext context, WidgetRef ref, Widget? child) {
-                            return ref
-                                .watch(customerProvider(history.customerID))
-                                .when(
-                                  data: (Customer? customer) {
-                                    if (customer == null) {
-                                      return const BodyTwoDefaultText(
-                                        text: Constant
-                                            .errorFetchingContactMessage,
-                                      );
-                                    }
-                                    return BodyOneDefaultText(
-                                      overflow: TextOverflow.ellipsis,
-                                      bold: true,
-                                      color: AppColors.getPrimaryColor,
-                                      text: '$namePrefix ${customer.name}',
-                                    );
-                                  },
-                                  error: (_, _) => const BodyTwoDefaultText(
-                                    text: Constant.errorFetchingContactMessage,
-                                  ),
-                                  loading: () => const Center(
-                                    child: LinearProgressIndicator(),
-                                  ),
-                                );
-                          },
-                    ),
-                  ),
-                ),
-                BodySmallText(text: formattedDate),
-              ],
-            ),
-          ),
-          CustomerImageWidget(customerId: history.customerID, size: 100),
-        ],
-      ),
-    );
-  }
-}
-
-class _TransactionSection extends ConsumerWidget {
-  const _TransactionSection({required this.transactionId});
-
-  final int transactionId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return ref
-        .watch(transactionByIDProvider(transactionId))
-        .when(
-          data: (Trx? trx) {
-            if (trx == null) {
-              return const Center(
-                child: BodyTwoDefaultText(text: 'No transaction found'),
+  Widget _buildTransactionSection({
+    required BuildContext context,
+    required WidgetRef ref,
+  }) {
+    // 1. If history.transactionID is not empty and not '0', watch that specific transaction
+    if (history.transactionID.isNotEmpty && history.transactionID != '0') {
+      return ref
+          .watch(transactionByIDProvider(history.transactionID))
+          .when(
+            data: (Trx? trx) {
+              if (trx != null) {
+                return _buildTransactionCard(
+                  context: context,
+                  trx: trx,
+                );
+              }
+              return _buildCustomerTransactionsFallback(
+                context: context,
+                ref: ref,
               );
-            }
-
-            return Column(
-              children: [
-                _TransactionInfoCard(
-                  title: Constant.rateOfIntrest,
-                  value: trx.intrestRate.toString(),
-                ),
-                _TransactionStatusCard(transactionType: trx.transacrtionType),
-                const SizedBox(height: 24),
-                Center(
-                  child: TextButton(
-                    onPressed: () => Routes.navigateToTransactionDetailsView(
-                      context: context,
-                      transacrtionId: trx.id!,
-                      customerId: trx.customerId,
-                    ),
-                    child: const BodyOneDefaultText(
-                      text: Constant.showTransaction,
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-          loading: () => const Center(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: CircularProgressIndicator.adaptive(),
+            },
+            loading: _buildLoadingCard,
+            error: (_, _) => _buildCustomerTransactionsFallback(
+              context: context,
+              ref: ref,
             ),
-          ),
-          error: (e, _) =>
-              Center(child: BodyTwoDefaultText(text: 'Error: ${e.toString()}')),
-        );
+          );
+    }
+
+    // 2. If history.transactionID is empty, resolve via customer's transactions
+    return _buildCustomerTransactionsFallback(
+      context: context,
+      ref: ref,
+    );
   }
-}
 
-// Separate widget to prevent unnecessary rebuilds
-class _TransactionInfoCard extends StatelessWidget {
-  const _TransactionInfoCard({required this.title, required this.value});
+  Widget _buildCustomerTransactionsFallback({
+    required BuildContext context,
+    required WidgetRef ref,
+  }) {
+    if (history.customerID.isEmpty) {
+      return _buildNoTransactionCard(
+        context: context,
+      );
+    }
 
-  final String title;
-  final String value;
+    final custTxnsAsync = ref.watch(
+      requriedCustomerTransactionsProvider(history.customerID),
+    );
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        title: BodyTwoDefaultText(text: title),
-        trailing: BodyTwoDefaultText(bold: true, text: value),
+    return custTxnsAsync.when(
+      data: (List<Trx> txns) {
+        if (txns.isNotEmpty) {
+          final Trx matchingTrx = txns.firstWhere(
+            (t) => t.amount == history.amount,
+            orElse: () => txns.first,
+          );
+          return _buildTransactionCard(
+            context: context,
+            trx: matchingTrx,
+          );
+        }
+        return _buildNoTransactionCard(
+          context: context,
+        );
+      },
+      loading: _buildLoadingCard,
+      error: (_, _) => _buildNoTransactionCard(
+        context: context,
       ),
     );
   }
-}
 
-// Separate widget to prevent unnecessary rebuilds
-class _TransactionStatusCard extends StatelessWidget {
-  const _TransactionStatusCard({required this.transactionType});
-
-  final String transactionType;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildTransactionCard({
+    required BuildContext context,
+    required Trx trx,
+  }) {
     return Card(
-      child: ListTile(
-        title: const BodyTwoDefaultText(text: Constant.transacrtionStatus),
-        trailing: StatusChipWidget(status: transactionType),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Row(
+                  children: [
+                    Icon(
+                      Icons.receipt_long_rounded,
+                      size: 18,
+                      color: AppColors.getLigthGreyColor,
+                    ),
+                    SizedBox(width: 8),
+                    BodyTwoDefaultText(
+                      text: "Transaction Details",
+                      bold: true,
+                      color: AppColors.getLigthGreyColor,
+                    ),
+                  ],
+                ),
+                StatusChipWidget(status: trx.transacrtionType),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Loan stats row
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const BodySmallText(
+                        text: "Principal Amount",
+                        color: AppColors.getLigthGreyColor,
+                      ),
+                      const SizedBox(height: 4),
+                      CurrencyWidget(amount: Utility.doubleFormate(trx.amount)),
+                    ],
+                  ),
+                ),
+                Container(
+                  height: 36,
+                  width: 1,
+                  color: AppColors.getLigthGreyColor.withValues(alpha: 0.2),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const BodySmallText(
+                        text: "Interest Rate",
+                        color: AppColors.getLigthGreyColor,
+                      ),
+                      const SizedBox(height: 4),
+                      TitleWidget(text: "${trx.intrestRate}% / mo"),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Transaction Details Action Button
+            FilledButton.icon(
+              onPressed: () => _navigateToTransaction(
+                context,
+                transactionId: trx.id ?? history.transactionID,
+                customerId: trx.customerId,
+              ),
+              icon: const Icon(Icons.receipt_long_rounded, size: 18),
+              label: const Text(
+                "Show Transaction Details",
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              style: FilledButton.styleFrom(
+                backgroundColor:
+                    AppColors.getPrimaryColor.withValues(alpha: 0.12),
+                foregroundColor: AppColors.getPrimaryColor,
+                elevation: 0,
+                minimumSize: const Size.fromHeight(44),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNoTransactionCard({
+    required BuildContext context,
+  }) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(
+              children: [
+                Icon(
+                  Icons.receipt_long_rounded,
+                  color: AppColors.getLigthGreyColor,
+                  size: 20,
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: BodySmallText(
+                    text:
+                        "No direct loan transaction record linked to this payment.",
+                    color: AppColors.getLigthGreyColor,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            FilledButton.icon(
+              onPressed: () => _navigateToTransaction(context),
+              icon: const Icon(Icons.receipt_long_rounded, size: 18),
+              label: const Text(
+                "Show Transaction Details",
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              style: FilledButton.styleFrom(
+                backgroundColor:
+                    AppColors.getPrimaryColor.withValues(alpha: 0.12),
+                foregroundColor: AppColors.getPrimaryColor,
+                elevation: 0,
+                minimumSize: const Size.fromHeight(44),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingCard() {
+    return const Card(
+      child: Padding(
+        padding: EdgeInsets.all(24),
+        child: Center(child: CircularProgressIndicator.adaptive()),
       ),
     );
   }

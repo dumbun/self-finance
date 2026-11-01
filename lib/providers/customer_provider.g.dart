@@ -16,7 +16,7 @@ final class CustomerNotifierProvider
     extends $StreamNotifierProvider<CustomerNotifier, Customer?> {
   CustomerNotifierProvider._({
     required CustomerNotifierFamily super.from,
-    required int super.argument,
+    required String super.argument,
   }) : super(
          retry: null,
          name: r'customerProvider',
@@ -50,7 +50,7 @@ final class CustomerNotifierProvider
   }
 }
 
-String _$customerNotifierHash() => r'c7bf77c8bf2f0190cccf23c227347bc9a004a074';
+String _$customerNotifierHash() => r'96b3fcfee9699b9f2bc4374963a79760d10d2999';
 
 final class CustomerNotifierFamily extends $Family
     with
@@ -59,7 +59,7 @@ final class CustomerNotifierFamily extends $Family
           AsyncValue<Customer?>,
           Customer?,
           Stream<Customer?>,
-          int
+          String
         > {
   CustomerNotifierFamily._()
     : super(
@@ -70,7 +70,7 @@ final class CustomerNotifierFamily extends $Family
         isAutoDispose: true,
       );
 
-  CustomerNotifierProvider call(int id) =>
+  CustomerNotifierProvider call(String id) =>
       CustomerNotifierProvider._(argument: id, from: this);
 
   @override
@@ -78,10 +78,10 @@ final class CustomerNotifierFamily extends $Family
 }
 
 abstract class _$CustomerNotifier extends $StreamNotifier<Customer?> {
-  late final _$args = ref.$arg as int;
-  int get id => _$args;
+  late final _$args = ref.$arg as String;
+  String get id => _$args;
 
-  Stream<Customer?> build(int id);
+  Stream<Customer?> build(String id);
   @$mustCallSuper
   @override
   void runBuild() {

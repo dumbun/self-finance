@@ -5,9 +5,11 @@ import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
+import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/providers/contacts_provider.dart';
 import 'package:self_finance/providers/image_providers.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
@@ -16,6 +18,7 @@ import 'package:self_finance/widgets/snack_bar_widget.dart';
 import 'package:self_finance/widgets/image_picker_widget.dart';
 import 'package:signature/signature.dart';
 
+@Deprecated('Use CustomerDetailsEntryView for the unified entry view')
 class CustomerConformationView extends ConsumerStatefulWidget {
   final String customerName;
   final String mobileNumber;
@@ -84,7 +87,7 @@ class _CustomerConformationViewState
                     ref.read<ImageFile>(imageFileProvider.notifier).set(file),
                 onClearImage: () =>
                     ref.read<ImageFile>(imageFileProvider.notifier).clear(),
-                title: Constant.customerPhoto,
+                title: context.l10n.customerPhoto,
                 defaultImage: Constant.defaultProfileImagePath,
               ),
             ),
@@ -95,7 +98,7 @@ class _CustomerConformationViewState
                     ref.read<ProofFile>(proofFileProvider.notifier).set(file),
                 onClearImage: () =>
                     ref.read<ProofFile>(proofFileProvider.notifier).clear(),
-                title: Constant.customerProof,
+                title: context.l10n.customerProof,
                 defaultImage: Constant.defaultProofImagePath,
               ),
             ),
@@ -108,7 +111,7 @@ class _CustomerConformationViewState
               ref.read<ItemFile>(itemFileProvider.notifier).set(file),
           onClearImage: () =>
               ref.read<ItemFile>(itemFileProvider.notifier).clear(),
-          title: Constant.customerItem,
+          title: context.l10n.customerItem,
           defaultImage: Constant.defaultItemImagePath,
         ),
       ],
@@ -117,8 +120,9 @@ class _CustomerConformationViewState
 
   bool _isloading = false;
 
-  void _alertDilog({required String title, required String content}) {
-    AlertDilogs.alertDialogWithOneAction(context, title, content);
+  Future<void> _alertDilog({required String title, required String content}) async {
+    if (!mounted) return;
+    await AlertDilogs.alertDialogWithOneAction(context, title, content);
     if (mounted) {
       setState(() {
         _isloading = false;
@@ -133,20 +137,24 @@ class _CustomerConformationViewState
       });
       SnackBarWidget.snackBarWidget(
         context: context,
-        message: Constant.savedSuccessfullyText,
+        message: context.l10n.savedSuccessfully,
       );
       Routes.navigateToDashboard(context: context);
     }
   }
 
-  void _afterFail() {
+  Future<void> _afterFail() async {
     if (mounted) {
-      _alertDilog(title: Constant.error, content: Constant.pleaseTryAgain);
-      Navigator.pop(context);
+      setState(() => _isloading = false);
+      await _alertDilog(
+        title: context.l10n.error,
+        content: context.l10n.pleaseTryAgain,
+      );
     }
   }
 
   Future<void> _save() async {
+    if (_isloading) return;
     setState(() => _isloading = true);
 
     try {
@@ -161,12 +169,13 @@ class _CustomerConformationViewState
             takenAmount: widget.takenAmount,
             rateOfIntrest: widget.rateOfIntrest,
             signatureController: _signatureGlobalKey,
+            takenDate: widget.takenDate,
           );
       if (!mounted) return;
-      res ? _afterSuccess() : _afterFail();
+      res ? _afterSuccess() : await _afterFail();
     } catch (e) {
       if (!mounted) return;
-      _afterFail();
+      await _afterFail();
     }
   }
 
@@ -174,15 +183,19 @@ class _CustomerConformationViewState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const BodySmallText(text: "Customer conformation", bold: true),
+        title: const BodyTwoDefaultText(text: "Customer Confirmation", bold: true),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.getPrimaryColor,
-        onPressed: _save,
+        onPressed: _isloading ? null : _save,
         child: Visibility(
           visible: _isloading,
           replacement: const Icon(Icons.volunteer_activism),
-          child: const Center(child: CircularProgressIndicator.adaptive()),
+          child: const Center(
+            child: CircularProgressIndicator.adaptive(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          ),
         ),
       ),
       body: SafeArea(
@@ -195,37 +208,37 @@ class _CustomerConformationViewState
                 children: [
                   _buildImagePickers(),
                   _buildListTile(
-                    title: Constant.customerName,
+                    title: context.l10n.customerName,
                     data: widget.customerName,
                   ),
                   _buildListTile(
-                    title: Constant.guardianName,
+                    title: context.l10n.guardianName,
                     data: widget.gaurdianName,
                   ),
                   _buildListTile(
-                    title: Constant.customerAddress,
+                    title: context.l10n.customerAddress,
                     data: widget.address,
                   ),
                   _buildListTile(
-                    title: Constant.mobileNumber,
+                    title: context.l10n.mobileNumber,
                     data: widget.mobileNumber,
                   ),
                   _buildListTile(
-                    title: Constant.takenDate,
+                    title: context.l10n.takenDate,
                     data: widget.takenDate,
                   ),
                   _buildListTile(
                     currency: true,
-                    title: Constant.takenAmount,
+                    title: context.l10n.takenAmount,
                     data: Utility.doubleFormate(widget.takenAmount),
                   ),
 
                   _buildListTile(
-                    title: Constant.rateOfIntrest,
-                    data: widget.rateOfIntrest.toString(),
+                    title: context.l10n.rateOfIntrest,
+                    data: "${widget.rateOfIntrest} %",
                   ),
                   _buildListTile(
-                    title: Constant.itemDescription,
+                    title: context.l10n.itemDescription,
                     data: widget.itemDescription,
                   ),
                   SignatureWidget(controller: _signatureGlobalKey),

@@ -9,12 +9,20 @@ class PinInputWidget extends StatelessWidget {
     required this.obscureText,
     this.validator,
     this.readOnly = false,
+    this.length = 4,
+    this.onCompleted,
+    this.onChanged,
+    this.autofocus = false,
   });
 
   final TextEditingController pinController;
   final bool obscureText;
   final String? Function(String?)? validator;
   final bool readOnly;
+  final int length;
+  final void Function(String)? onCompleted;
+  final void Function(String)? onChanged;
+  final bool autofocus;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +45,10 @@ class PinInputWidget extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Pinput(
+        length: length,
+        autofocus: autofocus,
+        onCompleted: onCompleted,
+        onChanged: onChanged,
         errorTextStyle: const TextStyle(
           fontFamily: "hell",
           fontStyle: FontStyle.italic,

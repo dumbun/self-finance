@@ -1,7 +1,7 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 
 class ExpandableFab extends StatelessWidget {
@@ -42,10 +42,12 @@ class ExpandableFab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return FloatingActionButton(
       splashColor: AppColors.getPrimaryColor,
       backgroundColor: AppColors.getPrimaryColor,
-      tooltip: Constant.addNewTransactionToolTip,
+      tooltip: l10n.addNewTransaction,
       onPressed: () async {
         await showModalBottomSheet(
           showDragHandle: true,
@@ -64,7 +66,7 @@ class ExpandableFab extends StatelessWidget {
                     _buildFlotingActionButtons(
                       () => _navigateToAddNewEntry(context),
                       const Icon(Icons.add, color: AppColors.contentColorBlack),
-                      "Create new Contact",
+                      l10n.createNewContact,
                     ),
                     const SizedBox(height: 12),
                     _buildFlotingActionButtons(
@@ -73,7 +75,7 @@ class ExpandableFab extends StatelessWidget {
                         Icons.contact_page_rounded,
                         color: AppColors.contentColorBlack,
                       ),
-                      "Show Contacts",
+                      l10n.showContacts,
                     ),
                   ],
                 ),

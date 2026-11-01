@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/backend/user_database.dart';
@@ -8,6 +9,7 @@ import 'package:self_finance/models/user_model.dart';
 import 'package:self_finance/providers/date_provider.dart';
 import 'package:self_finance/providers/image_providers.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
+import 'package:self_finance/core/sync/sync_provider.dart';
 import 'package:signature/signature.dart';
 
 part 'contacts_provider.g.dart';
@@ -71,12 +73,23 @@ class ContactsNotifier extends _$ContactsNotifier {
     required String guardianName,
     required String address,
     required String number,
+    String? takenDate,
+    String? verificationToken,
   }) async {
     final keepAlive = ref.keepAlive();
 
     try {
-      final DateTime? userPickedDate = ref.read(dateProvider);
-      if (userPickedDate == null) return false;
+      DateTime? userPickedDate = ref.read(dateProvider);
+      if (userPickedDate == null &&
+          takenDate != null &&
+          takenDate.trim().isNotEmpty) {
+        try {
+          userPickedDate = DateFormat('dd-MM-yyyy').parse(takenDate.trim());
+        } catch (_) {
+          userPickedDate = DateTime.now();
+        }
+      }
+      userPickedDate ??= DateTime.now();
 
       // saving image to storage
       final String imagePath = await ImageSavingUtility.saveImage(
@@ -103,9 +116,9 @@ class ContactsNotifier extends _$ContactsNotifier {
         createdDate: DateTime.now(),
       );
 
-      final int customerCreatedResponse = await BackEnd.createNewCustomer(c);
+      final String customerCreatedResponse = await BackEnd.createNewCustomer(c);
 
-      if (customerCreatedResponse != 0) {
+      if (customerCreatedResponse.isNotEmpty) {
         final bool createNewTransaction = await ref
             .read(transactionsProvider.notifier)
             .addNewTransactoion(
@@ -117,6 +130,7 @@ class ContactsNotifier extends _$ContactsNotifier {
               pawnAmount: takenAmount,
               rateOfIntrest: rateOfIntrest,
               signatureController: signatureController,
+              verificationToken: verificationToken,
             );
 
         if (createNewTransaction) {
@@ -124,6 +138,7 @@ class ContactsNotifier extends _$ContactsNotifier {
           ref.read(proofFileProvider.notifier).clear();
           ref.read(itemFileProvider.notifier).clear();
           ref.read(dateProvider.notifier).clear();
+          ref.read(syncProvider.notifier).triggerAutoSync();
         }
 
         return createNewTransaction;

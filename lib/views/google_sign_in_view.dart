@@ -1,7 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:self_finance/core/auth/supabase_auth_service.dart';
-import 'package:self_finance/core/constants/constants.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/providers/auth_provider.dart';
 
@@ -18,16 +17,15 @@ class GoogleSignInView extends ConsumerStatefulWidget {
 }
 
 class _GoogleSignInViewState extends ConsumerState<GoogleSignInView>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late final AnimationController _controller;
   late final Animation<double> _fadeIn;
   late final Animation<double> _slideUp;
-  bool _isLoading = false;
-  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -41,58 +39,36 @@ class _GoogleSignInViewState extends ConsumerState<GoogleSignInView>
   }
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  Future<void> _handleGoogleSignIn() async {
-    if (_isLoading) return;
-
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final SupabaseAuthService service = ref.read(supabaseAuthServiceProvider);
-      await service.signInWithGoogle();
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _errorMessage = 'Sign-in failed. Please try again.';
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.read(googleSignInProvider.notifier).handleAppResumed();
     }
   }
 
   @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final signInState = ref.watch(googleSignInProvider);
+    final bool isLoading = signInState.isLoading;
+    final String? errorMessage = signInState.errorMessage;
 
     return Scaffold(
-      backgroundColor: scaffoldBg,
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
-          color: scaffoldBg,
           gradient: RadialGradient(
             radius: 0.9,
-            colors: isDark
-                ? [
-                    AppColors.getPrimaryColor.withValues(alpha: 0.12),
-                    scaffoldBg,
-                  ]
-                : [
-                    AppColors.getPrimaryColor.withValues(alpha: 0.06),
-                    scaffoldBg,
-                  ],
+            colors: [
+              AppColors.getPrimaryColor.withValues(alpha: 0.1),
+              AppColors.getTransparentColor,
+            ],
           ),
         ),
         child: SafeArea(
@@ -112,7 +88,7 @@ class _GoogleSignInViewState extends ConsumerState<GoogleSignInView>
                   Container(
                     padding: const EdgeInsets.all(22),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                      color: AppColors.getPrimaryColor.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(32),
                       border: Border.all(
                         color: AppColors.getPrimaryColor.withValues(
@@ -123,7 +99,7 @@ class _GoogleSignInViewState extends ConsumerState<GoogleSignInView>
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.getPrimaryColor.withValues(
-                            alpha: isDark ? 0.28 : 0.15,
+                            alpha: 0.2,
                           ),
                           blurRadius: 40,
                           spreadRadius: 4,
@@ -139,20 +115,17 @@ class _GoogleSignInViewState extends ConsumerState<GoogleSignInView>
                   ),
                   const SizedBox(height: 28),
                   Text(
-                    Constant.appTitle,
-                    style: TextStyle(
+                    context.l10n.appTitle,
+                    style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5,
-                      color: isDark
-                          ? Colors.white
-                          : AppColors.getPrimaryTextColor,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    "Personal Lending & Finance",
-                    style: TextStyle(
+                  Text(
+                    context.l10n.appSubtitle,
+                    style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       letterSpacing: 0.3,
@@ -169,15 +142,13 @@ class _GoogleSignInViewState extends ConsumerState<GoogleSignInView>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Sign in to sync your data\nacross devices',
+                          context.l10n.signInToSyncData,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                             height: 1.5,
-                            color: isDark
-                                ? Colors.white70
-                                : AppColors.getLigthGreyColor,
+                            color: AppColors.getLigthGreyColor,
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -188,45 +159,36 @@ class _GoogleSignInViewState extends ConsumerState<GoogleSignInView>
                           height: 54,
                           child: FilledButton.icon(
                             style: FilledButton.styleFrom(
-                              backgroundColor: isDark
-                                  ? const Color(0xFF1E293B)
-                                  : Colors.white,
-                              foregroundColor: isDark
-                                  ? Colors.white
-                                  : AppColors.getPrimaryTextColor,
+                              backgroundColor: AppColors.getPrimaryColor,
+                              foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                side: BorderSide(
-                                  color: isDark
-                                      ? Colors.white.withValues(alpha: 0.12)
-                                      : Colors.black.withValues(alpha: 0.12),
-                                ),
                               ),
-                              elevation: 0,
+                              elevation: 2,
                             ),
-                            onPressed: _isLoading ? null : _handleGoogleSignIn,
-                            icon: _isLoading
-                                ? SizedBox(
+                            onPressed: isLoading
+                                ? null
+                                : () => ref
+                                      .read(googleSignInProvider.notifier)
+                                      .signInWithGoogle(),
+                            icon: isLoading
+                                ? const SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      color: isDark
-                                          ? Colors.white70
-                                          : AppColors.getPrimaryColor,
+                                      color: Colors.white,
                                     ),
                                   )
-                                : Icon(
+                                : const Icon(
                                     Icons.g_mobiledata_rounded,
                                     size: 28,
-                                    color: isDark
-                                        ? Colors.white
-                                        : AppColors.getPrimaryColor,
+                                    color: Colors.white,
                                   ),
                             label: Text(
-                              _isLoading
-                                  ? 'Signing in...'
-                                  : 'Continue with Google',
+                              isLoading
+                                  ? context.l10n.signingIn
+                                  : context.l10n.continueWithGoogle,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -237,7 +199,7 @@ class _GoogleSignInViewState extends ConsumerState<GoogleSignInView>
                         ),
 
                         // ── Error message ──
-                        if (_errorMessage != null) ...[
+                        if (errorMessage != null) ...[
                           const SizedBox(height: 16),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -261,7 +223,7 @@ class _GoogleSignInViewState extends ConsumerState<GoogleSignInView>
                                 const SizedBox(width: 8),
                                 Flexible(
                                   child: Text(
-                                    _errorMessage!,
+                                    errorMessage,
                                     style: const TextStyle(
                                       fontSize: 13,
                                       color: AppColors.getErrorColor,
@@ -273,6 +235,77 @@ class _GoogleSignInViewState extends ConsumerState<GoogleSignInView>
                             ),
                           ),
                         ],
+
+                        const SizedBox(height: 18),
+
+                        //// after implementing the phone number auth
+                        // // ── Divider ──
+                        // Row(
+                        //   children: [
+                        //     Expanded(
+                        //       child: Divider(
+                        //         color: AppColors.getLigthGreyColor.withValues(
+                        //           alpha: 0.25,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //     const Padding(
+                        //       padding: EdgeInsets.symmetric(horizontal: 12),
+                        //       child: Text(
+                        //         'OR',
+                        //         style: TextStyle(
+                        //           fontSize: 11,
+                        //           fontWeight: FontWeight.bold,
+                        //           color: AppColors.getLigthGreyColor,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //     Expanded(
+                        //       child: Divider(
+                        //         color: AppColors.getLigthGreyColor.withValues(
+                        //           alpha: 0.25,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
+                        // const SizedBox(height: 18),
+
+                        // // ── Customer / Borrower Portal Button ──
+                        // SizedBox(
+                        //   width: double.infinity,
+                        //   height: 52,
+                        //   child: OutlinedButton.icon(
+                        //     style: OutlinedButton.styleFrom(
+                        //       foregroundColor: AppColors.getPrimaryColor,
+                        //       side: const BorderSide(
+                        //         color: AppColors.getPrimaryColor,
+                        //         width: 1.5,
+                        //       ),
+                        //       shape: RoundedRectangleBorder(
+                        //         borderRadius: BorderRadius.circular(16),
+                        //       ),
+                        //     ),
+                        //     onPressed: () {
+                        //       Navigator.of(context).push(
+                        //         MaterialPageRoute<void>(
+                        //           builder: (_) => const CustomerLoginView(),
+                        //         ),
+                        //       );
+                        //     },
+                        //     icon: const Icon(
+                        //       Icons.phone_android_rounded,
+                        //       size: 20,
+                        //     ),
+                        //     label: Text(
+                        //       context.l10n.customerLogin,
+                        //       style: const TextStyle(
+                        //         fontSize: 15,
+                        //         fontWeight: FontWeight.w600,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
@@ -280,18 +313,18 @@ class _GoogleSignInViewState extends ConsumerState<GoogleSignInView>
                   const Spacer(),
 
                   // ── Trust indicators ──
-                  const Row(
+                  Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.shield_outlined,
                         size: 13,
                         color: AppColors.getLigthGreyColor,
                       ),
-                      SizedBox(width: 6),
+                      const SizedBox(width: 6),
                       Text(
-                        "Your data stays on your device",
-                        style: TextStyle(
+                        context.l10n.yourDataStaysOnDevice,
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
                           letterSpacing: 0.2,

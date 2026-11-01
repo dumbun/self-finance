@@ -1,9 +1,10 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_localizations/flutter_localizations.dart' as native_loc;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/constants/routes.dart';
+import 'package:self_finance/core/localization/fallback_localization_delegates.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
+import 'package:self_finance/l10n/app_localizations.dart';
 import 'package:self_finance/providers/settings_provider.dart';
 import 'package:self_finance/views/account_gate.dart';
 import 'package:self_finance/views/splash_screen.dart';
@@ -16,12 +17,20 @@ class SelfFinance extends ConsumerWidget {
     final themeAsync = ref.watch(themeProvider);
     final bool darkMode = themeAsync.value ?? false;
 
+    final localeAsync = ref.watch(localeProvider);
+    final Locale? activeLocale = localeAsync.value;
+
     return MaterialApp(
+      locale: activeLocale,
       localizationsDelegates: const [
-        native_loc.GlobalMaterialLocalizations.delegate,
-        native_loc.GlobalWidgetsLocalizations.delegate,
-        native_loc.GlobalCupertinoLocalizations.delegate,
+        ...AppLocalizations.localizationsDelegates,
+        ...GlobalMaterialLocalizations.delegates,
+        FallbackMuiMaterialLocalizationsDelegate(),
+        FallbackMuiCupertinoLocalizationsDelegate(),
+        FallbackMaterialLocalizationsDelegate(),
+        FallbackCupertinoLocalizationsDelegate(),
       ],
+      supportedLocales: AppLocalizations.supportedLocales,
       routes: Routes.namedRoutes,
       onGenerateRoute: (RouteSettings settings) {
         final String name = settings.name ?? '';

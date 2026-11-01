@@ -68,17 +68,14 @@ class YearlyChart extends _$YearlyChart {
 @riverpod
 class WeeklyChart extends _$WeeklyChart {
   @override
-  Stream<MonthlyChartState> build() {
+  Stream<MonthlyChartState> build() async* {
     ref.keepAlive();
-    return BackEnd.watchWeeklyChartData().transform(
-      StreamTransformer<
-        List<Map<String, dynamic>>,
-        MonthlyChartState
-      >.fromHandlers(
-        handleData: (rawData, sink) => sink.add(_toState(rawData)),
-        handleError: (_, _, sink) => sink.add(MonthlyChartState.empty()),
-      ),
-    );
+    final rawAsync = ref.watch(weeklyRawProvider);
+    if (rawAsync.hasValue) {
+      yield _toState(rawAsync.requireValue);
+    } else if (rawAsync.hasError) {
+      yield MonthlyChartState.empty();
+    }
   }
 
   MonthlyChartState _toState(List<Map<String, dynamic>> rawData) {

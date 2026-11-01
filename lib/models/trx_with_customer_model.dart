@@ -20,9 +20,9 @@ class TrxWithCustomer {
     required this.customerPhoto,
   });
 
-  final int id;
-  final int customerId;
-  final int itemId;
+  final String id;
+  final String customerId;
+  final String itemId;
   final DateTime transactionDate;
   final String transactionType;
   final double amount;

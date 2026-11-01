@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/widgets/build_transactions_list_widget.dart';
 import 'package:self_finance/widgets/transaction_filter_widget.dart';
@@ -37,7 +38,7 @@ class TransactionsView extends HookConsumerWidget {
                 RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
               ),
               elevation: const WidgetStatePropertyAll(0),
-              hintText: "Search transaction ID",
+              hintText: context.l10n.searchTransactionId,
               hintStyle: const WidgetStatePropertyAll(
                 TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),

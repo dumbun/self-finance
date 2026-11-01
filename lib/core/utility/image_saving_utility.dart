@@ -45,10 +45,28 @@ class ImageSavingUtility {
 
     const uuid = Uuid();
     final String imageName =
-        "photo_${DateTime.now().millisecondsSinceEpoch}_${uuid.v1()}_${DateTime.now()}.jpg";
+        "photo_${DateTime.now().millisecondsSinceEpoch}_${uuid.v7()}.jpg";
     final String filePath = '${locationPath.path}/$imageName';
     await File(image.path).copy(filePath);
     return p.join("Images", location, imageName);
+  }
+
+  static Future<void> _safeDeleteOldFile(
+    String? relativeOrAbsolutePath,
+    String appDirPath,
+  ) async {
+    if (relativeOrAbsolutePath == null || relativeOrAbsolutePath.trim().isEmpty) {
+      return;
+    }
+    try {
+      final path = p.isAbsolute(relativeOrAbsolutePath)
+          ? relativeOrAbsolutePath
+          : p.join(appDirPath, relativeOrAbsolutePath);
+      final file = File(path);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } catch (_) {}
   }
 
   static Future<String> updateCustomerImage({
@@ -67,17 +85,12 @@ class ImageSavingUtility {
     }
 
     /// 🔥 Delete old image if exists
-    if (customer.photo.isNotEmpty) {
-      final oldFile = File(customer.photo);
-      if (await oldFile.exists()) {
-        await oldFile.delete();
-      }
-    }
+    await _safeDeleteOldFile(customer.photo, appDir.path);
 
     /// 💾 Save new image
     const uuid = Uuid();
     final String imageName =
-        "photo_${DateTime.now().millisecondsSinceEpoch}_${uuid.v1()}_${DateTime.now()}.jpg";
+        "photo_${DateTime.now().millisecondsSinceEpoch}_${uuid.v7().substring(0, 8)}.jpg";
     final String newPath = '${customerDir.path}/$imageName';
     await File(newImage.path).copy(newPath);
     return p.join('Images', "customers", imageName);
@@ -99,17 +112,12 @@ class ImageSavingUtility {
     }
 
     /// 🔥 Delete old image if exists
-    if (customer.proof.isNotEmpty) {
-      final File oldFile = File(customer.proof);
-      if (await oldFile.exists()) {
-        await oldFile.delete();
-      }
-    }
+    await _safeDeleteOldFile(customer.proof, appDir.path);
 
     /// 💾 Save new image
     const Uuid uuid = Uuid();
     final String imageName =
-        "photo_${DateTime.now().millisecondsSinceEpoch}_${uuid.v1()}_${DateTime.now()}.jpg";
+        "photo_${DateTime.now().millisecondsSinceEpoch}_${uuid.v7().substring(0, 8)}.jpg";
     final String newPath = '${customerDir.path}/$imageName';
     await File(newImage.path).copy(newPath);
     return p.join('Images', "proof", imageName);
@@ -131,20 +139,14 @@ class ImageSavingUtility {
     }
 
     /// 🔥 Delete old image if exists
-    if (userImage.isNotEmpty) {
-      final File oldFile = File(userImage);
-      if (await oldFile.exists()) {
-        await oldFile.delete();
-      }
-    }
+    await _safeDeleteOldFile(userImage, appDir.path);
 
     /// 💾 Save new image
     const Uuid uuid = Uuid();
     final String newImageName =
-        "photo_${DateTime.now().millisecondsSinceEpoch}_${uuid.v1()}_${DateTime.now()}.jpg";
+        "photo_${DateTime.now().millisecondsSinceEpoch}_${uuid.v7().substring(0, 8)}.jpg";
     final String newPath = '${customerDir.path}/$newImageName';
     await File(newImage.path).copy(newPath);
-    final String returned = p.join('Images', 'user', newPath);
-    return returned;
+    return p.join('Images', 'user', newImageName);
   }
 }

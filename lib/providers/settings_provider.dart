@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:self_finance/core/utility/preferences_helper.dart';
 
@@ -65,3 +66,21 @@ class OnboardingCompleteNotifier extends _$OnboardingCompleteNotifier {
     await PreferencesHelper.setOnboardingComplete(value);
   }
 }
+
+@Riverpod(keepAlive: true)
+class LocaleNotifier extends _$LocaleNotifier {
+  @override
+  Future<Locale?> build() async {
+    final code = await PreferencesHelper.getLocaleCode();
+    if (code != null && code.isNotEmpty) {
+      return Locale(code);
+    }
+    return null;
+  }
+
+  Future<void> setLocale(Locale? locale) async {
+    state = AsyncData(locale);
+    await PreferencesHelper.setLocaleCode(locale?.languageCode);
+  }
+}
+

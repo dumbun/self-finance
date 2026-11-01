@@ -2,8 +2,10 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/utility/image_saving_utility.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
+import 'package:self_finance/l10n/app_localizations.dart';
 import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/providers/customer_provider.dart';
 import 'package:self_finance/widgets/dilogbox_widget.dart';
@@ -27,6 +29,7 @@ class _ContactEditingViewState extends State<ContactEditingView> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late String imagePath = widget.contact.photo;
   late String proofPath = widget.contact.proof;
+  bool _isLoading = false;
   @override
   void initState() {
     imagePath = widget.contact.photo;
@@ -47,25 +50,25 @@ class _ContactEditingViewState extends State<ContactEditingView> {
     super.dispose();
   }
 
-  Column _buildTextFields() {
+  Column _buildTextFields(AppLocalizations l10n) {
     return Column(
       children: [
         const SizedBox(height: 12),
         InputTextField(
           keyboardType: TextInputType.name,
           controller: _customerName,
-          hintText: Constant.customerName,
+          hintText: l10n.customerName,
         ),
         const SizedBox(height: 20),
         InputTextField(
           keyboardType: TextInputType.phone,
           controller: _mobileNumber,
-          hintText: Constant.mobileNumber,
+          hintText: l10n.mobileNumber,
           validator: (String? value) {
             if (Utility.isValidPhoneNumber(value)) {
               return null;
             } else {
-              return Constant.enterCorrectNumber;
+              return l10n.enterValidNumber;
             }
           },
         ),
@@ -73,13 +76,13 @@ class _ContactEditingViewState extends State<ContactEditingView> {
         InputTextField(
           keyboardType: TextInputType.name,
           controller: _gaurdianName,
-          hintText: Constant.guardianName,
+          hintText: l10n.guardianName,
         ),
         const SizedBox(height: 20),
         InputTextField(
           keyboardType: TextInputType.streetAddress,
           controller: _address,
-          hintText: Constant.customerAddress,
+          hintText: l10n.customerAddress,
         ),
       ],
     );
@@ -89,15 +92,15 @@ class _ContactEditingViewState extends State<ContactEditingView> {
     Navigator.pop(context);
     SnackBarWidget.snackBarWidget(
       context: context,
-      message: Constant.contactUpdatedSuccessfully,
+      message: context.l10n.contactUpdatedSuccessfully,
     );
   }
 
   void _showError() {
     AlertDilogs.alertDialogWithOneAction(
       context,
-      Constant.error,
-      Constant.errorUpdatingContactMessage,
+      context.l10n.error,
+      context.l10n.errorUpdatingContact,
     );
   }
 
@@ -138,9 +141,11 @@ class _ContactEditingViewState extends State<ContactEditingView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Scaffold(
       appBar: AppBar(
-        title: const BodyTwoDefaultText(text: Constant.editContact, bold: true),
+        title: BodyTwoDefaultText(text: l10n.editContact, bold: true),
       ),
       body: SafeArea(
         child: Padding(
@@ -168,7 +173,7 @@ class _ContactEditingViewState extends State<ContactEditingView> {
                         },
                         defaultImages: Constant.defaultProfileImagePath,
                         imagePath: imagePath,
-                        titile: "Customer Image",
+                        titile: l10n.customerPhoto,
                       ),
                       _buidImages(
                         onTap: () async {
@@ -184,53 +189,64 @@ class _ContactEditingViewState extends State<ContactEditingView> {
                         },
                         defaultImages: Constant.defaultProofImagePath,
                         imagePath: proofPath,
-                        titile: "Customer Proof",
+                        titile: l10n.customerProof,
                       ),
                     ],
                     // children: [_buildCustomerPhoto(), _buildCustomerProof()],
                   ),
                   const SizedBox(height: 20),
-                  _buildTextFields(),
+                  _buildTextFields(l10n),
                   const SizedBox(height: 20),
-                  Hero(
-                    tag: Constant.saveButtonTag,
-                    child: Consumer(
-                      builder: (context, ref, child) {
-                        return RoundedCornerButton(
-                          text: Constant.update,
+                  Consumer(
+                    builder: (context, ref, child) {
+                      return Visibility(
+                        visible: _isLoading,
+                        replacement: RoundedCornerButton(
+                          text: l10n.update,
                           onPressed: () async {
+                            if (_isLoading) return;
                             if (_validateAndSave()) {
-                              final Customer newCustomer = Customer(
-                                userID: widget.contact.userID,
-                                id: widget.contact.id,
-                                name: _customerName.text,
-                                guardianName: _gaurdianName.text,
-                                address: _address.text,
-                                number: _mobileNumber.text,
-                                photo: imagePath,
-                                proof: proofPath,
-                                createdDate: widget.contact.createdDate,
-                              );
+                              setState(() => _isLoading = true);
+                              try {
+                                final Customer newCustomer = Customer(
+                                  userID: widget.contact.userID,
+                                  id: widget.contact.id,
+                                  name: _customerName.text.trim(),
+                                  guardianName: _gaurdianName.text.trim(),
+                                  address: _address.text.trim(),
+                                  number: _mobileNumber.text.trim(),
+                                  photo: imagePath,
+                                  proof: proofPath,
+                                  createdDate: widget.contact.createdDate,
+                                );
 
-                              final int response = await ref
-                                  .read(
-                                    customerProvider(
-                                      widget.contact.id!,
-                                    ).notifier,
-                                  )
-                                  .updateCustomer(customer: newCustomer);
+                                final int response = await ref
+                                    .read(
+                                      customerProvider(
+                                        widget.contact.id!,
+                                      ).notifier,
+                                    )
+                                    .updateCustomer(customer: newCustomer);
 
-                              if (!context.mounted) return;
-                              if (response != 0) {
-                                _navigateToContactsView();
-                              } else {
-                                _showError();
+                                if (!context.mounted) return;
+                                if (response != 0) {
+                                  _navigateToContactsView();
+                                } else {
+                                  _showError();
+                                }
+                              } finally {
+                                if (mounted) {
+                                  setState(() => _isLoading = false);
+                                }
                               }
                             }
                           },
-                        );
-                      },
-                    ),
+                        ),
+                        child: const Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

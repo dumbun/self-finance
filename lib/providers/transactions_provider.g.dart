@@ -198,7 +198,7 @@ final class TransactionsNotifierProvider
 }
 
 String _$transactionsNotifierHash() =>
-    r'ebf015bc8680b18bb079514d2417c88ebba024cc';
+    r'1f293f2c644f3b69e6cb5444cfa979306e94869d';
 
 abstract class _$TransactionsNotifier
     extends $AsyncNotifier<TransactionsPaginationState> {
@@ -234,7 +234,7 @@ final class TransactionByIDProvider
     extends $StreamNotifierProvider<TransactionByID, Trx?> {
   TransactionByIDProvider._({
     required TransactionByIDFamily super.from,
-    required int super.argument,
+    required String super.argument,
   }) : super(
          retry: null,
          name: r'transactionByIDProvider',
@@ -268,7 +268,7 @@ final class TransactionByIDProvider
   }
 }
 
-String _$transactionByIDHash() => r'2a918e8a675a4bbf58bbda877319f4cc5abb7cf9';
+String _$transactionByIDHash() => r'7093f11077ba521b2a2258f124cf0959d401cd6a';
 
 final class TransactionByIDFamily extends $Family
     with
@@ -277,7 +277,7 @@ final class TransactionByIDFamily extends $Family
           AsyncValue<Trx?>,
           Trx?,
           Stream<Trx?>,
-          int
+          String
         > {
   TransactionByIDFamily._()
     : super(
@@ -288,7 +288,7 @@ final class TransactionByIDFamily extends $Family
         isAutoDispose: true,
       );
 
-  TransactionByIDProvider call(int transactionId) =>
+  TransactionByIDProvider call(String transactionId) =>
       TransactionByIDProvider._(argument: transactionId, from: this);
 
   @override
@@ -296,10 +296,10 @@ final class TransactionByIDFamily extends $Family
 }
 
 abstract class _$TransactionByID extends $StreamNotifier<Trx?> {
-  late final _$args = ref.$arg as int;
-  int get transactionId => _$args;
+  late final _$args = ref.$arg as String;
+  String get transactionId => _$args;
 
-  Stream<Trx?> build(int transactionId);
+  Stream<Trx?> build(String transactionId);
   @$mustCallSuper
   @override
   void runBuild() {

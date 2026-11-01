@@ -6,6 +6,7 @@ import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/models/trx_with_customer_model.dart';
 import 'package:self_finance/providers/transactions_provider.dart';
 import 'package:self_finance/widgets/circular_image_widget.dart';
@@ -89,10 +90,10 @@ class _BuildTransactionsListWidgetState
               physics: const AlwaysScrollableScrollPhysics(),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: const Center(
+                child: Center(
                   child: BodyOneDefaultText(
                     bold: true,
-                    text: 'No Transactions to view',
+                    text: context.l10n.noTransactionsToView,
                   ),
                 ),
               ),
@@ -120,8 +121,8 @@ class _BuildTransactionsListWidgetState
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const BodySmallText(
-                          text: 'Failed to load more transactions',
+                        BodySmallText(
+                          text: context.l10n.failedToLoadMoreTransactions,
                           color: AppColors.getLigthGreyColor,
                         ),
                         const SizedBox(height: 8),
@@ -130,7 +131,7 @@ class _BuildTransactionsListWidgetState
                               .read(transactionsProvider.notifier)
                               .loadMore(isRetry: true),
                           icon: const Icon(Icons.refresh, size: 18),
-                          label: const Text('Retry'),
+                          label: Text(context.l10n.retry),
                         ),
                       ],
                     ),

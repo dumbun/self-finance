@@ -1,11 +1,11 @@
 class UserHistory {
-  int? id;
+  final String? id;
   final int userID;
-  final int customerID;
-  final int itemID;
+  final String customerID;
+  final String itemID;
   final String customerNumber;
   final String customerName;
-  final int transactionID;
+  final String transactionID;
   final DateTime eventDate;
   final String eventType; // credited or debited
   final double amount;
@@ -29,28 +29,28 @@ class UserHistory {
     }
     return data.map((Map<String, Object?> e) {
       return UserHistory(
-        id: e["History_ID"] as int,
+        id: e["History_ID"]?.toString(),
         amount: e["Amount"] as double,
-        customerID: e["Customer_ID"] as int,
+        customerID: e["Customer_ID"]?.toString() ?? '',
         eventDate: e["Event_Date"] as DateTime,
         eventType: e["Event_Type"] as String,
-        itemID: e["Item_ID"] as int,
+        itemID: e["Item_ID"]?.toString() ?? '',
         customerName: e["Customer_Name"] as String,
         customerNumber: e["Contact_Number"] as String,
-        transactionID: e["Transaction_ID"] as int,
+        transactionID: (e["Transaction_ID"] == null || e["Transaction_ID"] == '0' || e["Transaction_ID"] == 0) ? '' : e["Transaction_ID"].toString(),
         userID: e["User_ID"] as int,
       );
     }).toList();
   }
 
   UserHistory copyWith({
-    int? id,
+    String? id,
     int? userID,
-    int? customerID,
-    int? itemID,
+    String? customerID,
+    String? itemID,
     String? customerNumber,
     String? customerName,
-    int? transactionID,
+    String? transactionID,
     DateTime? eventDate,
     String? eventType,
     double? amount,
@@ -85,17 +85,32 @@ class UserHistory {
   }
 
   factory UserHistory.fromMap(Map<String, dynamic> map) {
+    final rawTxnId = map['transactionID'] ?? map['Transaction_ID'];
+    final normalizedTxnId = (rawTxnId == null || rawTxnId == '0' || rawTxnId == 0)
+        ? ''
+        : rawTxnId.toString();
+
+    final rawUserId = map['userID'] ?? map['User_ID'] ?? 1;
+    final int normalizedUserId = (rawUserId is num)
+        ? rawUserId.toInt()
+        : int.tryParse(rawUserId.toString()) ?? 1;
+
     return UserHistory(
-      id: map['id'] != null ? map['id'] as int : null,
-      userID: map['userID'] as int,
-      customerID: map['customerID'] as int,
-      itemID: map['itemID'] as int,
-      customerNumber: map['customerNumber'] as String,
-      customerName: map['customerName'] as String,
-      transactionID: map['transactionID'] as int,
-      eventDate: map['eventDate'] as DateTime,
-      eventType: map['eventType'] as String,
-      amount: map['amount'] as double,
+      id: map['id']?.toString() ?? map['History_ID']?.toString(),
+      userID: normalizedUserId,
+      customerID: map['customerID']?.toString() ?? map['Customer_ID']?.toString() ?? '',
+      itemID: map['itemID']?.toString() ?? map['Item_ID']?.toString() ?? '',
+      customerNumber: map['customerNumber']?.toString() ?? map['Contact_Number']?.toString() ?? '',
+      customerName: map['customerName']?.toString() ?? map['Customer_Name']?.toString() ?? '',
+      transactionID: normalizedTxnId,
+      eventDate: map['eventDate'] is DateTime
+          ? map['eventDate'] as DateTime
+          : DateTime.tryParse(map['eventDate']?.toString() ?? '') ??
+              DateTime.now(),
+      eventType: map['eventType']?.toString() ?? '',
+      amount: (map['amount'] is num)
+          ? (map['amount'] as num).toDouble()
+          : double.tryParse(map['amount']?.toString() ?? '0.0') ?? 0.0,
     );
   }
 

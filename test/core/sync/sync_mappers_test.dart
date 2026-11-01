@@ -10,7 +10,7 @@ void main() {
     test('customerToSupabase maps all fields correctly', () {
       final customer = CustomerRow(
         userId: 1,
-        customerId: 1,
+        customerId: 'cust-uuid-1',
         customerName: 'John Doe',
         gaurdianName: 'Jane Doe',
         contactNumber: '9876543210',
@@ -38,8 +38,8 @@ void main() {
 
     test('itemToSupabase maps all fields correctly', () {
       final item = ItemRow(
-        itemId: 10,
-        customerId: 1,
+        itemId: 'item-uuid-1',
+        customerId: 'cust-uuid-1',
         itemName: 'Gold Ring',
         itemDescription: '22k 5g',
         pawnedDate: now,
@@ -64,9 +64,9 @@ void main() {
 
     test('transactionToSupabase maps all fields correctly', () {
       final txn = TransactionRow(
-        transactionId: 100,
-        customerId: 1,
-        itemId: 10,
+        transactionId: 'txn-uuid-1',
+        customerId: 'cust-uuid-1',
+        itemId: 'item-uuid-1',
         transactionDate: now,
         transactionType: 'Active',
         amount: 5000.0,
@@ -94,12 +94,41 @@ void main() {
       expect(map['amount'], 5000.0);
       expect(map['interest_rate'], 2.0);
       expect(map['transaction_type'], 'Active');
+      expect(map['verification_token'], isNull);
+    });
+
+    test('transactionToSupabase maps verification_token when present', () {
+      final txn = TransactionRow(
+        transactionId: 'txn-uuid-2',
+        customerId: 'cust-uuid-1',
+        itemId: 'item-uuid-1',
+        transactionDate: now,
+        transactionType: 'Active',
+        amount: 10000.0,
+        interestRate: 2.0,
+        interestAmount: 200.0,
+        remainingAmount: 10200.0,
+        signature: '',
+        createdDate: now,
+        syncId: 'txn-uuid-2',
+        updatedAt: now,
+        verificationToken: '01a19629-4748-7e30-b14e-ac42614502b1',
+      );
+
+      final map = SyncMappers.transactionToSupabase(
+        txn,
+        'cust-uuid-1',
+        'item-uuid-1',
+        ownerId,
+      );
+
+      expect(map['verification_token'], '01a19629-4748-7e30-b14e-ac42614502b1');
     });
 
     test('paymentToSupabase maps all fields correctly', () {
       final payment = PaymentRow(
-        paymentId: 5,
-        transactionId: 100,
+        paymentId: 'pay-uuid-1',
+        transactionId: 'txn-uuid-1',
         paymentDate: now,
         amountPaid: 100.0,
         paymentType: 'Interest',
@@ -123,13 +152,13 @@ void main() {
 
     test('historyToSupabase maps all fields correctly', () {
       final history = HistoryRow(
-        historyId: 20,
+        historyId: 'hist-uuid-1',
         userId: 1,
-        customerId: 1,
+        customerId: 'cust-uuid-1',
         customerName: 'John Doe',
         contactNumber: '9876543210',
-        itemId: 10,
-        transactionId: 100,
+        itemId: 'item-uuid-1',
+        transactionId: 'txn-uuid-1',
         amount: 5000.0,
         eventDate: now,
         eventType: 'Created',

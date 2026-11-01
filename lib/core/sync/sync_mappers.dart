@@ -11,7 +11,7 @@ class SyncMappers {
     String? remoteProofPath,
   }) {
     return {
-      'id': row.syncId,
+      'id': row.syncId.isNotEmpty ? row.syncId : row.customerId,
       'owner_id': ownerId,
       'name': row.customerName,
       'guardian_name': row.gaurdianName,
@@ -34,7 +34,7 @@ class SyncMappers {
     String? remotePhotoPath,
   }) {
     return {
-      'id': row.syncId,
+      'id': row.syncId.isNotEmpty ? row.syncId : row.itemId,
       'owner_id': ownerId,
       'customer_sync_id': customerSyncId,
       'name': row.itemName,
@@ -60,7 +60,7 @@ class SyncMappers {
     String? remoteSignaturePath,
   }) {
     return {
-      'id': row.syncId,
+      'id': row.syncId.isNotEmpty ? row.syncId : row.transactionId,
       'owner_id': ownerId,
       'customer_sync_id': customerSyncId,
       'item_sync_id': itemSyncId,
@@ -74,6 +74,7 @@ class SyncMappers {
       'created_at': row.createdDate.toUtc().toIso8601String(),
       'updated_at': (row.updatedAt ?? row.createdDate).toUtc().toIso8601String(),
       'deleted_at': row.deletedAt?.toUtc().toIso8601String(),
+      'verification_token': (row.verificationToken != null && row.verificationToken!.isNotEmpty) ? row.verificationToken : null,
     };
   }
 
@@ -85,7 +86,7 @@ class SyncMappers {
     String ownerId,
   ) {
     return {
-      'id': row.syncId,
+      'id': row.syncId.isNotEmpty ? row.syncId : row.paymentId,
       'owner_id': ownerId,
       'transaction_sync_id': transactionSyncId,
       'payment_date': row.paymentDate.toUtc().toIso8601String(),
@@ -107,13 +108,13 @@ class SyncMappers {
     String ownerId,
   ) {
     return {
-      'id': row.syncId,
+      'id': row.syncId.isNotEmpty ? row.syncId : row.historyId,
       'owner_id': ownerId,
       'customer_sync_id': customerSyncId,
       'customer_name': row.customerName,
       'contact_number': row.contactNumber,
-      'item_sync_id': (itemSyncId != null && itemSyncId.isNotEmpty) ? itemSyncId : null,
-      'transaction_sync_id': (transactionSyncId != null && transactionSyncId.isNotEmpty) ? transactionSyncId : null,
+      'item_sync_id': (itemSyncId != null && itemSyncId.isNotEmpty && itemSyncId != '0') ? itemSyncId : null,
+      'transaction_sync_id': (transactionSyncId != null && transactionSyncId.isNotEmpty && transactionSyncId != '0') ? transactionSyncId : null,
       'amount': row.amount,
       'event_date': row.eventDate.toUtc().toIso8601String(),
       'event_type': row.eventType,

@@ -14,16 +14,48 @@ class LoanCalculator {
   final DateTime? tenureDate;
   final bool inclusiveDays;
   final bool includeEndDate;
+  final int months;
+  final int remainingDays;
 
-  const LoanCalculator({
+  factory LoanCalculator({
+    required double takenAmount,
+    required double rateOfInterest,
+    required DateTime takenDate,
+    DateTime? tenureDate,
+    bool inclusiveDays = true,
+    bool includeEndDate = true,
+  }) {
+    assert(takenAmount >= 0, 'takenAmount cannot be negative');
+    assert(rateOfInterest >= 0, 'rateOfInterest cannot be negative');
+    final s = AppDateUtils.dateOnly(takenDate);
+    final e = AppDateUtils.dateOnly(tenureDate ?? DateTime.now());
+    final md = AppDateUtils.getCalendarMonthsAndRemainingDays(
+      start: s,
+      end: e,
+      includeEndDate: includeEndDate,
+    );
+    return LoanCalculator._(
+      takenAmount: takenAmount,
+      rateOfInterest: rateOfInterest,
+      takenDate: takenDate,
+      tenureDate: tenureDate,
+      inclusiveDays: inclusiveDays,
+      includeEndDate: includeEndDate,
+      months: md[0],
+      remainingDays: md[1],
+    );
+  }
+
+  const LoanCalculator._({
     required this.takenAmount,
     required this.rateOfInterest,
     required this.takenDate,
     this.tenureDate,
-    this.inclusiveDays = true,
-    this.includeEndDate = true,
-  }) : assert(takenAmount >= 0, 'takenAmount cannot be negative'),
-       assert(rateOfInterest >= 0, 'rateOfInterest cannot be negative');
+    required this.inclusiveDays,
+    required this.includeEndDate,
+    required this.months,
+    required this.remainingDays,
+  });
 
   DateTime get _startDate => AppDateUtils.dateOnly(takenDate);
   DateTime get _endDate => AppDateUtils.dateOnly(tenureDate ?? DateTime.now());
@@ -34,16 +66,6 @@ class LoanCalculator {
     endDate: _endDate,
     inclusive: inclusiveDays,
   );
-
-  /// [months, remainingDays]
-  List<int> get _monthsDays => AppDateUtils.getCalendarMonthsAndRemainingDays(
-    start: _startDate,
-    end: _endDate,
-    includeEndDate: includeEndDate,
-  );
-
-  int get months => _monthsDays[0];
-  int get remainingDays => _monthsDays[1];
 
   String get monthsAndRemainingDays => "$months Months - $remainingDays Days";
 

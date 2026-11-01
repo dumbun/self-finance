@@ -4,6 +4,8 @@ import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 
+import 'package:self_finance/core/localization/localization_extension.dart';
+
 class TermsAndConditionWidget extends StatelessWidget {
   const TermsAndConditionWidget({super.key});
 
@@ -18,7 +20,7 @@ class TermsAndConditionWidget extends StatelessWidget {
           Icons.work_rounded,
           color: AppColors.getPrimaryColor,
         ),
-        title: const BodyOneDefaultText(text: Constant.tAndcString, bold: true),
+        title: BodyOneDefaultText(text: context.l10n.termsAndConditions, bold: true),
       ),
     );
   }

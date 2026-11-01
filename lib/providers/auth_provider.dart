@@ -19,17 +19,17 @@ final authStateProvider = StreamProvider<AuthState>((ref) {
 
 final isSignedInProvider = Provider<bool>((ref) {
   final authState = ref.watch(authStateProvider);
+  final service = ref.watch(supabaseAuthServiceProvider);
   return authState.whenOrNull(data: (state) => state.session != null) ??
-      (Utility.isSupabaseInitialized &&
-          Supabase.instance.client.auth.currentSession != null);
+      service.isSignedIn;
 });
 
 /// The currently authenticated [User], or `null`.
 final currentUserProvider = Provider<User?>((ref) {
   // Re-evaluate whenever auth state changes.
   ref.watch(authStateProvider);
-  if (!Utility.isSupabaseInitialized) return null;
-  return Supabase.instance.client.auth.currentUser;
+  final service = ref.watch(supabaseAuthServiceProvider);
+  return service.currentUser;
 });
 
 /// Opens and prepares the account database for the currently authenticated user.
@@ -37,4 +37,73 @@ final accountDatabaseProvider =
     FutureProvider.family<void, String>((ref, userId) async {
   await AccountDatabaseManager.openForAccount(userId);
 });
+
+/// State representation for the Google sign-in UI.
+class GoogleSignInState {
+  final bool isLoading;
+  final String? errorMessage;
+
+  const GoogleSignInState({
+    this.isLoading = false,
+    this.errorMessage,
+  });
+
+  GoogleSignInState copyWith({
+    bool? isLoading,
+    String? errorMessage,
+    bool clearError = false,
+  }) {
+    return GoogleSignInState(
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+    );
+  }
+}
+
+/// Notifier handling the business logic for Google OAuth sign-in.
+class GoogleSignInNotifier extends Notifier<GoogleSignInState> {
+  @override
+  GoogleSignInState build() => const GoogleSignInState();
+
+  /// Initiates Google OAuth via [SupabaseAuthService].
+  Future<void> signInWithGoogle() async {
+    if (state.isLoading) return;
+    state = state.copyWith(isLoading: true, clearError: true);
+
+    try {
+      final service = ref.read(supabaseAuthServiceProvider);
+      await service.signInWithGoogle();
+      // Success: auth stream will trigger navigation; reset loading state
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Sign-in failed. Please try again.',
+      );
+    }
+  }
+
+  /// Handles app lifecycle resumption to unfreeze loading if the user cancelled
+  /// the external browser OAuth prompt.
+  void handleAppResumed() {
+    if (!state.isLoading) return;
+    Future.delayed(const Duration(seconds: 2), () {
+      final hasSession =
+          ref.read(supabaseAuthServiceProvider).currentSession != null;
+      if (!hasSession) {
+        state = state.copyWith(isLoading: false);
+      }
+    });
+  }
+
+  /// Clears any visible error message.
+  void clearError() {
+    state = state.copyWith(clearError: true);
+  }
+}
+
+final googleSignInProvider =
+    NotifierProvider<GoogleSignInNotifier, GoogleSignInState>(
+  GoogleSignInNotifier.new,
+);
 

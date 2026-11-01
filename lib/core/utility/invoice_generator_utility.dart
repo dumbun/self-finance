@@ -17,6 +17,7 @@ import 'package:self_finance/models/customer_model.dart';
 import 'package:self_finance/models/payment_model.dart';
 import 'package:self_finance/models/transaction_model.dart';
 import 'package:self_finance/models/user_model.dart';
+import 'package:self_finance/providers/customer_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 /// Invoice Generator Utility
@@ -59,10 +60,11 @@ class InvoiceGenerator {
     }
   }
 
-  /// Clear cached user data (call after user updates profile)
+  /// Clear cached user data (call after user updates profile or logs out)
   static void clearUserCache() {
     _cachedUser = null;
     _cacheTime = null;
+    clearVerifiedFilePathsCache();
   }
 
   /// Generate a professional PDF invoice for a transaction
@@ -84,6 +86,14 @@ class InvoiceGenerator {
     required Customer customer,
     String? userCurrency,
   }) async {
+    // Validate inputs
+    if (transaction.id == null) {
+      throw ArgumentError('Transaction ID cannot be null');
+    }
+    if (customer.name.trim().isEmpty) {
+      throw ArgumentError('Customer name cannot be empty');
+    }
+
     // Fetch App directory for images
     final Directory appDir = await getApplicationDocumentsDirectory();
     final customerImagePath = customer.photo.isEmpty
@@ -102,14 +112,6 @@ class InvoiceGenerator {
 
     // Get currency if not provided
     final String currency = userCurrency ?? user.userCurrency;
-
-    // Validate inputs
-    if (transaction.id == null) {
-      throw ArgumentError('Transaction ID cannot be null');
-    }
-    if (customer.name.trim().isEmpty) {
-      throw ArgumentError('Customer name cannot be empty');
-    }
 
     final ByteData data = await rootBundle.load("assets/fonts/Helvetica.ttf");
     final ByteData font = data.buffer.asByteData();
@@ -137,7 +139,9 @@ class InvoiceGenerator {
               takenAmount: transaction.amount,
               rateOfInterest: transaction.intrestRate,
               takenDate: transaction.transacrtionDate,
-              tenureDate: payments.first.paymentDate,
+              tenureDate: payments.isNotEmpty
+                  ? payments.first.paymentDate
+                  : DateTime.now(),
             );
 
       // Format dates
@@ -219,8 +223,17 @@ class InvoiceGenerator {
   /// Automatically fetches user data for company information
   static Future<void> shareInvoice({required Trx transaction}) async {
     try {
+      if (transaction.id == null) {
+        throw ArgumentError('Transaction ID cannot be null');
+      }
       final List<Customer> customerResponce =
           await BackEnd.fetchSingleContactDetails(id: transaction.customerId);
+
+      if (customerResponce.isEmpty) {
+        throw StateError(
+          'Customer not found for transaction: ${transaction.id}',
+        );
+      }
 
       final Customer customer = customerResponce.first;
 
@@ -297,7 +310,7 @@ class InvoiceGenerator {
   }
 
   static pw.Widget _buildInvoiceInfo({
-    required int transactionId,
+    required String transactionId,
     required String transactionDate,
     required String generatedDate,
   }) {
@@ -393,8 +406,7 @@ class InvoiceGenerator {
                   ],
                 ),
               ),
-              if (pdfImage != null)
-                pw.Image(pdfImage, height: 80, width: 80),
+              if (pdfImage != null) pw.Image(pdfImage, height: 80, width: 80),
             ],
           ),
         ],
@@ -540,8 +552,7 @@ class InvoiceGenerator {
           ),
           pw.Column(
             children: [
-              if (pdfImage != null)
-                pw.Image(pdfImage, height: 48, width: 48),
+              if (pdfImage != null) pw.Image(pdfImage, height: 48, width: 48),
               pw.Text('Signature'),
             ],
           ),

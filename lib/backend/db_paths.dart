@@ -26,3 +26,26 @@ Future<File> legacySqfliteDbFile(String dbName) async {
   await dbDir.create(recursive: true);
   return File(p.join(dbDir.path, dbName));
 }
+
+/// Returns a list of all directories where SQLite database files could reside
+/// on the host platform.
+Future<List<Directory>> allDatabaseDirectories() async {
+  final List<Directory> dirs = [];
+  try {
+    final docs = await getApplicationDocumentsDirectory();
+    if (Platform.isAndroid) {
+      dirs.add(Directory(p.join(docs.parent.path, 'databases')));
+    }
+    dirs.add(Directory(p.join(docs.path, 'databases')));
+    dirs.add(docs);
+
+    try {
+      final support = await getApplicationSupportDirectory();
+      dirs.add(Directory(p.join(support.path, 'databases')));
+      dirs.add(support);
+    } catch (_) {}
+  } catch (e) {
+    // ignore
+  }
+  return dirs;
+}

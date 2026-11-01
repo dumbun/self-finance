@@ -95,15 +95,10 @@ class _InputDatePickerState extends ConsumerState<InputDatePicker> {
           //DateTime.now() - not to allow to choose before today.
           lastDate: widget.lastDate,
           builder: (BuildContext context, Widget? child) {
-            return Theme(
-              data: Theme.of(context).copyWith(
-                // You can customize the theme here if needed
-              ),
-              child: Localizations.override(
-                context: context,
-                locale: const Locale('en', 'GB'),
-                child: child!,
-              ),
+            return Localizations.override(
+              context: context,
+              locale: const Locale('en', 'GB'),
+              child: child!,
             );
           },
         );

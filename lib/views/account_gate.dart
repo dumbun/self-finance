@@ -1,7 +1,5 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:self_finance/backend/account_database_manager.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 import 'package:self_finance/providers/auth_provider.dart';
 import 'package:self_finance/views/auth_view.dart';
@@ -22,21 +20,34 @@ class AccountGate extends ConsumerWidget {
     }
 
     final authState = ref.watch(authStateProvider);
+    final authService = ref.watch(supabaseAuthServiceProvider);
+    final currentSession = authService.currentSession;
+    final session = authState.asData?.value.session ?? currentSession;
 
-    return authState.when(
-      data: (AuthState state) {
-        if (state.session != null) {
+    if (session != null) {
+      final dbInit = ref.watch(accountDatabaseProvider(session.user.id));
+      return dbInit.when(
+        data: (_) => const AuthView(),
+        loading: () => const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator.adaptive(),
+          ),
+        ),
+        error: (error, _) {
+          debugPrint('Account database init error: $error');
           return const AuthView();
-        }
+        },
+      );
+    }
 
-        AccountDatabaseManager.closeCurrentAccount();
-        return const GoogleSignInView();
-      },
-      loading: () => const AuthView(),
-      error: (error, _) {
-        debugPrint('Auth state error: $error');
-        return const GoogleSignInView();
-      },
-    );
+    if (authState.isLoading && currentSession == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator.adaptive(),
+        ),
+      );
+    }
+
+    return const GoogleSignInView();
   }
 }

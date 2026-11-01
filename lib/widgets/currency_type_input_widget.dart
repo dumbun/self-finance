@@ -1,9 +1,8 @@
 import 'package:currency_picker/currency_picker.dart';
 import 'package:material_ui/material_ui.dart';
-
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 
 class CurrencyTypeInputWidget extends StatelessWidget {
@@ -25,7 +24,10 @@ class CurrencyTypeInputWidget extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              const BodyTwoDefaultText(text: Constant.currencyType, bold: true),
+              BodyTwoDefaultText(
+                text: context.l10n.selectCurrencyType,
+                bold: true,
+              ),
               ValueListenableBuilder<TextEditingValue>(
                 valueListenable: controller,
                 builder: (context, value, _) => BodyOneDefaultText(

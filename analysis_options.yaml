@@ -7,6 +7,7 @@ analyzer:
     - windows/**
     - macos/**
     - linux/**
+    - lib/firebase_options.dart
 include: package:flutter_lints/flutter.yaml
 
 linter:

@@ -1,30 +1,32 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_two_default_text.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/models/items_model.dart';
 import 'package:self_finance/providers/item_provider.dart';
 import 'package:self_finance/widgets/image_widget.dart';
 
 class ItemImageWidget extends ConsumerWidget {
-  const ItemImageWidget({super.key, required this.transactionId});
-  final int transactionId;
+  const ItemImageWidget({super.key, required this.itemId});
+  final String itemId;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+
     return ref
-        .watch(itemByIdProvider(transactionId))
+        .watch(itemByIdProvider(itemId))
         .when(
           data: (Items? item) {
             if (item == null) {
-              return const BodyTwoDefaultText(text: "Error fetching Item data");
+              return BodyTwoDefaultText(text: l10n.errorFetchingItem);
             }
             if (item.photo.isEmpty) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const BodyTwoDefaultText(
+                  BodyTwoDefaultText(
                     bold: true,
-                    text: Constant.itemDescription,
+                    text: l10n.itemDescription,
                   ),
                   Card(
                     elevation: 2,
@@ -41,9 +43,9 @@ class ItemImageWidget extends ConsumerWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const BodyTwoDefaultText(
+                  BodyTwoDefaultText(
                     bold: true,
-                    text: Constant.customerItem,
+                    text: l10n.customerItem,
                   ),
                   SizedBox(
                     width: double.infinity,

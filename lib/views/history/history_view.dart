@@ -1,6 +1,7 @@
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/providers/history_provider.dart';
 import 'package:self_finance/widgets/build_history_list_widget.dart';
 
@@ -29,7 +30,7 @@ class HistoryView extends HookConsumerWidget {
                 RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
               ),
               elevation: const WidgetStatePropertyAll(0),
-              hintText: 'phone number or customer name',
+              hintText: context.l10n.searchCustomerOrPhone,
               hintStyle: const WidgetStatePropertyAll(
                 TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),

@@ -93,7 +93,6 @@ abstract class Constant {
   static const String dashboardView = "/dashboardview/";
   static const String addNewEntryView = "/addNewEntry/";
   static const String contactView = "/contactsView/";
-  static const String pinCreatingView = "/pinCreatingView/";
   static const String accountSettingsView = "/AccountSettingsView/";
 
   static const String currencyType = "Please select a currency type";
@@ -142,6 +141,9 @@ abstract class Constant {
 
   static const String pAndPUrl =
       "https://dumbun.github.io/self-finance/privacy_and_policy";
+
+  static const String accountDeletionUrl =
+      "https://dumbun.github.io/self-finance/account_deletion";
 
   static const String savedSuccessfullyText = "Saved successfully ✅";
 

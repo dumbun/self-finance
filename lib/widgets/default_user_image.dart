@@ -88,12 +88,11 @@ class DefaultUserImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final double size = height ?? width ?? 44.0;
     final String initials = getInitials(userName);
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final Color accentColor = getColorForName(userName);
 
     // Soft accent tinted background instead of harsh solid saturation
     final Color bgColor =
-        backgroundColor ?? accentColor.withValues(alpha: isDark ? 0.22 : 0.12);
+        backgroundColor ?? accentColor.withValues(alpha: 0.16);
 
     final Color fgColor =
         textColor ?? (backgroundColor != null ? Colors.white : accentColor);
@@ -112,7 +111,7 @@ class DefaultUserImage extends StatelessWidget {
             color: bgColor,
             shape: BoxShape.circle,
             border: Border.all(
-              color: accentColor.withValues(alpha: isDark ? 0.28 : 0.16),
+              color: accentColor.withValues(alpha: 0.2),
             ),
           ),
           child: Center(

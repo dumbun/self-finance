@@ -4,6 +4,8 @@ import 'package:self_finance/core/fonts/body_text.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/core/utility/user_utility.dart';
 
+import 'package:self_finance/core/localization/localization_extension.dart';
+
 class PrivacyPolicyButtonWidget extends StatelessWidget {
   const PrivacyPolicyButtonWidget({super.key});
 
@@ -16,7 +18,7 @@ class PrivacyPolicyButtonWidget extends StatelessWidget {
           Icons.privacy_tip_rounded,
           color: AppColors.getPrimaryColor,
         ),
-        title: const BodyOneDefaultText(text: Constant.pandp, bold: true),
+        title: BodyOneDefaultText(text: context.l10n.privacyPolicy, bold: true),
       ),
     );
   }

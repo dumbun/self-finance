@@ -1,5 +1,5 @@
 class Contact {
-  final int id;
+  final String id;
   final String name;
   final String number;
   Contact({required this.id, required this.name, required this.number});
@@ -14,7 +14,7 @@ class Contact {
       return List.generate(data.length, (index) {
         final e = data[index];
         return Contact(
-          id: e["Customer_ID"] as int,
+          id: e["Customer_ID"] as String,
           name: e["Customer_Name"] as String,
           number: e["Contact_Number"] as String,
         );
@@ -23,7 +23,7 @@ class Contact {
     return []; // Return empty list if no data
   }
 
-  Contact copyWith({int? id, String? name, String? number}) {
+  Contact copyWith({String? id, String? name, String? number}) {
     return Contact(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -37,9 +37,9 @@ class Contact {
 
   factory Contact.fromMap(Map<String, dynamic> map) {
     return Contact(
-      id: map['id'] as int,
-      name: map['name'] as String,
-      number: map['number'] as String,
+      id: map['id']?.toString() ?? '',
+      name: map['name']?.toString() ?? '',
+      number: map['number']?.toString() ?? '',
     );
   }
 

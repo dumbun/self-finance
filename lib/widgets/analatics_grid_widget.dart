@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
 import 'package:self_finance/core/fonts/body_text.dart';
@@ -9,7 +10,12 @@ import 'package:self_finance/providers/analytics_provider.dart';
 import 'package:self_finance/widgets/currency_widget.dart';
 
 class AnalaticsGridWidget extends ConsumerWidget {
-  const AnalaticsGridWidget({super.key});
+  final EdgeInsetsGeometry padding;
+
+  const AnalaticsGridWidget({
+    super.key,
+    this.padding = const EdgeInsets.all(16),
+  });
 
   /// Adjust breakpoints to taste
   int _columnsForWidth(double width) {
@@ -25,13 +31,13 @@ class AnalaticsGridWidget extends ConsumerWidget {
         final int columns = _columnsForWidth(constraints.maxWidth);
 
         return Padding(
-          padding: const EdgeInsets.all(16),
+          padding: padding,
           child: GridView.count(
             key: const ValueKey<String>(Constant.gridWidgetKey),
             crossAxisCount: columns,
             mainAxisSpacing: 13,
             crossAxisSpacing: 13,
-            childAspectRatio: 1.1,
+            childAspectRatio: 1.15,
             shrinkWrap: true, // Important: allows grid to size itself
             physics:
                 const NeverScrollableScrollPhysics(), // Disable internal scrolling
@@ -63,7 +69,7 @@ class _TotalCustomersCard extends ConsumerWidget {
       icon: Icons.people,
       iconColor: AppColors.getPrimaryColor,
       value: Utility.numberFormate(value),
-      title: 'Total Customers',
+      title: context.l10n.totalCustomers,
     );
   }
 }
@@ -78,7 +84,7 @@ class _ActiveLoansCard extends ConsumerWidget {
       icon: Icons.credit_card,
       iconColor: AppColors.getGreenColor,
       value: Utility.numberFormate(value),
-      title: 'Active Loans',
+      title: context.l10n.activeLoans,
     );
   }
 }
@@ -89,12 +95,13 @@ class _OutstandingAmountCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final double value = ref.watch(outstandingAmountProvider);
+    final l10n = context.l10n;
     return StatCardWidget(
       icon: Icons.account_balance_wallet,
       iconColor: AppColors.contentColorYellow,
       currency: true,
       value: Utility.doubleFormate(value),
-      title: 'Outstanding Amount\nTo be collected',
+      title: '${l10n.outstandingAmount}\n${l10n.outstandingAmountSub}',
     );
   }
 }
@@ -105,11 +112,12 @@ class _InterestEarnedCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final double value = ref.watch(interestEarnedProvider);
+    final l10n = context.l10n;
     return StatCardWidget(
       icon: Icons.trending_up,
       iconColor: AppColors.contentColorPurple,
       value: Utility.doubleFormate(value),
-      title: 'Interest Earned\nFrom completed',
+      title: '${l10n.interestEarned}\n${l10n.interestEarnedSub}',
       currency: true,
     );
   }
@@ -121,12 +129,13 @@ class _TotalDisbursedCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final double value = ref.watch(totalDisbursedProvider);
+    final l10n = context.l10n;
     return StatCardWidget(
       icon: Icons.arrow_upward,
       iconColor: AppColors.getErrorColor,
       value: Utility.doubleFormate(value),
       currency: true,
-      title: 'Total Disbursed\nAll time',
+      title: '${l10n.totalDisbursed}\n${l10n.allTime}',
     );
   }
 }
@@ -137,12 +146,13 @@ class _PaymentsReceivedCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final double value = ref.watch(paymentsReceivedProvider);
+    final l10n = context.l10n;
     return StatCardWidget(
       icon: Icons.arrow_downward,
       iconColor: AppColors.getGreenColor,
       currency: true,
       value: Utility.doubleFormate(value),
-      title: 'Payments Received\nTotal collected',
+      title: '${l10n.paymentsReceived}\n${l10n.totalCollected}',
     );
   }
 }
@@ -168,18 +178,25 @@ class StatCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 1.5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.08),
+        ),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, color: iconColor, size: 18),
+              child: Icon(icon, color: iconColor, size: 20),
             ),
             const Spacer(),
 

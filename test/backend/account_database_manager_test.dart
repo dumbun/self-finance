@@ -27,5 +27,11 @@ void main() {
       expect(itDataDbName, equals('itdata_$suffix.db'));
       expect(userDbName, equals('user_$suffix.db'));
     });
+
+    test('deleteAllLocalData completes and resets activeUserId', () async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      await AccountDatabaseManager.deleteAllLocalData(userId: 'test-user');
+      expect(AccountDatabaseManager.activeUserId, isNull);
+    });
   });
 }
