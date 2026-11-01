@@ -96,6 +96,20 @@ void main() {
       await SyncOutboxService.queueAllExistingRecords(db);
       final pendingSecond = await SyncOutboxService.getPending(db);
       expect(pendingSecond.length, 1);
+
+      // Clear the outbox to simulate a completed sync
+      await SyncOutboxService.removeEntries(db, [pendingSecond.first.outboxId]);
+      expect(await SyncOutboxService.getPending(db), isEmpty);
+
+      // Calling with default forceAll: false will not queue already-synced rows
+      await SyncOutboxService.queueAllExistingRecords(db);
+      expect(await SyncOutboxService.getPending(db), isEmpty);
+
+      // Calling with forceAll: true re-queues all active records for cloud upload
+      await SyncOutboxService.queueAllExistingRecords(db, forceAll: true);
+      final pendingForce = await SyncOutboxService.getPending(db);
+      expect(pendingForce.length, 1);
+      expect(pendingForce.first.entitySyncId, afterRows.first.syncId);
     });
   });
 }
