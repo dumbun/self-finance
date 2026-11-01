@@ -116,9 +116,30 @@ class _CustomerDashboardViewState
                     style: const TextStyle(fontSize: 14),
                   ),
                   const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: () => ref.refresh(customerPortalDataProvider),
-                    child: Text(l10n.pleaseTryAgain),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      FilledButton(
+                        onPressed: () => ref.refresh(customerPortalDataProvider),
+                        child: Text(l10n.pleaseTryAgain),
+                      ),
+                      OutlinedButton(
+                        onPressed: () async {
+                          await ref
+                              .read(customerPortalAuthProvider.notifier)
+                              .signOut();
+                          if (!context.mounted) return;
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const CustomerLoginView(),
+                            ),
+                          );
+                        },
+                        child: Text(l10n.customerLogin),
+                      ),
+                    ],
                   ),
                 ],
               ),
