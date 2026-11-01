@@ -29,11 +29,15 @@ class PinInputWidget extends StatelessWidget {
     const focusedBorderColor = Color(0xFF2196F3);
     const fillColor = Color.fromRGBO(243, 246, 249, 0);
 
+    final double pinWidth = length > 4 ? 42.0 : 54.0;
+    final double pinHeight = length > 4 ? 48.0 : 54.0;
+    final double separatorWidth = length > 4 ? 8.0 : 16.0;
+
     final defaultPinTheme = PinTheme(
-      width: 54,
-      height: 54,
-      textStyle: const TextStyle(
-        fontSize: 26,
+      width: pinWidth,
+      height: pinHeight,
+      textStyle: TextStyle(
+        fontSize: length > 4 ? 22 : 26,
         color: AppColors.getPrimaryColor,
       ),
       decoration: BoxDecoration(
@@ -80,7 +84,7 @@ class PinInputWidget extends StatelessWidget {
               return null;
             },
         defaultPinTheme: defaultPinTheme,
-        separatorBuilder: (int index) => const SizedBox(width: 16),
+        separatorBuilder: (int index) => SizedBox(width: separatorWidth),
         hapticFeedbackType: HapticFeedbackType.lightImpact,
       ),
     );

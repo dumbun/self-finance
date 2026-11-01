@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
+import 'package:self_finance/customer/views/customer_login_view.dart';
 import 'package:self_finance/providers/auth_provider.dart';
 
 /// Full-screen Google sign-in view shown when no Firebase session exists.
@@ -238,74 +239,74 @@ class _GoogleSignInViewState extends ConsumerState<GoogleSignInView>
 
                         const SizedBox(height: 18),
 
-                        //// after implementing the phone number auth
-                        // // ── Divider ──
-                        // Row(
-                        //   children: [
-                        //     Expanded(
-                        //       child: Divider(
-                        //         color: AppColors.getLigthGreyColor.withValues(
-                        //           alpha: 0.25,
-                        //         ),
-                        //       ),
-                        //     ),
-                        //     const Padding(
-                        //       padding: EdgeInsets.symmetric(horizontal: 12),
-                        //       child: Text(
-                        //         'OR',
-                        //         style: TextStyle(
-                        //           fontSize: 11,
-                        //           fontWeight: FontWeight.bold,
-                        //           color: AppColors.getLigthGreyColor,
-                        //         ),
-                        //       ),
-                        //     ),
-                        //     Expanded(
-                        //       child: Divider(
-                        //         color: AppColors.getLigthGreyColor.withValues(
-                        //           alpha: 0.25,
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
-                        // const SizedBox(height: 18),
+                        // after implementing the phone number auth
+                        // ── Divider ──
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Divider(
+                                color: AppColors.getLigthGreyColor.withValues(
+                                  alpha: 0.25,
+                                ),
+                              ),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 12),
+                              child: Text(
+                                'OR',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.getLigthGreyColor,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Divider(
+                                color: AppColors.getLigthGreyColor.withValues(
+                                  alpha: 0.25,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 18),
 
-                        // // ── Customer / Borrower Portal Button ──
-                        // SizedBox(
-                        //   width: double.infinity,
-                        //   height: 52,
-                        //   child: OutlinedButton.icon(
-                        //     style: OutlinedButton.styleFrom(
-                        //       foregroundColor: AppColors.getPrimaryColor,
-                        //       side: const BorderSide(
-                        //         color: AppColors.getPrimaryColor,
-                        //         width: 1.5,
-                        //       ),
-                        //       shape: RoundedRectangleBorder(
-                        //         borderRadius: BorderRadius.circular(16),
-                        //       ),
-                        //     ),
-                        //     onPressed: () {
-                        //       Navigator.of(context).push(
-                        //         MaterialPageRoute<void>(
-                        //           builder: (_) => const CustomerLoginView(),
-                        //         ),
-                        //       );
-                        //     },
-                        //     icon: const Icon(
-                        //       Icons.phone_android_rounded,
-                        //       size: 20,
-                        //     ),
-                        //     label: Text(
-                        //       context.l10n.customerLogin,
-                        //       style: const TextStyle(
-                        //         fontSize: 15,
-                        //         fontWeight: FontWeight.w600,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
+                        // ── Customer / Borrower Portal Button ──
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.getPrimaryColor,
+                              side: const BorderSide(
+                                color: AppColors.getPrimaryColor,
+                                width: 1.5,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute<void>(
+                                  builder: (_) => const CustomerLoginView(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.phone_android_rounded,
+                              size: 20,
+                            ),
+                            label: Text(
+                              context.l10n.customerLogin,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

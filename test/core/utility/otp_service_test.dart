@@ -70,6 +70,36 @@ void main() {
       expect(expiredSession.isExpired, isTrue);
       expect(expiredSession.verify('1234'), isFalse);
     });
+
+    test('formatToE164 normalizes numbers correctly with and without country code', () {
+      expect(OtpService.formatToE164('9876543210'), equals('+919876543210'));
+      expect(OtpService.formatToE164('+91 98765 43210'), equals('+919876543210'));
+      expect(OtpService.formatToE164('+1 (555) 234-5678'), equals('+15552345678'));
+      expect(OtpService.formatToE164('09876543210'), equals('+919876543210'));
+      expect(OtpService.formatToE164('00919876543210'), equals('+919876543210'));
+    });
+
+    test('OtpSession supports automated phone verification parameters', () {
+      final OtpSession session = OtpSession(
+        verificationId: 'v-12345',
+        code: '',
+        createdAt: DateTime.now(),
+        expiresAt: DateTime.now().add(const Duration(minutes: 5)),
+        phoneNumber: '+919876543210',
+        customerName: 'Suresh',
+        amount: 50000.0,
+        isCloudVerified: true,
+        isAutomated: true,
+        codeLength: 6,
+        resendToken: 9988,
+      );
+
+      expect(session.isAutomated, isTrue);
+      expect(session.codeLength, equals(6));
+      expect(session.verificationId, equals('v-12345'));
+      expect(session.resendToken, equals(9988));
+      expect(session.isExpired, isFalse);
+    });
   });
 
   group('OTP Localization Tests', () {
