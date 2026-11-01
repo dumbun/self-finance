@@ -1,6 +1,6 @@
 import 'package:self_finance/backend/backend.dart';
 
-/// Maps between local Drift entities and Supabase cloud JSON records.
+/// Maps between local Drift entities and Cloud Firestore JSON documents.
 class SyncMappers {
   // ── Customers ──
 

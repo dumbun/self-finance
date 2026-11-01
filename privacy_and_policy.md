@@ -29,7 +29,7 @@ Depending on how you use Self-Finance, the App handles the following categories 
 
 ### A. Account & Profile Information
 When you sign in using Google Sign-In to use cloud backup and multi-device synchronization:
-* **Account Credentials & Identifiers:** Your Google account email address, display name, profile avatar photo URL, and a unique user identifier assigned by our authentication provider (Supabase Auth).
+* **Account Credentials & Identifiers:** Your Google account email address, display name, profile avatar photo URL, and a unique user identifier assigned by our authentication provider (Firebase Auth).
 * **Purpose:** To create and securely authenticate your user account, manage user sessions, and isolate your synchronized financial data so that only you can access it.
 
 ### B. Customer & Borrower Information (User-Entered)
@@ -71,7 +71,7 @@ To deliver specific features, Self-Finance requests the following device permiss
 | **Photo Library / Storage** | `android.permission.READ_MEDIA_IMAGES` / `NSPhotoLibraryUsageDescription` | Used exclusively when you choose to attach an existing image from your photo gallery to a customer record, proof document, or item profile. |
 | **Biometric Authentication** | `android.permission.USE_BIOMETRIC` / `NSFaceIDUsageDescription` | Used to lock and unlock the app using Fingerprint, Face ID, or device biometrics. **Biometric verification is handled strictly by your device’s operating system (Secure Enclave / Android Keystore). The App never accesses, receives, or stores your biometric data.** |
 | **Notifications** | `android.permission.POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM`, `RECEIVE_BOOT_COMPLETED` | Used exclusively to schedule local on-device reminder notifications for loan due dates and payment milestones. **These notifications are generated locally on your device; they are never used for promotional push marketing.** |
-| **Internet & Network** | `android.permission.INTERNET`, `ACCESS_NETWORK_STATE` | Required to communicate with Supabase for cloud synchronization, authenticate your Google account, and check network status before syncing. |
+| **Internet & Network** | `android.permission.INTERNET`, `ACCESS_NETWORK_STATE` | Required to communicate with Google Firebase for cloud synchronization, authenticate your Google account, and check network status before syncing. |
 | **External App Launchers** | Phone, SMS, and Email intents (`tel:`, `sms:`, `mailto:`) | Enables you to tap a phone number or email within the app to initiate a phone call, send an SMS, or draft an email using your device’s default phone or messaging applications. The app does not read your SMS messages or call history. |
 | **Document Sharing** | `LSSupportsOpeningDocumentsInPlace`, `UIFileSharingEnabled` | Allows you to export transaction histories to CSV spreadsheets and save or print generated PDF invoices. |
 
@@ -82,10 +82,10 @@ To deliver specific features, Self-Finance requests the following device permiss
 Self-Finance offers an **offline-first** architecture with optional **cloud synchronization**:
 
 1. **Local Storage:** All your records (customers, transactions, items, photos, and signatures) are stored locally in a high-performance local database (Drift / SQLite) and local sandboxed storage on your device. You can use the app completely offline without an internet connection.
-2. **Cloud Synchronization (Via Supabase):** When you sign in with your Google account, Self-Finance enables cloud synchronization. The app securely uploads and synchronizes your database records and media files to our hosted **Supabase** backend:
+2. **Cloud Synchronization (Via Google Firebase):** When you sign in with your Google account, Self-Finance enables cloud synchronization. The app securely uploads and synchronizes your database records and media files to our hosted **Firebase** backend:
    * Cloud sync ensures that your financial ledger and attached images are safely backed up and accessible across your devices.
    * Sync occurs automatically when an internet connection is available and when you perform actions in the app.
-   * **Row-Level Security (RLS):** All synchronized cloud data is strictly isolated using Supabase Row-Level Security. Each record is cryptographically linked to your unique user ID (`auth.uid()`), ensuring that no other user can view, access, or modify your data.
+   * **Security Rules:** All synchronized cloud data is strictly isolated using Firebase Security Rules. Each document and file is cryptographically linked to your unique user ID (`request.auth.uid`), ensuring that no other user can view, access, or modify your data.
 3. **If You Prefer Not to Sync:** If you do not wish to have your data stored in the cloud, you can use the app without signing in or log out of your cloud account. Note that without cloud sync, your data resides solely on your physical device.
 
 ---
@@ -116,7 +116,7 @@ To provide reliable authentication and cloud synchronization, Self-Finance integ
 
 | Provider | Service Provided | Data Processed | Privacy Information |
 | :--- | :--- | :--- | :--- |
-| **Supabase Inc.** | Cloud database hosting (PostgreSQL), cloud object storage (attachments & images), and user authentication. | Synced database records, customer files, photos, signatures, email address, user UUID. | Encrypted in transit (TLS 1.2/1.3) and at rest (AES-256). Subject to [Supabase Privacy Policy](https://supabase.com/privacy). |
+| **Google LLC (Firebase)** | Cloud database hosting (Cloud Firestore), cloud object storage (Firebase Storage), and user authentication (Firebase Auth). | Synced database records, customer files, photos, signatures, email address, user UUID. | Encrypted in transit (TLS 1.2/1.3) and at rest (AES-256). Subject to [Google Privacy Policy](https://policies.google.com/privacy) and [Firebase Data Processing Terms](https://firebase.google.com/terms/data-processing-terms). |
 | **Google LLC** | Google Sign-In (OAuth 2.0) authentication and Google Play Services on Android. | Basic Google profile information (name, email, profile picture, account ID). | Governed by [Google Privacy Policy](https://policies.google.com/privacy). |
 
 When you use features such as calling a customer, sending an SMS, or exporting files via third-party apps (e.g., WhatsApp, Gmail, Google Drive, or local file viewers), the handling of the exported file or communication is governed by the destination application’s privacy policy.
@@ -127,9 +127,9 @@ When you use features such as calling a customer, sending an SMS, or exporting f
 
 We implement rigorous technical, organizational, and administrative safeguards to protect your data against unauthorized access, loss, misuse, or alteration:
 
-* **Encryption in Transit:** All communications between Self-Finance and our Supabase cloud servers are encrypted using modern Transport Layer Security (TLS 1.2 and TLS 1.3).
-* **Encryption at Rest:** Cloud database records and media files stored in Supabase Storage are encrypted at rest using industry-standard AES-256 encryption.
-* **Row-Level Security (RLS):** Supabase database tables enforce strict database-level access rules tied to your authenticated user identifier. No other user or third party can query or retrieve your records.
+* **Encryption in Transit:** All communications between Self-Finance and our Firebase cloud servers are encrypted using modern Transport Layer Security (TLS 1.2 and TLS 1.3).
+* **Encryption at Rest:** Cloud database records and media files stored in Firebase Storage are encrypted at rest using industry-standard AES-256 encryption.
+* **Security Rules:** Firebase Firestore and Storage enforce strict server-side access rules tied to your authenticated user identifier. No other user or third party can query or retrieve your records.
 * **Application Lock:** The app provides a built-in security gate allowing you to secure access to Self-Finance on your device using a custom 4-digit PIN code and biometric authentication (Fingerprint / Face ID).
 * **Storage Sandboxing:** Local files, photos, and database instances are stored in your device’s private application sandbox, protected by mobile OS security boundaries.
 
@@ -140,7 +140,7 @@ We implement rigorous technical, organizational, and administrative safeguards t
 ## 8. Data Retention Policy
 
 * **Local Data:** Data stored locally on your device remains on your device until you delete specific records, clear the app data in device system settings, or uninstall the application.
-* **Cloud Data:** Synced records and attachments stored in Supabase remain associated with your account for as long as your account remains active.
+* **Cloud Data:** Synced records and attachments stored in Firebase remain associated with your account for as long as your account remains active.
 * **Backups:** Because local data may be lost if your device is damaged, lost, or reset, we recommend maintaining regular backups using the built-in CSV export feature.
 
 ---
@@ -163,9 +163,9 @@ If you have created an account or used cloud synchronization and wish to permane
 
 2. **What Data Is Deleted:**
    * Upon receipt and verification of your request, we permanently delete:
-     * Your user account credentials and authentication records in Supabase Auth.
+     * Your user account credentials and authentication records in Firebase Auth.
      * All database ledger records, customer details, transaction histories, payment records, and notes.
-     * All uploaded photographs (customer photos, identity proof images, collateral item images) and customer digital signatures stored in Supabase Storage buckets.
+     * All uploaded photographs (customer photos, identity proof images, collateral item images) and customer digital signatures stored in Firebase Storage buckets.
    * Deletion is permanent, irreversible, and wipes all cloud copies.
 
 3. **Processing Timeline:**
@@ -233,10 +233,10 @@ This section provides an explicit reference mapping for the **Google Play Data S
 * **Do you provide a way for users to request that their data is deleted?** Yes (Via in-app record deletion, clearing app storage, and by sending an email request to sf.help.vamshi@gmail.com).
 * **Data Types Collected:**
   * *Personal Info:* Name, Email address, User ID (Collected for Account Management, App Functionality; Not shared with third parties).
-  * *Financial Info:* User payment history, loan records (Collected for App Functionality; Stored locally and in Supabase; Not shared).
-  * *Photos and Videos:* Photos (Customer profile photos, proof images, item images; Collected for App Functionality; Stored locally and in Supabase; Not shared).
+  * *Financial Info:* User payment history, loan records (Collected for App Functionality; Stored locally and in Firebase; Not shared).
+  * *Photos and Videos:* Photos (Customer profile photos, proof images, item images; Collected for App Functionality; Stored locally and in Firebase; Not shared).
   * *Files and Documents:* Files/Documents (Customer ID proof documents, CSV exports; Collected for App Functionality; Not shared).
-  * *Other Actions:* Customer Digital Signatures (Collected for App Functionality / Invoicing; Stored locally and in Supabase; Not shared).
+  * *Other Actions:* Customer Digital Signatures (Collected for App Functionality / Invoicing; Stored locally and in Firebase; Not shared).
 
 ### Apple App Store Privacy Nutrition Labels Mapping:
 * **Data Used to Track You:** None (Self-Finance does not track users across other companies’ apps and websites).

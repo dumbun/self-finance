@@ -129,7 +129,7 @@ class SyncOutboxService {
   }
 
   /// Ensures all local records have a valid UUID syncId and queues any un-synced
-  /// records into the outbox so that existing/restored records are pushed to Supabase.
+  /// records into the outbox so that existing/restored records are pushed to Cloud Firestore.
   ///
   /// This is intentionally kept as a migration/backfill path; it should not run on
   /// every sync cycle because it does a full table scan and creates outbox items for

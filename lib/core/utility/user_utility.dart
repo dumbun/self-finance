@@ -45,7 +45,6 @@ class Utility {
   }
 
   static bool get isFirebaseInitialized => Firebase.apps.isNotEmpty;
-  static bool get isSupabaseInitialized => false;
 
   /// Initializes Firebase using platform options if not already initialized.
   static Future<void> _initFirebase() async {

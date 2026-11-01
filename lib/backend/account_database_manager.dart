@@ -18,7 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AccountDatabaseManager {
   static String? _activeUserId;
 
-  /// The currently active Supabase user ID, or `null` if unauthenticated/offline.
+  /// The currently active Firebase user ID, or `null` if unauthenticated/offline.
   static String? get activeUserId => _activeUserId;
 
   /// Derives a deterministic 16-character hexadecimal suffix from the user ID.
@@ -105,7 +105,7 @@ class AccountDatabaseManager {
     return true;
   }
 
-  /// Opens the databases for the specified Supabase user account.
+  /// Opens the databases for the specified Firebase user account.
   ///
   /// Automatically runs one-time legacy migration if needed, initializes
   /// account-scoped [ItDataDatabase] and [UserDatabase], and configures [BackEnd]

@@ -14,14 +14,14 @@ This page provides official, transparent instructions on how users of the **Self
 
 ## 1. What Data Can Be Deleted?
 
-Self-Finance stores data in two locations: locally on your device, and (if you signed in using Google Sign-In) in our hosted Supabase cloud backend.
+Self-Finance stores data in two locations: locally on your device, and (if you signed in using Google Sign-In) in our hosted Firebase cloud backend (Google Cloud).
 
 ### A. Local Data (On Your Physical Device)
 * You can delete individual customer profiles, transaction entries, item records, and photos directly inside the App by using the edit/delete options on each screen.
 * To completely remove all local data, clear the application storage/cache in your Android/iOS settings or uninstall the App.
 
 ### B. Cloud Account & Cloud-Synchronized Data
-When you request account deletion, we permanently delete all data linked to your account in our cloud backend (Supabase), including:
+When you request account deletion, we permanently delete all data linked to your account in our cloud backend (Google Firebase), including:
 1. **User Account & Authentication Profile:** Your Google email address, display name, profile avatar URL, and internal authentication UUID.
 2. **Customer Records:** All customer names, guardian names, phone numbers, addresses, and notes entered under your account.
 3. **Ledger & Transaction History:** All loan records, repayment histories, interest calculations, balance entries, and timestamps.

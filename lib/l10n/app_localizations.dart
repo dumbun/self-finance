@@ -1528,7 +1528,7 @@ abstract class AppLocalizations {
   /// **'Too many incorrect attempts. Please request a new code.'**
   String get tooManyOtpAttempts;
 
-  /// Loading status while fetching OTP from Supabase
+  /// Loading status while fetching OTP from cloud server
   ///
   /// In en, this message translates to:
   /// **'Requesting secure OTP from server...'**

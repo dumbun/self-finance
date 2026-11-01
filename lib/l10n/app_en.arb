@@ -995,7 +995,7 @@
   },
   "generatingOtp": "Requesting secure OTP from server...",
   "@generatingOtp": {
-    "description": "Loading status while fetching OTP from Supabase"
+    "description": "Loading status while fetching OTP from cloud server"
   },
   "customerPortal": "Customer Portal",
   "@customerPortal": {

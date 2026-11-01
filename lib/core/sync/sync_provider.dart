@@ -186,7 +186,7 @@ class SyncNotifier extends Notifier<SyncState> {
       return;
     }
 
-    if (!Utility.isFirebaseInitialized && !Utility.isSupabaseInitialized) {
+    if (!Utility.isFirebaseInitialized) {
       debugPrint('Sync skipped: Cloud backend not initialized.');
       return;
     }

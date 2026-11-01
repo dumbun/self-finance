@@ -17,7 +17,7 @@ By installing, accessing, creating an account with, or using the Self-Finance Ap
 
 Self-Finance is a digital record-keeping, ledger, customer management, interest calculation, and invoicing application designed for shopkeepers, small finance operators, pawnbrokers, and individuals to track transactions, collateral items, repayments, and customer balances.
 
-The App operates in an offline-first architecture on your local device and offers optional cloud backup and synchronization across your devices through our hosted Supabase backend.
+The App operates in an offline-first architecture on your local device and offers optional cloud backup and synchronization across your devices through our hosted Firebase backend (Google Cloud).
 
 ---
 
@@ -51,9 +51,9 @@ We disclaim all liability arising from your failure to comply with statutory mon
 
 ## 4. Accounts, Authentication & Cloud Synchronization
 
-1. **Account Registration:** To enable cloud synchronization across devices, you must sign in using your Google account via our Supabase authentication integration. You agree to provide accurate information and maintain the security of your Google account credentials.
+1. **Account Registration:** To enable cloud synchronization across devices, you must sign in using your Google account via our Firebase authentication integration. You agree to provide accurate information and maintain the security of your Google account credentials.
 2. **Device-Level Security:** You are responsible for safeguarding your physical device, configuring a secure 4-digit PIN code within the App, and enabling biometric authentication (Fingerprint / Face ID) to prevent unauthorized access to your ledger records.
-3. **Cloud Sync Operations:** Cloud synchronization transmits and stores encrypted copies of your records, customer files, photos, and signatures on Supabase cloud infrastructure. While we employ industry-standard cloud security and Row-Level Security (RLS), we do not guarantee that cloud synchronization will be uninterrupted, instant, or free from network-induced transmission errors.
+3. **Cloud Sync Operations:** Cloud synchronization transmits and stores encrypted copies of your records, customer files, photos, and signatures on Google Firebase cloud infrastructure. While we employ industry-standard cloud security and Firebase Security Rules, we do not guarantee that cloud synchronization will be uninterrupted, instant, or free from network-induced transmission errors.
 4. **Data Backups & Export:** **You are strictly responsible for maintaining independent backups of your records.** You should regularly export your transaction data using the built-in CSV export tool. We are not responsible for any loss of data resulting from device damage, app uninstallation, lost devices, or network connectivity failures.
 
 ---
@@ -71,14 +71,14 @@ The App allows you to input, store, and sync customer information, phone numbers
    * Record false, fraudulent, defamatory, or deceptive transaction records.
    * Store obscene, unlawful, harassing, or infringing media or documents.
    * Violate any applicable anti-money laundering (AML), counter-terrorist financing (CTF), or anti-extortion regulations.
-   * Attempt to reverse-engineer, decompile, tamper with, or compromise the security or integrity of the App, its APIs, or Supabase backend systems.
+   * Attempt to reverse-engineer, decompile, tamper with, or compromise the security or integrity of the App, its APIs, or Firebase backend systems.
 
 ---
 
 ## 6. Device Permissions & Third-Party Services
 
 1. **Device Permissions:** The App requests access to device features (Camera, Photo Gallery, Biometrics, Notifications, and Phone/SMS launchers) to provide core functionality. You may control these permissions through your device settings, although disabling them may render corresponding features unavailable.
-2. **Third-Party Services:** The App integrates third-party services, including **Google LLC** (Google Sign-In) and **Supabase Inc.** (Cloud database, authentication, and storage). Your use of these third-party services is subject to their respective terms and privacy policies. We are not responsible for the availability, security, or operations of third-party platforms.
+2. **Third-Party Services:** The App integrates third-party services, including **Google LLC** (Google Sign-In, Firebase Authentication, Cloud Firestore, and Firebase Cloud Storage). Your use of these third-party services is subject to their respective terms and privacy policies. We are not responsible for the availability, security, or operations of third-party platforms.
 3. **External Communications & Sharing:** When you initiate phone calls, send SMS messages, or export records to external apps (such as WhatsApp, Google Drive, or email clients), those communications and files are handled by the receiving apps under their own separate terms.
 
 ---

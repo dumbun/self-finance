@@ -4,7 +4,7 @@ import 'package:self_finance/core/localization/localization_extension.dart';
 import 'package:self_finance/core/theme/app_colors.dart';
 import 'package:self_finance/providers/auth_provider.dart';
 
-/// Full-screen Google sign-in view shown when no Supabase session exists.
+/// Full-screen Google sign-in view shown when no Firebase session exists.
 ///
 /// This screen appears **before** the existing PIN/biometric gate and
 /// does not replace it. After a successful Google sign-in, the account

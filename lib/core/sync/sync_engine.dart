@@ -81,7 +81,7 @@ class SyncEngine {
   // PUSH PHASE
   // ===========================================================================
 
-  /// Pushes pending outbox mutations to Supabase in foreign-key dependency order.
+  /// Pushes pending outbox mutations to Cloud Firestore in foreign-key dependency order.
   Future<void> push([String? appDir]) async {
     final resolvedAppDir = appDir ?? await _resolveAppDir();
 
@@ -492,7 +492,7 @@ class SyncEngine {
   // PULL PHASE
   // ===========================================================================
 
-  /// Pulls changes updated in Supabase since last sync and merges them into Drift.
+  /// Pulls changes updated in Cloud Firestore since last sync and merges them into Drift.
   Future<void> pull([String? appDir]) async {
     final resolvedAppDir = appDir ?? await _resolveAppDir();
     final prefs = await SharedPreferences.getInstance();
