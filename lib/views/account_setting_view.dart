@@ -43,9 +43,7 @@ class AccountSettingsView extends ConsumerWidget {
           bold: true,
           text: context.l10n.accountSettings,
         ),
-        actions: const [
-          OfflineIndicator(margin: EdgeInsets.only(right: 16)),
-        ],
+        actions: const [OfflineIndicator(margin: EdgeInsets.only(right: 16))],
       ),
       body: SafeArea(
         child: ref
@@ -78,9 +76,7 @@ class _AccountSettingsBody extends StatelessWidget {
     final User? data = user;
 
     if (data == null || data.id == null) {
-      return Center(
-        child: BodyTwoDefaultText(text: l10n.errorUserFetch),
-      );
+      return Center(child: BodyTwoDefaultText(text: l10n.errorUserFetch));
     }
 
     final int userId = data.id!;
@@ -405,7 +401,8 @@ class _LanguageTile extends ConsumerWidget {
 
     return _SettingsTile(
       title: l10n?.language ?? 'Language',
-      semanticsLabel: 'Change application language. Current: $currentLanguageName',
+      semanticsLabel:
+          'Change application language. Current: $currentLanguageName',
       icon: const Icon(Icons.language, color: AppColors.getPrimaryColor),
       onTap: () => _showLanguageDialog(context, ref, currentLocale),
     );
@@ -429,7 +426,10 @@ class _LanguageTile extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: BodyOneDefaultText(
                   text: l10n?.selectLanguage ?? 'Select Language',
                   bold: true,
@@ -439,7 +439,10 @@ class _LanguageTile extends ConsumerWidget {
                 leading: const Icon(Icons.settings_suggest_outlined),
                 title: Text(l10n?.systemDefault ?? 'System Default'),
                 trailing: currentLocale == null
-                    ? const Icon(Icons.check_circle, color: AppColors.getPrimaryColor)
+                    ? const Icon(
+                        Icons.check_circle,
+                        color: AppColors.getPrimaryColor,
+                      )
                     : null,
                 onTap: () {
                   ref.read(localeProvider.notifier).setLocale(null);
@@ -450,10 +453,15 @@ class _LanguageTile extends ConsumerWidget {
                 leading: const Text('🇬🇧', style: TextStyle(fontSize: 22)),
                 title: Text(l10n?.english ?? 'English'),
                 trailing: currentLocale?.languageCode == 'en'
-                    ? const Icon(Icons.check_circle, color: AppColors.getPrimaryColor)
+                    ? const Icon(
+                        Icons.check_circle,
+                        color: AppColors.getPrimaryColor,
+                      )
                     : null,
                 onTap: () {
-                  ref.read(localeProvider.notifier).setLocale(const Locale('en'));
+                  ref
+                      .read(localeProvider.notifier)
+                      .setLocale(const Locale('en'));
                   Navigator.of(ctx).pop();
                 },
               ),
@@ -461,10 +469,15 @@ class _LanguageTile extends ConsumerWidget {
                 leading: const Text('🇮🇳', style: TextStyle(fontSize: 22)),
                 title: Text(l10n?.hindi ?? 'Hindi (हिंदी)'),
                 trailing: currentLocale?.languageCode == 'hi'
-                    ? const Icon(Icons.check_circle, color: AppColors.getPrimaryColor)
+                    ? const Icon(
+                        Icons.check_circle,
+                        color: AppColors.getPrimaryColor,
+                      )
                     : null,
                 onTap: () {
-                  ref.read(localeProvider.notifier).setLocale(const Locale('hi'));
+                  ref
+                      .read(localeProvider.notifier)
+                      .setLocale(const Locale('hi'));
                   Navigator.of(ctx).pop();
                 },
               ),
@@ -472,10 +485,15 @@ class _LanguageTile extends ConsumerWidget {
                 leading: const Text('🇮🇳', style: TextStyle(fontSize: 22)),
                 title: Text(l10n?.telugu ?? 'Telugu (తెలుగు)'),
                 trailing: currentLocale?.languageCode == 'te'
-                    ? const Icon(Icons.check_circle, color: AppColors.getPrimaryColor)
+                    ? const Icon(
+                        Icons.check_circle,
+                        color: AppColors.getPrimaryColor,
+                      )
                     : null,
                 onTap: () {
-                  ref.read(localeProvider.notifier).setLocale(const Locale('te'));
+                  ref
+                      .read(localeProvider.notifier)
+                      .setLocale(const Locale('te'));
                   Navigator.of(ctx).pop();
                 },
               ),

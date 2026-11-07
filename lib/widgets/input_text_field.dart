@@ -39,7 +39,7 @@ class InputTextField extends StatelessWidget {
       validator:
           validator ??
           (value) {
-            if (value == null || value.isEmpty || value == "") {
+            if (value == null || value.trim().isEmpty) {
               return 'Please enter a valid value';
             }
             return null;

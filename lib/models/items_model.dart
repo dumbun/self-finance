@@ -31,14 +31,25 @@ class Items {
       return Items(
         id: e["Item_ID"]?.toString(),
         customerid: e["Customer_ID"]?.toString() ?? '',
-        name: e["Item_Name"] as String,
-        description: e["Item_Description"] as String,
-        pawnedDate: e["Pawned_Date"] as DateTime,
-        expiryDate: e["Expiry_Date"] as DateTime,
-        pawnAmount: e["Pawn_Amount"] as double,
-        status: e["Item_Status"] as String,
-        photo: e["Item_Photo"] as String,
-        createdDate: e["Created_Date"] as DateTime,
+        name: e["Item_Name"]?.toString() ?? '',
+        description: e["Item_Description"]?.toString() ?? '',
+        pawnedDate: e["Pawned_Date"] is DateTime
+            ? e["Pawned_Date"] as DateTime
+            : DateTime.tryParse(e["Pawned_Date"]?.toString() ?? '') ??
+                DateTime.now(),
+        expiryDate: e["Expiry_Date"] is DateTime
+            ? e["Expiry_Date"] as DateTime
+            : DateTime.tryParse(e["Expiry_Date"]?.toString() ?? '') ??
+                DateTime.now(),
+        pawnAmount: (e["Pawn_Amount"] is num)
+            ? (e["Pawn_Amount"] as num).toDouble()
+            : double.tryParse(e["Pawn_Amount"]?.toString() ?? '0.0') ?? 0.0,
+        status: e["Item_Status"]?.toString() ?? '',
+        photo: e["Item_Photo"]?.toString() ?? '',
+        createdDate: e["Created_Date"] is DateTime
+            ? e["Created_Date"] as DateTime
+            : DateTime.tryParse(e["Created_Date"]?.toString() ?? '') ??
+                DateTime.now(),
       );
     }).toList();
   }

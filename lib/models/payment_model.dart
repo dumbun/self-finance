@@ -23,10 +23,18 @@ class Payment {
       return Payment(
         id: e["Payment_ID"]?.toString(),
         transactionId: e["Transaction_ID"]?.toString() ?? '',
-        paymentDate: e["Payment_Date"],
-        amountpaid: e["Amount_Paid"],
-        type: e["Payment_Type"],
-        createdDate: e["Created_Date"],
+        paymentDate: e["Payment_Date"] is DateTime
+            ? e["Payment_Date"] as DateTime
+            : DateTime.tryParse(e["Payment_Date"]?.toString() ?? '') ??
+                DateTime.now(),
+        amountpaid: (e["Amount_Paid"] is num)
+            ? (e["Amount_Paid"] as num).toDouble()
+            : double.tryParse(e["Amount_Paid"]?.toString() ?? '0.0') ?? 0.0,
+        type: e["Payment_Type"]?.toString() ?? '',
+        createdDate: e["Created_Date"] is DateTime
+            ? e["Created_Date"] as DateTime
+            : DateTime.tryParse(e["Created_Date"]?.toString() ?? '') ??
+                DateTime.now(),
       );
     }).toList();
   }

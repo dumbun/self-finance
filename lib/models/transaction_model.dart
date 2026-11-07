@@ -49,14 +49,28 @@ class Trx {
         id: e["Transaction_ID"]?.toString(),
         customerId: e["Customer_ID"]?.toString() ?? '',
         itemId: e["Item_ID"]?.toString() ?? '',
-        transacrtionDate: e["Transaction_Date"],
-        transacrtionType: e["Transaction_Type"],
-        amount: e["Amount"],
-        intrestRate: e["Interest_Rate"],
-        intrestAmount: e["Interest_Amount"],
-        remainingAmount: e["Remaining_Amount"],
-        signature: e["Signature"],
-        createdDate: e["Created_Date"],
+        transacrtionDate: e["Transaction_Date"] is DateTime
+            ? e["Transaction_Date"] as DateTime
+            : DateTime.tryParse(e["Transaction_Date"]?.toString() ?? '') ??
+                DateTime.now(),
+        transacrtionType: e["Transaction_Type"]?.toString() ?? '',
+        amount: (e["Amount"] is num)
+            ? (e["Amount"] as num).toDouble()
+            : double.tryParse(e["Amount"]?.toString() ?? '0.0') ?? 0.0,
+        intrestRate: (e["Interest_Rate"] is num)
+            ? (e["Interest_Rate"] as num).toDouble()
+            : double.tryParse(e["Interest_Rate"]?.toString() ?? '0.0') ?? 0.0,
+        intrestAmount: (e["Interest_Amount"] is num)
+            ? (e["Interest_Amount"] as num).toDouble()
+            : double.tryParse(e["Interest_Amount"]?.toString() ?? '0.0') ?? 0.0,
+        remainingAmount: (e["Remaining_Amount"] is num)
+            ? (e["Remaining_Amount"] as num).toDouble()
+            : double.tryParse(e["Remaining_Amount"]?.toString() ?? '0.0') ?? 0.0,
+        signature: e["Signature"]?.toString() ?? '',
+        createdDate: e["Created_Date"] is DateTime
+            ? e["Created_Date"] as DateTime
+            : DateTime.tryParse(e["Created_Date"]?.toString() ?? '') ??
+                DateTime.now(),
         verificationToken: e["Verification_Token"]?.toString(),
       );
     }).toList();
@@ -72,7 +86,6 @@ class Trx {
     double? intrestRate,
     double? intrestAmount,
     double? remainingAmount,
-    String? proofPhoto,
     String? signature,
     DateTime? createdDate,
     String? verificationToken,
@@ -160,7 +173,8 @@ class Trx {
         other.intrestAmount == intrestAmount &&
         other.remainingAmount == remainingAmount &&
         other.signature == signature &&
-        other.createdDate == createdDate;
+        other.createdDate == createdDate &&
+        other.verificationToken == verificationToken;
   }
 
   @override
@@ -175,6 +189,7 @@ class Trx {
         intrestAmount.hashCode ^
         remainingAmount.hashCode ^
         signature.hashCode ^
-        createdDate.hashCode;
+        createdDate.hashCode ^
+        verificationToken.hashCode;
   }
 }

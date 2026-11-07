@@ -156,7 +156,9 @@ class SyncStatusWidget extends ConsumerWidget {
                         ? null
                         : () async {
                             HapticFeedback.selectionClick();
-                            await ref.read(syncProvider.notifier).syncNow();
+                            await ref
+                                .read(syncProvider.notifier)
+                                .syncNow(forceFullSync: true);
                             if (context.mounted) {
                               final current = ref.read(syncProvider);
                               if (current.status == SyncStatus.error) {
@@ -396,7 +398,9 @@ class SyncStatusWidget extends ConsumerWidget {
                   child: FilledButton.icon(
                     onPressed: () {
                       Navigator.pop(ctx);
-                      ref.read(syncProvider.notifier).syncNow();
+                      ref
+                          .read(syncProvider.notifier)
+                          .syncNow(forceFullSync: true);
                     },
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.getPrimaryColor,

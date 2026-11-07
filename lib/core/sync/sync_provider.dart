@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:drift/drift.dart' hide Constant;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:self_finance/backend/account_database_manager.dart';
 import 'package:self_finance/backend/backend.dart';
 import 'package:self_finance/core/sync/sync_engine.dart';
 import 'package:self_finance/core/sync/sync_outbox_service.dart';
@@ -168,10 +171,15 @@ class SyncNotifier extends Notifier<SyncState> {
 
   /// Triggers a bidirectional sync.
   Future<void> syncNow({bool forceFullSync = false}) async {
-    final user = ref.read(currentUserProvider);
+    final user = ref.read(currentUserProvider) ??
+        (Firebase.apps.isNotEmpty ? FirebaseAuth.instance.currentUser : null);
 
     if (user == null) {
       debugPrint('Sync skipped: user not active.');
+      state = state.copyWith(
+        status: SyncStatus.error,
+        errorMessage: 'User not signed in or cloud offline.',
+      );
       return;
     }
 
@@ -181,14 +189,21 @@ class SyncNotifier extends Notifier<SyncState> {
       return;
     }
 
-    final ItDataDatabase? db = BackEnd.activeDatabase;
+    ItDataDatabase? db = BackEnd.activeDatabase;
     if (db == null) {
-      debugPrint('Sync skipped: database not active.');
-      return;
+      if (user.id.isNotEmpty) {
+        await AccountDatabaseManager.openForAccount(user.id);
+        db = BackEnd.activeDatabase;
+      }
+      db ??= await BackEnd.db();
     }
 
     if (!Utility.isFirebaseInitialized) {
       debugPrint('Sync skipped: Cloud backend not initialized.');
+      state = state.copyWith(
+        status: SyncStatus.error,
+        errorMessage: 'Cloud backend not initialized.',
+      );
       return;
     }
 
@@ -196,7 +211,7 @@ class SyncNotifier extends Notifier<SyncState> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final fullSyncKey = 'firebase_full_entities_v3_completed_${user.id}';
+      final fullSyncKey = 'firebase_full_entities_v4_completed_${user.id}';
       final hasCompletedInitialUpload = prefs.getBool(fullSyncKey) ?? false;
       final needsBackfill = await SyncOutboxService.hasRecordsNeedingSync(db);
       final shouldForceAll = forceFullSync || !hasCompletedInitialUpload;

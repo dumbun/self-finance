@@ -55,6 +55,13 @@ class UserDatabase extends _$UserDatabase {
 
   @override
   int get schemaVersion => 1;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA journal_mode = WAL');
+    },
+  );
 }
 
 class UserBackEnd {
@@ -141,7 +148,6 @@ class UserBackEnd {
               ..where(d.userTable.id.equals(1))
               ..limit(1))
             .getSingleOrNull();
-    if (row != null) {}
     return row?.read(d.userTable.id) ?? 0;
   }
 

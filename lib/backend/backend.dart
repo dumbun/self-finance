@@ -760,6 +760,15 @@ class ItDataDatabase extends _$ItDataDatabase {
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_transactions_created_date ON Transactions(Created_Date)',
     );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_history_transaction ON History(Transaction_ID)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_transactions_type_date ON Transactions(Transaction_Type, Transaction_Date)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_outbox_entity ON Sync_Outbox(Entity_Type, Entity_Sync_ID)',
+    );
   }
 
   Future<void> _backfillSyncIds() async {
@@ -1093,7 +1102,7 @@ Stream<R> _combineLatest2<A, B, R>(
   var hasB = false;
 
   void tryEmit() {
-    if (hasA && hasB) {
+    if (!controller.isClosed && hasA && hasB) {
       controller.add(combiner(lastA as A, lastB as B));
     }
   }
@@ -1104,13 +1113,17 @@ Stream<R> _combineLatest2<A, B, R>(
         lastA = av;
         hasA = true;
         tryEmit();
-      }, onError: controller.addError);
+      }, onError: (Object err, StackTrace stack) {
+        if (!controller.isClosed) controller.addError(err, stack);
+      });
 
       subB = b.listen((bv) {
         lastB = bv;
         hasB = true;
         tryEmit();
-      }, onError: controller.addError);
+      }, onError: (Object err, StackTrace stack) {
+        if (!controller.isClosed) controller.addError(err, stack);
+      });
     },
     onCancel: () async {
       await subA?.cancel();
@@ -1167,30 +1180,32 @@ class BackEnd {
       final id = (customer.id != null && customer.id!.isNotEmpty)
           ? customer.id!
           : const Uuid().v7();
-      await d
-          .into(d.customersTable)
-          .insert(
-            CustomersTableCompanion.insert(
-              customerId: Value(id),
-              userId: customer.userID,
-              customerName: customer.name.trim(),
-              gaurdianName: customer.guardianName.trim(),
-              customerAddress: customer.address.trim(),
-              contactNumber: customer.number.trim(),
-              customerPhoto: customer.photo,
-              proofPhoto: customer.proof,
-              createdDate: customer.createdDate,
-              syncId: Value(id),
-              updatedAt: Value(DateTime.now()),
-            ),
-          );
+      await d.transaction(() async {
+        await d
+            .into(d.customersTable)
+            .insert(
+              CustomersTableCompanion.insert(
+                customerId: Value(id),
+                userId: customer.userID,
+                customerName: customer.name.trim(),
+                gaurdianName: customer.guardianName.trim(),
+                customerAddress: customer.address.trim(),
+                contactNumber: customer.number.trim(),
+                customerPhoto: customer.photo,
+                proofPhoto: customer.proof,
+                createdDate: customer.createdDate,
+                syncId: Value(id),
+                updatedAt: Value(DateTime.now()),
+              ),
+            );
 
-      await SyncOutboxService.recordOperation(
-        db: d,
-        entityType: SyncOutboxService.entityCustomer,
-        entitySyncId: id,
-        operation: SyncOutboxService.opCreate,
-      );
+        await SyncOutboxService.recordOperation(
+          db: d,
+          entityType: SyncOutboxService.entityCustomer,
+          entitySyncId: id,
+          operation: SyncOutboxService.opCreate,
+        );
+      });
 
       return id;
     } on SqliteException {
@@ -1269,7 +1284,28 @@ class BackEnd {
             ..where((t) => t.customerId.equals(customerID)))
           .getSingleOrNull();
 
-      if (customer != null && customer.syncId.isNotEmpty) {
+      if (customer == null) return;
+
+      // 1. Delete customer photos from disk
+      if (customer.customerPhoto.isNotEmpty) {
+        final f = File(customer.customerPhoto);
+        if (await f.exists()) {
+          try {
+            await f.delete();
+          } catch (_) {}
+        }
+      }
+      if (customer.proofPhoto.isNotEmpty) {
+        final f = File(customer.proofPhoto);
+        if (await f.exists()) {
+          try {
+            await f.delete();
+          } catch (_) {}
+        }
+      }
+
+      // 2. Queue outbox delete for customer
+      if (customer.syncId.isNotEmpty) {
         await SyncOutboxService.recordOperation(
           db: d,
           entityType: SyncOutboxService.entityCustomer,
@@ -1278,6 +1314,82 @@ class BackEnd {
         );
       }
 
+      // 3. Find and clean up all child items
+      final items = await (d.select(d.itemsTable)
+            ..where((i) => i.customerId.equals(customerID)))
+          .get();
+      for (final item in items) {
+        if (item.itemPhoto.isNotEmpty) {
+          final f = File(item.itemPhoto);
+          if (await f.exists()) {
+            try {
+              await f.delete();
+            } catch (_) {}
+          }
+        }
+        if (item.syncId.isNotEmpty) {
+          await SyncOutboxService.recordOperation(
+            db: d,
+            entityType: SyncOutboxService.entityItem,
+            entitySyncId: item.syncId,
+            operation: SyncOutboxService.opDelete,
+          );
+        }
+      }
+
+      // 4. Find and clean up all child transactions & payments
+      final txns = await (d.select(d.transactionsTable)
+            ..where((t) => t.customerId.equals(customerID)))
+          .get();
+      for (final txn in txns) {
+        if (txn.signature.isNotEmpty) {
+          final f = File(txn.signature);
+          if (await f.exists()) {
+            try {
+              await f.delete();
+            } catch (_) {}
+          }
+        }
+        if (txn.syncId.isNotEmpty) {
+          await SyncOutboxService.recordOperation(
+            db: d,
+            entityType: SyncOutboxService.entityTransaction,
+            entitySyncId: txn.syncId,
+            operation: SyncOutboxService.opDelete,
+          );
+        }
+
+        final payments = await (d.select(d.paymentsTable)
+              ..where((p) => p.transactionId.equals(txn.transactionId)))
+            .get();
+        for (final p in payments) {
+          if (p.syncId.isNotEmpty) {
+            await SyncOutboxService.recordOperation(
+              db: d,
+              entityType: SyncOutboxService.entityPayment,
+              entitySyncId: p.syncId,
+              operation: SyncOutboxService.opDelete,
+            );
+          }
+        }
+      }
+
+      // 5. Child history entries
+      final historyRows = await (d.select(d.historyTable)
+            ..where((h) => h.customerId.equals(customerID)))
+          .get();
+      for (final h in historyRows) {
+        if (h.syncId.isNotEmpty) {
+          await SyncOutboxService.recordOperation(
+            db: d,
+            entityType: SyncOutboxService.entityHistory,
+            entitySyncId: h.syncId,
+            operation: SyncOutboxService.opDelete,
+          );
+        }
+      }
+
+      // 6. Delete customer row (SQLite foreign key CASCADE deletes child rows in DB)
       await (d.delete(
         d.customersTable,
       )..where((t) => t.customerId.equals(customerID))).go();
@@ -2615,6 +2727,9 @@ class BackEnd {
 
   static Future<void> close() async {
     final d = _db;
+    _cachedActiveLoans = null;
+    _cachedOutstanding = 0.0;
+    _cachedCalcDate = null;
     if (d == null) return;
     try {
       await d.customStatement('PRAGMA wal_checkpoint(TRUNCATE)');

@@ -28,14 +28,19 @@ class Customer {
     return data.map((e) {
       return Customer(
         id: e["Customer_ID"]?.toString(),
-        userID: e["User_ID"] as int,
-        name: e["Customer_Name"] as String,
-        guardianName: e["Gaurdian_Name"] as String,
-        address: e["Customer_Address"] as String,
-        number: e["Contact_Number"] as String,
-        photo: e["Customer_Photo"] as String,
-        proof: e["Proof_Photo"] as String,
-        createdDate: e["Created_Date"] as DateTime,
+        userID: (e["User_ID"] is num)
+            ? (e["User_ID"] as num).toInt()
+            : int.tryParse(e["User_ID"]?.toString() ?? '1') ?? 1,
+        name: e["Customer_Name"]?.toString() ?? '',
+        guardianName: e["Gaurdian_Name"]?.toString() ?? '',
+        address: e["Customer_Address"]?.toString() ?? '',
+        number: e["Contact_Number"]?.toString() ?? '',
+        photo: e["Customer_Photo"]?.toString() ?? '',
+        proof: e["Proof_Photo"]?.toString() ?? '',
+        createdDate: e["Created_Date"] is DateTime
+            ? e["Created_Date"] as DateTime
+            : DateTime.tryParse(e["Created_Date"]?.toString() ?? '') ??
+                DateTime.now(),
       );
     }).toList();
   }
@@ -67,6 +72,7 @@ class Customer {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
+      'userID': userID,
       'name': name,
       'guardianName': guardianName,
       'address': address,
@@ -98,7 +104,7 @@ class Customer {
 
   @override
   String toString() {
-    return 'Customer(id: $id, name: $name, guardianName: $guardianName, address: $address, number: $number, photo: $photo, proof: $proof, createdDate: $createdDate)';
+    return 'Customer(id: $id, userID: $userID, name: $name, guardianName: $guardianName, address: $address, number: $number, photo: $photo, proof: $proof, createdDate: $createdDate)';
   }
 
   @override
@@ -106,6 +112,7 @@ class Customer {
     if (identical(this, other)) return true;
 
     return other.id == id &&
+        other.userID == userID &&
         other.name == name &&
         other.guardianName == guardianName &&
         other.address == address &&
@@ -118,6 +125,7 @@ class Customer {
   @override
   int get hashCode {
     return id.hashCode ^
+        userID.hashCode ^
         name.hashCode ^
         guardianName.hashCode ^
         address.hashCode ^

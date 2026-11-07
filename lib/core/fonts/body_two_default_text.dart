@@ -34,7 +34,7 @@ class BodyTwoDefaultText extends StatelessWidget {
       overflow: overflow,
       softWrap: true,
       style: TextStyle(
-        fontFamily: "hell",
+        fontFamily: font ?? "hell",
         fontWeight: bold ? FontWeight.bold : FontWeight.w400,
         fontSize: 16,
         color: _getColor(context),

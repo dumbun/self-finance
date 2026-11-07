@@ -27,8 +27,9 @@ class AuthView extends ConsumerWidget {
               child: BodyTwoDefaultText(text: error.toString(), error: true),
             ),
           ),
-          loading: () =>
-              const Center(child: CircularProgressIndicator.adaptive()),
+          loading: () => const Scaffold(
+            body: Center(child: CircularProgressIndicator.adaptive()),
+          ),
         );
   }
 }

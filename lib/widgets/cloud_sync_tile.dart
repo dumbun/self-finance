@@ -92,7 +92,7 @@ class CloudSyncTile extends ConsumerWidget {
             ).push(MaterialPageRoute(builder: (_) => const GoogleSignInView()));
           } else {
             if (syncState.status == SyncStatus.syncing) return;
-            await ref.read(syncProvider.notifier).syncNow();
+            await ref.read(syncProvider.notifier).syncNow(forceFullSync: true);
             if (context.mounted) {
               final nextState = ref.read(syncProvider);
               if (nextState.status == SyncStatus.error) {

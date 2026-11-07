@@ -73,7 +73,7 @@ class _SyncIndicatorIconButtonState extends ConsumerState<SyncIndicatorIconButto
             ? null
             : () async {
                 HapticFeedback.selectionClick();
-                await ref.read(syncProvider.notifier).syncNow();
+                await ref.read(syncProvider.notifier).syncNow(forceFullSync: true);
                 if (context.mounted && ref.read(syncProvider).status == SyncStatus.error) {
                   final err = ref.read(syncProvider).errorMessage;
                   ScaffoldMessenger.of(context).showSnackBar(

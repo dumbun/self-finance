@@ -30,32 +30,34 @@ class FirebaseAuthService {
   FirebaseAuthService({
     FirebaseAuth? auth,
     GoogleSignIn? googleSignIn,
-  })  : _auth = auth ??
-            (Firebase.apps.isNotEmpty ? FirebaseAuth.instance : null),
+  })  : _explicitAuth = auth,
         _googleSignIn = googleSignIn ??
             GoogleSignIn(
               serverClientId: serverClientId,
             );
 
-  final FirebaseAuth? _auth;
+  final FirebaseAuth? _explicitAuth;
   final GoogleSignIn _googleSignIn;
 
+  FirebaseAuth? get _activeAuth =>
+      _explicitAuth ?? (Firebase.apps.isNotEmpty ? FirebaseAuth.instance : null);
+
   /// Whether the Firebase Auth client is available and initialized.
-  bool get isAvailable => _auth != null;
+  bool get isAvailable => _activeAuth != null;
 
   /// The currently authenticated Firebase user, or `null` if signed out or uninitialized.
-  User? get currentUser => _auth?.currentUser;
+  User? get currentUser => _activeAuth?.currentUser;
 
   /// Whether a Firebase session is active.
   bool get isSignedIn => currentUser != null;
 
   /// Reactive stream of auth state changes (sign-in, sign-out, token refresh).
   Stream<User?> get authStateChanges =>
-      _auth?.authStateChanges() ?? const Stream<User?>.empty();
+      _activeAuth?.authStateChanges() ?? const Stream<User?>.empty();
 
   /// Starts the native Google Sign-In flow (bottom sheet account picker).
   Future<UserCredential?> signInWithGoogle() async {
-    final auth = _auth;
+    final auth = _activeAuth;
     if (auth == null) {
       throw StateError('Firebase is not initialized.');
     }
@@ -90,8 +92,9 @@ class FirebaseAuthService {
       } catch (e) {
         debugPrint('GoogleSignIn signOut ignored error: $e');
       }
-      if (_auth != null) {
-        await _auth.signOut();
+      final auth = _activeAuth;
+      if (auth != null) {
+        await auth.signOut();
       }
     } catch (e) {
       debugPrint('Firebase sign-out error: $e');

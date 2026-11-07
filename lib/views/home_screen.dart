@@ -663,7 +663,6 @@ class _RecentActivitySection extends ConsumerWidget {
 
             return Column(
               children: transactions.map((t) {
-                final bool isActive = t.remainingAmount > 0;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Card(
@@ -719,7 +718,7 @@ class _RecentActivitySection extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 StatusChipWidget(
-                                  status: isActive ? 'Active' : 'Paid',
+                                  status: t.transactionType,
                                   smallText: true,
                                 ),
                               ],

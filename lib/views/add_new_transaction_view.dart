@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:self_finance/core/constants/constants.dart';
 import 'package:self_finance/core/fonts/body_small_text.dart';
@@ -58,7 +59,7 @@ class _AddNewTransactionViewState extends ConsumerState<AddNewTransactionView> {
   void initState() {
     super.initState();
     final DateTime now = DateTime.now();
-    _transacrtionDate.text = "${now.day}-${now.month}-${now.year}";
+    _transacrtionDate.text = DateFormat('dd-MM-yyyy').format(now);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         ref.read(dateProvider.notifier).set(now);

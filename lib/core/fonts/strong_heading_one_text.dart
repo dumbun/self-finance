@@ -33,10 +33,21 @@ class StrongHeadingOne extends StatelessWidget {
       overflow: overflow,
       softWrap: true,
       style: TextStyle(
+        fontFamily: font ?? "hell",
         fontWeight: bold ? FontWeight.bold : FontWeight.normal,
         fontSize: 20,
-        color: !error ? color : AppColors.getErrorColor,
+        color: _getColor(context),
       ),
     );
+  }
+
+  Color? _getColor(BuildContext context) {
+    if (error) {
+      return AppColors.getErrorColor;
+    } else if (whiteColor) {
+      return AppColors.getBackgroundColor;
+    } else {
+      return color;
+    }
   }
 }

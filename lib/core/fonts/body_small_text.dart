@@ -38,7 +38,7 @@ class BodySmallText extends StatelessWidget {
       style: TextStyle(
         fontWeight: bold ? FontWeight.bold : FontWeight.w400,
         fontSize: 12,
-        fontFamily: "hell",
+        fontFamily: font ?? "hell",
         color: _getColor(context),
         fontStyle: italic ?? false ? FontStyle.italic : null,
       ),

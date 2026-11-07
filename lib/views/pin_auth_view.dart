@@ -118,7 +118,8 @@ class _PinAuthViewState extends ConsumerState<PinAuthView> {
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: userAsync.when(
-              loading: () => const SizedBox.shrink(),
+              loading: () =>
+                  const Center(child: CircularProgressIndicator.adaptive()),
 
               error: (_, _) => BodyTwoDefaultText(text: l10n.errorUserFetch),
 

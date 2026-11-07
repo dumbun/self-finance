@@ -540,8 +540,9 @@ class SyncEngine {
     if (remoteRows.isEmpty) return;
 
     final syncIds = remoteRows
-        .map((map) => map['id'] as String?)
+        .map((map) => map['id']?.toString())
         .whereType<String>()
+        .where((id) => id.isNotEmpty)
         .toList();
     final existingBySyncId = await _existingRowsBySyncId(
       SyncOutboxService.entityCustomer,
@@ -557,7 +558,8 @@ class SyncEngine {
       }
       if (_safeParseDateTime(map['deleted_at']) != null) continue;
 
-      final syncId = map['id'] as String;
+      final syncId = map['id']?.toString() ?? '';
+      if (syncId.isEmpty) continue;
       final existing = existingBySyncId[syncId];
 
       localPhotoBySyncId[syncId] = await _resolvePulledFile(
@@ -584,7 +586,8 @@ class SyncEngine {
           continue;
         }
 
-        final syncId = map['id'] as String;
+        final syncId = map['id']?.toString() ?? '';
+        if (syncId.isEmpty) continue;
         final deletedAt = _safeParseDateTime(map['deleted_at']);
         final existing = existingBySyncId[syncId];
 
@@ -645,8 +648,9 @@ class SyncEngine {
     if (remoteRows.isEmpty) return;
 
     final syncIds = remoteRows
-        .map((map) => map['id'] as String?)
+        .map((map) => map['id']?.toString())
         .whereType<String>()
+        .where((id) => id.isNotEmpty)
         .toList();
     final existingBySyncId = await _existingRowsBySyncId(
       SyncOutboxService.entityItem,
@@ -667,7 +671,8 @@ class SyncEngine {
       }
       if (_safeParseDateTime(map['deleted_at']) != null) continue;
 
-      final syncId = map['id'] as String;
+      final syncId = map['id']?.toString() ?? '';
+      if (syncId.isEmpty) continue;
       final existing = existingBySyncId[syncId];
 
       localPhotoBySyncId[syncId] = await _resolvePulledFile(
@@ -682,8 +687,9 @@ class SyncEngine {
 
     await db.transaction(() async {
       for (final map in remoteRows) {
-        final syncId = map['id'] as String;
-        final custSyncId = map['customer_sync_id'] as String;
+        final syncId = map['id']?.toString() ?? '';
+        final custSyncId = map['customer_sync_id']?.toString() ?? '';
+        if (syncId.isEmpty || custSyncId.isEmpty) continue;
         final deletedAt = _safeParseDateTime(map['deleted_at']);
         final updatedAt = _safeParseDateTime(map['updated_at']);
         final createdDate = _safeParseDateTime(map['created_at']);
@@ -717,7 +723,7 @@ class SyncEngine {
           continue;
         }
 
-        final pawnAmount = (map['pawn_amount'] as num).toDouble();
+        final pawnAmount = (map['pawn_amount'] as num?)?.toDouble() ?? 0.0;
         final localPhoto = localPhotoBySyncId[syncId] ?? '';
 
         if (existing == null) {
@@ -767,8 +773,9 @@ class SyncEngine {
     if (remoteRows.isEmpty) return;
 
     final syncIds = remoteRows
-        .map((map) => map['id'] as String?)
+        .map((map) => map['id']?.toString())
         .whereType<String>()
+        .where((id) => id.isNotEmpty)
         .toList();
     final existingBySyncId = await _existingRowsBySyncId(
       SyncOutboxService.entityTransaction,
@@ -785,7 +792,8 @@ class SyncEngine {
       }
       if (_safeParseDateTime(map['deleted_at']) != null) continue;
 
-      final syncId = map['id'] as String;
+      final syncId = map['id']?.toString() ?? '';
+      if (syncId.isEmpty) continue;
       final existing = existingBySyncId[syncId];
 
       localSigBySyncId[syncId] = await _resolvePulledFile(
@@ -803,9 +811,12 @@ class SyncEngine {
 
     await db.transaction(() async {
       for (final map in remoteRows) {
-        final syncId = map['id'] as String;
-        final custSyncId = map['customer_sync_id'] as String;
-        final itemSyncId = map['item_sync_id'] as String;
+        final syncId = map['id']?.toString() ?? '';
+        final custSyncId = map['customer_sync_id']?.toString() ?? '';
+        final itemSyncId = map['item_sync_id']?.toString() ?? '';
+        if (syncId.isEmpty || custSyncId.isEmpty || itemSyncId.isEmpty) {
+          continue;
+        }
         final deletedAt = _safeParseDateTime(map['deleted_at']);
         final updatedAt = _safeParseDateTime(map['updated_at']);
         final createdDate = _safeParseDateTime(map['created_at']);
@@ -846,10 +857,12 @@ class SyncEngine {
           continue;
         }
 
-        final amount = (map['amount'] as num).toDouble();
-        final interestRate = (map['interest_rate'] as num).toDouble();
-        final interestAmount = (map['interest_amount'] as num).toDouble();
-        final remainingAmount = (map['remaining_amount'] as num).toDouble();
+        final amount = (map['amount'] as num?)?.toDouble() ?? 0.0;
+        final interestRate = (map['interest_rate'] as num?)?.toDouble() ?? 0.0;
+        final interestAmount =
+            (map['interest_amount'] as num?)?.toDouble() ?? 0.0;
+        final remainingAmount =
+            (map['remaining_amount'] as num?)?.toDouble() ?? 0.0;
         final localSig = localSigBySyncId[syncId] ?? '';
 
         if (existing == null) {
@@ -903,8 +916,9 @@ class SyncEngine {
     if (remoteRows.isEmpty) return;
 
     final syncIds = remoteRows
-        .map((map) => map['id'] as String?)
+        .map((map) => map['id']?.toString())
         .whereType<String>()
+        .where((id) => id.isNotEmpty)
         .toList();
     final existingBySyncId = await _existingRowsBySyncId(
       SyncOutboxService.entityPayment,
@@ -916,8 +930,9 @@ class SyncEngine {
     await db.transaction(() async {
       for (final json in remoteRows) {
         final map = json;
-        final syncId = map['id'] as String;
-        final txnSyncId = map['transaction_sync_id'] as String;
+        final syncId = map['id']?.toString() ?? '';
+        final txnSyncId = map['transaction_sync_id']?.toString() ?? '';
+        if (syncId.isEmpty || txnSyncId.isEmpty) continue;
         final deletedAt = _safeParseDateTime(map['deleted_at']);
         final updatedAt = _safeParseDateTime(map['updated_at']);
         final createdDate = _safeParseDateTime(map['created_at']);
@@ -947,7 +962,7 @@ class SyncEngine {
           continue;
         }
 
-        final amountPaid = (map['amount_paid'] as num).toDouble();
+        final amountPaid = (map['amount_paid'] as num?)?.toDouble() ?? 0.0;
 
         if (existing == null) {
           await db
@@ -988,8 +1003,9 @@ class SyncEngine {
     if (remoteRows.isEmpty) return;
 
     final syncIds = remoteRows
-        .map((map) => map['id'] as String?)
+        .map((map) => map['id']?.toString())
         .whereType<String>()
+        .where((id) => id.isNotEmpty)
         .toList();
     final existingBySyncId = await _existingRowsBySyncId(
       SyncOutboxService.entityHistory,
@@ -1001,8 +1017,9 @@ class SyncEngine {
     await db.transaction(() async {
       for (final json in remoteRows) {
         final map = json;
-        final syncId = map['id'] as String;
-        final custSyncId = map['customer_sync_id'] as String;
+        final syncId = map['id']?.toString() ?? '';
+        final custSyncId = map['customer_sync_id']?.toString() ?? '';
+        if (syncId.isEmpty || custSyncId.isEmpty) continue;
         final deletedAt = _safeParseDateTime(map['deleted_at']);
         final updatedAt = _safeParseDateTime(map['updated_at']);
         final eventDate = _safeParseDateTime(map['event_date']);
@@ -1031,8 +1048,8 @@ class SyncEngine {
           continue;
         }
 
-        final amount = (map['amount'] as num).toDouble();
-        final txnSyncId = map['transaction_sync_id'] as String?;
+        final amount = (map['amount'] as num?)?.toDouble() ?? 0.0;
+        final txnSyncId = map['transaction_sync_id']?.toString();
         String resolvedTxnId = '';
         if (txnSyncId != null && txnSyncId.isNotEmpty && txnSyncId != '0') {
           final txn = await (db.select(

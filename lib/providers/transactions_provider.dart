@@ -325,7 +325,7 @@ class TransactionsNotifier extends _$TransactionsNotifier {
           amount: pawnAmount,
           intrestRate: rateOfIntrest,
           intrestAmount: 0.0,
-          remainingAmount: 0.0,
+          remainingAmount: pawnAmount,
           signature: signaturePath,
           createdDate: DateTime.now(),
           verificationToken: verificationToken,
